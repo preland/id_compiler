@@ -1,0 +1,48 @@
+// `idparse --keeps`: one line per function, `<name>\t<kept>\t<fresh>`, instead
+// of a build. <kept> has a character per parameter, `0` when the escape
+// summary (mid/types/check/store/assign/rule/escape/flow/sum/mask.id) proves
+// the callee neither keeps that argument nor hands an element of it out, `1`
+// otherwise; <fresh> is `1` when the summary proves the result is a block the
+// call made and nothing else names. bin/idc turns these rows into the table
+// the JavaScript bindings use to free an argument after the call and a result
+// once it has been copied out (docs/INTEROP.md): a character the analysis
+// cannot prove is `1`, so the bindings keep today's behaviour for it.
+
+keeps_chars(int kp_m, int kp_n) {
+  string kp_s = "";
+  int kp_i = 0;
+  while(kp_i < kp_n) {
+    int kp_b = ((kp_m >> kp_i) | (kp_m >> (15 + kp_i))) & 1;
+    kp_s = kp_s + chr(48 + kp_b);
+    kp_i = kp_i + 1;
+  }
+} return string kp_s;
+(0, 2):("00")
+(1, 2):("10")
+(32770, 2):("11")
+(2, 3):("010")
+(-1, 2):("11")
+(5, 0):("")
+
+keeps_row(string kp_nm, int kp_m, int kp_n) {
+  string kp_ks = keeps_chars(kp_m, kp_n);
+  int kp_f = (kp_m >> 30) == 0;
+  string kp_ln = kp_nm + chr(9) + kp_ks + chr(9) + kp_f;
+} return string kp_ln;
+("f", 0, 1):("f\t0\t1")
+("g", 1, 2):("g\t10\t1")
+("h", 1073741824, 1):("h\t0\t0")
+("k", -1, 1):("k\t1\t0")
+
+keeps_print() {
+  esc_seed();
+  int kp_x = 0;
+  while(kp_x < len((import fnames))) {
+    if((import fnodes)[kp_x] >= 0) {
+      print(keeps_at(kp_x));
+    }
+    kp_x = kp_x + 1;
+  }
+} return void;
+given esc_fix ():() then prints:("fa_sink\t11\t1\nfa_loc\t1\t0\nfa_nest\t1\t1\n")
+given esc_fix ():() then calls keeps_at:[3]

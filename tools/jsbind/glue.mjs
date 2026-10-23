@@ -661,14 +661,21 @@ export async function load(source, options) {
     const f = exps["id_" + name];
     if (typeof f !== "function") continue;
     const lows = sig.params.map(([pn, pt]) => lowerer(pt, name, pn, h));
-    const lift = lifter(sig.ret, h);
+    const lift0 = lifter(sig.ret, h);
     const n = lows.length;
-    const freeArgs = opts.freeArgs === true || (Array.isArray(opts.freeArgs) && opts.freeArgs.includes(name));
-    const owned = sig.params.map((p, i) => i).filter((i) => /^(string|bytes|int\[\]|float\[\]|string\[\])$/.test(sig.params[i][1]));
+    const heapTy = /^(string|bytes|int\[\]|float\[\]|string\[\])$/;
+    const owned = sig.params.map((p, i) => i).filter((i) => heapTy.test(sig.params[i][1]));
+    const kp = typeof IDW_KEEPS === "undefined" ? null : IDW_KEEPS[name];
+    const manual = opts.freeArgs === true || (Array.isArray(opts.freeArgs) && opts.freeArgs.includes(name));
+    const auto = !manual && opts.freeArgs !== false && kp && kp[0].length === n;
+    const freed = manual ? owned : auto ? owned.filter((i) => kp[0][i] === "0") : [];
+    const freeArgs = freed.length > 0;
+    const freshRet = !!kp && opts.freeArgs !== false && kp[1] === 1 && heapTy.test(sig.ret);
+    const lift = freshRet ? (p) => { const v = lift0(p); h.release(sig.ret, p); return v; } : lift0;
     const dead = () => new Error("id: the instance is dead (an earlier call trapped or exited, or dispose() ran); load a new one");
     const arity = () => new TypeError(name + " takes " + n + " argument(s)");
     const finish = (a, r) => {
-      if (freeArgs) for (const i of owned) h.release(sig.params[i][1], a[i]);
+      if (freeArgs) for (const i of freed) h.release(sig.params[i][1], a[i]);
       return r;
     };
     const fail = (e) => {

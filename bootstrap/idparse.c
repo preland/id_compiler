@@ -3218,6 +3218,11 @@ void id_fix_then(int sn);
 void id_fix_while(int sn);
 void id_fix_used_at(int x);
 void id_fix_block(IdList* stmts);
+void id_keeps_or_fp(int kp_mode);
+char* id_keeps_at(int kp_x);
+char* id_keeps_chars(int kp_m, int kp_n);
+char* id_keeps_row(char* kp_nm, int kp_m, int kp_n);
+void id_keeps_print(void);
 char* id_canon_expr(int id);
 char* id_ce2(int id);
 char* id_ce3(int id);
@@ -5925,9 +5930,10 @@ void id_check_asm_targets(int argc, IdList* argv) {
 
 void id_guarded_emit_tail(int argc, IdList* argv) {
     int fp_mode;
-int idsq_35;
+int idsq_44;
+int idsq_37;
 int idsq_28;
-    fp_mode = (idsq_35 = id_arg_flag(argc, argv, 1, ID_S("--fingerprints")), idsq_28 = id_arg_flag(argc, argv, 1, ID_S("--fixes")), ((idsq_35 + (2 * idsq_28)) + (4 * id_arg_flag(argc, argv, 1, ID_S("--index")))));
+    fp_mode = (idsq_44 = id_arg_flag(argc, argv, 1, ID_S("--fingerprints")), idsq_37 = id_arg_flag(argc, argv, 1, ID_S("--fixes")), idsq_28 = id_arg_flag(argc, argv, 1, ID_S("--index")), (((idsq_44 + (2 * idsq_37)) + (4 * idsq_28)) + (8 * id_arg_flag(argc, argv, 1, ID_S("--keeps")))));
     if ((fp_mode == 0)) {
         id_emit_or_notes(argc, argv);
     } else {
@@ -25712,8 +25718,8 @@ void id_fix_walk_kids(int e, int cd) {
 }
 
 void id_report_mode(int argc, IdList* argv, int mode) {
-    if ((mode == 1)) {
-        id_print_fingerprints();
+    if (((mode == 1) || (mode == 8))) {
+        id_keeps_or_fp(mode);
     } else if ((mode == 4)) {
         id_ixw_print();
     } else {
@@ -25930,6 +25936,66 @@ void id_fix_block(IdList* stmts) {
     while ((i < id_list_len(stmts))) {
         id_fix_stmt((int)(id_list_get(stmts, i)), 0);
         i = (i + 1);
+    }
+    return;
+}
+
+void id_keeps_or_fp(int kp_mode) {
+    if ((kp_mode == 8)) {
+        id_keeps_print();
+    } else {
+        id_print_fingerprints();
+    }
+    return;
+}
+
+char* id_keeps_at(int kp_x) {
+    char* kp_nm;
+    int kp_n;
+    int kp_m;
+    char* kp_ln = NULL;
+    kp_nm = (char*)(intptr_t)(id_list_get(fnames, kp_x));
+IdList* idsq_20;
+    kp_n = (idsq_20 = nl1, id_list_len((IdList*)(intptr_t)(id_list_get(idsq_20, (int)(id_list_get(fnodes, kp_x))))));
+    kp_m = id_esc_mask(kp_nm);
+    { char* idfe_o = kp_ln; kp_ln = id_keeps_row(kp_nm, kp_m, kp_n); id_str_free(idfe_o); }
+    return kp_ln;
+}
+
+char* id_keeps_chars(int kp_m, int kp_n) {
+    char* kp_s = NULL;
+    int kp_i;
+    int kp_b;
+    { char* idfe_o = kp_s; kp_s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    kp_i = 0;
+    while ((kp_i < kp_n)) {
+        kp_b = ((id_sar(kp_m, kp_i) | id_sar(kp_m, (15 + kp_i))) & 1);
+        kp_s = id_concat_f(kp_s, id_chr((48 + kp_b)), 3);
+        kp_i = (kp_i + 1);
+    }
+    return kp_s;
+}
+
+char* id_keeps_row(char* kp_nm, int kp_m, int kp_n) {
+    char* kp_ks = NULL;
+    int kp_f;
+    char* kp_ln = NULL;
+    { char* idfe_o = kp_ks; kp_ks = id_keeps_chars(kp_m, kp_n); id_str_free(idfe_o); }
+    kp_f = (id_sar(kp_m, 30) == 0);
+char* idsq_12;
+    { char* idfe_o = kp_ln; kp_ln = (idsq_12 = id_chr(9), id_concat_f(id_concat_f(id_concat_f(id_concat_f(kp_nm, idsq_12, 2), kp_ks, 1), id_chr(9), 3), id_str_of_int(kp_f), 3)); id_str_free(idfe_o); }
+    { id_str_free(kp_ks); return kp_ln; }
+}
+
+void id_keeps_print(void) {
+    int kp_x;
+    id_esc_seed();
+    kp_x = 0;
+    while ((kp_x < id_list_len(fnames))) {
+        if (((int)(id_list_get(fnodes, kp_x)) >= 0)) {
+            id_print(id_keeps_at(kp_x));
+        }
+        kp_x = (kp_x + 1);
     }
     return;
 }

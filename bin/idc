@@ -89,6 +89,7 @@ ALLOW_UNTESTED=0
 LIST_UNTESTED=0
 EMIT_SOURCES=0
 FINGERPRINTS=0
+KEEPS=0
 CALLS=0
 CHECK=0
 WORD_SCAN=0
@@ -144,6 +145,8 @@ while [ $# -gt 0 ]; do
             LIST_UNTESTED=1; shift ;;
         --emit-sources)
             EMIT_SOURCES=1; shift ;;
+        --keeps)
+            FINGERPRINTS=1; KEEPS=1; shift ;;
         --fingerprints)
             FINGERPRINTS=1; shift ;;
         --calls)
@@ -2012,7 +2015,7 @@ fi
 PARSE_ARGS+=(--host-triple "$(host_triple)")
 [ "$WORD_SCAN" -eq 1 ] && PARSE_ARGS+=(--word-scan)
 if [ "$FINGERPRINTS" -eq 1 ]; then
-    PARSE_ARGS+=(--fingerprints)
+    if [ "$KEEPS" -eq 1 ]; then PARSE_ARGS+=(--keeps); else PARSE_ARGS+=(--fingerprints); fi
 elif [ "$CALLS" -eq 1 ]; then
     PARSE_ARGS+=(--calls)
 elif [ "$LIST_UNTESTED" -eq 1 ]; then
@@ -2297,7 +2300,7 @@ if [ "$CACHE_ON" -eq 1 ] && [ -z "${IDC_STAGE_LEX:-}" ]; then
           tc_skip=0
           for a in "${PARSE_ARGS[@]}"; do
               case "$a" in
-                  --harness|--natives|--units|--tc-keys|--check|--calls|--fingerprints|--untested|--require-tests) ;;
+                  --harness|--natives|--units|--tc-keys|--check|--calls|--fingerprints|--keeps|--untested|--require-tests) ;;
                   --std-unit|--exclude-units|--unit-roots) tc_skip=1 ;;
                   *) [ "$tc_skip" -eq 1 ] && tc_skip=0 || printf '%s\0' "$a" ;;
               esac
@@ -4596,6 +4599,11 @@ if [ "$TARGET" = wasm ]; then
             progress_clear
             echo "idc: the JS bindings could not be written; the .wasm is built (--no-js stops idc writing them)" >&2
             exit 1
+        fi
+        keeps_bk=()
+        for b in ${BACKENDS[@]+"${BACKENDS[@]}"}; do keeps_bk+=(--backend "$b"); done
+        if "$SCRIPT_DIR/idc" "$PATH_ARG" --allow-untested ${keeps_bk[@]+"${keeps_bk[@]}"} --keeps >"$WORK/keeps.tsv" 2>/dev/null; then
+            awk -F'\t' -v w="$(IFS=,; echo "${WEXPORT_NAMES[*]}")" 'BEGIN { printf "const IDW_KEEPS = {" } NF == 3 && (w == "" || index("," w ",", "," $1 ",")) { printf "%s\"%s\":[\"%s\",%s]", (n++ ? "," : ""), $1, $2, $3 } END { print "};" }' "$WORK/keeps.tsv" >> "${WOUT%.wasm}.mjs"
         fi
         WBIND=", bindings ${WOUT%.wasm}.mjs, .d.mts and .d.ts"
     fi

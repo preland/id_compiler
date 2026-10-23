@@ -125,19 +125,41 @@ await check("two instances do not share state", async () => {
   assert.notEqual(a.memory, b.memory);
 });
 
-await check("freeArgs releases arguments: memory stays flat where the default grows", async () => {
+const growth = (m, call, n) => {
+  const at = () => m.memory.buffer.byteLength;
+  for (let i = 0; i < n; i++) call();
+  const a = at();
+  for (let i = 0; i < 3 * n; i++) call();
+  return at() - a;
+};
+
+await check("by default an argument the escape summary shows unkept is freed: memory growth from N to 4N calls is bounded", async () => {
   const everything = await mod("liball");
   const s = "x".repeat(4096);
-  const grow = await everything.load();
-  const flat = await everything.load(undefined, { freeArgs: ["measure"] });
-  for (let i = 0; i < 4000; i++) {
-    assert.equal(grow.measure(s), 4097);
-    assert.equal(flat.measure(s), 4097);
-  }
-  assert.ok(grow.memory.buffer.byteLength > 8 * 1048576, "the default grew to " + grow.memory.buffer.byteLength);
-  assert.ok(flat.memory.buffer.byteLength < 2 * 1048576 + 1048576 * 8, "freeArgs stayed at " + flat.memory.buffer.byteLength);
-  assert.ok(grow.memory.buffer.byteLength > 2 * flat.memory.buffer.byteLength);
+  const m = await everything.load();
+  assert.equal(m.measure(s), 4097);
+  assert.ok(growth(m, () => m.measure(s), 1000) < 1048576, "the default kept growing");
 });
+
+await check("freeArgs: false keeps the old behaviour: the same calls grow memory", async () => {
+  const everything = await mod("liball");
+  const s = "x".repeat(4096);
+  const m = await everything.load(undefined, { freeArgs: false });
+  assert.equal(m.measure(s), 4097);
+  assert.ok(growth(m, () => m.measure(s), 1000) > 4 * 1048576, "freeArgs: false did not grow");
+});
+
+await check("an argument the summary says is kept (it reaches a native) is not freed, and the answers stay right", async () => {
+  const src = fs.readFileSync(path.join(dir, "liball.mjs"), "utf8");
+  assert.match(src, /"shout":\["1",/);
+  assert.match(src, /"measure":\["0",/);
+  const everything = await mod("liball");
+  const m = await everything.load();
+  const s = "y".repeat(4096);
+  for (let i = 0; i < 2000; i++) assert.equal(m.shout(s + i), s.toUpperCase() + i + "!?");
+  assert.ok(growth(m, () => m.shout(s), 500) > 4 * 1048576, "the kept argument was freed");
+});
+
 
 await check("a backend nothing reaches is not bundled and costs no import", async () => {
   const src = fs.readFileSync(path.join(dir, "nobe.mjs"), "utf8");
