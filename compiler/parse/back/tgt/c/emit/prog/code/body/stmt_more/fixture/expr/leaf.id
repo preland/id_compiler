@@ -13,6 +13,7 @@ nz_env() {
   export int nz_int = node_txt2("int", "7", 7, 0);
 } return void;
 ():() then calls node_txt2:("int", "7", 7, 0)
+():() then len((import tyname)):(5)
 ():() then init_units:(0)
 
 // harn_init gives (import harn)[0] (prog/test/unit/flag.id) its `harn` cell, read by
@@ -23,6 +24,7 @@ nz_int2_fixture() {
   export int nz_int2 = node_txt2("int", "3", 3, 0);
 } return void;
 ():() then calls node_txt2:("int", "3", 3, 0)
+():() then calls node_txt2:("int", "7", 7, 0) then (import harn)[0]:(0)
 ():() then init_units:(0)
 
 // init_rtc gives is_builtin (mid/names/exports/extern/builtin/report.id, on
@@ -33,4 +35,5 @@ nz_str_fixture() {
   export int nz_strn = node_txt("str", "\"hi\"");
 } return void;
 ():() then calls node_txt:("str", "\"hi\"")
+():() then calls node_txt2:("int", "3", 3, 0) then (import lvc)[0]:(1)
 ():() then init_units:(0)

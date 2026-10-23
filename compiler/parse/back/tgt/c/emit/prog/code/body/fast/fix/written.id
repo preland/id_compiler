@@ -15,6 +15,7 @@ lpf_lr() {
   export int lpf_hir = lpf_wr - 1;
 } return void;
 ():() then calls lpf_lh:[1] then (import lpf_hir):(147)
+():() then calls node_txt:("var", "lrn") then calls lpf_inc:("lrj", 1)
 ():() then init_units:(0)
 
 lpf_lw() {
@@ -31,6 +32,7 @@ lpf_lw() {
   export int lpf_hiw = lpf_ww - 1;
 } return void;
 ():() then calls lpf_lr:[1] then (import lpf_hiw):(161)
+():() then calls node_txt:("var", "lwn") then calls lpf_inc:("lwj", 1)
 ():() then init_units:(0)
 
 lpf_lx() {
@@ -50,4 +52,5 @@ lpf_lx() {
   export int lpf_hix = lpf_wx - 1;
 } return void;
 ():() then calls lpf_lw:[1] then (import lpf_hix):(178)
+():() then calls node_txt:("var", "lxf") then calls lpf_inc:("lxj", 1)
 ():() then init_units:(0)

@@ -7,6 +7,7 @@ nz_call_foo_fixture() {
   export int nz_call_foo = node_call("foo", [(import nz_int)]);
 } return void;
 ():() then calls nz_pair_fixture:[1] then (import nz_call_foo):(7)
+given nz_pair_fixture ():() then calls node_call:("foo", [(import nz_int)])
 ():() then init_units:(0)
 
 nz_call_eprint_fixture() {
@@ -14,4 +15,5 @@ nz_call_eprint_fixture() {
   export int nz_call_eprint = node_call("eprint", [(import nz_int)]);
 } return void;
 ():() then calls nz_call_foo_fixture:[1] then (import nz_call_eprint):(8)
+given nz_call_foo_fixture ():() then calls node_call:("eprint", [(import nz_int)])
 ():() then init_units:(0)

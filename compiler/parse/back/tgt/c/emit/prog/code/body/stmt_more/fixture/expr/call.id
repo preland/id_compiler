@@ -6,6 +6,7 @@ nz_bin_eq_fixture() {
   export int nz_bin_eq = node_txt2("bin", "==", (import nz_strn), (import nz_strn2));
 } return void;
 ():() then calls nz_bin_concat_fixture:[1] then (import nz_bin_eq):(6)
+given nz_bin_concat_fixture ():() then calls node_txt2:("bin", "==", (import nz_strn), (import nz_strn2))
 ():() then init_units:(0)
 
 nz_call_print_fixture() {
@@ -13,6 +14,7 @@ nz_call_print_fixture() {
   export int nz_call_print = node_call("print", [(import nz_strn)]);
 } return void;
 ():() then calls nz_bin_eq_fixture:[1] then (import nz_call_print):(7)
+given nz_bin_eq_fixture ():() then calls node_call:("print", [(import nz_strn)])
 ():() then init_units:(0)
 
 nz_bin_streq_fixture() {
@@ -20,4 +22,5 @@ nz_bin_streq_fixture() {
   export int nz_bin_streq = node_txt2("bin", "=", (import nz_strn), (import nz_strn2));
 } return void;
 ():() then calls nz_call_print_fixture:[1] then (import nz_bin_streq):(8)
+given nz_call_print_fixture ():() then calls node_txt2:("bin", "=", (import nz_strn), (import nz_strn2))
 ():() then init_units:(0)

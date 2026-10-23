@@ -7,6 +7,7 @@ harn_fix() {
   harn_init();
 } return void;
 ():() then calls stmt_fix:[1] then (import harn)[0]:(0)
+():() then calls node_txt2:("int", "5", 5, 0) then calls node_decl:("int", "y", 0, 0)
 ():() then init_units:(0)
 
 // func_fix plus init_tyc -- hoist_decl_line calls c_type, which reads the C
@@ -18,4 +19,5 @@ tyc_fix() {
   init_tyc();
 } return void;
 ():() then calls func_fix:[1] then (import tyc)[0]:("int")
+():() then calls node_func:("f", "int", [6], [1, 2], 0) then (import tyc)[4]:("void")
 ():() then init_units:(0)

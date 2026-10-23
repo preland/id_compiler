@@ -7,4 +7,5 @@ nz_bin_nest_fixture() {
   export int nz_nest_r = node_txt2("bin", "+", (import nz_strn), (import nz_bin_concat));
 } return void;
 ():() then calls nz_bin_streq_fixture:[1] then (import nz_nest_r):(10)
+given nz_bin_streq_fixture ():() then calls node_txt2:("bin", "+", (import nz_bin_concat), (import nz_strn)) then calls node_txt2:("bin", "+", (import nz_strn), (import nz_bin_concat))
 ():() then init_units:(0)

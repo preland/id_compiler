@@ -6,6 +6,7 @@ nz_pair_fixture() {
   export int[] nz_pair = [(import nz_int), (import nz_int2)];
 } return void;
 ():() then calls nz_bin_eq_fixture:[1] then (import nz_pair)[1]:(1)
+():() then (import nz_pair)[0]:(0) then len((import nz_pair)):(2)
 ():() then init_units:(0)
 
 // A literal too wide for a 32-bit int, matching the `big` flag a real parse
@@ -15,4 +16,5 @@ nz_int_big_fixture() {
   export int nz_int_big = node_txt2("int", "9999999999", 0, 1);
 } return void;
 ():() then calls node_txt2:("int", "9999999999", 0, 1)
+():() then (import nz_int_big):(7)
 ():() then init_units:(0)

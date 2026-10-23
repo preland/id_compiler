@@ -14,4 +14,5 @@ lpq_lz() {
   export int lpq_hiz = lpq_wz - 1;
 } return void;
 ():() then calls lpq_li:[1] then (import lpq_hiz):(376)
+():() then calls node_txt:("var", "lzn") then calls lpf_inc:("lzj", 1)
 ():() then init_units:(0)

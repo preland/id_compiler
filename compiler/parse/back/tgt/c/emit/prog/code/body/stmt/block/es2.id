@@ -6,6 +6,7 @@ lz_l() {
   export int lz_decl5 = node_decl("int", "r", (import lz_r5), 0);
 } return void;
 ():() then calls node_txt:("var", "r")
+given lz_k ():() then calls node_decl:("int", "r", (import lz_r5), 0)
 ():() then init_units:(0)
 
 es2(int id, string ind) {

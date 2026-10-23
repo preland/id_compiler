@@ -7,6 +7,7 @@ nz_exprstmt_fixture() {
   export int nz_exprstmtn = node_exprstmt((import nz_int));
 } return void;
 ():() then calls nz_call_eprint_fixture:[1] then (import nz_exprstmtn):(9)
+given nz_call_eprint_fixture ():() then calls node_exprstmt:((import nz_int))
 ():() then init_units:(0)
 
 // A `break` leaf and an early `return 7;` whose function returns int, for the
@@ -19,4 +20,5 @@ flow_emit_fixture() {
   export int flow_retn = newnode("ret", (import nz_int), 0, "f", "int", flow_none, flow_none);
 } return void;
 ():() then calls newleaf:("break", 0, 0, "", "")
+given nz_exprstmt_fixture ():() then calls newnode:("ret", (import nz_int), 0, "f", "int", [], [])
 ():() then init_units:(0)
