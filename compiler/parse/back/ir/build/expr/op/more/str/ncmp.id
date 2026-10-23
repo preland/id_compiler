@@ -29,4 +29,5 @@ str_fixture() {
   export int scmp_node = node_txt2("bin", "==", (import str_node), (import str_node));
 } return void;
 ():() then calls node_txt:("str", "hi")
+():() then calls node_txt2:("bin", "==", 3, 3)
 ():() then init_units:(0)

@@ -26,5 +26,6 @@ strcmp_fs1() {
   lset((import fsc), 0, 1);
 } return void;
 ():() then (import fsc)[0]:(1)
+():() then (import lvc)[0]:(1)
 ():() then init_units:(0)
 ():() then calls strcmp_fs0:[1]

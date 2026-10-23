@@ -5,6 +5,8 @@ lw_fin(int node) {
   lw_params(l1_of_v);
   lw_fin_tail(node);
 } return void;
+given lw_func_fixture ((import g_fnnode)):() then calls lw_stmts:([1])
+given lw_func_fixture ((import g_fnnode)):() then calls lw_op:("ret", "int", 6, -1, "")
 given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
@@ -16,6 +18,8 @@ lw_ret(int node) {
   int lw_brto_v = lw_brto((import lwbody)[0]);
   lw_ret_tail(node, lw_ent_v, lw_brto_v);
 } return void;
+given lw_func_fixture ((import g_fnnode)):() then calls ir_add:(0, 5)
+given lw_func_fixture ((import g_fnnode)):() then calls lw_op:("ret", "int", 4, -1, "")
 given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 

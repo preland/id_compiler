@@ -22,5 +22,6 @@ addr_export_fixture() {
   push((import etypes), "int");
 } return void;
 ():() then len((import enames)):(1)
+():() then len((import etypes)):(1)
 ():() then init_units:(0)
 ():() then calls lw_fixture:[1]

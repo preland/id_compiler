@@ -9,6 +9,7 @@ bound_fixture() {
   export int assign_node = node_txt1("assign", "y", (import ev_node));
 } return void;
 ():() then calls lw_alloca:("int", "y")
+():() then calls node_txt1:("assign", "y", 0)
 ():() then init_units:(0)
 
 // bound_fixture with "g" exported, for a case on lw_decl that needs a
@@ -19,6 +20,7 @@ bound_fixture2() {
   push((import etypes), "int");
 } return void;
 ():() then len((import enames)):(1)
+():() then len((import etypes)):(1)
 ():() then init_units:(0)
 ():() then calls bound_fixture:[1]
 
@@ -29,6 +31,8 @@ gdecl_fixture() {
   export int gdecl_node = node_decl("int", "g", (import ev_node), 1);
   export int gassign_node = node_txt1("assign", "g", (import ev_node));
 } return void;
+():() then calls node_decl:("int", "g", 0, 1)
+():() then calls node_txt1:("assign", "g", 0)
 ():() then (import gdecl_node):(3)
 ():() then init_units:(0)
 ():() then calls bound_fixture2:[1]

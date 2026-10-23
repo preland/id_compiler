@@ -16,6 +16,7 @@ fix_env4() {
   fix_take("baz_v", "int");
 } return void;
 ():() then calls fix_take:("baz_v", "int")
+():() then last_fixd_nm:("baz_v")
 ():() then init_units:(0)
 
 lw_brto(int b) {

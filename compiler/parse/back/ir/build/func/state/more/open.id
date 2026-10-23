@@ -15,6 +15,7 @@ lw_fixture_vars() {
   push((import lwslot), 9);
 } return void;
 ():() then len((import lwvar)):(1)
+():() then len((import lwslot)):(1)
 ():() then init_units:(0)
 ():() then calls lw_fixture:[1]
 

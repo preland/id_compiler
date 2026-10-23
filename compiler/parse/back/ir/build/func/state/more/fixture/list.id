@@ -13,6 +13,7 @@ lw_fix_iassign() {
   export int fix_iassign_n = node_iassign((import fix_index_n), v);
 } return void;
 ():() then calls node_txt2:("int", "9", 9, 0)
+():() then calls node_iassign:(3, 4)
 ():() then init_units:(0)
 
 lw_fix_arr() {
@@ -21,6 +22,7 @@ lw_fix_arr() {
   export int fix_arr_n = node_arr([a]);
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_arr:([1])
 ():() then init_units:(0)
 
 lw_fix_arr_empty() {
@@ -28,6 +30,7 @@ lw_fix_arr_empty() {
   int[] none = [];
   export int fix_arr_empty_n = node_arr(none);
 } return void;
+():() then calls node_arr:([])
 ():() then (import fix_arr_empty_n):(1)
 ():() then init_units:(0)
 ():() then calls lw_env_fixture:[1]

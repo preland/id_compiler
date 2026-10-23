@@ -25,4 +25,5 @@ decl_fixture() {
   export int decl_node = node_decl("int", "y", (import ev_node), 0);
 } return void;
 ():() then calls node_txt2:("int", "7", 7, 0)
+():() then calls node_decl:("int", "y", 0, 0)
 ():() then init_units:(0)

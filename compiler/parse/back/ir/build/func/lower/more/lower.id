@@ -25,6 +25,8 @@ lw_func(int node) {
   string s2_of_v = (import ns2)[node];
   lw_func_mid(node, s1_of_v, s2_of_v);
 } return void;
+given lw_func_fixture ((import g_fnnode)):() then calls lw_func_mid:(3, "g", "int")
+given lw_func_fixture ((import g_fnnode)):() then calls ir_func:(3, "g", "int")
 given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 

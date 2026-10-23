@@ -4,6 +4,8 @@ lw_fin_tail(int node) {
   lw_stmts(l2_of_v);
   lw_ret(node);
 } return void;
+given lw_func_fixture ((import g_fnnode)):() then calls lw_stmts:([1])
+given lw_func_fixture ((import g_fnnode)):() then calls lw_ret:(3)
 given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
@@ -14,6 +16,8 @@ lw_ret_tail(int node, int lw_entry_blk, int lw_body_blk) {
   string s2_of_v = (import ns2)[node];
   lw_ret_val(node, s2_of_v);
 } return void;
+given lw_func_fixture ((import g_fnnode), 0, 2):() then calls ir_add:(0, 2)
+given lw_func_fixture ((import g_fnnode), 0, 2):() then calls lw_op:("ret", "int", 3, -1, "")
 given lw_func_fixture ((import g_fnnode), 0, 2):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode), 0, 2):() then init_units:(0)
 
@@ -25,6 +29,8 @@ lw_func_fixture() {
   int[] none = [];
   export int g_fnnode = node_func("g", "int", none, [(import decl_node)], (import ev_node));
 } return void;
+():() then calls node_func:("g", "int", [], [1], 0)
+():() then calls node_decl:("int", "y", 0, 0)
 ():() then (import g_fnnode):(3)
 ():() then init_units:(0)
 ():() then calls bound_fixture:[1]

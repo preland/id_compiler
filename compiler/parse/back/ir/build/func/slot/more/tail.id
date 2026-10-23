@@ -27,4 +27,5 @@ lw_fixture_pnode() {
   int b = newleaf("param", 0, 0, "word", "y");
 } return void;
 ():() then calls newleaf:("param", 0, 0, "int", "x")
+():() then calls newleaf:("param", 0, 0, "word", "y")
 ():() then init_units:(0)

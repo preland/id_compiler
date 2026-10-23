@@ -14,6 +14,8 @@ loop_fixture() {
   bound_fixture();
   export int while_node = node_while((import ev_node), [(import decl_node)]);
 } return void;
+():() then calls node_while:(0, [1])
+():() then calls lw_alloca:("int", "y")
 ():() then (import while_node):(3)
 ():() then init_units:(0)
 ():() then calls bound_fixture:[1]
@@ -24,6 +26,8 @@ nest_fixture() {
   int[] none = [];
   export int if_node = node_if((import ev_node), [(import decl_node)], none, 0);
 } return void;
+():() then calls node_if:(0, [1], [], 0)
+():() then calls node_while:(0, [1])
 ():() then (import if_node):(4)
 ():() then init_units:(0)
 ():() then calls loop_fixture:[1]

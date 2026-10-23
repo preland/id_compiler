@@ -22,6 +22,8 @@ strcmp_fs0() {
   ir_rows();
   init_rtc();
 } return void;
+():() then entry_count(0):(1)
+():() then (import lvc)[0]:(1)
 ():() then (import fsc)[0]:(0)
 ():() then init_units:(0)
 ():() then calls ir_rows:[1]
