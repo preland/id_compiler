@@ -380,24 +380,24 @@ self_refuse "bin/idc: a string case compares by content" \
 
 tf_chunk_1() {
 # --- a trigraph in a string literal is its three characters ------------------
-cat > "$TMP/p.id" <<'EOF2'
+cat > "$TMP/p.id" <<'EOF'
 tag(string s) {
   string r = s + "??>";
 } return string r;
 ("??("):("??(??>")
 ("x"):("x??)")
-EOF2
+EOF
 self_refuse "bin/idc: a case literal and its message keep a trigraph as written" \
     'test failed: tag("x") = "x??>", expected "x??)"' --emit-c /dev/null
 sed -i 's/"x??)"/"x??>"/' "$TMP/p.id"
 self_accept "bin/idc: a string case holding trigraph sequences passes" --allow-untested --emit-c /dev/null
-cat > "$TMP/p.id" <<'EOF2'
+cat > "$TMP/p.id" <<'EOF'
 measure(string s) {
   int n = len(s) * 2;
 } return int n;
 ("abcd"):(8)[time:O(n), mem:O(1)]
 ("abcdefgh??/"):(22)[time:O(n), mem:O(1)]
-EOF2
+EOF
 self_accept "bin/idc: a scaling claim sizes a literal ending in a trigraph by its bytes" --emit-c /dev/null
 
 # --- a case that stops on its own is that case failing -----------------------
@@ -815,8 +815,43 @@ wrap(int k) {
 given mk (0):() then (import cnt)[0]:(0)
 given mk (1):() then (import cnt)[1]:(5)
 EOF
-self_refuse "bin/idc: then (import NAME) under a function that only reads NAME is rejected, naming the fix" \
-    "p.id:8: error: then (import cnt): the function under test, 'wrap', reads (import cnt) but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'" --allow-untested --emit-c /dev/null
+self_accept "bin/idc: then (import NAME) under a function that only reads NAME is accepted when a given sets NAME" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+nop() {
+  int z = 0;
+} return void;
+
+wrap(int k) {
+  int a = (import cnt)[k];
+} return void;
+given nop (0):() then (import cnt)[0]:(0)
+given nop (1):() then (import cnt)[1]:(5)
+EOF
+self_refuse "bin/idc: then (import NAME) under a function that only reads NAME is rejected when no given sets NAME, naming the fix" \
+    "p.id:12: error: then (import cnt): the function under test, 'wrap', reads (import cnt) but never writes it, so this check would only repeat its own read; check an export the function changes, give the case a setup that writes (import cnt) itself (a setup that only calls a function that writes it does not count), or write one check function that states the whole expected state and name it in 'then CHECK:(value)'" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+viamk() {
+  mk();
+} return void;
+
+wrap(int k) {
+  int a = (import cnt)[k];
+} return void;
+given viamk (0):() then (import cnt)[0]:(0)
+given viamk (1):() then (import cnt)[1]:(5)
+EOF
+self_refuse "bin/idc: then (import NAME) is rejected when the only given setup calls the function that writes NAME" \
+    "p.id:12: error: then (import cnt): the function under test, 'wrap', reads (import cnt) but never writes it, so this check would only repeat its own read; check an export the function changes, give the case a setup that writes (import cnt) itself (a setup that only calls a function that writes it does not count), or write one check function that states the whole expected state and name it in 'then CHECK:(value)'" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 mk() {
@@ -861,7 +896,7 @@ self_refuse "bin/idc: a len check that does not hold fails the case, naming the 
 FLDIR="$TMP/fldir"; mkdir -p "$FLDIR/types"
 printf 'struct Page {\n  int[] starts;\n  int count;\n}\n' > "$FLDIR/types/page.id"
 printf 'struct Book {\n  Page pages;\n  string title;\n}\n' > "$FLDIR/types/book.id"
-cat > "$FLDIR/main.id" <<'EOF2'
+cat > "$FLDIR/main.id" <<'EOF'
 book_open() {
   Page pg = Page([0, 0], 2);
   export Book bk = Book(pg, "t");
@@ -878,8 +913,8 @@ book_add(int n) {
 } return void;
 given book_open (1):() then (import bk).pages.count:(4) then len((import bk).pages.starts):(4)
 given book_open (2):() then (import bk).pages.starts[2]:(2) then (import bk).title:("t") then (import bk).pages.starts:([0, 0, 2, 2])
-EOF2
-cat > "$FLDIR/run.id" <<'EOF2'
+EOF
+cat > "$FLDIR/run.id" <<'EOF'
 book_push(int n) {
   push((import bk).pages.starts, n);
   push((import bk).pages.starts, n * 2);
@@ -889,7 +924,7 @@ given book_open (8):() then (import bk).pages.starts:([0, 0, 8, 16])
 
 main(int argc, string[] argv) {
 } return int 0;
-EOF2
+EOF
 if ../bin/idc "$FLDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     ok "bin/idc: a check reads a field, a nested field, an element and the length of a list field"
 else
@@ -917,7 +952,7 @@ fi
 # not reuse its earlier pass.
 CKDIR="$TMP/ckdir"; mkdir -p "$CKDIR/types"
 printf 'struct Pt {\n  int x;\n  int y;\n}\n' > "$CKDIR/types/pt.id"
-cat > "$CKDIR/main.id" <<'EOF2'
+cat > "$CKDIR/main.id" <<'EOF'
 pt_open() {
   Pt p = Pt(1, 2);
   export Pt pt = p;
@@ -933,11 +968,11 @@ pt_move(int d) {
 } return void;
 given pt_open (1):() then (import pt).y:(2)
 given pt_open (2):() then (import pt).x:(5)
-EOF2
-cat > "$CKDIR/run.id" <<'EOF2'
+EOF
+cat > "$CKDIR/run.id" <<'EOF'
 main(int argc, string[] argv) {
 } return int 0;
-EOF2
+EOF
 if ../bin/idc "$CKDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     ok "bin/idc: a field check of a struct builds"
 else
@@ -1088,7 +1123,7 @@ self_accept "bin/idc: the cases of a caller may check NAME against a literal" --
 # reused.
 IXDIR="$TMP/ixdir"; mkdir -p "$IXDIR"
 printf 'int slot = 1;\n' > "$IXDIR/conf.id"
-cat > "$IXDIR/main.id" <<'EOF2'
+cat > "$IXDIR/main.id" <<'EOF'
 mk() {
   export int[] cnt = [0, 5];
 } return void;
@@ -1104,11 +1139,11 @@ wrap(int k) {
 } return void;
 given mk (0):() then (import cnt)[(import slot)]:(5)
 given mk (1):() then (import cnt)[(import slot)]:(7)
-EOF2
-cat > "$IXDIR/run.id" <<'EOF2'
+EOF
+cat > "$IXDIR/run.id" <<'EOF'
 main(int argc, string[] argv) {
 } return int 0;
-EOF2
+EOF
 if ../bin/idc "$IXDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     ok "bin/idc: a conf.id constant names a check's index"
 else
@@ -1128,7 +1163,7 @@ fi
 # after the call, so a changed constant must change the case's cache key.
 ARGDIR="$TMP/argdir"; mkdir -p "$ARGDIR"
 printf 'int slot = 1;\n' > "$ARGDIR/conf.id"
-cat > "$ARGDIR/main.id" <<'EOF2'
+cat > "$ARGDIR/main.id" <<'EOF'
 mk(int s) {
   export int[] cnt = [0, 0];
   int[] c = (import cnt);
@@ -1148,11 +1183,11 @@ wrap(int k) {
 given mk((import slot)) (0):() then pick((import cnt)[1]):(6)
 given mk((import slot)) (1):() then pick((import cnt)[(import slot)]):(7)
 given mk(0) (1):() then pick((import slot)):(2)
-EOF2
-cat > "$ARGDIR/run.id" <<'EOF2'
+EOF
+cat > "$ARGDIR/run.id" <<'EOF'
 main(int argc, string[] argv) {
 } return int 0;
-EOF2
+EOF
 if ../bin/idc "$ARGDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     ok "bin/idc: a constant in a setup or check, and an indexed export in a check, are accepted"
 else
@@ -2041,16 +2076,16 @@ self_refuse "bin/idc: a wrapper that reassigns its own local is rejected with th
 # inside @idc_const_init, so each target would otherwise reject a conf.id that
 # builds on the other.
 CDIR="$TMP/cdir"; mkdir -p "$CDIR"
-cat > "$CDIR/conf.id" <<'EOF2'
+cat > "$CDIR/conf.id" <<'EOF'
 int base = 7;
 int again = (import base);
 int[] tbl = [(import base), 2];
-EOF2
-cat > "$CDIR/main.id" <<'EOF2'
+EOF
+cat > "$CDIR/main.id" <<'EOF'
 main(int argc, string[] argv) {
   print("" + (import again) + " " + (import tbl)[0] + " " + (import tbl)[1]);
 } return int 0;
-EOF2
+EOF
 for tgt in c llvm; do
     rm -f "$TMP/cout"
     if ../bin/idc "$CDIR" --allow-untested --target "$tgt" -o "$TMP/cout" >"$TMP/log" 2>&1 && [ "$("$TMP/cout" 2>&1)" = "7 7 2" ]; then

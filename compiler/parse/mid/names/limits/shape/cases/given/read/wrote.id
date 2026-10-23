@@ -1,0 +1,63 @@
+// Whether a setup of case `ci` writes the export `imp_nm` itself: one of the
+// setups it names is the function that exports it, or writes it through an
+// `(import NAME)` (fn_import_use answers 2, ../../report/host/cases/given.id).
+// A setup that only calls something which writes it does not count -- the
+// check would read what a callee did, not what the setup states -- so a `then
+// (import NAME)` check after such a setup is still the function under test's
+// own read (then_imp_value, ../../report/host/cases/then.id).
+given_writes(int ci, string imp_nm) {
+  string[] setups = str_split((import casegiven)[ci], " ");
+  int ek = find_str((import enames), imp_nm);
+  int hit = 0;
+} chain (int ci, string imp_nm) {
+  int si = 0;
+  while(si < len(setups) && ek >= 0) {
+    hit = setup_writes(setups[si], ek, imp_nm, hit);
+    si = si + 1;
+  }
+} return int hit;
+given then_imp_fixture ("int[]", 1, 0) given sset((import eowners), 0, "fx_target") given sset((import casegiven), 0, "fx_target") (0, "gx"):(1)
+given then_imp_fixture ("int[]", 1, 0) given sset((import eowners), 0, "fx_target") (0, "gx"):(0)
+given then_imp_fixture ("int[]", 1, 0) given sset((import eowners), 0, "fx_target") given sset((import casegiven), 0, "fx_target") (0, "gy"):(0)
+given wrote_fixture () given sset((import casegiven), 0, "wr") (0, "gx"):(1)
+given wrote_fixture () given sset((import casegiven), 0, "wc") (0, "gx"):(0)
+given wrote_fixture () given sset((import casegiven), 0, "wc wr") (0, "gx"):(1)
+
+// One setup of a multi-setup `given`: raises `hit` when this name is a
+// function in the build that exports NAME or writes it through an import.
+setup_writes(string nm, int ek, string imp_nm, int hit) {
+  int r = hit;
+  int fnd = func_node(nm);
+  if(fnd >= 0 && ((import eowners)[ek] == nm || fn_import_use(fnd, imp_nm) == 2)) {
+    r = 1;
+  }
+} return int r;
+given wrote_fixture () ("wr", 0, "gx", 0):(1)
+given wrote_fixture () ("wc", 0, "gx", 0):(0)
+given wrote_fixture () ("nosuchfn123", 0, "gx", 1):(1)
+given wrote_fixture () ("fx_target", 0, "gx", 0):(0)
+
+// The fixture of then_imp_fixture (rd reads gx, exporter mk) plus two more
+// functions registered where func_node looks: wr, which binds a list name to
+// gx and so writes it, and wc, whose only content is a call to wr.
+wrote_fixture() {
+  then_imp_fixture("int[]", 1, 1);
+  int[] none = [];
+  export int wrote_rd = node_txt("import", "gx");
+} chain () {
+  export int wrote_decl = node_decl("int[]", "al", (import wrote_rd), 0);
+  export int wrote_wr = node_func("wr", "int", none, none, (import wrote_rd));
+  push((import prog), (import wrote_wr));
+} chain () {
+  push((import fnames), "wr");
+  push((import fnodes), (import wrote_wr));
+  export int wrote_call = node_call("wr", none);
+} chain () {
+  export int wrote_wc = node_func("wc", "int", none, none, (import wrote_call));
+  push((import prog), (import wrote_wc));
+  push((import fnames), "wc");
+} chain () {
+  push((import fnodes), (import wrote_wc));
+} return void;
+():() then len((import prog)):(4)
+():() then len((import fnames)):(3)

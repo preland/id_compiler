@@ -3629,6 +3629,8 @@ int id_rc_has(char* src, char* dst);
 void id_rc_visit(IdList* rcfl, IdList* rctodo, int rcw);
 void id_rc_walk(IdList* rcfl, IdList* rctodo);
 void id_rc_step(IdList* rcfl, IdList* rctodo, int rcrow, int rci);
+int id_given_writes(int ci, char* imp_nm);
+int id_setup_writes(char* nm, int ek, char* imp_nm, int hit);
 IdList* id_given_items(int i, int si);
 void id_given_args(int i, int si, int sfn);
 void id_given_arg(int i, int sfn, IdList* items, int j);
@@ -30224,6 +30226,33 @@ void id_rc_step(IdList* rcfl, IdList* rctodo, int rcrow, int rci) {
     return;
 }
 
+int id_given_writes(int ci, char* imp_nm) {
+    IdList* setups = NULL;
+    int ek;
+    int hit;
+    int si;
+    { IdList* idfe_o = setups; setups = id_str_split((char*)(intptr_t)(id_list_get(casegiven, ci)), ID_S(" ")); id_list_free(idfe_o); }
+    ek = id_find_str(enames, imp_nm);
+    hit = 0;
+    si = 0;
+    while (((si < id_list_len(setups)) && (ek >= 0))) {
+        hit = id_setup_writes((char*)(intptr_t)(id_list_get(setups, si)), ek, imp_nm, hit);
+        si = (si + 1);
+    }
+    { id_list_free(setups); return hit; }
+}
+
+int id_setup_writes(char* nm, int ek, char* imp_nm, int hit) {
+    int r;
+    int fnd;
+    r = hit;
+    fnd = id_func_node(nm);
+    if (((fnd >= 0) && ((strcmp((char*)(intptr_t)(id_list_get(eowners, ek)), nm) == 0) || (id_fn_import_use(fnd, imp_nm) == 2)))) {
+        r = 1;
+    }
+    return r;
+}
+
 IdList* id_given_items(int i, int si) {
     IdList* items;
     IdList* gs;
@@ -31354,34 +31383,34 @@ void id_then_imp_value(int ci, int chk_node, char* want) {
     vt = id_then_imp_type(chk_node);
     imp_nm = (char*)(intptr_t)(id_list_get(ns1, chk_node));
     if (((id_list_len(imp_ix) == 1) && (id_ty_is_list(want) == 0))) {
-IdList* idsq_178;
-char* idsq_176;
-        (idsq_178 = ns2, idsq_176 = (char*)(intptr_t)(id_list_get(idsq_178, chk_node)), ({ char* idft1 = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(")"), 1), idsq_176, 1), ID_S("[...] reads one element, but '"), 1), imp_nm, 1), (char*)(intptr_t)(id_list_get(ns2, chk_node)), 1), ID_S("' is a "), 1), want, 1), ID_S(", not a list; drop the index, or name a list export"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
+IdList* idsq_189;
+char* idsq_187;
+        (idsq_189 = ns2, idsq_187 = (char*)(intptr_t)(id_list_get(idsq_189, chk_node)), ({ char* idft1 = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(")"), 1), idsq_187, 1), ID_S("[...] reads one element, but '"), 1), imp_nm, 1), (char*)(intptr_t)(id_list_get(ns2, chk_node)), 1), ID_S("' is a "), 1), want, 1), ID_S(", not a list; drop the index, or name a list export"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
     } else if ((id_list_len(imp_ix) == 1)) {
         id_fit_then_ix(ci, (int)(id_list_get(imp_ix, 0)));
     }
-IdList* idsq_124;
+IdList* idsq_135;
     if ((id_list_len(items) != 1)) {
         ne = id_list_len(items);
         ({ char* idft1 = id_concat_f(ID_S("a 'then' check compares exactly one value, not "), id_str_of_int(ne), 2); id_case_err(ci, idft1); id_str_free(idft1); });
-    } else if ((idsq_124 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_124, (int)(id_list_get(items, 0)))), ID_S("cimport")) == 0))) {
-IdList* idsq_114;
-        (idsq_114 = ns1, ({ char* idft1 = id_concat_f(id_concat(ID_S("a 'then' check compares a literal; (import "), (char*)(intptr_t)(id_list_get(idsq_114, (int)(id_list_get(items, 0))))), ID_S(") is not one, so write the value as a literal (for a conf.id constant, the constant's value)"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
+    } else if ((idsq_135 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_135, (int)(id_list_get(items, 0)))), ID_S("cimport")) == 0))) {
+IdList* idsq_125;
+        (idsq_125 = ns1, ({ char* idft1 = id_concat_f(id_concat(ID_S("a 'then' check compares a literal; (import "), (char*)(intptr_t)(id_list_get(idsq_125, (int)(id_list_get(items, 0))))), ID_S(") is not one, so write the value as a literal (for a conf.id constant, the constant's value)"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
     } else {
         id_fit_value(ci, (int)(id_list_get(items, 0)), vt);
     }
     if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, chk_node)), ID_S("thenlen")) == 0) && (id_ty_is_list(want) == 0)) && (strcmp(want, ID_S("string")) != 0))) {
-IdList* idsq_68;
-char* idsq_66;
-IdList* idsq_60;
-char* idsq_58;
-        (idsq_68 = ns2, idsq_66 = (char*)(intptr_t)(id_list_get(idsq_68, chk_node)), idsq_60 = ns2, idsq_58 = (char*)(intptr_t)(id_list_get(idsq_60, chk_node)), ({ char* idft1 = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("len((import "), imp_nm), ID_S(")"), 1), idsq_66, 1), ID_S(") measures a list or a string, but '"), 1), imp_nm, 1), idsq_58, 1), ID_S("' is a "), 1), want, 1), ID_S("; name a list or string export, or compare the value itself with then (import "), 1), imp_nm, 1), ID_S(")"), 1), (char*)(intptr_t)(id_list_get(ns2, chk_node)), 1), ID_S(":(value)"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
+IdList* idsq_79;
+char* idsq_77;
+IdList* idsq_71;
+char* idsq_69;
+        (idsq_79 = ns2, idsq_77 = (char*)(intptr_t)(id_list_get(idsq_79, chk_node)), idsq_71 = ns2, idsq_69 = (char*)(intptr_t)(id_list_get(idsq_71, chk_node)), ({ char* idft1 = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("len((import "), imp_nm), ID_S(")"), 1), idsq_77, 1), ID_S(") measures a list or a string, but '"), 1), imp_nm, 1), idsq_69, 1), ID_S("' is a "), 1), want, 1), ID_S("; name a list or string export, or compare the value itself with then (import "), 1), imp_nm, 1), ID_S(")"), 1), (char*)(intptr_t)(id_list_get(ns2, chk_node)), 1), ID_S(":(value)"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
     }
-    if ((id_fn_import_use((int)(id_list_get(casefn, ci)), imp_nm) == 1)) {
-IdList* idsq_22;
-char* idsq_20;
-IdList* idsq_16;
-        (idsq_22 = ns2, idsq_20 = (char*)(intptr_t)(id_list_get(idsq_22, chk_node)), idsq_16 = ns1, ({ char* idft1 = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("then (import "), imp_nm), ID_S(")"), 1), idsq_20, 1), ID_S(": the function under test, '"), 1), (char*)(intptr_t)(id_list_get(idsq_16, (int)(id_list_get(casefn, ci)))), 1), ID_S("', reads (import "), 1), imp_nm, 1), ID_S(") but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
+    if (((id_fn_import_use((int)(id_list_get(casefn, ci)), imp_nm) == 1) && (id_given_writes(ci, imp_nm) == 0))) {
+IdList* idsq_26;
+char* idsq_24;
+IdList* idsq_20;
+        (idsq_26 = ns2, idsq_24 = (char*)(intptr_t)(id_list_get(idsq_26, chk_node)), idsq_20 = ns1, ({ char* idft1 = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("then (import "), imp_nm), ID_S(")"), 1), idsq_24, 1), ID_S(": the function under test, '"), 1), (char*)(intptr_t)(id_list_get(idsq_20, (int)(id_list_get(casefn, ci)))), 1), ID_S("', reads (import "), 1), imp_nm, 1), ID_S(") but never writes it, so this check would only repeat its own read; check an export the function changes, give the case a setup that writes (import "), 1), imp_nm, 1), ID_S(") itself (a setup that only calls a function that writes it does not count), or write one check function that states the whole expected state and name it in 'then CHECK:(value)'"), 1); id_case_err(ci, idft1); id_str_free(idft1); }));
     }
     return;
 }
