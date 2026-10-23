@@ -3,12 +3,14 @@
 // spelling in the IR is what lets a fold read a comparison without knowing
 // which target will print it.
 ll_pred(string op, string t) {
-  string s = ll_pred_word(op, "eq", "ne", "s");
+  string ll_pre = str_pick(str_sub(op, 0, 1), "u", "u", "s");
+  string s = ll_pred_word(op, "eq", "ne", ll_pre);
   if(ty_kind(t) == "float") {
     s = ll_pred_word(op, "oeq", "une", "o");
   }
 } return string s;
 given init_tyreg ("<", "int"):("slt")
+given init_tyreg ("u<", "int"):("ult")
 given init_tyreg ("<", "float"):("olt")
 given init_tyreg ("!=", "int"):("ne")
 given init_tyreg ("==", "float"):("oeq")

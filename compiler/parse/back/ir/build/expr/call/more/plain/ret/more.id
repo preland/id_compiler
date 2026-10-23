@@ -8,7 +8,7 @@ given ocall_fixture ((import ocall_node), "fx_target", "int"):(0)
 given bicall_fixture ((import bicall_node), "chr", "int"):(1)
 
 lw_plain_tail(int node, string h, string helper, int[] args) {
-  int v = lw_callf(helper, h, args);
+  int v = lw_expand(helper, h, args);
   string lw_ety_v = lw_ety(node);
   int ret_i = lw_conv(v, h, lw_ety_v);
 } return int ret_i;

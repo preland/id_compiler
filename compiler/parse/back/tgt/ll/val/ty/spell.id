@@ -13,7 +13,7 @@ ll_ty(string t) {
 ("float"):("double")
 
 ll_ty2(string t) {
-  string s = "ptr";
+  string s = str_pick(t, "wide", "i128", "ptr");
   if(t == "float") {
     s = "double";
   } else if(t == "bool" || t == "" || t == "void") {
@@ -21,6 +21,7 @@ ll_ty2(string t) {
   }
 } return string s;
 ("string"):("ptr")
+("wide"):("i128")
 ("float"):("double")
 ("bool"):("i1")
 (""):("void")

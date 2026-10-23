@@ -1,0 +1,23 @@
+// A 32-bit rotate: fshl reduces the count modulo 32 itself, and the result
+// sign-extends, as the C helper's `(int)` cast does.
+lw_inline_turn32(int[] ih_args) {
+  int ih_val = lw_op("trunc", "int", ih_args[0], 0 - 1, "");
+  int ih_cnt = lw_op("trunc", "int", ih_args[1], 0 - 1, "");
+  int ih_rot = lw_callf("llvm.fshl.i32", "int", [ih_val, ih_val, ih_cnt]);
+} chain (int[] ih_args) {
+  int ret_i = lw_op("sext", "word", ih_rot, 0 - 1, "");
+} return int ret_i;
+given lw_env_fixture ([0, 1]):(3) then (import istr)[2]:("llvm.fshl.i32")
+given lw_env_fixture ([2, 5]):(3) then (import iop)[3]:("sext")
+
+// The high half of the 128-bit product of two unsigned words.
+lw_inline_high(int[] ih_args) {
+  int ih_left = lw_op("zext", "wide", ih_args[0], 0 - 1, "");
+  int ih_right = lw_op("zext", "wide", ih_args[1], 0 - 1, "");
+  int ih_prod = lw_op("mul", "wide", ih_left, ih_right, "");
+} chain (int[] ih_args) {
+  int ih_top = lw_op("lshr", "wide", ih_prod, lw_const("wide", "64"), "");
+  int ret_i = lw_op("trunc", "word", ih_top, 0 - 1, "");
+} return int ret_i;
+given lw_env_fixture ([0, 1]):(5) then (import iop)[4]:("lshr")
+given lw_env_fixture ([2, 3]):(5) then (import iop)[2]:("mul")

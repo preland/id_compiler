@@ -1,0 +1,21 @@
+lw_expand_turn32(string helper, string ret_ty, int[] ih_args) {
+  int ret_i = 0 - 1;
+  if(helper == "id_rotl32") {
+    ret_i = lw_inline_turn32(ih_args);
+  } else {
+    ret_i = lw_expand_high(helper, ret_ty, ih_args);
+  }
+} return int ret_i;
+given lw_env_fixture ("id_rotl32", "word", [0, 1]):(3)
+given lw_env_fixture ("id_x", "word", [0, 1]):(0)
+
+lw_expand_high(string helper, string ret_ty, int[] ih_args) {
+  int ret_i = 0 - 1;
+  if(helper == "id_umul_hi") {
+    ret_i = lw_inline_high(ih_args);
+  } else {
+    ret_i = lw_callf(helper, ret_ty, ih_args);
+  }
+} return int ret_i;
+given lw_env_fixture ("id_umul_hi", "word", [0, 1]):(5)
+given lw_env_fixture ("id_x", "word", [0, 1]):(0)

@@ -112,8 +112,8 @@ string[] irop_ik = ["+", "-", "*", "|", "^"];
 string[] irop_iv = ["add", "sub", "mul", "or", "xor"];
 string[] irop_fk = ["-", "*", "/"];
 string[] irop_fv = ["fsub", "fmul", "fdiv"];
-string[] llrel_k = ["<", ">", "<="];
-string[] llrel_v = ["lt", "gt", "le"];
+string[] llrel_k = ["<", ">", "<=", "u<"];
+string[] llrel_v = ["lt", "gt", "le", "lt"];
 // The C text the compiler prints for the runtime and for the test harness. Each
 // is a constant, so it is one here and the code that prints it passes it to
 // print -- not a function of its own per text, which is the same

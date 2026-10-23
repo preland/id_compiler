@@ -1429,6 +1429,15 @@ int id_lb_b5(int node);
 IdList* id_lw_bargs(int node);
 int id_lw_barg_at(int node, int i, IdList* vals);
 char* id_lw_bpty(char* name, int i, int node);
+int id_lw_inline_ult(IdList* ih_args);
+int id_lw_inline_uword(IdList* ih_args);
+int id_lw_expand(char* helper, char* ret_ty, IdList* ih_args);
+int id_lw_expand_word(char* helper, char* ret_ty, IdList* ih_args);
+int id_lw_expand_turn(char* helper, char* ret_ty, IdList* ih_args);
+int id_lw_expand_turn32(char* helper, char* ret_ty, IdList* ih_args);
+int id_lw_expand_high(char* helper, char* ret_ty, IdList* ih_args);
+int id_lw_inline_turn32(IdList* ih_args);
+int id_lw_inline_high(IdList* ih_args);
 int id_lw_plain_mid(int node, char* name, char* h);
 int id_lw_plain_tail(int node, char* h, char* helper, IdList* args);
 int id_lw_barg_push(int i, IdList* vals, int v);
@@ -4908,9 +4917,9 @@ static void idc_const_init(void) {
     id_list_lock(irop_fk);
     irop_fv = id_list_lit(3, (long long)(intptr_t)(ID_S("fsub")), (long long)(intptr_t)(ID_S("fmul")), (long long)(intptr_t)(ID_S("fdiv")));
     id_list_lock(irop_fv);
-    llrel_k = id_list_lit(3, (long long)(intptr_t)(ID_S("<")), (long long)(intptr_t)(ID_S(">")), (long long)(intptr_t)(ID_S("<=")));
+    llrel_k = id_list_lit(4, (long long)(intptr_t)(ID_S("<")), (long long)(intptr_t)(ID_S(">")), (long long)(intptr_t)(ID_S("<=")), (long long)(intptr_t)(ID_S("u<")));
     id_list_lock(llrel_k);
-    llrel_v = id_list_lit(3, (long long)(intptr_t)(ID_S("lt")), (long long)(intptr_t)(ID_S("gt")), (long long)(intptr_t)(ID_S("le")));
+    llrel_v = id_list_lit(4, (long long)(intptr_t)(ID_S("lt")), (long long)(intptr_t)(ID_S("gt")), (long long)(intptr_t)(ID_S("le")), (long long)(intptr_t)(ID_S("lt")));
     id_list_lock(llrel_v);
     mulops = id_list_lit(3, (long long)(intptr_t)(ID_S("*")), (long long)(intptr_t)(ID_S("/")), (long long)(intptr_t)(ID_S("%")));
     id_list_lock(mulops);
@@ -4976,6 +4985,7 @@ static void idfr_ZstdBlock(IdList* p) { id_free_walk(p, "S3..S3..."); }
 static void idfr_ZstdDecoded(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }
 static void idfr_ZstdWalk(IdList* p) { id_free_walk(p, "S3S3...S3...S3..."); }
+static void idfr_BlendMesh(IdList* p) { id_free_walk(p, "S3..S3..."); }
 static void idfr_GuiBd(IdList* p) { id_free_walk(p, "S3S3lsl.l.S3l.lsl.S3l.lsl."); }
 static void idfr_GuiCl(IdList* p) { id_free_walk(p, "S3l.lsl."); }
 static void idfr_GuiHm(IdList* p) { id_free_walk(p, "S3lsl.l."); }
@@ -7617,6 +7627,106 @@ char* id_lw_bpty(char* name, int i, int node) {
     return t;
 }
 
+int id_lw_inline_ult(IdList* ih_args) {
+    int ih_flag;
+    int ret_i;
+int idsq_18;
+    ih_flag = (idsq_18 = (int)(id_list_get(ih_args, 0)), id_lw_op(ID_S("icmp"), ID_S("bool"), idsq_18, (int)(id_list_get(ih_args, 1)), ID_S("u<")));
+    ret_i = id_lw_op(ID_S("zext"), ID_S("word"), ih_flag, (0 - 1), ID_S(""));
+    return ret_i;
+}
+
+int id_lw_inline_uword(IdList* ih_args) {
+    int ih_low;
+    int ret_i;
+    ih_low = id_lw_op(ID_S("trunc"), ID_S("int"), (int)(id_list_get(ih_args, 0)), (0 - 1), ID_S(""));
+    ret_i = id_lw_op(ID_S("zext"), ID_S("word"), ih_low, (0 - 1), ID_S(""));
+    return ret_i;
+}
+
+int id_lw_expand(char* helper, char* ret_ty, IdList* ih_args) {
+    int ret_i;
+    ret_i = (0 - 1);
+    if ((strcmp(helper, ID_S("id_ult")) == 0)) {
+        ret_i = id_lw_inline_ult(ih_args);
+    } else {
+        ret_i = id_lw_expand_word(helper, ret_ty, ih_args);
+    }
+    return ret_i;
+}
+
+int id_lw_expand_word(char* helper, char* ret_ty, IdList* ih_args) {
+    int ret_i;
+    ret_i = (0 - 1);
+    if ((strcmp(helper, ID_S("id_uword_of_int")) == 0)) {
+        ret_i = id_lw_inline_uword(ih_args);
+    } else {
+        ret_i = id_lw_expand_turn(helper, ret_ty, ih_args);
+    }
+    return ret_i;
+}
+
+int id_lw_expand_turn(char* helper, char* ret_ty, IdList* ih_args) {
+    int ret_i;
+    ret_i = (0 - 1);
+    if ((strcmp(helper, ID_S("id_rotl")) == 0)) {
+int idsq_18;
+int idsq_15;
+        ret_i = (idsq_18 = (int)(id_list_get(ih_args, 0)), idsq_15 = (int)(id_list_get(ih_args, 0)), id_lw_callf(ID_S("llvm.fshl.i64"), ID_S("word"), id_list_lit(3, (long long)(idsq_18), (long long)(idsq_15), (long long)((int)(id_list_get(ih_args, 1))))));
+    } else {
+        ret_i = id_lw_expand_turn32(helper, ret_ty, ih_args);
+    }
+    return ret_i;
+}
+
+int id_lw_expand_turn32(char* helper, char* ret_ty, IdList* ih_args) {
+    int ret_i;
+    ret_i = (0 - 1);
+    if ((strcmp(helper, ID_S("id_rotl32")) == 0)) {
+        ret_i = id_lw_inline_turn32(ih_args);
+    } else {
+        ret_i = id_lw_expand_high(helper, ret_ty, ih_args);
+    }
+    return ret_i;
+}
+
+int id_lw_expand_high(char* helper, char* ret_ty, IdList* ih_args) {
+    int ret_i;
+    ret_i = (0 - 1);
+    if ((strcmp(helper, ID_S("id_umul_hi")) == 0)) {
+        ret_i = id_lw_inline_high(ih_args);
+    } else {
+        ret_i = id_lw_callf(helper, ret_ty, ih_args);
+    }
+    return ret_i;
+}
+
+int id_lw_inline_turn32(IdList* ih_args) {
+    int ih_val;
+    int ih_cnt;
+    int ih_rot;
+    int ret_i;
+    ih_val = id_lw_op(ID_S("trunc"), ID_S("int"), (int)(id_list_get(ih_args, 0)), (0 - 1), ID_S(""));
+    ih_cnt = id_lw_op(ID_S("trunc"), ID_S("int"), (int)(id_list_get(ih_args, 1)), (0 - 1), ID_S(""));
+    ih_rot = id_lw_callf(ID_S("llvm.fshl.i32"), ID_S("int"), id_list_lit(3, (long long)(ih_val), (long long)(ih_val), (long long)(ih_cnt)));
+    ret_i = id_lw_op(ID_S("sext"), ID_S("word"), ih_rot, (0 - 1), ID_S(""));
+    return ret_i;
+}
+
+int id_lw_inline_high(IdList* ih_args) {
+    int ih_left;
+    int ih_right;
+    int ih_prod;
+    int ih_top;
+    int ret_i;
+    ih_left = id_lw_op(ID_S("zext"), ID_S("wide"), (int)(id_list_get(ih_args, 0)), (0 - 1), ID_S(""));
+    ih_right = id_lw_op(ID_S("zext"), ID_S("wide"), (int)(id_list_get(ih_args, 1)), (0 - 1), ID_S(""));
+    ih_prod = id_lw_op(ID_S("mul"), ID_S("wide"), ih_left, ih_right, ID_S(""));
+    ih_top = id_lw_op(ID_S("lshr"), ID_S("wide"), ih_prod, id_lw_const(ID_S("wide"), ID_S("64")), ID_S(""));
+    ret_i = id_lw_op(ID_S("trunc"), ID_S("word"), ih_top, (0 - 1), ID_S(""));
+    return ret_i;
+}
+
 int id_lw_plain_mid(int node, char* name, char* h) {
     char* sys_helper_v;
     IdList* lw_bargs_v;
@@ -7631,7 +7741,7 @@ int id_lw_plain_tail(int node, char* h, char* helper, IdList* args) {
     int v;
     char* lw_ety_v;
     int ret_i;
-    v = id_lw_callf(helper, h, args);
+    v = id_lw_expand(helper, h, args);
     lw_ety_v = id_lw_ety(node);
     ret_i = id_lw_conv(v, h, lw_ety_v);
     return ret_i;
@@ -17406,7 +17516,7 @@ void id_ll_declares(void) {
 
 void id_ll_decl_block(void) {
     id_ll_decl_cmp();
-    id_print(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_list_free_bytes(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_character_code_at(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_umul_hi(i64, i64)\ndeclare i64 @id_rotl(i64, i64)\ndeclare i64 @id_rotl32(i64, i64)\ndeclare i64 @id_uword_of_int(i64)\ndeclare i64 @id_add_checked(i64, i64)\ndeclare i64 @id_add_checked32(i64, i64)\ndeclare i64 @id_sub_checked(i64, i64)\ndeclare i64 @id_sub_checked32(i64, i64)\ndeclare i64 @id_mul_checked(i64, i64)\ndeclare i64 @id_mul_checked32(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare ptr @id_bytes_new(i32)\ndeclare void @id_bytes_free(ptr)\ndeclare i32 @id_bytes_len_raw(ptr)\ndeclare i32 @id_bytes_cap_raw(ptr)\ndeclare i32 @id_bytes_len(ptr)\ndeclare i64 @id_bytes_get(ptr, i32)\ndeclare void @id_bytes_set(ptr, i32, i64)\ndeclare i64 @id_bytes_cell(ptr, i32)\ndeclare void @id_bytes_cell_set(ptr, i32, i64)\ndeclare void @id_bytes_push(ptr, i64)\ndeclare i64 @id_bytes_pop(ptr)\ndeclare void @id_bytes_append(ptr, ptr)\ndeclare ptr @id_bytes_sub(ptr, i32, i32)\ndeclare i32 @id_bytes_cmp(ptr, ptr)\ndeclare ptr @id_bytes_of_string(ptr)\ndeclare ptr @id_string_of_bytes(ptr)\ndeclare ptr @id_bytes_of_memory(i64, i32)\ndeclare i64 @id_memory_of_bytes(ptr)\ndeclare void @id_fail(ptr)"));
+    id_print(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_list_free_bytes(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_character_code_at(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @llvm.fshl.i64(i64, i64, i64)\ndeclare i32 @llvm.fshl.i32(i32, i32, i32)\ndeclare i64 @id_add_checked(i64, i64)\ndeclare i64 @id_add_checked32(i64, i64)\ndeclare i64 @id_sub_checked(i64, i64)\ndeclare i64 @id_sub_checked32(i64, i64)\ndeclare i64 @id_mul_checked(i64, i64)\ndeclare i64 @id_mul_checked32(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare ptr @id_bytes_new(i32)\ndeclare void @id_bytes_free(ptr)\ndeclare i32 @id_bytes_len_raw(ptr)\ndeclare i32 @id_bytes_cap_raw(ptr)\ndeclare i32 @id_bytes_len(ptr)\ndeclare i64 @id_bytes_get(ptr, i32)\ndeclare void @id_bytes_set(ptr, i32, i64)\ndeclare i64 @id_bytes_cell(ptr, i32)\ndeclare void @id_bytes_cell_set(ptr, i32, i64)\ndeclare void @id_bytes_push(ptr, i64)\ndeclare i64 @id_bytes_pop(ptr)\ndeclare void @id_bytes_append(ptr, ptr)\ndeclare ptr @id_bytes_sub(ptr, i32, i32)\ndeclare i32 @id_bytes_cmp(ptr, ptr)\ndeclare ptr @id_bytes_of_string(ptr)\ndeclare ptr @id_string_of_bytes(ptr)\ndeclare ptr @id_bytes_of_memory(i64, i32)\ndeclare i64 @id_memory_of_bytes(ptr)\ndeclare void @id_fail(ptr)"));
     id_print(ID_S(""));
     return;
 }
@@ -17850,8 +17960,10 @@ char* idsq_19;
 }
 
 char* id_ll_pred(char* op, char* t) {
+    char* ll_pre;
     char* s;
-    s = id_ll_pred_word(op, ID_S("eq"), ID_S("ne"), ID_S("s"));
+    ll_pre = id_str_pick(id_str_sub(op, 0, 1), ID_S("u"), ID_S("u"), ID_S("s"));
+    s = id_ll_pred_word(op, ID_S("eq"), ID_S("ne"), ll_pre);
     if ((strcmp(id_ty_kind(t), ID_S("float")) == 0)) {
         s = id_ll_pred_word(op, ID_S("oeq"), ID_S("une"), ID_S("o"));
     }
@@ -18132,7 +18244,7 @@ char* id_ll_ty(char* t) {
 
 char* id_ll_ty2(char* t) {
     char* s;
-    s = ID_S("ptr");
+    s = id_str_pick(t, ID_S("wide"), ID_S("i128"), ID_S("ptr"));
     if ((strcmp(t, ID_S("float")) == 0)) {
         s = ID_S("double");
     } else if ((((strcmp(t, ID_S("bool")) == 0) || (strcmp(t, ID_S("")) == 0)) || (strcmp(t, ID_S("void")) == 0))) {

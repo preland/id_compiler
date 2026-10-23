@@ -1258,6 +1258,7 @@ static void idfr_ZstdBlock(IdList* p) { id_free_walk(p, "S3..S3..."); }
 static void idfr_ZstdDecoded(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }
 static void idfr_ZstdWalk(IdList* p) { id_free_walk(p, "S3S3...S3...S3..."); }
+static void idfr_BlendMesh(IdList* p) { id_free_walk(p, "S3..S3..."); }
 static void idfr_GuiBd(IdList* p) { id_free_walk(p, "S3S3lsl.l.S3l.lsl.S3l.lsl."); }
 static void idfr_GuiCl(IdList* p) { id_free_walk(p, "S3l.lsl."); }
 static void idfr_GuiHm(IdList* p) { id_free_walk(p, "S3lsl.l."); }
