@@ -13,6 +13,8 @@ ir_fix1() {
   init_tyreg();
   export int irf_n0 = ir_leaf("const", "int", 0 - 1, 0 - 1, "5");
 } return void;
+():() then calls ir_leaf:("const", "int", -1, -1, "5")
+():() then ir_last_b:(0)
 ():() then init_units:(0)
 ():() then init_opt:(0)
 
@@ -21,6 +23,8 @@ ir_fix2() {
   export int irf_n1 = ir_leaf("const", "string", 0 - 1, 0 - 1, "hi");
   export int irf_n3 = ir_leaf("add", "int", (import irf_n0), (import irf_n0), "");
 } return void;
+():() then calls ir_leaf:("const", "string", -1, -1, "hi")
+given ir_fix1 ():() then calls ir_leaf:("add", "int", (import irf_n0), (import irf_n0), "")
 ():() then init_units:(0)
 ():() then init_opt:(0)
 
@@ -29,5 +33,7 @@ ir_fix3() {
   export int irf_n4 = ir_leaf("global", "string", 0 - 1, 0 - 1, "gname");
   export int irf_n5 = ir_leaf("icmp", "int", (import irf_n0), (import irf_n0), "<");
 } return void;
+():() then calls ir_leaf:("global", "string", -1, -1, "gname")
+given ir_fix1 ():() then calls ir_leaf:("icmp", "int", (import irf_n0), (import irf_n0), "<")
 ():() then init_units:(0)
 ():() then init_opt:(0)

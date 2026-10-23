@@ -9,6 +9,7 @@ fcallv_fixture() {
   fcallv_fixture_reg();
 } return void;
 ():() then (import fcallv_node):(1)
+():() then calls node_call:("gfunc", [])
 ():() then init_units:(0)
 ():() then calls lw_env_fixture:[1]
 
@@ -20,6 +21,8 @@ fcallv_fixture_reg() {
   add_var("gfunc", "func(int) return int", u);
   fcallv_fixture_node();
 } return void;
+given fcallv_fixture ():() then calls add_var:("gfunc", "func(int) return int", 0)
+given fcallv_fixture ():() then calls node_call:("gfunc", [])
 given fcallv_fixture ():() then (import chkfail)[0]:(0)
 given fcallv_fixture ():() then init_units:(0)
 
@@ -27,5 +30,7 @@ fcallv_fixture_node() {
   int[] none = [];
   export int fcallv_node = node_call("gfunc", none);
 } return void;
+given fcallv_fixture ():() then calls node_call:("gfunc", [])
+given fcallv_fixture ():() then (import fcallv_node):(2)
 given fcallv_fixture ():() then (import chkfail)[0]:(0)
 given fcallv_fixture ():() then init_units:(0)

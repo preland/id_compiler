@@ -8,6 +8,7 @@ lw_fix_bound() {
   lw_bind("x", 42);
 } return void;
 ():() then calls lw_bind:("x", 42)
+():() then calls node_txt:("var", "x")
 ():() then init_units:(0)
 
 // One instruction on the store, with operand B left at its usual -1 --
@@ -17,6 +18,7 @@ ir_last_fix() {
   int x = lw_tmp("int");
 } return void;
 ():() then calls lw_tmp:("int")
+():() then ir_last_b:(0)
 ():() then init_units:(0)
 
 // The same, but with a real operand B (5), so ir_last_b's two cases pin
@@ -26,4 +28,5 @@ ir_last_fix2() {
   int x = lw_op("add", "int", 0, 5, "");
 } return void;
 ():() then calls lw_op:("add", "int", 0, 5, "")
+():() then ir_last_b:(6)
 ():() then init_units:(0)

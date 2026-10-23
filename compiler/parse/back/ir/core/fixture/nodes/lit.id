@@ -12,6 +12,7 @@ lw_fix_int() {
   export int fix_int_n = node_txt2("int", "5", 5, 0);
 } return void;
 ():() then calls node_txt2:("int", "5", 5, 0)
+():() then (import fix_int_n):(1)
 ():() then init_units:(0)
 
 lw_fix_var() {
@@ -20,6 +21,7 @@ lw_fix_var() {
   lw_fix_var_ty();
 } return void;
 ():() then calls node_txt:("var", "x")
+():() then (import fix_var_n):(1)
 ():() then init_units:(0)
 
 lw_fix_var_ty() {
@@ -27,5 +29,7 @@ lw_fix_var_ty() {
   push((import enames), "x");
   push((import etypes), "int");
 } return void;
+given env_init ():() then (import enames)[0]:("x")
+given env_init ():() then (import etypes)[0]:("int")
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)

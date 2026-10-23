@@ -14,6 +14,7 @@ lws_fixture() {
   export int lws_ent = (import lwent)[0];
 } return void;
 ():() then calls ir_func:(-1, "fs_acc", "int")
+():() then calls lw_alloca:("string", "s")
 ():() then init_units:(0)
 
 lws_fixture_in() {
@@ -21,6 +22,7 @@ lws_fixture_in() {
   lset((import esc_cons), 0, (import efs_vs));
 } return void;
 ():() then (import esc_cons)[0]:(50)
+():() then calls lw_alloca:("string", "s")
 ():() then init_units:(0)
 ():() then calls lws_fixture:[1]
 
@@ -30,5 +32,6 @@ lws_fixture_ret() {
   export int lws_r = lw_alloca("string", "r");
 } return void;
 ():() then (import sqbase)[0]:(61)
+():() then calls lw_alloca:("string", "r")
 ():() then init_units:(0)
 ():() then calls lws_fixture:[1]

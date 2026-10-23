@@ -11,6 +11,7 @@ lw_fix_fnval() {
   lw_fix_fnval_reg();
 } return void;
 ():() then (import fix_fnval_n):(1)
+():() then calls fidx_add:("fx_target")
 ():() then init_units:(0)
 ():() then calls lw_env_fixture:[1]
 
@@ -19,6 +20,8 @@ lw_fix_fnval_reg() {
   push((import fnodes), (import lw_fixture_n));
   export int fix_fnval_n = node_txt("var", "fx_target");
 } return void;
+given lw_fix_fnval ():() then calls fidx_add:("fx_target")
+given lw_fix_fnval ():() then calls node_txt:("var", "fx_target")
 given lw_fix_fnval ():() then (import chkfail)[0]:(0)
 given lw_fix_fnval ():() then init_units:(0)
 
@@ -31,4 +34,5 @@ lw_fix_bin() {
   export int fix_bin_n = node_txt2("bin", "+", x, x);
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_txt2:("bin", "+", 1, 1)
 ():() then init_units:(0)
