@@ -19,6 +19,8 @@ esc_ff_h() {
   export int eff_rlb = node_arr([(import eff_row1)]);
   export int eff_rdb = node_decl("int[][]", "b", (import eff_rlb), 0);
 } return void;
+given esc_ffix ():() then calls node_arr:([(import eff_vn)]) then calls node_arr:((import ef_none)) then calls node_arr:([(import eff_row1), (import eff_row2)])
+given esc_ffix ():() then calls node_decl:("int[][]", "a", (import eff_rl), 0) then calls node_decl:("int[][]", "b", (import eff_rlb), 0)
 given esc_ffix ():() then (import chkfail)[0]:(0)
 given esc_ffix ():() then init_units:(0)
 
@@ -35,5 +37,7 @@ esc_ff_i() {
   export int eff_dsy = node_decl("int[][]", "y", (import eff_cleak), 0);
   export int eff_shallow = node_func("ff_shallow", "int", (import eff_np), [(import eff_dsy)], (import eff_vn));
 } return void;
+given esc_ffix ():() then calls node_decl:("int[]", "r", (import eff_bi), 0) then calls node_call:("ff_rows", [(import eff_vn)]) then calls node_decl:("int[][]", "z", (import eff_crows), 0)
+given esc_ffix ():() then calls node_call:("ff_rleak", [(import eff_vn)]) then calls node_decl:("int[][]", "y", (import eff_cleak), 0) then calls node_func:("ff_shallow", "int", (import eff_np), [(import eff_dsy)], (import eff_vn))
 given esc_ffix ():() then (import chkfail)[0]:(0)
 given esc_ffix ():() then init_units:(0)

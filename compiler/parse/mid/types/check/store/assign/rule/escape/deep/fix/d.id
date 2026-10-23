@@ -4,5 +4,7 @@
 esc_fd_i() {
   export int efd_blit = node_arr((import efd_elbad));
 } return void;
+given esc_dfix ():() then calls node_arr:((import efd_elbad))
+given esc_dfix ():() then calls newnode:("arr", 0, 0, "", "", (import efd_elbad), [])
 given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)

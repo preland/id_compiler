@@ -5,6 +5,8 @@ esc_fx_c() {
   export int efc_y = node_decl("int[]", "y", node_txt("var", "s"), 0);
   export int[] efc_wl = [(import efc_w), (import efc_y)];
 } return void;
+given esc_fix ():() then calls node_arr:((import ef_none)) then calls node_decl:("int[]", "w", 49, 0)
+given esc_fix ():() then calls node_txt:("var", "s") then calls node_decl:("int[]", "y", 51, 0)
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)
 
@@ -13,6 +15,8 @@ esc_fx_c2() {
   export int efc_cond = node_txt2("bin", "<", (import efc_len), node_txt2("int", "3", 3, 0));
   export int efc_loop = node_while((import efc_cond), (import efc_wl));
 } return void;
+given esc_fix ():() then calls node_txt:("var", "s") then calls node_call:("len", [49]) then calls node_txt2:("int", "3", 3, 0)
+given esc_fix ():() then calls node_txt2:("bin", "<", (import efc_len), 51) then calls node_while:((import efc_cond), (import efc_wl))
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)
 
@@ -21,5 +25,7 @@ esc_fx_c3() {
   export int efc_z = node_decl("int[]", "z", node_arr((import ef_none)), 0);
   export int[] efc_stmts = [(import efc_loop), (import efc_z)];
 } return void;
+given esc_fix ():() then calls node_if:((import efc_cond), (import efc_wl), (import ef_none), 0)
+given esc_fix ():() then calls node_arr:((import ef_none)) then calls node_decl:("int[]", "z", 50, 0)
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)

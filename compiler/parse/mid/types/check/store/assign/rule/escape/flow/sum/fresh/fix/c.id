@@ -25,6 +25,8 @@ esc_ff_reg() {
   add_func("ff_rows", "int[][]", (import eff_rows));
   add_func("ff_rleak", "int[][]", (import eff_rleak));
 } return void;
+given esc_ffix ():() then calls sd_note:("FfPt", ["x"], ["int"], "ff.id", 1) then calls add_func:("fs_ret", "string", (import efs_ret)) then calls add_func:("ff_make", "int[]", (import eff_make))
+given esc_ffix ():() then calls add_func:("ff_pong", "int[]", (import eff_pong)) then calls add_func:("ff_bad", "int[]", (import eff_bad)) then calls add_func:("ff_rleak", "int[][]", (import eff_rleak))
 given esc_ffix ():() then (import chkfail)[0]:(0)
 given esc_ffix ():() then init_units:(0)
 
@@ -64,5 +66,7 @@ esc_ff_d() {
 } chain () {
   export int eff_bad = node_func("ff_bad", "int[]", (import eff_bp), [(import eff_d0), (import eff_ifb)], (import eff_vr));
 } return void;
+given esc_ffix ():() then calls node_txt:("var", "p") then calls node_txt1:("assign", "r", (import eff_vp))
+given esc_ffix ():() then calls node_if:((import eff_cond), [(import eff_asb)], [(import eff_sbp)], 0) then calls node_func:("ff_bad", "int[]", (import eff_bp), [(import eff_d0), (import eff_ifb)], (import eff_vr))
 given esc_ffix ():() then (import chkfail)[0]:(0)
 given esc_ffix ():() then init_units:(0)

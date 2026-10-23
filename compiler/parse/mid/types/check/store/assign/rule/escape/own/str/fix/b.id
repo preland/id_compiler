@@ -10,6 +10,8 @@ esc_fs_d() {
   export int efs_db = node_decl("string", "b", (import efs_va), 0);
   export int efs_alias = node_func("fs_alias", "int", (import efs_np), [(import efs_da), (import efs_aa), (import efs_db)], (import efs_vn));
 } return void;
+given esc_sfix ():() then calls node_txt:("var", "a") then calls node_decl:("string", "a", (import efs_lit0), 0)
+given esc_sfix ():() then calls node_txt2:("bin", "+", (import efs_va), (import efs_vn)) then calls node_txt1:("assign", "a", (import efs_asum)) then calls node_decl:("string", "b", (import efs_va), 0) then calls node_func:("fs_alias", "int", (import efs_np), [(import efs_da), (import efs_aa), (import efs_db)], (import efs_vn))
 given esc_sfix ():() then (import chkfail)[0]:(0)
 given esc_sfix ():() then init_units:(0)
 
@@ -25,5 +27,7 @@ esc_fs_e() {
   export int efs_arr = node_arr([(import efs_vn)]);
   export int efs_one = node_txt2("int", "1", 1, 0);
 } return void;
+given esc_sfix ():() then calls node_txt:("var", "d") then calls node_decl:("string", "d", (import efs_lit0), 0) then calls node_txt2:("bin", "+", (import efs_vd), (import efs_vn)) then calls node_txt2:("bin", "+", (import efs_dn), (import efs_vd))
+given esc_sfix ():() then calls node_txt1:("assign", "d", (import efs_dt)) then calls node_func:("fs_dbl", "int", (import efs_np), [(import efs_dd), (import efs_ad)], (import efs_vn)) then calls node_arr:([(import efs_vn)]) then calls node_txt2:("int", "1", 1, 0)
 given esc_sfix ():() then (import chkfail)[0]:(0)
 given esc_sfix ():() then init_units:(0)

@@ -5,6 +5,8 @@ esc_fx_b() {
   export int efb_vp = node_txt("var", "p");
   export int[] efb_args = [(import efb_vt), (import efb_vp)];
 } return void;
+given full_env ():() then calls node_txt:("var", "t")
+given full_env ():() then calls node_txt:("var", "p")
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
@@ -13,6 +15,8 @@ esc_fx_b2() {
   export int efb_dt = node_decl("int[]", "t", node_arr((import ef_none)), 0);
   export int efb_dv = node_decl("int[]", "v", (import efb_vp), 0);
 } return void;
+given esc_fix ():() then calls node_call:("fa_sink", (import efb_args))
+given esc_fix ():() then calls node_arr:((import ef_none)) then calls node_decl:("int[]", "t", 50, 0) then calls node_decl:("int[]", "v", (import efb_vp), 0)
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)
 
@@ -21,5 +25,7 @@ esc_fx_b3() {
   export int efb_ret0 = newnode("ret", 0 - 1, 0, "", "", (import ef_none), (import ef_none));
   export int efb_fn = node_func("fa_loc", "int[]", (import efb_ps), (import efb_stmts), node_txt("var", "v"));
 } return void;
+given esc_fix ():() then calls newnode:("ret", (import efb_vp), 0, "", "", (import ef_none), (import ef_none))
+given esc_fix ():() then calls newnode:("ret", -1, 0, "", "", (import ef_none), (import ef_none)) then calls node_func:("fa_loc", "int[]", (import efb_ps), (import efb_stmts), 51)
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)

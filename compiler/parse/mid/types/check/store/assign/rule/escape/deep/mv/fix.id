@@ -23,6 +23,8 @@ esc_fm_a() {
   export int efm_pc = node_call("push", [(import efm_kv), (import efm_rc)]);
   export int efm_ps = node_exprstmt((import efm_pc));
 } return void;
+given esc_fm_fix ():() then calls sd_note:("Tr", ["kids"], ["Tr[]"], "tr.id", 1) then calls add_var:("kids", "Tr[]", 0) then calls add_var:("n", "int", 0)
+given esc_fm_fix ():() then calls node_call:("fm_ok", [(import efm_dv)]) then calls node_call:("push", [(import efm_kv), (import efm_rc)])
 given esc_fm_fix ():() then (import chkfail)[0]:(0)
 given esc_fm_fix ():() then init_units:(0)
 
@@ -39,6 +41,8 @@ esc_fm_b() {
   export int[] efm_bbody = [(import efm_ds), (import efm_ct), (import efm_dn)];
   export int efm_bad = node_func("fm_bad", "Tr", (import efm_pd), (import efm_bbody), node_txt("var", "t"));
 } return void;
+given esc_fm_fix ():() then calls node_call:("Tr", [(import efm_kv)]) then calls node_decl:("Tr", "t", (import efm_cc), 0)
+given esc_fm_fix ():() then calls node_call:("len", [(import efm_kv)]) then calls node_param:("param", "int", "d")
 given esc_fm_fix ():() then (import chkfail)[0]:(0)
 given esc_fm_fix ():() then init_units:(0)
 
