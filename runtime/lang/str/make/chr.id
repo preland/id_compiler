@@ -1,10 +1,10 @@
 // The two ways a new string comes into existence: one byte of it, or two
 // existing ones end to end.
 //
-// Both hand back arena space that nothing will ever reclaim, which is what
-// docs/SPEC.md 6 promises and what makes string building in a loop a memory
-// cost rather than a bug. Each block is the count, the bytes, and a NUL; the
-// string is the address of the bytes.
+// Both hand back arena space from the size-class pool, which str_free gives
+// back when the compiler proves the string owned and dead (docs/MEMORY.md 2a);
+// a string it cannot prove stays until the program ends. Each block is the
+// count, the bytes, and a NUL; the string is the address of the bytes.
 
 chr(int n) {
   word p = str_blk(1);
