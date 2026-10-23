@@ -1,0 +1,11 @@
+// A list literal is a byte literal where a struct field or a bytes[] element
+// is bytes: the constructor argument and the pushed values each build a buffer.
+main(int argc, string[] argv) {
+  Packet p = Packet(7, [10, 20, 255]);
+  bytes[] parts = [];
+  push(parts, [1, 2]);
+} chain (int argc, string[] argv) {
+  push(parts, []);
+  string line = p.tag + " " + len(p.body) + " " + p.body[2] + " " + len(parts) + " " + len(parts[0]) + " " + len(parts[1]);
+  print(line);
+} return int 0;

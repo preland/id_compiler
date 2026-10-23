@@ -10,7 +10,7 @@ given lw_fix_arr ((import fix_arr_n), 0, 5, "word"):() then calls lw_arr_push2:(
 
 lw_arr_push2(int a, int v, string elem) {
   int boxed = lw_box(v, elem);
-  lw_callf("id_list_push", "", [a, boxed]);
+  lw_callf(lw_bfn(a, "id_list_push", "id_bytes_push"), "", [a, boxed]);
 } return void;
 given lw_env_fixture (0, 0, "int"):() then calls lw_callf:("id_list_push", "", [0, 0])
 given lw_env_fixture (0, 1, "word"):() then calls lw_callf:("id_list_push", "", [0, 1])

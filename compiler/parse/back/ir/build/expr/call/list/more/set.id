@@ -16,7 +16,14 @@ given lw_fix_iassign ((import fix_iassign_n), 5, "x"):() then calls lw_callf:("i
 // is not.
 lw_new(string ty) {
   int[] none = [];
-  int ret_i = lw_callf("id_list_new", ty, none);
+  string maker = "id_list_new";
+  if(ty == "bytes") {
+    maker = "id_bytes_new";
+    none = [lw_const("int", "0")];
+  }
+} chain (string ty) {
+  int ret_i = lw_callf(maker, ty, none);
 } return int ret_i;
 given lw_env_fixture ("int"):(0)
 given lw_env_fixture ("string"):(0)
+given lw_env_fixture ("bytes"):(1)

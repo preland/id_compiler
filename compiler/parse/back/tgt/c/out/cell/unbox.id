@@ -24,6 +24,11 @@ unbox3(string code, string type) {
   if(type == "float") {
     s = "id_unbox_f(" + code + ")";
   }
+  if(type == "bytes") {
+    s = "(IdBytes*)(intptr_t)(" + code + ")";
+  }
 } return string s;
 ("x", "float"):("id_unbox_f(x)")
 ("x", "word"):("(long long)(x)")
+("x", "bytes"):("(IdBytes*)(intptr_t)(x)")
+("x", "int[]"):("(IdList*)(intptr_t)(x)")

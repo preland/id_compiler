@@ -6,7 +6,7 @@
 want_decl(int i, int id) {
   string t = (import ns1)[i];
   int ok = 0;
-  if((import nkind)[i] == "decl" && (import ni1)[i] == id && ty_is_list(t) == 1) {
+  if((import nkind)[i] == "decl" && (import ni1)[i] == id && (ty_is_list(t) == 1 || t == "bytes")) {
     ok = 1;
   }
 } return int ok;
@@ -18,7 +18,7 @@ given idxfix (0, (import rgidx_node)):(0)
 want_asg(int i, int id) {
   string vt = var_type_at(i);
   int ok = 0;
-  if((import nkind)[i] == "assign" && (import ni1)[i] == id && ty_is_list(vt) == 1) {
+  if((import nkind)[i] == "assign" && (import ni1)[i] == id && (ty_is_list(vt) == 1 || vt == "bytes")) {
     ok = 1;
   }
 } return int ok;

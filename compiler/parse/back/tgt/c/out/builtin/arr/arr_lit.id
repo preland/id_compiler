@@ -8,9 +8,15 @@ emit_arr(int id) {
   if(len(l1_of_v) > 0) {
     s = emit_arr_n(id);
   }
+} chain (int id) {
+  if(type_of(id) == "bytes") {
+    s = "id_bytes_lit" + str_sub(s, 11, len(s) - 11);
+  }
 } return string s;
 given lit_int_fixture ((import lit_e)):("id_list_lit(0)")
 given lit_arr_fixture ((import lit_arr_e)):("id_list_lit(2, (long long)(5), (long long)(4))")
+given lit_int_fixture given tcache_set((import lit_e), "bytes") ((import lit_e)):("id_bytes_lit(0)")
+given lit_arr_fixture given tcache_set((import lit_arr_e), "bytes") ((import lit_arr_e)):("id_bytes_lit(2, (long long)(5), (long long)(4))")
 
 emit_arr_n(int id) {
   int[] elems = (import nl1)[id];

@@ -1,0 +1,24 @@
+// A list literal in a bytes slot is a byte literal: declaration, assignment,
+// call argument and return value each build a bytes buffer, not an int list.
+total(bytes b) {
+  int s = 0;
+  int i = 0;
+  while(i < len(b)) {
+    s = s + b[i];
+    i = i + 1;
+  }
+} return int s;
+
+made() {
+  bytes r = [4, 255];
+} return bytes r;
+
+main(int argc, string[] argv) {
+  bytes d = [1, 255];
+  bytes e = [];
+  e = [7, 8];
+} chain (int argc, string[] argv) {
+  bytes m = made();
+  string line = total(d) + " " + total(e) + " " + total([9, 9, 9]) + " " + total(m);
+  print(line);
+} return int 0;

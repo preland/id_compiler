@@ -1,0 +1,40 @@
+// The argument side of bytes_slot: a literal passed where the callee's
+// parameter, or the constructed struct's field, is bytes.
+
+bytes_mark_args(int i) {
+  int bm_k = 0;
+  while(bm_k < len(((import nl1)[i]))) {
+    bytes_mark_arg(i, bm_k);
+    bm_k = bm_k + 1;
+  }
+} return void;
+given bm_sized ((import bm_call_fn)):() then calls bytes_mark_arg:((import bm_call_fn), 0)
+given bm_sized ((import bm_call_fn)):() then calls bytes_mark_arg:[1]
+
+bytes_mark_arg(int i, int bm_k) {
+  int bm_a = (import nl1)[i][bm_k];
+  string bm_t = "";
+  if((import nkind)[bm_a] == "arr") {
+    bm_t = bytes_param_type(i, bm_k);
+  }
+} chain (int i, int bm_k) {
+  if(bm_t == "bytes") {
+    lset((import bytesmark), bm_a, 1);
+  }
+} return void;
+given bm_sized ((import bm_call_fn), 0):() then calls lset:((import bytesmark), (import bm_arr_fn), 1)
+given bm_sized ((import bm_call_ctor), 0):() then calls lset:((import bytesmark), (import bm_arr_ctor), 1)
+given bm_sized ((import bm_call_int), 0):() then calls lset:[0]
+
+bytes_param_type(int i, int bm_k) {
+  string bm_nm = (import ns1)[i];
+  int bm_fn = func_node(bm_nm);
+  string bm_t = sd_cell((import sdftype), bm_nm, bm_k);
+} chain (int i, int bm_k) {
+  if(bm_fn >= 0 && bm_k < len(((import nl1)[bm_fn]))) {
+    bm_t = (import ns1)[(import nl1)[bm_fn][bm_k]];
+  }
+} return string bm_t;
+given bm_fixture ((import bm_call_fn), 0):("bytes")
+given bm_fixture ((import bm_call_ctor), 0):("bytes")
+given bm_fixture ((import bm_call_fn), 1):("")

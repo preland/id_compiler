@@ -1,0 +1,35 @@
+// What one node hands a bytes type to: a call hands it to its arguments, a
+// declaration or an assignment to its value.
+
+bytes_mark_at(int i) {
+  if((import nkind)[i] == "call") {
+    bytes_mark_args(i);
+  } else {
+    bytes_mark_store(i);
+  }
+} return void;
+given bm_sized ((import bm_dec_bytes)):() then calls bytes_mark_store:((import bm_dec_bytes))
+given bm_sized ((import bm_call_fn)):() then calls bytes_mark_args:((import bm_call_fn))
+
+bytes_mark_store(int i) {
+  string bm_want = bytes_store_type(i);
+  int bm_val = (import ni1)[i];
+  if(bm_want == "bytes" && (import nkind)[bm_val] == "arr") {
+    lset((import bytesmark), bm_val, 1);
+  }
+} return void;
+given bm_sized ((import bm_dec_bytes)):() then calls lset:((import bytesmark), (import bm_arr_decl), 1)
+given bm_sized ((import bm_dec_plain)):() then calls lset:[0]
+given bm_sized ((import bm_asg_bytes)):() then calls lset:((import bytesmark), (import bm_arr_asg), 1)
+
+bytes_store_type(int i) {
+  string bm_t = "";
+  if((import nkind)[i] == "decl") {
+    bm_t = (import ns1)[i];
+  } else if((import nkind)[i] == "assign") {
+    bm_t = var_type_at(i);
+  }
+} return string bm_t;
+given bm_fixture ((import bm_dec_bytes)):("bytes")
+given bm_fixture ((import bm_asg_bytes)):("bytes")
+given bm_fixture ((import bm_arr_plain)):("")

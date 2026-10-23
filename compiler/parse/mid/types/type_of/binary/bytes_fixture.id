@@ -1,0 +1,47 @@
+// Nodes for bytes_slot's cases: bytes slots of each kind holding a literal
+// (declaration, assignment, a defined function's argument, a constructor's)
+// beside the slots that hold a literal without handing it bytes.
+
+bm_fixture() {
+  call2_setup();
+  leaves_fixture();
+  bm_slots();
+} chain () {
+  bm_calls();
+} return void;
+():() then calls bm_slots:[1]
+():() then (import chkfail)[0]:(0)
+
+bm_slots() {
+  add_var("bm_var", "bytes", 0);
+  export int bm_arr_plain = node_arr([(import lit_a)]);
+  export int bm_arr_decl = node_arr([(import lit_a), (import lit_b)]);
+} chain () {
+  export int bm_dec_bytes = node_decl("bytes", "bm_d", (import bm_arr_decl), 0);
+  export int bm_dec_plain = node_decl("int[]", "bm_p", (import bm_arr_plain), 0);
+  export int bm_arr_asg = node_arr([(import lit_b)]);
+} chain () {
+  export int bm_asg_bytes = node_txt1("assign", "bm_var", (import bm_arr_asg));
+} return void;
+given leaves_fixture ():() then calls add_var:("bm_var", "bytes", 0)
+given leaves_fixture ():() then calls node_decl:[2]
+
+bm_calls() {
+  int bm_param = node_param("param", "bytes", "bm_p");
+  export int bm_func = node_func("bm_f", "int", [bm_param], [bm_param], 0);
+  push((import fnodes), (import bm_func));
+} chain () {
+  fidx_add("bm_f");
+  export int bm_arr_fn = node_arr([(import lit_a)]);
+  export int bm_call_fn = node_call("bm_f", [(import bm_arr_fn)]);
+} chain () {
+  push((import sdname), "BmS");
+  push((import sdfname), ["bm_field"]);
+  push((import sdftype), ["bytes"]);
+} chain () {
+  export int bm_arr_ctor = node_arr([(import lit_a)]);
+  export int bm_call_ctor = node_call("BmS", [(import bm_arr_ctor)]);
+  export int bm_call_int = node_call("bm_f", [(import lit_a)]);
+} return void;
+given call2_setup given leaves_fixture ():() then calls node_param:("param", "bytes", "bm_p")
+given call2_setup given leaves_fixture ():() then calls node_call:[3]

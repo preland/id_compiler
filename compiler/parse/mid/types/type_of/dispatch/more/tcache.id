@@ -16,6 +16,7 @@ init_tcache() {
   export int[] seqt = [];
 } chain () {
   export int[] arrmark = [];
+  export int[] bytesmark = [];
 } return void;
 given env_init given tcache_set(0, "int") ():() then len((import tcache)):(0)
 given env_init given tcache_set(1, "string") ():() then len((import tcache_ok)):(0)

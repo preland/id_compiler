@@ -18,6 +18,10 @@ given idxquiet ((import idx_node3)):(0)
 want_elem_ok2(string t) {
   string elem_type_v = elem_type(t);
   int ok = ty_is_list(elem_type_v);
+  if(elem_type_v == "bytes") {
+    ok = 1;
+  }
 } return int ok;
 ("int[][]"):(1)
 ("int[]"):(0)
+("bytes[]"):(1)

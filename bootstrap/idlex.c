@@ -903,6 +903,8 @@ static unsigned char id_byte_fit(long long v) {
     if (v < 0 || v > 255) id_byte_range(v);
     return (unsigned char)v;
 }
+static int id_bytes_len_raw(IdBytes* B) { return B ? B->len : -1; }
+static int id_bytes_cap_raw(IdBytes* B) { return B ? B->cap : -1; }
 static int id_bytes_len(IdBytes* B) { if (!B) id_null_read(); if (B->len < 0) id_freed_trap(); return B->len; }
 static long long id_bytes_get(IdBytes* B, int i) {
     if (!B) id_null_read();

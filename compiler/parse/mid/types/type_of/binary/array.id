@@ -10,9 +10,15 @@ type_arr(int id) {
     int[] l1_of_v2 = (import nl1)[id];
     t = type_of(l1_of_v2[0]) + "[]";
   }
+} chain (int id) {
+  if(bytes_slot(id) == 1) {
+    t = "bytes";
+  }
 } return string t;
 given shapes_fixture ((import arr_ints)):("int[]")
 given strarr_fixture ((import arr_strs)):("string[]")
+given bm_fixture ((import bm_arr_decl)):("bytes")
+given bm_fixture ((import bm_arr_plain)):("int[]")
 
 call2_setup() {
   cm_setup();

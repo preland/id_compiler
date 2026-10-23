@@ -1,0 +1,36 @@
+// A list literal in a bytes slot is a bytes value, and the emitters ask
+// type_of to say so. The literal has no parent link, so the question is asked
+// backwards from the slots (a declaration, an assignment, a call or
+// constructor argument): bytesmark holds a 1 for every literal some node hands
+// a bytes type, built by one pass over the store the first time a literal asks.
+// It is recomputed from the store alone, so a build that skips the type check
+// (a front-end cache hit) answers the same as one that ran it.
+
+bytes_slot(int id) {
+  if(len((import bytesmark)) != len((import nkind))) {
+    bytes_marks();
+  }
+  int ok = (import bytesmark)[id];
+} return int ok;
+given bm_fixture ((import bm_arr_decl)):(1)
+given bm_fixture ((import bm_arr_plain)):(0)
+
+bytes_marks() {
+  list_set_all((import bytesmark), len((import bytesmark)), 0);
+  list_fill((import bytesmark), len((import nkind)) - len((import bytesmark)), 0);
+  int i = 0;
+} chain () {
+  while(i < len((import nkind))) {
+    bytes_mark_at(i);
+    i = i + 1;
+  }
+} return void;
+given bm_fixture ():() then calls lset:((import bytesmark), (import bm_arr_fn), 1)
+given bm_fixture ():() then calls lset:[4]
+
+bm_sized() {
+  bm_fixture();
+  list_fill((import bytesmark), len((import nkind)), 0);
+} return void;
+():() then calls bm_fixture:[1]
+():() then (import chkfail)[0]:(0)
