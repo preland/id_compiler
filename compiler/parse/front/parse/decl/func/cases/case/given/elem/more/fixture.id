@@ -8,6 +8,7 @@ tup1_fix() {
   toks_push(["op", "int", "op"], ["(", "5", ")"]);
 } return void;
 ():() then calls toks_push:(["op", "int", "op"], ["(", "5", ")"])
+():() then (import ttext)[1]:("5")
 ():() then init_units:(0)
 
 tup2_fix() {
@@ -15,6 +16,7 @@ tup2_fix() {
   toks_push(["op", "int", "op", "int", "op"], ["(", "5", ",", "6", ")"]);
 } return void;
 ():() then calls toks_push:(["op", "int", "op", "int", "op"], ["(", "5", ",", "6", ")"])
+():() then (import ttext)[3]:("6")
 ():() then init_units:(0)
 
 colon_fix() {
@@ -22,4 +24,5 @@ colon_fix() {
   toks_push(["op"], [":"]);
 } return void;
 ():() then calls toks_push:(["op"], [":"])
+():() then (import ttext)[0]:(":")
 ():() then init_units:(0)

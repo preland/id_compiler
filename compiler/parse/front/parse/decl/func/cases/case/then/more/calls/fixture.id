@@ -6,6 +6,7 @@ calls_args_fix() {
   toks_push(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "(", "6", ")"]);
 } return void;
 ():() then calls toks_push:(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "(", "6", ")"])
+():() then (import ttext)[1]:("myfn")
 ():() then init_units:(0)
 
 // `traps:("...")` (docs/TESTS.md): its own kind, "thentraps", since the

@@ -8,5 +8,6 @@ eprints_fix() {
   toks_push(["kw", "op", "op", "str", "op"], ["eprints", ":", "(", "\"hi\"", ")"]);
 } return void;
 ():() then calls toks_push:(["kw", "op", "op", "str", "op"], ["eprints", ":", "(", "\"hi\"", ")"])
+():() then (import ttext)[0]:("eprints")
 ():() then init_units:(0)
 

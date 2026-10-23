@@ -25,4 +25,5 @@ lit_fix() {
   export int lit_var = node_txt("var", "x");
 } return void;
 ():() then calls node_txt2:("int", "5", 5, 0)
+():() then calls node_txt:("var", "x")
 ():() then init_units:(0)

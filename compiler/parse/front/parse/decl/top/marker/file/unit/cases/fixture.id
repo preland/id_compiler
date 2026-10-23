@@ -7,5 +7,6 @@ asm_fix_full() {
   toks_push(["op", "op", "kw", "kw", "ident", "op"], ["{", "}", "return", "int", "result", ";"]);
 } return void;
 ():() then calls toks_push:(["op", "op", "kw", "kw", "ident", "op"], ["{", "}", "return", "int", "result", ";"])
+():() then (import ttext)[2]:("return")
 ():() then init_units:(0)
 

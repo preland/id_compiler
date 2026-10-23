@@ -29,6 +29,7 @@ list_fix() {
   toks_push(["op", "int", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op", "op"], ["[", "5", ",", "(", "import", "zz", ")", "]", "[", "[", "5", "]", "]"]);
 } return void;
 ():() then calls toks_push:(["op", "int", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op", "op"], ["[", "5", ",", "(", "import", "zz", ")", "]", "[", "[", "5", "]", "]"])
+():() then (import ttext)[5]:("zz")
 ():() then init_units:(0)
 
 // `given f (1, 2) (3):(4)` from 0 and `given g (3):(4)` from 14: one stream
@@ -38,4 +39,5 @@ gargs_fix() {
   toks_push(["kw", "ident", "op", "int", "op", "int", "op", "op", "int", "op", "op", "op", "int", "op", "kw", "ident", "op", "int", "op", "op", "op", "int", "op"], ["given", "f", "(", "1", ",", "2", ")", "(", "3", ")", ":", "(", "4", ")", "given", "g", "(", "3", ")", ":", "(", "4", ")"]);
 } return void;
 ():() then calls toks_push:(["kw", "ident", "op", "int", "op", "int", "op", "op", "int", "op", "op", "op", "int", "op", "kw", "ident", "op", "int", "op", "op", "op", "int", "op"], ["given", "f", "(", "1", ",", "2", ")", "(", "3", ")", ":", "(", "4", ")", "given", "g", "(", "3", ")", ":", "(", "4", ")"])
+():() then (import ttext)[15]:("g")
 ():() then init_units:(0)

@@ -7,6 +7,7 @@ fnname_fix() {
   toks_push(["ident", "op"], ["myfn", ")"]);
 } return void;
 ():() then calls toks_push:(["ident", "op"], ["myfn", ")"])
+():() then (import ttext)[0]:("myfn")
 ():() then init_units:(0)
 
 bound_n_fix() {
@@ -14,5 +15,6 @@ bound_n_fix() {
   toks_push(["ident", "op", "ident", "op"], ["O", "(", "n", ")"]);
 } return void;
 ():() then calls toks_push:(["ident", "op", "ident", "op"], ["O", "(", "n", ")"])
+():() then (import ttext)[2]:("n")
 ():() then init_units:(0)
 

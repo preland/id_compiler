@@ -8,5 +8,6 @@ fnrhs_fix() {
   toks_push(["op", "op", "int", "op"], [":", "(", "6", ")"]);
 } return void;
 ():() then calls toks_push:(["op", "op", "int", "op"], [":", "(", "6", ")"])
+():() then (import ttext)[0]:(":")
 ():() then init_units:(0)
 

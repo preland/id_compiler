@@ -10,9 +10,10 @@ parse_decl_top(int[] pos) {
     parse_decl_fn(pos);
   }
 } return void;
+given sd_toks ([0]):() then len((import sdname)):(1)
+given decl_tokens ([0]):() then len((import prog)):(1)
 given decl_tokens ([0]):() then (import chkfail)[0]:(0)
 given decl_tokens ([0]):() then init_units:(0)
-given sd_toks ([0]):() then len((import sdname)):(1)
 
 // Any test cases following the return clause are taken in the return clause
 // here, which is free under the action limit -- and which also runs after the
@@ -34,6 +35,8 @@ init_files2() {
   export int[] lnseen = [];
   init_lines2();
 } return void;
+given case_fixture ():() then len((import tline)):(0)
+given case_fixture ():() then len((import nline)):(0)
 ():() then len((import tline)):(0)
 ():() then init_units:(0)
 ():() then calls init_lines2:[1]

@@ -8,5 +8,6 @@ case_min_fix() {
   toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"]);
 } return void;
 ():() then calls toks_push:(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"])
+():() then (import ttext)[3]:(":")
 ():() then init_units:(0)
 

@@ -19,6 +19,8 @@ init_lines2() {
   export int[] nline = [];
   init_lines3();
 } return void;
+given farm_i ():() then len((import pline)):(0)
+given case_fixture ():() then len((import nline)):(0)
 ():() then len((import pline)):(0)
 ():() then init_units:(0)
 ():() then calls init_lines3:[1]

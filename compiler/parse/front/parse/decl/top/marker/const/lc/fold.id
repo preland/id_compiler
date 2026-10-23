@@ -14,5 +14,7 @@ fold_setup() {
   export int fold_arr = node_arr([(import fold_e)]);
   export int fold_ls = lc_reg("int[]", "ls", (import fold_arr));
 } return void;
+():() then calls node_txt2:("int", "5", 5, 0)
+():() then calls node_txt:("import", "zz")
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
