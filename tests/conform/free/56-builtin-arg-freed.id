@@ -1,0 +1,17 @@
+// A string a builtin makes and a call receives directly, `weigh(str_sub(s, 0, 2))`,
+// has no name, so once `weigh` returns it nothing can reach it. `weigh` only
+// reads its parameter, so the caller gives the block back after each call:
+// three substrings are made and three are freed.
+weigh(string t) {
+  int w = len(t) * 2;
+} return int w;
+
+run(string s) {
+  int a = weigh(str_sub(s, 0, 2));
+  int b = weigh(str_sub(s, 1, 3));
+  int c = weigh(str_sub(s, 2, 4)) + a + b;
+} return int c;
+
+main(int argc, string[] argv) {
+  print(run("abcdef"));
+} return int 0;

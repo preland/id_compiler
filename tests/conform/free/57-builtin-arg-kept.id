@@ -1,0 +1,15 @@
+// The same direct call, but the callee pushes its parameter into a list that
+// outlives the call: the substring is then held by the list, so the caller must
+// not free it after the call. The list frees its strings with itself at the exit.
+shelve(string[] pool, string t) {
+  push(pool, t);
+  int c = len(pool);
+} return int c;
+
+main(int argc, string[] argv) {
+  string[] pool = [];
+  int a = shelve(pool, str_sub("abcdef", 0, 2));
+  int b = shelve(pool, str_sub("abcdef", 2, 4));
+} chain (int argc, string[] argv) {
+  print(a + b + len(pool[0]) + len(pool[1]));
+} return int 0;

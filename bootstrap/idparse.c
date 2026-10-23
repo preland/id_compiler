@@ -15760,7 +15760,7 @@ IdList* idsq_23;
 void id_ur_seed(char* urs) {
     IdList* urparts = NULL;
     if ((strcmp(urs, ID_S("")) != 0)) {
-        { IdList* idfe_o = urparts; urparts = id_str_split(urs, id_chr(31)); id_list_free(idfe_o); }
+        { IdList* idfe_o = urparts; urparts = ({ char* idft1 = id_chr(31); IdList* idfr = id_str_split(urs, idft1); id_str_free(idft1); idfr; }); id_list_free(idfe_o); }
         id_keep_strs(urparts, uroots);
     }
     { id_list_free(urparts); return; }
@@ -18471,7 +18471,7 @@ char* idsq_19;
 char* id_ll_pred(char* op, char* t) {
     char* ll_pre;
     char* s;
-    ll_pre = id_str_pick(id_str_sub(op, 0, 1), ID_S("u"), ID_S("u"), ID_S("s"));
+    ll_pre = ({ char* idft0 = id_str_sub(op, 0, 1); char* idfr = id_str_pick(idft0, ID_S("u"), ID_S("u"), ID_S("s")); id_str_free(idft0); idfr; });
     s = id_ll_pred_word(op, ID_S("eq"), ID_S("ne"), ll_pre);
     if ((strcmp(id_ty_kind(t), ID_S("float")) == 0)) {
         s = id_ll_pred_word(op, ID_S("oeq"), ID_S("une"), ID_S("o"));
@@ -38384,7 +38384,8 @@ int id_esc_tmp_arg(int etc_node, int a, int i) {
     int m;
     int ok;
     m = id_esc_mask((char*)(intptr_t)(id_list_get(ns1, etc_node)));
-    ok = ((id_esc_bit(m, i) == 0) && (id_esc_fresh_node(a) == 1));
+int idsq_10;
+    ok = ((id_esc_bit(m, i) == 0) && (idsq_10 = id_esc_fresh_node(a), ((idsq_10 + id_str_fresh_call(a)) > 0)));
     return ok;
 }
 
