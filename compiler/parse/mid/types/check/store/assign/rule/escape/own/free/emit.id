@@ -31,6 +31,9 @@ esc_store_code(string nm, string code, int e) {
   if(esc_own(esc_cur(), nm) == 1 && esc_inplace() == 0) {
     s = "{ " + esc_c_ty(nm) + " idfe_o = " + nm + "; " + s + " " + esc_free_fn(esc_cur(), nm) + "(idfe_o); }";
   }
+  if(esc_xown(nm) == 1) {
+    s = esc_xstore_code(nm, code);
+  }
 } return string s;
 given esc_fix ("w", "v", (import efc_y)):("{ IdList* idfe_o = w; w = v; id_list_free(idfe_o); }")
 given esc_dfix ("a", "v", (import efc_y)):("{ IdList* idfe_o = a; a = v; id_list_free_deep(idfe_o); }")

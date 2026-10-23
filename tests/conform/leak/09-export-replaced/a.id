@@ -1,0 +1,21 @@
+// Replacing an exported list every pass used to keep every old list until the
+// program exited, because nothing proved that no reader held the old value. The
+// readers here only index and take a length, so the writer frees what it
+// replaces: allocated minus freed does not grow with the number of passes.
+fill(int n) {
+  export int[] xs = [n, n + 1, n + 2];
+} return void;
+
+probe(int n) {
+  int t = (import xs)[1] + len((import xs));
+} return int t;
+
+run(int n) {
+  int i = 0;
+  int acc = 0;
+  while(i < n) {
+    fill(i);
+    acc = acc + probe(i);
+    i = i + 1;
+  }
+} return int acc;

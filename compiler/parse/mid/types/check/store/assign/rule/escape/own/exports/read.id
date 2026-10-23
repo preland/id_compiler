@@ -1,0 +1,40 @@
+// The three judgements scan.id combines: `len(x)` reads one list and keeps
+// nothing; a subscript may only contain operators and leaves (a call, or a list
+// literal that could hold one, makes it unsafe); a declaration of the export
+// that stores a value which may be someone else's list.
+
+esc_xlen(int i, string nm) {
+  int[] args = (import nl1)[i];
+  int weight = 0;
+  if(len(args) == 1) {
+    weight = esc_xmine(args[0], nm);
+  }
+} return int weight;
+given esc_xfix ((import exa_len), "xg"):(1)
+given esc_xfix ((import exa_len), "xr"):(0)
+given esc_xfix ((import exa_two), "xt"):(0)
+
+esc_xclean(int e) {
+  int ok = (import nkind)[e] != "call" && (import nkind)[e] != "arr";
+  if(ok == 1 && ((import nkind)[e] == "bin" || (import nkind)[e] == "index")) {
+    ok = esc_xclean((import ni1)[e]) == 1 && esc_xclean((import ni2)[e]) == 1;
+  } else if(ok == 1 && (import nkind)[e] == "un") {
+    ok = esc_xclean((import ni1)[e]);
+  }
+} return int ok;
+given esc_xfix ((import exa_zero)):(1)
+given esc_xfix ((import exa_ix)):(1)
+given esc_xfix ((import exa_f)):(0)
+given esc_xfix ((import exa_ixi)):(0)
+given esc_xfix ((import exa_un)):(0)
+given esc_xfix ((import exa_bin)):(0)
+
+esc_xbad(int i, string nm) {
+  int weight = 0;
+  if((import nkind)[i] == "decl" && (import ns2)[i] == nm && (import ni2)[i] == 1 && (esc_fresh((import ni1)[i], nm, nm) & 2) != 0) {
+    weight = 1000000;
+  }
+} return int weight;
+given esc_xfix ((import exa_dg), "xg"):(0)
+given esc_xfix ((import exa_ds), "xs"):(1000000)
+given esc_xfix ((import exa_ds), "xg"):(0)

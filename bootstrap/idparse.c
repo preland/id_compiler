@@ -4240,6 +4240,16 @@ int id_esc_ret(int sn, char* nm);
 int id_esc_store(int sn, char* nm);
 int id_esc_put(int e, char* tg, char* nm);
 int id_esc_fresh(int e, char* tg, char* nm);
+char* id_esc_xstore_code(char* nm, char* code);
+int id_esc_xown(char* nm);
+int id_esc_xmemo(int export_slot, char* nm);
+int id_esc_xcheck(int export_slot, char* nm);
+int id_esc_xlen(int i, char* nm);
+int id_esc_xclean(int e);
+int id_esc_xbad(int i, char* nm);
+int id_esc_xscan(char* nm);
+int id_esc_xmine(int e, char* nm);
+int id_esc_xsafe(int i, char* nm);
 char* id_esc_free_decl(int fn, int sn, char* out);
 char* id_esc_free_nest(int fn, int sn, char* out);
 char* id_esc_store_code(char* nm, char* code, int e);
@@ -4876,6 +4886,7 @@ IdList* esc_mem;  /* exported by esc_init() */
 IdList* esc_fx;  /* exported by esc_init() */
 IdList* purenode;  /* exported by esc_init() */
 IdList* esc_cons;  /* exported by esc_init() */
+IdList* esc_xm;  /* exported by esc_init() */
 IdList* tkik;  /* exported by tk_maps() */
 IdList* tkiv;  /* exported by tk_maps() */
 IdList* tkiu;  /* exported by tk_maps() */
@@ -7846,8 +7857,10 @@ int id_lw_bin_op(int node, char* op) {
 int id_lw_old(int addr) {
     int o;
     o = (0 - 1);
-int idsq_27;
-    if (((((strcmp((char*)(intptr_t)(id_list_get(iop, addr)), ID_S("alloca")) == 0) && (id_lw_slot((char*)(intptr_t)(id_list_get(istr, addr))) == addr)) && (idsq_27 = id_esc_cur(), (id_esc_own(idsq_27, (char*)(intptr_t)(id_list_get(istr, addr))) == 1))) && (id_esc_inplace() == 0))) {
+int idsq_53;
+    if (((((strcmp((char*)(intptr_t)(id_list_get(iop, addr)), ID_S("alloca")) == 0) && (id_lw_slot((char*)(intptr_t)(id_list_get(istr, addr))) == addr)) && (idsq_53 = id_esc_cur(), (id_esc_own(idsq_53, (char*)(intptr_t)(id_list_get(istr, addr))) == 1))) && (id_esc_inplace() == 0))) {
+        o = id_lw_op(ID_S("load"), (char*)(intptr_t)(id_list_get(ity, addr)), addr, (0 - 1), ID_S(""));
+    } else if (((strcmp((char*)(intptr_t)(id_list_get(iop, addr)), ID_S("global")) == 0) && (id_esc_xown((char*)(intptr_t)(id_list_get(istr, addr))) == 1))) {
         o = id_lw_op(ID_S("load"), (char*)(intptr_t)(id_list_get(ity, addr)), addr, (0 - 1), ID_S(""));
     }
     return o;
@@ -36424,6 +36437,7 @@ void id_esc_init(void) {
     esc_fx = id_list_lit(3, (long long)(0), (long long)(1000000), (long long)(0));
     purenode = id_list_lit(0);
     esc_cons = id_list_lit(1, (long long)((0 - 1)));
+    esc_xm = id_list_lit(0);
     return;
 }
 
@@ -37103,6 +37117,118 @@ int id_esc_fresh(int e, char* tg, char* nm) {
     return r;
 }
 
+char* id_esc_xstore_code(char* nm, char* code) {
+    char* ty;
+    char* s = NULL;
+    ty = id_esc_c_ty(nm);
+    { char* idfe_o = s; s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("{ "), ty), ID_S(" idfe_n = "), 1), code, 1), ID_S("; "), 1); id_str_free(idfe_o); }
+    s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(s, ty, 1), ID_S(" idfe_o = "), 1), nm, 1), ID_S("; "), 1), nm, 1), ID_S(" = idfe_n; "), 1);
+    s = id_concat_f(id_concat_f(s, id_esc_free_fn(id_esc_cur(), nm), 1), ID_S("(idfe_o); }"), 1);
+    return s;
+}
+
+int id_esc_xown(char* nm) {
+    int export_slot;
+    int ok;
+    export_slot = id_find_str(enames, nm);
+    ok = 0;
+    if (((export_slot >= 0) && (id_esc_on() == 1))) {
+        ok = id_esc_xmemo(export_slot, nm);
+    }
+    return ok;
+}
+
+int id_esc_xmemo(int export_slot, char* nm) {
+    int ok;
+IdList* idsq_34;
+int idsq_33;
+    while ((idsq_34 = esc_xm, idsq_33 = id_list_len(idsq_34), (idsq_33 < id_list_len(enames)))) {
+        id_list_push(esc_xm, (long long)((0 - 1)));
+    }
+    if (((int)(id_list_get(esc_xm, export_slot)) < 0)) {
+IdList* idsq_14;
+        (idsq_14 = esc_xm, id_lset(idsq_14, export_slot, id_esc_xcheck(export_slot, nm)));
+    }
+    ok = (int)(id_list_get(esc_xm, export_slot));
+    return ok;
+}
+
+int id_esc_xcheck(int export_slot, char* nm) {
+    char* t;
+    int ok;
+    t = (char*)(intptr_t)(id_list_get(etypes, export_slot));
+    ok = (((((id_fn_index(ID_S("main")) >= 0) && ((int)(id_list_get(harn, 0)) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(eowners, export_slot)), ID_S("conf.id")) != 0)) && (id_is_list_ty(t) == 1)) && (id_esc_dkind(t) == 0));
+    if ((ok == 1)) {
+        ok = (id_esc_xscan(nm) == 0);
+    }
+    return ok;
+}
+
+int id_esc_xlen(int i, char* nm) {
+    IdList* args;
+    int weight;
+    args = (IdList*)(intptr_t)(id_list_get(nl1, i));
+    weight = 0;
+    if ((id_list_len(args) == 1)) {
+        weight = id_esc_xmine((int)(id_list_get(args, 0)), nm);
+    }
+    return weight;
+}
+
+int id_esc_xclean(int e) {
+    int ok;
+    ok = ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("call")) != 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("arr")) != 0));
+    if (((ok == 1) && ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("bin")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("index")) == 0)))) {
+        ok = ((id_esc_xclean((int)(id_list_get(ni1, e))) == 1) && (id_esc_xclean((int)(id_list_get(ni2, e))) == 1));
+    } else if (((ok == 1) && (strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("un")) == 0))) {
+        ok = id_esc_xclean((int)(id_list_get(ni1, e)));
+    }
+    return ok;
+}
+
+int id_esc_xbad(int i, char* nm) {
+    int weight;
+    weight = 0;
+    if (((((strcmp((char*)(intptr_t)(id_list_get(nkind, i)), ID_S("decl")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns2, i)), nm) == 0)) && ((int)(id_list_get(ni2, i)) == 1)) && ((id_esc_fresh((int)(id_list_get(ni1, i)), nm, nm) & 2) != 0))) {
+        weight = 1000000;
+    }
+    return weight;
+}
+
+int id_esc_xscan(char* nm) {
+    int r;
+    int i;
+    r = 0;
+    i = 0;
+    while (((i < id_list_len(nkind)) && (r < 1000000))) {
+int idsq_19;
+int idsq_14;
+        r = (idsq_19 = id_esc_xmine(i, nm), idsq_14 = id_esc_xsafe(i, nm), (((r + idsq_19) - idsq_14) + id_esc_xbad(i, nm)));
+        i = (i + 1);
+    }
+    return r;
+}
+
+int id_esc_xmine(int e, char* nm) {
+    int ok;
+    ok = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("import")) == 0)) {
+        ok = (strcmp((char*)(intptr_t)(id_list_get(ns1, e)), nm) == 0);
+    }
+    return ok;
+}
+
+int id_esc_xsafe(int i, char* nm) {
+    int weight;
+    weight = 0;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, i)), ID_S("index")) == 0) && (id_esc_xmine((int)(id_list_get(ni1, i)), nm) == 1))) {
+        weight = id_esc_xclean((int)(id_list_get(ni2, i)));
+    } else if (((strcmp((char*)(intptr_t)(id_list_get(nkind, i)), ID_S("call")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, i)), ID_S("len")) == 0))) {
+        weight = id_esc_xlen(i, nm);
+    }
+    return weight;
+}
+
 char* id_esc_free_decl(int fn, int sn, char* out) {
     char* nm;
     char* line = NULL;
@@ -37124,8 +37250,11 @@ char* id_esc_store_code(char* nm, char* code, int e) {
     char* s = NULL;
     { char* idfe_o = s; s = id_concat_f(id_concat_f(id_concat(nm, ID_S(" = ")), id_esc_val_code(nm, code, e), 1), ID_S(";"), 1); id_str_free(idfe_o); }
     if (((id_esc_own(id_esc_cur(), nm) == 1) && (id_esc_inplace() == 0))) {
-char* idsq_23;
-        { char* idfe_o = s; s = (idsq_23 = id_esc_c_ty(nm), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("{ "), idsq_23), ID_S(" idfe_o = "), 1), nm, 1), ID_S("; "), 1), s, 1), ID_S(" "), 1), id_esc_free_fn(id_esc_cur(), nm), 1), ID_S("(idfe_o); }"), 1)); id_str_free(idfe_o); }
+char* idsq_34;
+        { char* idfe_o = s; s = (idsq_34 = id_esc_c_ty(nm), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("{ "), idsq_34), ID_S(" idfe_o = "), 1), nm, 1), ID_S("; "), 1), s, 1), ID_S(" "), 1), id_esc_free_fn(id_esc_cur(), nm), 1), ID_S("(idfe_o); }"), 1)); id_str_free(idfe_o); }
+    }
+    if ((id_esc_xown(nm) == 1)) {
+        { char* idfe_o = s; s = id_esc_xstore_code(nm, code); id_str_free(idfe_o); }
     }
     return s;
 }

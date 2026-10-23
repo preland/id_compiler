@@ -1,0 +1,15 @@
+// The C of a store into an export whose old list is freed: the new value is
+// computed into a temporary first, because computing it may read the old list
+// (the subscript of an index) or run a function that stores the export itself,
+// and either would find the old list freed or freed twice if it had been taken
+// out of the export before.
+
+esc_xstore_code(string nm, string code) {
+  string ty = esc_c_ty(nm);
+  string s = "{ " + ty + " idfe_n = " + code + "; ";
+  s = s + ty + " idfe_o = " + nm + "; " + nm + " = idfe_n; ";
+} chain (string nm, string code) {
+  s = s + esc_free_fn(esc_cur(), nm) + "(idfe_o); }";
+} return string s;
+given esc_xfix ("xg", "v"):("{ IdList* idfe_n = v; IdList* idfe_o = xg; xg = idfe_n; id_list_free(idfe_o); }")
+given esc_xfix ("xs", "f(1)"):("{ IdList* idfe_n = f(1); IdList* idfe_o = xs; xs = idfe_n; id_list_free(idfe_o); }")

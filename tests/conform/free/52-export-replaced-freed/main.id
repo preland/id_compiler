@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  int r = run(4);
+  print(r);
+} return int 0;

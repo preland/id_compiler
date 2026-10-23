@@ -1,0 +1,42 @@
+// The proof over the node table. Each node of the program adds a weight for the
+// export `nm`: +1 for a read of it, -1 for a read whose parent is a use that
+// cannot keep the list (an index with a call-free subscript, or len), and
+// 1000000 for a store of anything but a fresh list. A sum of 0 means every read
+// is such a use. The subscript must be call-free because a call there may run
+// a store of its own, and C leaves the order of the operands open.
+
+esc_xscan(string nm) {
+  int r = 0;
+  int i = 0;
+  while(i < len((import nkind)) && r < 1000000) {
+    r = r + esc_xmine(i, nm) - esc_xsafe(i, nm) + esc_xbad(i, nm);
+    i = i + 1;
+  }
+} return int r;
+given esc_xfix ("xg"):(0)
+given esc_xfix ("xr"):(1)
+given esc_xfix ("xi"):(1)
+given esc_xfix ("xs"):(1000000)
+
+esc_xmine(int e, string nm) {
+  int ok = 0;
+  if((import nkind)[e] == "import") {
+    ok = (import ns1)[e] == nm;
+  }
+} return int ok;
+given esc_xfix ((import exa_imp), "xg"):(1)
+given esc_xfix ((import exa_imp), "xr"):(0)
+given esc_xfix ((import exa_zero), "xg"):(0)
+
+esc_xsafe(int i, string nm) {
+  int weight = 0;
+  if((import nkind)[i] == "index" && esc_xmine((import ni1)[i], nm) == 1) {
+    weight = esc_xclean((import ni2)[i]);
+  } else if((import nkind)[i] == "call" && (import ns1)[i] == "len") {
+    weight = esc_xlen(i, nm);
+  }
+} return int weight;
+given esc_xfix ((import exa_ix), "xg"):(1)
+given esc_xfix ((import exa_ixi), "xi"):(0)
+given esc_xfix ((import exa_len), "xg"):(1)
+given esc_xfix ((import exa_sink), "xr"):(0)

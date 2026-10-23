@@ -1,0 +1,15 @@
+// lwo_fixture (wide.id) over the export program of the escape cases
+// (escape/own/exports/fix): `xg` is an export whose old list a store may free,
+// `xr` is one whose readers keep it, so only the first gets a load of its old
+// value.
+lwx_fixture() {
+  esc_xfix();
+  int r = init_ir();
+  int f = ir_func(0 - 1, "fa_nest", "int[]");
+} chain () {
+  int o = lw_open(f);
+  export int lwx_g = lw_addr("xg");
+  export int lwx_r = lw_addr("xr");
+} return void;
+():() then calls ir_func:(-1, "fa_nest", "int[]")
+():() then init_units:(0)

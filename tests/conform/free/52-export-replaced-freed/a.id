@@ -1,0 +1,22 @@
+// An exported list that its one writer replaces is freed when no reader can
+// still hold the old value (docs/MEMORY.md 3.4). Every read of xs is an index
+// or a len, which copy an element or a count out and keep nothing, so the list
+// a later fill replaces is dead. Four fills replace three lists; the first
+// one replaced the empty global.
+fill(int n) {
+  export int[] xs = [n, n + 1, n + 2];
+} return void;
+
+probe(int n) {
+  int t = (import xs)[1] + len((import xs));
+} return int t;
+
+run(int n) {
+  int i = 0;
+  int acc = 0;
+  while(i < n) {
+    fill(i);
+    acc = acc + probe(i);
+    i = i + 1;
+  }
+} return int acc;

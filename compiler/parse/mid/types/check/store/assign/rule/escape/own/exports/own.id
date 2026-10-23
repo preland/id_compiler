@@ -1,0 +1,46 @@
+// Whether the store `export T x = V` may free the list it replaces (docs/MEMORY.md
+// 3.4). Every condition is a proof obligation, and the answer is kept per name
+// because the proof reads the whole node table:
+//   * the analysis is on and the program has a `main`: a library build has
+//     callers this program never sees, and a test-harness build reads the
+//     export through harness code, so neither is eligible;
+//   * the export is not a conf.id constant and is a flat list: the rows of a
+//     list of lists, or the buffers of bytes, are somebody else's concern;
+//   * scan.id: every store into it is a fresh list and every read of it is an
+//     index or a len, so no reference to the old list can outlive the store.
+
+esc_xown(string nm) {
+  int export_slot = find_str((import enames), nm);
+  int ok = 0;
+  if(export_slot >= 0 && esc_on() == 1) {
+    ok = esc_xmemo(export_slot, nm);
+  }
+} return int ok;
+given esc_xfix ("xg"):(1)
+given esc_xfix ("xr"):(0)
+given esc_xfix ("nope"):(0)
+given full_env ("xg"):(0)
+
+esc_xmemo(int export_slot, string nm) {
+  while(len((import esc_xm)) < len((import enames))) {
+    push((import esc_xm), 0 - 1);
+  }
+  if((import esc_xm)[export_slot] < 0) {
+    lset((import esc_xm), export_slot, esc_xcheck(export_slot, nm));
+  }
+  int ok = (import esc_xm)[export_slot];
+} return int ok;
+given esc_xfix (0, "xg"):(1)
+given esc_xfix (1, "xr"):(0)
+given esc_xfix (3, "xs"):(0)
+
+esc_xcheck(int export_slot, string nm) {
+  string t = (import etypes)[export_slot];
+  int ok = fn_index("main") >= 0 && (import harn)[0] == 0 && (import eowners)[export_slot] != "conf.id" && is_list_ty(t) == 1 && esc_dkind(t) == 0;
+  if(ok == 1) {
+    ok = esc_xscan(nm) == 0;
+  }
+} return int ok;
+given esc_xfix (0, "xg"):(1)
+given esc_xfix (1, "xr"):(0)
+given esc_xfix (4, "xd"):(0)

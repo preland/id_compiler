@@ -1,0 +1,38 @@
+// The nodes the export cases read (b.id describes the program): `xg` is
+// declared from a list literal and read only by an index and a len; `xr` is
+// handed to a call; `xi` is indexed by a call.
+
+esc_xfx_a() {
+  export int exa_lit = node_txt("int", "1");
+  export int exa_arr = node_arr([(import exa_lit)]);
+  export int exa_zero = node_txt("int", "0");
+} chain () {
+  export int exa_dg = node_decl("int[]", "xg", (import exa_arr), 1);
+  export int exa_imp = node_txt("import", "xg");
+  export int exa_ix = node_index((import exa_imp), (import exa_zero));
+} chain () {
+  export int exa_imq = node_txt("import", "xg");
+  export int exa_len = node_call("len", [(import exa_imq)]);
+  export int exa_dr = node_decl("int[]", "xr", (import exa_arr), 1);
+} return void;
+given esc_xfix ():() then calls node_index:((import exa_imp), (import exa_zero))
+given esc_xfix ():() then calls node_call:("len", [(import exa_imq)])
+given esc_xfix ():() then (import chkfail)[0]:(0)
+given esc_xfix ():() then init_units:(0)
+
+esc_xfx_b() {
+  export int exa_imr = node_txt("import", "xr");
+  export int exa_sink = node_call("fa_sink", [(import exa_imr)]);
+  export int exa_di = node_decl("int[]", "xi", (import exa_arr), 1);
+} chain () {
+  export int exa_imi = node_txt("import", "xi");
+  export int exa_f = node_call("fa_sink", (import ef_none));
+  export int exa_ixi = node_index((import exa_imi), (import exa_f));
+} chain () {
+  export int exa_un = node_txt1("un", "-", (import exa_f));
+  export int exa_bin = node_txt2("bin", "+", (import exa_zero), (import exa_f));
+} return void;
+given esc_xfix ():() then calls node_index:((import exa_imi), (import exa_f))
+given esc_xfix ():() then calls node_txt2:("bin", "+", (import exa_zero), (import exa_f))
+given esc_xfix ():() then (import chkfail)[0]:(0)
+given esc_xfix ():() then init_units:(0)

@@ -1,0 +1,48 @@
+// The rest of the export program, and its assembly. `xs` is declared from a
+// parameter (not a fresh list), `xd` is a list of lists, `xt` is read by a
+// len with two arguments. The exports are registered in the order the cases
+// index them (xg 0, xr 1, xi 2, xs 3, xd 4) and a `main` is registered so the
+// program is one that can be executed.
+
+esc_xfx_c() {
+  export int exa_vp = node_txt("var", "p");
+  export int exa_ds = node_decl("int[]", "xs", (import exa_vp), 1);
+  export int exa_dd = node_decl("int[][]", "xd", (import exa_arr), 1);
+} chain () {
+  export int exa_imt = node_txt("import", "xt");
+  export int exa_two = node_call("len", [(import exa_imt), (import exa_imt)]);
+  export int exa_main = node_func("main", "void", (import ef_none), (import ef_none), 0 - 1);
+} return void;
+given esc_xfix ():() then calls node_decl:("int[]", "xs", (import exa_vp), 1)
+given esc_xfix ():() then calls node_func:("main", "void", (import ef_none), (import ef_none), -1)
+given esc_xfix ():() then (import chkfail)[0]:(0)
+given esc_xfix ():() then init_units:(0)
+
+esc_xfx_d() {
+  add_export("xg", "int[]", "xo");
+  add_export("xr", "int[]", "xo");
+  add_export("xi", "int[]", "xo");
+} chain () {
+  add_export("xs", "int[]", "xo");
+  add_export("xd", "int[][]", "xo");
+  add_func("main", "void", (import exa_main));
+} chain () {
+  esc_seed();
+  harn_init();
+} return void;
+given esc_xfix ():() then calls add_export:("xg", "int[]", "xo")
+given esc_xfix ():() then calls add_func:("main", "void", (import exa_main))
+given esc_xfix ():() then (import chkfail)[0]:(0)
+given esc_xfix ():() then init_units:(0)
+
+esc_xfix() {
+  esc_fix();
+  esc_xfx_a();
+  esc_xfx_b();
+} chain () {
+  esc_xfx_c();
+  esc_xfx_d();
+} return void;
+():() then calls esc_fix:[1]
+():() then calls esc_xfx_d:[1]
+():() then init_units:(0)

@@ -18,11 +18,15 @@ lw_old(int addr) {
   int o = 0 - 1;
   if((import iop)[addr] == "alloca" && lw_slot((import istr)[addr]) == addr && esc_own(esc_cur(), (import istr)[addr]) == 1 && esc_inplace() == 0) {
     o = lw_op("load", (import ity)[addr], addr, 0 - 1, "");
+  } else if((import iop)[addr] == "global" && esc_xown((import istr)[addr]) == 1) {
+    o = lw_op("load", (import ity)[addr], addr, 0 - 1, "");
   }
 } return int o;
 given lwo_fixture ((import lwo_w)):(-1)
 given lwo_fixture ((import lwo_z)):(-1)
 given lwo_fixture ((import lwo_w2)):(7)
+given lwx_fixture ((import lwx_g)):(2)
+given lwx_fixture ((import lwx_r)):(-1)
 
 lw_drop(int old, string nm) {
   string freer = "";

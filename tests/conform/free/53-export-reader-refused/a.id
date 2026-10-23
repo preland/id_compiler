@@ -1,0 +1,20 @@
+// The same writer as 52, but grab binds the whole exported list to a name, so
+// the value place replaced is still held by run's `old` when the second place runs.
+// The proof sees a read that is neither an index nor a len and refuses: nothing
+// is freed, and the read of old after the second place (3 + 6, then 4) would
+// print garbage under the guard if the first list had been given back.
+place(int n) {
+  export int[] ys = [n, n * 2];
+} return void;
+
+grab(int n) {
+  int[] g = (import ys);
+} return int[] g;
+
+run(int n) {
+  place(n);
+  int[] old = grab(n);
+  place(n + 1);
+} chain (int n) {
+  int t = old[0] + old[1] + (import ys)[0];
+} return int t;
