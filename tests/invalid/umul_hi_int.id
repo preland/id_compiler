@@ -1,0 +1,6 @@
+// EXPECT: [E0644]
+// umul_hi multiplies unsigned 64-bit words, so an int is widened with uword_of_int first
+main(int argc, string[] argv) {
+  word a = 5;
+  print("" + umul_hi(a, 3));
+} return int 0;

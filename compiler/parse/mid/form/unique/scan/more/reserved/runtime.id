@@ -48,7 +48,7 @@ init_resv_names() {
     i = take_name((import resv_names_src), i, (import resv_names));
   }
 } return void;
-():() then len((import resv_names)):(130)
-():() then (import resv_names)[124]:("str_dup")
-():() then calls take_name:[130]
+():() then len((import resv_names)):(134)
+():() then (import resv_names)[128]:("str_dup")
+():() then calls take_name:[134]
 

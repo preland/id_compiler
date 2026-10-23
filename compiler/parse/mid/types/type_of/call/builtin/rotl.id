@@ -1,0 +1,29 @@
+// rotl's result is as wide as the value it rotates, so its type is its first
+// argument's: a word stays a word and anything else is read as an int, which
+// leaves a wrong argument to the argument check rather than to a second error
+// here.
+rotl_type(int id) {
+  int[] rot_args = (import nl1)[id];
+  string rot_t = "int";
+  if(len(rot_args) > 0 && type_of(rot_args[0]) == "word") {
+    rot_t = "word";
+  }
+} return string rot_t;
+given rotl_fixture ((import rot_int)):("int")
+given rotl_wide ((import rot_word)):("word")
+given bi_flush_setup ((import bi_flush_call)):("int")
+
+rotl_fixture() {
+  shapes_fixture();
+  export int rot_int = node_call("rotl", [(import lit_a), (import lit_a)]);
+  export int rot_wide = node_call("alloc", [(import lit_a)]);
+} return void;
+given shapes_fixture ():() then calls node_call:("rotl", [(import lit_a), (import lit_a)])
+given shapes_fixture ():() then calls node_call:("alloc", [(import lit_a)])
+
+rotl_wide() {
+  rotl_fixture();
+  export int rot_word = node_call("rotl", [(import rot_wide), (import lit_a)]);
+} return void;
+():() then calls rotl_fixture:[1]
+():() then init_units:(0)

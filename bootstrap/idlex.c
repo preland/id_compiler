@@ -611,6 +611,33 @@ static long long id_umod(long long a, long long b) {
 static long long id_ult(long long a, long long b) {
     return (unsigned long long)a < (unsigned long long)b;
 }
+static long long id_umul_hi(long long a, long long b) {
+#if defined(__SIZEOF_INT128__) && !defined(__wasm__)
+    return (long long)(((unsigned __int128)(unsigned long long)a * (unsigned long long)b) >> 64);
+#else
+    unsigned long long xl = (unsigned long long)a & 0xffffffffULL;
+    unsigned long long xh = (unsigned long long)a >> 32;
+    unsigned long long yl = (unsigned long long)b & 0xffffffffULL;
+    unsigned long long yh = (unsigned long long)b >> 32;
+    unsigned long long lh = xl * yh;
+    unsigned long long hl = xh * yl;
+    unsigned long long mid = ((xl * yl) >> 32) + (lh & 0xffffffffULL) + (hl & 0xffffffffULL);
+    return (long long)(xh * yh + (lh >> 32) + (hl >> 32) + (mid >> 32));
+#endif
+}
+static long long id_rotl32(long long x, long long n) {
+    unsigned int v = (unsigned int)x;
+    unsigned int k = (unsigned int)n & 31u;
+    return (long long)(int)((v << k) | (v >> ((0u - k) & 31u)));
+}
+static long long id_rotl(long long x, long long n) {
+    unsigned long long v = (unsigned long long)x;
+    unsigned long long k = (unsigned long long)n & 63ULL;
+    return (long long)((v << k) | (v >> ((0ULL - k) & 63ULL)));
+}
+static long long id_uword_of_int(long long a) {
+    return (long long)(unsigned int)a;
+}
 
 /* ---- the flat store -----------------------------------------------------
    One flat, byte-addressed memory. An address is an ordinary word, so

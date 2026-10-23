@@ -21,12 +21,12 @@ lw_narrow(string t, string want) {
 given env_init ("word", "int"):("trunc")
 given env_init ("int", "word"):("sext")
 
-// A builtin argument widened to what its helper takes. `udiv`, `umod` and
-// `ushr` read an `int` as its 32 unsigned bits, so there the widening is a
+// A builtin argument widened to what its helper takes. `udiv`, `umod`, `ult`
+// and `ushr` read an `int` as its 32 unsigned bits, so there the widening is a
 // zero extension instead of lw_narrow's sign extension.
 lw_as_arg(int node, string want, string name) {
   int r = 0;
-  if((name == "udiv" || name == "umod" || name == "ushr") && lw_ety(node) == "int") {
+  if((name == "udiv" || name == "umod" || name == "ult" || name == "ushr") && lw_ety(node) == "int") {
     int v = lw_expr(node);
     r = lw_op("zext", want, v, 0 - 1, "");
   } else {
@@ -34,4 +34,5 @@ lw_as_arg(int node, string want, string name) {
   }
 } return int r;
 given lw_fix_int ((import fix_int_n), "word", "ushr"):(1)
+given lw_fix_int ((import fix_int_n), "word", "ult"):(1)
 given lw_fix_int ((import fix_int_n), "int", "chr"):(0)

@@ -31,7 +31,7 @@ bi_zero(string name) {
 
 bi_one(string name) {
   int ok = 0;
-  if(name == "print" || name == "eprint" || name == "len" || name == "pop" || name == "to_int" || name == "chr" || name == "put" || name == "sleep_ms" || name == "mem_of_str" || name == "alloc" || name == "fail" || name == "bits_of_float" || name == "float_of_bits" || name == "bits32_of_float" || name == "float_of_bits32" || name == "bytes_new" || name == "string_of_bytes" || name == "bytes_of_string" || name == "memory_of_bytes" || str_in((import peekfns), name) == 1) {
+  if(name == "print" || name == "eprint" || name == "len" || name == "pop" || name == "to_int" || name == "chr" || name == "put" || name == "sleep_ms" || name == "mem_of_str" || name == "alloc" || name == "fail" || name == "bits_of_float" || name == "float_of_bits" || name == "bits32_of_float" || name == "float_of_bits32" || name == "bytes_new" || name == "string_of_bytes" || name == "bytes_of_string" || name == "memory_of_bytes" || name == "uword_of_int" || str_in((import peekfns), name) == 1) {
     ok = 1;
   }
 } return int ok;
@@ -40,4 +40,6 @@ bi_one(string name) {
 ("fail"):(1)
 ("bits32_of_float"):(1)
 ("memory_of_bytes"):(1)
+("uword_of_int"):(1)
+("rotl"):(0)
 ("bytes_append"):(0)

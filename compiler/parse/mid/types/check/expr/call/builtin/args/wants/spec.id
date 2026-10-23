@@ -5,14 +5,24 @@
 //   int      exactly an int            strlist  a string or any T[]
 //   index    an int, worded as an index (character_code_at's second argument)
 //   word     an int or a word          addr     the same, worded as an address
-//   float    exactly a float
+//   float    exactly a float           uword    exactly a word (an int is refused)
 
 bi_wants(string name, int i) {
   string s = bi_wants_bytes(name, i, bi_wants2(name, i));
   if(name == "to_int" || name == "mem_of_str" || name == "fail" || (name == "character_code_at" || name == "str_sub") && i == 0) {
     s = "string";
   }
+  if(name == "uword_of_int") {
+    s = "int";
+  }
+} chain (string name, int i) {
+  if(name == "umul_hi") {
+    s = "uword";
+  }
 } return string s;
+("umul_hi", 1):("uword")
+("uword_of_int", 0):("int")
+("rotl", 1):("word")
 ("to_int", 0):("string")
 ("push", 0):("list")
 ("fail", 0):("string")

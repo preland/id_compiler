@@ -1,0 +1,5 @@
+// EXPECT: [E0638]
+// rotl rotates a number, so a string is refused
+main(int argc, string[] argv) {
+  print("" + rotl("abc", 1));
+} return int 0;

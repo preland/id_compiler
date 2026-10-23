@@ -17,12 +17,15 @@ given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then ca
 bi_arg_err2(int id, int i, string want, string t) {
   if(want == "addr") {
     tc_diag(id, "E0637", "str_of_mem takes an address and a length, both int: argument " + i + " is " + t, "str_of_mem", "an address and a length are whole numbers, and a string or a list is neither", "pass the address and the length as ints, as in str_of_mem(address, 5)");
+  } else if(want == "uword") {
+    bi_arg_err_uword(id, i, t);
   } else {
     bi_arg_err3(id, i, want, t);
   }
 } return void;
 given bi_mismatch_setup ((import bi_mismatch_call), 0, "addr", "int"):() then (import chkfail)[0]:(1)
 given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err3:((import bi_mismatch_call), 0, "list", "int")
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "uword", "int"):() then calls bi_arg_err_uword:((import bi_mismatch_call), 0, "int")
 
 // The flat-store group is the only family that reports at the *argument's*
 // line rather than the call's -- idc.py raises it from inside the loop over

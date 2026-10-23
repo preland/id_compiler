@@ -1,0 +1,33 @@
+// `rotl` is the one builtin whose helper depends on a type: it rotates within
+// the width of its first argument, so an int takes the 32-bit helper and a word
+// the 64-bit one. Both helpers return a `long long`; the 32-bit result is cut
+// back to an `int` here so that C arithmetic on it wraps at 32 bits too.
+sys_helper_at(int id) {
+  string sha_h = sys_helper((import ns1)[id]);
+  int[] sha_args = (import nl1)[id];
+  if(sha_h == "id_rotl" && type_of(sha_args[0]) == "int") {
+    sha_h = "id_rotl32";
+  }
+} return string sha_h;
+given call_rotl_fixture ((import call_e_rotl)):("id_rotl32")
+given call_rotl_fixture ((import call_e_rotlw)):("id_rotl")
+given call_rotl_fixture ((import call_e_sys)):("id_peek8")
+
+sys_narrow(int id, string text) {
+  string sha_r = text;
+  if(sys_helper_at(id) == "id_rotl32") {
+    sha_r = "(int)(" + text + ")";
+  }
+} return string sha_r;
+given call_rotl_fixture ((import call_e_rotl), "X"):("(int)(X)")
+given call_rotl_fixture ((import call_e_rotlw), "X"):("X")
+given call_rotl_fixture ((import call_e_sys), "X"):("X")
+
+call_rotl_fixture() {
+  call_sys_fixture();
+  export int call_e_rotl = newnode("call", 0, 0, "rotl", "", (import call_args), (import call_args));
+  export int call_e_rotlw = newnode("call", 0, 0, "rotl", "", [(import call_e_sys2), (import call_e_sys2)], [(import call_e_sys2), (import call_e_sys2)]);
+} return void;
+given call_sys_fixture ():() then calls newnode:("call", 0, 0, "rotl", "", (import call_args), (import call_args))
+():() then init_units:(0)
+():() then calls call_sys_fixture:[1]

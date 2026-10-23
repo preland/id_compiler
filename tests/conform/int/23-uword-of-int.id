@@ -1,0 +1,9 @@
+main(int argc, string[] argv) {
+  int m = 0 - 1;
+  int lo = 0 - 2147483647 - 1;
+  word z = uword_of_int(m);
+} chain (int argc, string[] argv) {
+  string l1 = "" + z + " " + uword_of_int(lo) + " " + uword_of_int(5) + " " + uword_of_int(0);
+  string l2 = "" + (z + 1) + " " + udiv(uword_of_int(m), 3);
+  print(l1 + " " + l2);
+} return int 0;

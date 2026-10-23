@@ -36,11 +36,14 @@ bt5(string name) {
 // question, so it is an int like every other comparison.
 is_wordfn(string name) {
   int ok = 0;
-  if(name == "alloc" || name == "store_size" || name == "peek8" || name == "peek16" || name == "peek32" || name == "peek64" || name == "peek8s" || name == "peek16s" || name == "peek32s" || name == "peek8u" || name == "peek16u" || name == "peek32u" || name == "udiv" || name == "umod" || name == "ushr") {
+  if(name == "alloc" || name == "store_size" || name == "peek8" || name == "peek16" || name == "peek32" || name == "peek64" || name == "peek8s" || name == "peek16s" || name == "peek32s" || name == "peek8u" || name == "peek16u" || name == "peek32u" || name == "udiv" || name == "umod" || name == "ushr" || name == "rotl" || name == "umul_hi" || name == "uword_of_int") {
     ok = 1;
   }
 } return int ok;
 ("alloc"):(1)
 ("ult"):(0)
+("rotl"):(1)
+("umul_hi"):(1)
+("uword_of_int"):(1)
 ("peek32s"):(1)
 ("peek8u"):(1)

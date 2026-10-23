@@ -9,6 +9,10 @@ call_shaped(int id, string t) {
   if((import ns1)[id] == "bind") {
     ret_s = bind_type(id);
   }
+} chain (int id, string t) {
+  if((import ns1)[id] == "rotl") {
+    ret_s = rotl_type(id);
+  }
 } return string ret_s;
 given idx_build ((import call_pop), "?"):("int")
 given bind_fixture ((import bind_ok), "func"):("func() return int")

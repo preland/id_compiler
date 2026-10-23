@@ -1,0 +1,17 @@
+main(int argc, string[] argv) {
+  word all = 0xFFFFFFFFFFFFFFFF;
+  word top = 0x8000000000000000;
+  word neg = 0 - 1;
+} chain (int argc, string[] argv) {
+  word small = 3;
+  word two = 2;
+  word s32 = 4294967296;
+} chain (int argc, string[] argv) {
+  word s32m = 4294967295;
+  word s32p = 4294967297;
+  string l1 = "" + umul_hi(all, all) + " " + umul_hi(top, two) + " " + umul_hi(small, small) + " " + umul_hi(neg, two) + " " + umul_hi(neg, neg);
+} chain (int argc, string[] argv) {
+  string l2 = "" + umul_hi(s32, s32) + " " + umul_hi(s32m, s32p) + " " + umul_hi(all, small) + " " + umul_hi(top, top) + " " + (small * small);
+  print(l1);
+  print(l2);
+} return int 0;

@@ -1,0 +1,13 @@
+main(int argc, string[] argv) {
+  int x = 305419896;
+  word w = 0x123456789ABCDEF0;
+  int big = 1073741824;
+} chain (int argc, string[] argv) {
+  string l1 = "" + rotl(x, 0) + " " + rotl(x, 1) + " " + rotl(x, 31) + " " + rotl(x, 32) + " " + rotl(x, 33) + " " + rotl(x, 0 - 1) + " " + rotl(x, 0 - 32);
+  string l2 = "" + rotl(w, 0) + " " + rotl(w, 1) + " " + rotl(w, 63) + " " + rotl(w, 64) + " " + rotl(w, 65) + " " + rotl(w, 0 - 1) + " " + rotl(w, 0 - 64);
+  string l3 = "" + (rotl(big, 1) - 1) + " " + rotl(0 - 2147483647, 1) + " " + rotl(w, x);
+} chain (int argc, string[] argv) {
+  print(l1);
+  print(l2);
+  print(l3);
+} return int 0;

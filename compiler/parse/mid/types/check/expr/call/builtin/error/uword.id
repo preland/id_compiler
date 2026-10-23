@@ -1,0 +1,10 @@
+// umul_hi multiplies unsigned 64-bit words, and an int is not one: it has 32
+// bits and a sign. Widening is the program's decision, so the error says how
+// to write it rather than doing it silently.
+bi_arg_err_uword(int id, int i, string t) {
+  int[] l1_of_v = (import nl1)[id];
+  string s1_of_v = (import ns1)[id];
+  tc_diag(l1_of_v[i], "E0644", s1_of_v + " takes word arguments, got " + t + " for argument " + i + "; widen an int first with uword_of_int, as in " + s1_of_v + "(uword_of_int(a), b)", s1_of_v, "it multiplies two unsigned 64-bit words, and argument " + i + " is " + t, "pass a word, or zero-extend an int with uword_of_int(a)");
+} return void;
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "int"):() then (import chkfail)[0]:(1)
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "string"):() then (import chkfail)[0]:(1)
