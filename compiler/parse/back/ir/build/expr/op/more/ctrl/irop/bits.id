@@ -8,5 +8,6 @@ un_fixture() {
   export int not_node = node_txt1("un", "!", (import ev_node));
 } return void;
 ():() then (import neg_node):(3)
+():() then (import not_node):(4)
 ():() then init_units:(0)
 ():() then calls bound_fixture:[1]

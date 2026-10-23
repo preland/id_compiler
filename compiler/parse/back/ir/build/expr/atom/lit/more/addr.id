@@ -9,6 +9,7 @@ lz_h() {
   export int lz_idx2 = node_index((import lz_str), (import lz_var));
 } return void;
 ():() then calls lz_g:[1] then (import lz_idx2):(12)
+():() then (import lz_func1):(11)
 ():() then init_units:(0)
 
 lw_name_addr(int node) {

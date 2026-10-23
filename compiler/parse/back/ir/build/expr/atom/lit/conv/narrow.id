@@ -9,6 +9,7 @@ lz_g() {
   export int lz_retvar = node_txt("var", "y");
 } return void;
 ():() then calls node_txt:("var", "y")
+():() then (import lz_body1)[0]:(7)
 ():() then init_units:(0)
 
 lw_narrow(string t, string want) {

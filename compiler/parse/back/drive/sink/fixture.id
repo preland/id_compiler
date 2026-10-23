@@ -5,4 +5,5 @@ lz_d() {
   export int[] lz_callargs = [(import lz_i1)];
 } return void;
 ():() then calls lz_c:[1] then (import lz_idx):(5)
+():() then (import lz_callargs)[0]:(2)
 ():() then init_units:(0)

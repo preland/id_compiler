@@ -6,6 +6,7 @@ lz_f() {
   export int lz_exprstmt = node_exprstmt((import lz_callid));
 } return void;
 ():() then calls lz_e:[1] then (import lz_assignid):(8)
+():() then (import lz_exprstmt):(9)
 ():() then init_units:(0)
 
 // A case node naming fx_target as a function-value argument (a "cfn" leaf,

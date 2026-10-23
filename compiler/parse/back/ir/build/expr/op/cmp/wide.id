@@ -32,4 +32,5 @@ lwo_fixture() {
   export int lwo_ent = (import lwent)[0];
 } return void;
 ():() then calls ir_func:(-1, "fa_nest", "int[]")
+():() then (import lwo_w2):(4)
 ():() then init_units:(0)

@@ -14,6 +14,7 @@ ocall_fixture() {
   ocall_fixture_reg();
 } return void;
 ():() then calls lw_env_fixture:[1] then (import ocall_node):(1)
+():() then calls add_func:("fx_target", "int", 0)
 ():() then init_units:(0)
 
 // fx_target (lw_fixture_n, already the function under lowering) registered
@@ -25,5 +26,7 @@ ocall_fixture_reg() {
   add_func("fx_target", "int", (import lw_fixture_n));
   export int ocall_node = node_call("fx_target", none);
 } return void;
+given ocall_fixture ():() then calls add_func:("fx_target", "int", 0)
+given ocall_fixture ():() then (import ocall_node):(2)
 given ocall_fixture ():() then (import chkfail)[0]:(0)
 given ocall_fixture ():() then init_units:(0)

@@ -32,4 +32,5 @@ lwt_fixture() {
   int o = lw_open(f);
 } return void;
 ():() then calls ir_func:(-1, "ff_tmp", "int")
+():() then calls lw_open:(0)
 ():() then init_units:(0)

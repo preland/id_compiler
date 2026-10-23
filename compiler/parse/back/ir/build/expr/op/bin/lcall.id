@@ -12,6 +12,7 @@ lencall_fixture() {
   lencall_fixture_reg();
 } return void;
 ():() then (import lencall_node):(2)
+():() then (import lencall_args)[0]:(1)
 ():() then init_units:(0)
 ():() then calls lw_env_fixture:[1]
 
@@ -19,6 +20,8 @@ lencall_fixture_reg() {
   export int[] lencall_args = [node_txt2("int", "1", 1, 0)];
   export int lencall_node = node_call("len", lencall_args);
 } return void;
+given lencall_fixture ():() then (import lencall_node):(4)
+given lencall_fixture ():() then calls node_call:("len", [3])
 given lencall_fixture ():() then (import chkfail)[0]:(0)
 given lencall_fixture ():() then init_units:(0)
 
@@ -28,5 +31,6 @@ popcall_fixture() {
   popcall_fixture_reg();
 } return void;
 ():() then (import popcall_node):(2)
+():() then (import popcall_args)[0]:(1)
 ():() then init_units:(0)
 ():() then calls lw_env_fixture:[1]

@@ -7,6 +7,7 @@ lz_j() {
   export int lz_edecl = node_decl("int", "z", (import lz_i1), 1);
 } return void;
 ():() then calls lz_i:[1] then (import lz_func2):(15)
+():() then (import lz_edecl):(16)
 ():() then init_units:(0)
 
 lw_unbox2(int v, string t) {
@@ -30,5 +31,6 @@ lz_j_dup() {
   lz_j();
   add_export("z", "int", "fn1");
 } return void;
+():() then (import enames)[0]:("z")
 ():() then calls add_export:("z", "int", "fn1")
 ():() then init_units:(0)

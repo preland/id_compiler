@@ -24,6 +24,7 @@ lw_nl_fixture() {
   add_func("nat", "int[]", (import nl_id));
 } return void;
 ():() then (import nl_id):(1)
+():() then calls add_func:("nat", "int[]", 1)
 ():() then init_units:(0)
 
 lw_native_list(int f, string ety) {

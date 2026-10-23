@@ -13,6 +13,7 @@ lz_e() {
   export int lz_declid = node_decl("int", "y", (import lz_i1), 0);
 } return void;
 ():() then calls lz_d:[1] then (import lz_callid):(6)
+():() then (import lz_declid):(7)
 ():() then init_units:(0)
 
 // A casegiven entry naming no function in the build, for given.id's own

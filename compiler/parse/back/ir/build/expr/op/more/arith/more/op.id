@@ -31,5 +31,6 @@ arith_fixture() {
   export int div_node = node_txt2("bin", "/", (import ev_node), (import ev_node));
 } return void;
 ():() then (import bin_node):(3)
+():() then (import div_node):(4)
 ():() then init_units:(0)
 ():() then calls bound_fixture:[1]

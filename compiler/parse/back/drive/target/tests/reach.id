@@ -45,6 +45,8 @@ flat_call_fixture() {
   cm_setup();
   export int flat_outer_call = node_call("outer", [(import cm_push_call)]);
 } return void;
+():() then (import flat_outer_call):(6)
+():() then calls node_call:("outer", [5])
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
@@ -57,5 +59,7 @@ flat_deep_call_fixture() {
   export int[] flat_deep_args = [(import cm_push_call), (import flat_outer_call)];
   export int flat_deep_call = node_call("mid", flat_deep_args);
 } return void;
+():() then (import flat_deep_call):(7)
+():() then (import flat_deep_args)[1]:(6)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

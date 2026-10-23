@@ -22,4 +22,5 @@ sr_fixture() {
   export int sr_iw = node_iassign((import sr_ix), (import sr_one));
 } return void;
 ():() then calls sd_note:("P", ["x", "y"], ["int", "int"], "p.id", 1)
+():() then (import sr_iw):(8)
 ():() then init_units:(0)
