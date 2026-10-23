@@ -7,6 +7,8 @@ lz_p() {
   lz_o();
   imd_fill();
 } return void;
+():() then imd_dump:("23:()->int=>v0{d:int 0=I5}~~23:()->int=>v0{d:int 0=I9}~")
+():() then len((import imd_tab)):(4)
 ():() then calls imd_fill:()
 ():() then init_units:(0)
 

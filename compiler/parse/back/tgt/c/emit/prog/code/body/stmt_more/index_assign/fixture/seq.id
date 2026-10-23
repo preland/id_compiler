@@ -29,6 +29,7 @@ sq_fixture() {
   init_tyc();
 } return void;
 ():() then calls node_txt2:("int", "0", 0, 0)
+given nz_call_eprint_fixture ():() then calls node_call:("bar", [(import nz_int2)]) then calls node_txt2:("bin", "/", (import nz_int), (import nz_int2))
 ():() then init_units:(0)
 
 // The same nodes, with foo(7) already bound to its temporary.

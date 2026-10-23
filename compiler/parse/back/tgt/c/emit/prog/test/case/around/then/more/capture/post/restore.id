@@ -19,5 +19,6 @@ eprints_post_fixture() {
   push((import thennode), en);
 } return void;
 ():() then (import thennode)[1]:(8)
+given print_fixture ():() then calls newnode:("theneprints", (import fixture_ci), 0, "", "", (import fixture_print_two), (import fixture_print_two))
 ():() then init_units:(0)
 ():() then calls print_fixture:[1]

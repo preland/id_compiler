@@ -6,6 +6,8 @@ cl_setup() {
   lc_env();
   export int cl_d = lc_reg_list1("k", "5", 5);
 } return void;
+():() then calls lc_reg_list1:("k", "5", 5)
+():() then (import cl_d):(2)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
@@ -13,6 +15,8 @@ cl_scalar_setup() {
   lc_env();
   export int cl_scalar_d = lc_reg_int("m", "9", 9);
 } return void;
+():() then calls lc_reg_int:("m", "9", 9)
+():() then (import cl_scalar_d):(1)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
@@ -31,5 +35,7 @@ cl_fwd_setup() {
   int dc = lc_reg("int", "fc", (import cl_cyc_ic));
   int dd = lc_reg("int", "fd", node_txt("import", "fc"));
 } return void;
+():() then calls node_txt2:("int", "4", 4, 0) then calls node_txt:("import", "fb")
+given cl_fwd_setup ():() then calls lc_reg:("int", "fb", (import cl_fwd_lit))
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

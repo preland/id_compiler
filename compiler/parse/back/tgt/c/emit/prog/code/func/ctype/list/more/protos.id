@@ -16,6 +16,8 @@ tc_types_init() {
   export string[] tctys = [];
   export string[] tcsts = [];
 } return void;
+given tctys_note_one_setup ():() then len((import tctys)):(0)
+given nz_env ():() then len((import tcsts)):(0)
 given nz_env ():() then (import chkfail)[0]:(0)
 given nz_env ():() then init_units:(0)
 

@@ -9,6 +9,7 @@ lz_n() {
   push((import prog), (import lz_fn5));
 } return void;
 given lz_n ():() then calls node_func:("dup9", "int", (import f_none), [(import lz_decl9)], (import lz_dv))
+():() then (import prog)[0]:(22) then (import lz_fn9):(23)
 ():() then init_units:(0)
 
 int_code(int id) {

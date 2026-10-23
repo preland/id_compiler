@@ -10,6 +10,7 @@ iassign_fixture_lst() {
   export int iassign_lst = node_arr([iassign_onelit]);
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_arr:([0])
 ():() then init_units:(0)
 
 iassign_fixture_idxval() {
@@ -18,6 +19,7 @@ iassign_fixture_idxval() {
   export int iassign_valn = node_txt2("int", "7", 7, 0);
 } return void;
 ():() then calls node_txt2:("int", "0", 0, 0)
+():() then calls node_txt2:("int", "7", 7, 0)
 ():() then init_units:(0)
 
 iassign_fixture() {
@@ -26,4 +28,5 @@ iassign_fixture() {
   export int iassign_node = newnode("iassign", (import iassign_lst), (import iassign_idx), "", "", (import iassign_vlist), (import iassign_vlist));
 } return void;
 given iassign_fixture ():() then calls newnode:("iassign", (import iassign_lst), (import iassign_idx), "", "", (import iassign_vlist), (import iassign_vlist))
+():() then calls newnode:("iassign", 1, 2, "", "", [3], [3])
 ():() then init_units:(0)

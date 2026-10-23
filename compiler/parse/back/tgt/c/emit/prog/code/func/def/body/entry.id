@@ -20,11 +20,14 @@ entry_fixture() {
   entry_fixture_harn();
 } return void;
 given fn_fixture ():() then (import harn)[0]:(1)
+():() then len((import harn)):(1) then (import fixture_fn):(3)
 given fn_fixture ():() then init_units:(0)
 
 entry_fixture_harn() {
   harn_init();
   lset((import harn), 0, 1);
 } return void;
+given fn_fixture ():() then (import harn)[0]:(1)
+given entry_fixture ():() then (import harn)[0]:(1)
 given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)

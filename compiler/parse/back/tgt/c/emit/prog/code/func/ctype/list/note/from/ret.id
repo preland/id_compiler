@@ -20,4 +20,5 @@ tctys_note_one_setup() {
   note_one("int[]");
 } return void;
 ():() then calls note_one:("int[]")
+():() then (import tctys)[0]:("int[]") then len((import tcsts)):(0)
 ():() then init_units:(0)

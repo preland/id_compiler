@@ -8,6 +8,7 @@ nz_main_fixture() {
   export int nz_mainfn = node_func("main", "int", (import nz_mainparams), mainbody, (import nz_int));
 } return void;
 given nz_main_fixture ():() then calls node_func:("main", "int", (import nz_mainparams), [], (import nz_int))
+given nz_main_parts ():() then calls node_func:("main", "int", (import nz_mainparams), [], (import nz_int)) then (import nz_mainfn):(11)
 ():() then init_units:(0)
 
 nz_plain_fixture() {
@@ -16,6 +17,7 @@ nz_plain_fixture() {
   export int nz_plainfn = node_func("run", "void", none, none, 0 - 1);
 } return void;
 ():() then calls node_func:("run", "void", [], [], -1)
+():() then (import nz_plainfn):(12)
 ():() then init_units:(0)
 
 nz_prog_fixture() {
@@ -24,4 +26,5 @@ nz_prog_fixture() {
   push((import prog), (import nz_plainfn));
 } return void;
 ():() then len((import prog)):(2)
+():() then (import prog)[0]:(11) then (import prog)[1]:(12)
 ():() then init_units:(0)

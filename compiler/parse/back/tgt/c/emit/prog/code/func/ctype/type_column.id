@@ -11,6 +11,8 @@ init_tyc() {
   export string[] tyc = [];
   init_tyc_rows();
 } return void;
+given nz_env ():() then (import tyc)[1]:("long long") then (import tyc)[4]:("void")
+given lc_env2 ():() then len((import tyc)):(5)
 given nz_env ():() then (import chkfail)[0]:(0)
 given nz_env ():() then init_units:(0)
 
@@ -19,6 +21,8 @@ init_tyc_rows() {
   push((import tyc), "long long");
   init_tyc_rows2();
 } return void;
+given lc_env2 ():() then (import tyc)[5]:("int") then (import tyc)[6]:("long long")
+given lc_env2 ():() then len((import tyc)):(10) then (import tyc)[9]:("void")
 given lc_env2 ():() then (import chkfail)[0]:(0)
 given lc_env2 ():() then init_units:(0)
 
@@ -29,5 +33,7 @@ init_tyc_rows2() {
   push((import tyc), "char*");
   push((import tyc), "void");
 } return void;
+given lc_env2 ():() then (import tyc)[5]:("double") then (import tyc)[6]:("char*")
+given lc_env2 ():() then len((import tyc)):(8) then (import tyc)[7]:("void")
 given lc_env2 ():() then (import chkfail)[0]:(0)
 given lc_env2 ():() then init_units:(0)

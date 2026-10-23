@@ -7,6 +7,7 @@ nz_main_parts() {
   export int[] nz_mainparams = [node_param("param", "int", "argc")];
 } return void;
 ():() then calls node_param:("param", "int", "argc")
+():() then len((import nz_mainparams)):(1) then (import nz_mainparams)[0]:(10)
 ():() then init_units:(0)
 
 nz_prog_nomain_fixture() {
@@ -14,4 +15,5 @@ nz_prog_nomain_fixture() {
   push((import prog), (import nz_plainfn));
 } return void;
 ():() then len((import prog)):(1)
+():() then (import prog)[0]:(12)
 ():() then init_units:(0)
