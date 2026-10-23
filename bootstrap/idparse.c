@@ -935,9 +935,9 @@ int id_url_hexval(int idstd_uh_c);
 int id_fixed_point_minimum(int idstd_a, int idstd_b);
 int id_fixed_point_maximum(int idstd_a, int idstd_b);
 int id_fixed_point_sign(int idstd_a);
-int id_chr_lower(int idstd_c);
-int id_chr_in(int idstd_c, int idstd_lo, int idstd_hi);
-int id_chr_is_space(int idstd_c);
+int id_character_lower(int idstd_lower_code);
+int id_character_in(int idstd_range_code, int idstd_lo, int idstd_hi);
+int id_character_is_space(int idstd_space_code);
 int id_str_adv(char* idstd_adv_s, int idstd_adv_i, int idstd_adv_esc, int idstd_adv_by);
 int id_str_is_axis_piece(char* idstd_axis_piece, int idstd_axis_parts);
 int id_idstd_str_split_bound(char* idstd_s, char* idstd_separator, int idstd_i, int idstd_size);
@@ -4967,7 +4967,7 @@ int id_list_pick(int idstd_at, int idstd_i, int idstd_hit) {
 int id_url_hexval(int idstd_uh_c) {
     int idstd_uh_l;
     int idstd_uh_r;
-    idstd_uh_l = id_chr_lower(idstd_uh_c);
+    idstd_uh_l = id_character_lower(idstd_uh_c);
     idstd_uh_r = (0 - 1);
     if (((idstd_uh_c >= 48) && (idstd_uh_c <= 57))) {
         idstd_uh_r = (idstd_uh_c - 48);
@@ -5002,24 +5002,24 @@ int id_fixed_point_sign(int idstd_a) {
     return idstd_ret_i;
 }
 
-int id_chr_lower(int idstd_c) {
-    int idstd_v;
-    idstd_v = idstd_c;
-    if ((id_chr_in(idstd_c, 65, 90) == 1)) {
-        idstd_v = (idstd_c + 32);
+int id_character_lower(int idstd_lower_code) {
+    int idstd_lower_result;
+    idstd_lower_result = idstd_lower_code;
+    if ((id_character_in(idstd_lower_code, 65, 90) == 1)) {
+        idstd_lower_result = (idstd_lower_code + 32);
     }
-    return idstd_v;
+    return idstd_lower_result;
 }
 
-int id_chr_in(int idstd_c, int idstd_lo, int idstd_hi) {
+int id_character_in(int idstd_range_code, int idstd_lo, int idstd_hi) {
     int idstd_ret_i;
-    idstd_ret_i = ((idstd_c >= idstd_lo) && (idstd_c <= idstd_hi));
+    idstd_ret_i = ((idstd_range_code >= idstd_lo) && (idstd_range_code <= idstd_hi));
     return idstd_ret_i;
 }
 
-int id_chr_is_space(int idstd_c) {
+int id_character_is_space(int idstd_space_code) {
     int idstd_ret_i;
-    idstd_ret_i = ((((idstd_c == 32) || (idstd_c == 9)) || (idstd_c == 10)) || (idstd_c == 13));
+    idstd_ret_i = ((((idstd_space_code == 32) || (idstd_space_code == 9)) || (idstd_space_code == 10)) || (idstd_space_code == 13));
     return idstd_ret_i;
 }
 
@@ -5313,7 +5313,7 @@ void id_idstd_str_lower_step(char* idstd_s, long long idstd_address, int idstd_i
     int idstd_charat_v;
     int idstd_chr_lower_v;
     idstd_charat_v = id_character_code_at(idstd_s, idstd_i);
-    idstd_chr_lower_v = id_chr_lower(idstd_charat_v);
+    idstd_chr_lower_v = id_character_lower(idstd_charat_v);
     id_poke8((long long)((idstd_address + idstd_i)), (long long)(idstd_chr_lower_v));
     return;
 }
@@ -5336,7 +5336,7 @@ int id_idstd_chr_is_space_at(char* idstd_s, int idstd_i) {
     int idstd_charat_v;
     int idstd_ret_i;
     idstd_charat_v = id_character_code_at(idstd_s, idstd_i);
-    idstd_ret_i = id_chr_is_space(idstd_charat_v);
+    idstd_ret_i = id_character_is_space(idstd_charat_v);
     return idstd_ret_i;
 }
 
@@ -5431,14 +5431,14 @@ void id_print_calls(void) {
 
 void id_print_call_cases(void) {
     int i;
-    char* line = NULL;
+    char* line;
     i = 0;
     while ((i < id_list_len(prog))) {
-        { char* idfe_o = line; line = id_call_case_row(i); id_str_free(idfe_o); }
+        line = id_call_case_row(i);
         id_print(line);
         i = (i + 1);
     }
-    { id_str_free(line); return; }
+    return;
 }
 
 char* id_call_case_row(int i) {
