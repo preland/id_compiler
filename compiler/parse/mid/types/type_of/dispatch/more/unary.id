@@ -31,5 +31,7 @@ h_call_match() {
   int a = node_txt2("int", "1", 1, 0);
   export int h_call_1 = node_call("h", [a]);
 } return void;
+():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_call:("h", [6])
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

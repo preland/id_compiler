@@ -16,5 +16,7 @@ argfn_badtype_call() {
   int a = node_txt("str", "x");
   export int argfn_call_badtype = node_call("g", [a]);
 } return void;
+():() then calls node_txt:("str", "x")
+():() then calls node_call:("g", [8])
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
