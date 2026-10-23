@@ -14,7 +14,7 @@ lw_expand_high(string helper, string ret_ty, int[] ih_args) {
   if(helper == "id_umul_hi") {
     ret_i = lw_inline_high(ih_args);
   } else {
-    ret_i = lw_callf(helper, ret_ty, ih_args);
+    ret_i = lw_expand_trap(helper, ret_ty, ih_args);
   }
 } return int ret_i;
 given lw_env_fixture ("id_umul_hi", "word", [0, 1]):(5)

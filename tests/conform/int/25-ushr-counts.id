@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  word m = 0 - argc;
+  string a = "" + ushr(m, m + 1) + " " + ushr(m, m + 32) + " " + ushr(m, m + 33);
+  print(a + " " + ushr(m, m + 64) + " " + ushr(m, m + 65) + " " + ushr(m, m + 66));
+} return int 0;

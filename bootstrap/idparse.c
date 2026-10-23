@@ -1434,6 +1434,10 @@ int id_lw_inline_uword(IdList* ih_args);
 int id_lw_expand(char* helper, char* ret_ty, IdList* ih_args);
 int id_lw_expand_word(char* helper, char* ret_ty, IdList* ih_args);
 int id_lw_expand_turn(char* helper, char* ret_ty, IdList* ih_args);
+void id_lw_guard(int gd_bad, char* gd_msg);
+int id_lw_inline_ushr(IdList* ih_args);
+int id_lw_expand_trap(char* helper, char* ret_ty, IdList* ih_args);
+int id_lw_expand_ushr(char* helper, char* ret_ty, IdList* ih_args);
 int id_lw_expand_turn32(char* helper, char* ret_ty, IdList* ih_args);
 int id_lw_expand_high(char* helper, char* ret_ty, IdList* ih_args);
 int id_lw_inline_turn32(IdList* ih_args);
@@ -5126,8 +5130,8 @@ void id_hash_map_put(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_use
     if (((int)(id_list_get(idstd_used, idstd_slot)) == 0)) {
         id_list_set(idstd_used, idstd_slot, (long long)(1));
         id_list_set(idstd_count_cell, 0, (long long)(((int)(id_list_get(idstd_count_cell, 0)) + 1)));
+        id_list_set(idstd_keys, idstd_slot, (long long)(intptr_t)(id_concat(idstd_key, ID_S(""))));
     }
-    id_list_set(idstd_keys, idstd_slot, (long long)(intptr_t)(idstd_key));
     id_list_set(idstd_values, idstd_slot, (long long)(idstd_stored_value));
     return;
 }
@@ -7709,6 +7713,66 @@ int idsq_15;
     return ret_i;
 }
 
+void id_lw_guard(int gd_bad, char* gd_msg) {
+    int gd_trap;
+    int gd_ok;
+    int gd_text;
+    gd_trap = id_ir_block((int)(id_list_get(lwfn, 0)), ID_S("trap"));
+    gd_ok = id_ir_block((int)(id_list_get(lwfn, 0)), ID_S("ok"));
+    id_lw_term(ID_S("cbr"), gd_bad, id_list_lit(2, (long long)(gd_trap), (long long)(gd_ok)));
+    id_lw_go(gd_trap);
+    gd_text = id_lw_const(ID_S("string"), id_concat_f(id_concat(ID_S("\""), gd_msg), ID_S("\""), 1));
+    id_lw_callf(ID_S("id_fail"), ID_S(""), id_list_lit(1, (long long)(gd_text)));
+    id_lw_term(ID_S("br"), (0 - 1), id_list_lit(1, (long long)(gd_ok)));
+    id_lw_go(gd_ok);
+    return;
+}
+
+int id_lw_inline_ushr(IdList* ih_args) {
+    int ih_zero;
+    int ih_neg;
+    int ih_width;
+    int ih_small;
+    int ih_mask;
+    int ih_six;
+    int ih_cnt;
+    int ih_shr;
+    int ret_i;
+    ih_zero = id_lw_const(ID_S("word"), ID_S("0"));
+    ih_neg = id_lw_op(ID_S("icmp"), ID_S("bool"), (int)(id_list_get(ih_args, 1)), ih_zero, ID_S("<"));
+    id_lw_guard(ih_neg, ID_S("shift by a negative amount"));
+    ih_width = id_lw_const(ID_S("word"), ID_S("64"));
+    ih_small = id_lw_op(ID_S("icmp"), ID_S("bool"), (int)(id_list_get(ih_args, 1)), ih_width, ID_S("u<"));
+    ih_mask = id_lw_op(ID_S("sext"), ID_S("word"), ih_small, (0 - 1), ID_S(""));
+    ih_six = id_lw_const(ID_S("word"), ID_S("63"));
+    ih_cnt = id_lw_op(ID_S("and"), ID_S("word"), (int)(id_list_get(ih_args, 1)), ih_six, ID_S(""));
+    ih_shr = id_lw_op(ID_S("lshr"), ID_S("word"), (int)(id_list_get(ih_args, 0)), ih_cnt, ID_S(""));
+    ret_i = id_lw_op(ID_S("and"), ID_S("word"), ih_shr, ih_mask, ID_S(""));
+    return ret_i;
+}
+
+int id_lw_expand_trap(char* helper, char* ret_ty, IdList* ih_args) {
+    int ret_i;
+    ret_i = (0 - 1);
+    if (((int)(id_list_get(fsc, 0)) == 1)) {
+        ret_i = id_lw_callf(helper, ret_ty, ih_args);
+    } else {
+        ret_i = id_lw_expand_ushr(helper, ret_ty, ih_args);
+    }
+    return ret_i;
+}
+
+int id_lw_expand_ushr(char* helper, char* ret_ty, IdList* ih_args) {
+    int ret_i;
+    ret_i = (0 - 1);
+    if ((strcmp(helper, ID_S("id_ushr")) == 0)) {
+        ret_i = id_lw_inline_ushr(ih_args);
+    } else {
+        ret_i = id_lw_callf(helper, ret_ty, ih_args);
+    }
+    return ret_i;
+}
+
 int id_lw_expand_turn32(char* helper, char* ret_ty, IdList* ih_args) {
     int ret_i;
     ret_i = (0 - 1);
@@ -7726,7 +7790,7 @@ int id_lw_expand_high(char* helper, char* ret_ty, IdList* ih_args) {
     if ((strcmp(helper, ID_S("id_umul_hi")) == 0)) {
         ret_i = id_lw_inline_high(ih_args);
     } else {
-        ret_i = id_lw_callf(helper, ret_ty, ih_args);
+        ret_i = id_lw_expand_trap(helper, ret_ty, ih_args);
     }
     return ret_i;
 }

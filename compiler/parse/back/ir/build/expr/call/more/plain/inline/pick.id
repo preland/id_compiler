@@ -1,0 +1,26 @@
+// The dispatch for the trap-bearing helpers, after the ones that never trap
+// (dispatch.id). A freestanding build keeps every call: its runtime is written
+// in `id` and has no id_fail to branch to, and its shifts do not trap the way
+// the hosted C helper does, so an inline guard would change what the program
+// does there.
+lw_expand_trap(string helper, string ret_ty, int[] ih_args) {
+  int ret_i = 0 - 1;
+  if((import fsc)[0] == 1) {
+    ret_i = lw_callf(helper, ret_ty, ih_args);
+  } else {
+    ret_i = lw_expand_ushr(helper, ret_ty, ih_args);
+  }
+} return int ret_i;
+given lw_env_fixture ("id_ushr", "word", [0, 1]):(12)
+given lw_trap_fs1 ("id_ushr", "word", [0, 1]):(0)
+
+lw_expand_ushr(string helper, string ret_ty, int[] ih_args) {
+  int ret_i = 0 - 1;
+  if(helper == "id_ushr") {
+    ret_i = lw_inline_ushr(ih_args);
+  } else {
+    ret_i = lw_callf(helper, ret_ty, ih_args);
+  }
+} return int ret_i;
+given lw_env_fixture ("id_ushr", "word", [0, 1]):(12)
+given lw_env_fixture ("id_x", "word", [0, 1]):(0)

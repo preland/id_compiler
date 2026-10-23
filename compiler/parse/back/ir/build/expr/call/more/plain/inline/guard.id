@@ -1,0 +1,46 @@
+// The unsigned shift as LLVM instructions, guarded by the same
+// trap the C helpers raise. The guard is built here, at IR-build time, the way
+// `&&` builds its blocks (../../../../../op/more/ctrl/logic): a conditional
+// branch to a block that calls id_fail with the helper's own message, and a
+// join block the rest of the expression continues in. The .ll printer never
+// splits a block, so no phi's incoming label can go stale.
+
+// Branch to a trap block when `bad` holds, then carry on in the join block.
+lw_guard(int gd_bad, string gd_msg) {
+  int gd_trap = ir_block((import lwfn)[0], "trap");
+  int gd_ok = ir_block((import lwfn)[0], "ok");
+  lw_term("cbr", gd_bad, [gd_trap, gd_ok]);
+} chain (int gd_bad, string gd_msg) {
+  lw_go(gd_trap);
+  int gd_text = lw_const("string", "\"" + gd_msg + "\"");
+  lw_callf("id_fail", "", [gd_text]);
+} chain (int gd_bad, string gd_msg) {
+  lw_term("br", 0 - 1, [gd_ok]);
+  lw_go(gd_ok);
+} return void;
+given lw_env_fixture (5, "boom"):() then (import lwcur)[0]:(3)
+given lw_env_fixture (6, "bang"):() then (import istr)[2]:("id_fail")
+
+// A logical shift right. A negative count traps, a count of the word's width
+// or more gives zero (the C helper's rule), and a count in range is the plain
+// lshr. lshr by 64 or more is poison, so the count is masked to six bits and
+// the result is anded with all ones when the count was in range and zero when
+// not -- no select, which the IR has no instruction for.
+lw_inline_ushr(int[] ih_args) {
+  int ih_zero = lw_const("word", "0");
+  int ih_neg = lw_op("icmp", "bool", ih_args[1], ih_zero, "<");
+  lw_guard(ih_neg, "shift by a negative amount");
+} chain (int[] ih_args) {
+  int ih_width = lw_const("word", "64");
+  int ih_small = lw_op("icmp", "bool", ih_args[1], ih_width, "u<");
+  int ih_mask = lw_op("sext", "word", ih_small, 0 - 1, "");
+} chain (int[] ih_args) {
+  int ih_six = lw_const("word", "63");
+  int ih_cnt = lw_op("and", "word", ih_args[1], ih_six, "");
+  int ih_shr = lw_op("lshr", "word", ih_args[0], ih_cnt, "");
+} chain (int[] ih_args) {
+  int ret_i = lw_op("and", "word", ih_shr, ih_mask, "");
+} return int ret_i;
+given lw_env_fixture ([0, 1]):(12) then (import iop)[0]:("const")
+given lw_env_fixture ([2, 3]):(12) then (import lwcur)[0]:(3)
+
