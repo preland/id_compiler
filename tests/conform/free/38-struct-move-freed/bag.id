@@ -1,0 +1,4 @@
+struct Bag {
+  Pt[] pts;
+  int n;
+}

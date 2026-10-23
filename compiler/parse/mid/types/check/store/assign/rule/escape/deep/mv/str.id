@@ -1,0 +1,21 @@
+// A string name moved into a list of strings is a block the function made, not
+// a literal, which a string owner would have copied to the heap and a move
+// would not. The move proof (esc_movable, arg.id) says the name is declared and
+// pushed in one block and mentioned nowhere else; what a string needs on top is
+// that its declaration is a fresh string (str_fresh_node: a concatenation or a
+// builtin that makes one) and that the two statements are its only mentions, so
+// no assignment between them swaps in a literal or somebody else's block.
+
+// 1 when the argument `a` of the statement `i` of `stmts` is not a string name,
+// or is one declared by a fresh string and mentioned only there and at `i`.
+esc_mvstr(int[] stmts, int i, int a) {
+  int ok = 1;
+  int dz_j = esc_declat(stmts, i, (import ns1)[a]);
+  if(type_of(a) == "string" && dz_j >= 0) {
+    ok = str_fresh_node((import ni1)[(stmts[dz_j])]) == 1 && esc_cntr(stmts, dz_j, i, (import ns1)[a]) == 2;
+  }
+} return int ok;
+given esc_ms_fix ((import ems_body), 2, (import ems_sv)):(1)
+given esc_ms_fix ((import ems_lbody), 2, (import ems_sv)):(0)
+given esc_ms_fix ((import ems_abody), 3, (import ems_sv)):(0)
+given esc_ms_fix ((import ems_body), 2, (import ems_nv)):(1)

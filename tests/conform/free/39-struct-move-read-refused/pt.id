@@ -1,0 +1,4 @@
+struct Pt {
+  string name;
+  int y;
+}

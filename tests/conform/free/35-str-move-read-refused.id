@@ -1,0 +1,15 @@
+// The moved name is read after the push, so the list must not free it: s still
+// reaches the block. A free here would be caught by ID_FREE_GUARD as a use of
+// a freed string.
+build(int n) {
+  string[] names = [];
+  string s = "k" + n;
+  push(names, s);
+} chain (int n) {
+  int t = len(names) + len(s);
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

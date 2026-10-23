@@ -1,0 +1,36 @@
+// A struct name moved into a list of structs is freed by type through the list,
+// all the way down (idfr_NAME), so it must be what a struct that frees itself
+// is: nothing it holds is shared. The move proof (esc_movable, arg.id) has
+// refused a keeping use, a store that is not fresh and a second constructor;
+// what a pushed struct needs on top is that its walk has none of the bits that
+// stop a struct from owning what it holds (4, 8, 32 and 128, as esc_deepk asks)
+// and that every list it takes over was itself moved in (esc_mvok).
+
+// 1 when the argument `a` of the statement `i` of `stmts` is not a struct name
+// pushed by that statement, or is one a list of structs may free by type.
+esc_mvsd(int fn, int[] stmts, int i, int a) {
+  int ok = 1;
+  string sd_kn = (import ns1)[a];
+  if((import nkind)[(stmts[i])] == "exprstmt" && is_list_ty(type_of(a)) == 0 && esc_sbear(type_of(a)) == 1) {
+    ok = (esc_block((import nl2)[fn], sd_kn) & 172) == 0 && esc_mvok(fn, sd_kn) == 1;
+  }
+} return int ok;
+given esc_ms_fix ((import ems_sfn), (import ems_sbody), 3, (import ems_tv)):(1)
+given esc_ms_fix ((import ems_sbfn), (import ems_sbbody), 3, (import ems_tv)):(0)
+given esc_ms_fix ((import ems_sfn), (import ems_sbody), 2, (import ems_tv)):(1)
+given esc_ms_fix ((import ems_sfn), (import ems_sbody), 3, (import ems_sv)):(1)
+
+// A list a struct takes over is freed by the struct's type, element by element,
+// so the elements pushed onto it must have been moved in too (flag 256, the
+// walk's mark of a push of a name): 1 when the argument `a` is not a list name
+// with such a push, or when every push onto it is a proved move (esc_mvok).
+esc_mvrow(int fn, int[] stmts, int i, int a) {
+  int ok = 1;
+  string rw_kn = (import ns1)[a];
+  if(is_list_ty(type_of(a)) == 1 && (esc_block((import nl2)[fn], rw_kn) & 256) != 0) {
+    ok = esc_mvok(fn, rw_kn);
+  }
+} return int ok;
+given esc_mp_fix ((import emp_fn), (import emp_body), 2, (import emp_rv)):(1)
+given esc_mp_fix ((import emp_bad), (import emp_bbody), 2, (import emp_rv)):(0)
+given esc_mp_fix ((import emp_fn), (import emp_body), 2, (import emp_nv)):(1)

@@ -1,0 +1,19 @@
+// Strings built in a loop body and moved into a list of strings are given back
+// with it: each pass allocates one string and the list frees all of them, so
+// allocated minus freed does not grow with N.
+build(int n) {
+  string[] names = [];
+  int i = 0;
+  while(i < n) {
+    string s = "k" + i;
+    push(names, s);
+    i = i + 1;
+  }
+} chain (int n) {
+  int t = len(names) + len(names[0]);
+} return int t;
+
+main(int argc, string[] argv) {
+  int r = build(50);
+  print(r);
+} return int 0;

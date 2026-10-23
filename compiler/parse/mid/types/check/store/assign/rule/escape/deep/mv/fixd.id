@@ -1,0 +1,66 @@
+// The struct half of the move cases' programs (fixs.id has the string half),
+// and the assembly of both on top of esc_fix's:
+//
+//   ms_sd(int mn)    { Tr[] mts = []; Tr[] mkids = []; Tr mt = Tr(mkids); push(mts, mt); }                 returns mn
+//   ms_sdbad(int mn) { ... the same, then int mm = len(mkids); }                                           returns mn
+//
+// over `struct Tr { Tr[] kids; }`. ms_sd is the shape of a builder whose list
+// of structs takes over a struct it filled; ms_sdbad reads the list the struct
+// holds after the struct has it, which the list of structs would then free
+// twice.
+
+esc_ms_c() {
+  sd_note("Tr", ["kids"], ["Tr[]"], "tr.id", 1);
+  add_var("mts", "Tr[]", 0);
+  add_var("mt", "Tr", 0);
+} chain () {
+  add_var("mkids", "Tr[]", 0);
+  add_var("mm", "int", 0);
+  export int ems_tv = node_txt("var", "mt");
+} chain () {
+  export int ems_kv = node_txt("var", "mkids");
+  export int ems_tsv = node_txt("var", "mts");
+  export int ems_dts = node_decl("Tr[]", "mts", node_arr((import ef_none)), 0);
+} chain () {
+  export int ems_dk = node_decl("Tr[]", "mkids", node_arr((import ef_none)), 0);
+  export int ems_cc = node_call("Tr", [(import ems_kv)]);
+  export int ems_dt = node_decl("Tr", "mt", (import ems_cc), 0);
+} chain () {
+  export int ems_sc = node_call("push", [(import ems_tsv), (import ems_tv)]);
+  export int ems_sp = node_exprstmt((import ems_sc));
+  export int ems_dm = node_decl("int", "mm", node_call("len", [(import ems_kv)]), 0);
+} return void;
+given esc_ms_fix ():() then calls sd_note:("Tr", ["kids"], ["Tr[]"], "tr.id", 1) then calls add_var:("mts", "Tr[]", 0) then calls add_var:("mm", "int", 0)
+given esc_ms_fix ():() then calls node_call:("Tr", [(import ems_kv)]) then calls node_call:("push", [(import ems_tsv), (import ems_tv)])
+given esc_ms_fix ():() then (import chkfail)[0]:(0)
+given esc_ms_fix ():() then init_units:(0)
+
+esc_ms_d() {
+  export int[] ems_sbody = [(import ems_dts), (import ems_dk), (import ems_dt), (import ems_sp)];
+  export int[] ems_sbbody = [(import ems_dts), (import ems_dk), (import ems_dt), (import ems_sp), (import ems_dm)];
+  export int[] ems_pd = [node_param("param", "int", "mn")];
+} chain () {
+  export int ems_sfn = node_func("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv));
+  export int ems_sbfn = node_func("ms_sdbad", "int", (import ems_pd), (import ems_sbbody), (import ems_nv));
+} return void;
+given esc_ms_fix ():() then calls node_param:("param", "int", "mn") then calls node_func:("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv))
+given esc_ms_fix ():() then calls node_func:("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv)) then calls node_func:("ms_sdbad", "int", (import ems_pd), (import ems_sbbody), (import ems_nv))
+given esc_ms_fix ():() then (import chkfail)[0]:(0)
+given esc_ms_fix ():() then init_units:(0)
+
+esc_ms_fix() {
+  esc_fix();
+  esc_ms_a();
+  esc_ms_b();
+} chain () {
+  esc_ms_c();
+  esc_ms_d();
+  add_func("ms_sd", "int", (import ems_sfn));
+} chain () {
+  add_func("ms_sdbad", "int", (import ems_sbfn));
+  esc_seed();
+} return void;
+given esc_ms_fix ():() then calls add_func:("ms_sd", "int", (import ems_sfn)) then calls add_func:("ms_sdbad", "int", (import ems_sbfn))
+():() then calls esc_fix:[1]
+():() then calls esc_ms_c:[1]
+():() then init_units:(0)

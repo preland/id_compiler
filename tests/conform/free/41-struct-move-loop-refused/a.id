@@ -1,0 +1,14 @@
+// The name is declared outside the loop that pushes it, so one block would be
+// pushed on every pass: the list would hold it three times. Not a move.
+build(int n) {
+  Pt[] pts = [];
+  Pt p = Pt("k" + n, n);
+  int i = 0;
+} chain (int n) {
+  while(i < n) {
+    push(pts, p);
+    i = i + 1;
+  }
+  Bag b = Bag(pts, n);
+  int t = len(b.pts) + b.n;
+} return int t;

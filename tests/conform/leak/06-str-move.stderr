@@ -1,0 +1,4 @@
+id: allocated 2 lists
+id: allocated 102 strings
+id: freed 1 lists
+id: freed 100 strings

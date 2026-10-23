@@ -1,0 +1,15 @@
+// The string is a literal, not a block the function made, so the list has
+// nothing of its own to free: moving it in would hand a literal to the heap's
+// free. Not a move.
+build(int n) {
+  string[] names = [];
+  string s = "k";
+  push(names, s);
+} chain (int n) {
+  int t = len(names) + n;
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

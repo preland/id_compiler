@@ -6,7 +6,7 @@
 esc_mvarg(int fn, int[] stmts, int i, int a) {
   int ok = 1;
   if((import nkind)[a] == "var" && esc_heap_ty(type_of(a)) == 1) {
-    ok = esc_movable(fn, stmts, i, (import ns1)[a]);
+    ok = esc_movable(fn, stmts, i, (import ns1)[a]) & esc_mvstr(stmts, i, a) & esc_mvsd(fn, stmts, i, a) & esc_mvrow(fn, stmts, i, a);
   }
 } return int ok;
 given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_kv)):(1)

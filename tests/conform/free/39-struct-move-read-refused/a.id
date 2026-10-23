@@ -1,0 +1,11 @@
+// The moved name is read after the push, so the list must not free it: p still
+// reaches the block. A free here would be caught by ID_FREE_GUARD as a use of a
+// freed struct.
+build(int n) {
+  Pt[] pts = [];
+  Pt p = Pt("k" + n, n);
+  push(pts, p);
+} chain (int n) {
+  Bag b = Bag(pts, n);
+  int t = len(b.pts) + p.y;
+} return int t;

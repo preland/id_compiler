@@ -1,0 +1,16 @@
+// Structs built in a loop body and moved into a list of structs are given back
+// with it: each pass allocates one struct and one string and the holder struct
+// the list is moved into frees all of them, so allocated minus freed does not
+// grow with N.
+build(int n) {
+  Pt[] pts = [];
+  int i = 0;
+  while(i < n) {
+    Pt p = Pt("k" + i, i);
+    push(pts, p);
+    i = i + 1;
+  }
+} chain (int n) {
+  Bag b = Bag(pts, n);
+  int t = len(b.pts) + b.pts[0].y;
+} return int t;

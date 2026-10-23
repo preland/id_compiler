@@ -4077,13 +4077,17 @@ int id_esc_mvnest(int fn, int sn, char* nm);
 int id_esc_mvctor(int fn, IdList* stmts, int i, int e);
 int id_esc_mvel(int b, int v);
 int id_esc_mvmask(int sn);
+int id_esc_mvsame(char* lt, char* vt);
 int id_esc_pushat(int fn, IdList* stmts, int i, char* nm);
 int id_esc_pushof(int sn, char* nm);
 int id_esc_pushto(int e, char* nm);
 int id_esc_mvok(int fn, char* nm);
 int id_esc_mvin(int fn, IdList* stmts, char* nm);
 int id_esc_mvone(int fn, IdList* stmts, int i, char* nm);
+int id_esc_mvsd(int fn, IdList* stmts, int i, int a);
+int id_esc_mvrow(int fn, IdList* stmts, int i, int a);
 int id_esc_deepk(int fn, char* nm, int dz_k);
+int id_esc_mvstr(IdList* stmts, int i, int a);
 int id_esc_list_of(char* t, int esc_inner);
 int id_esc_deep(int fn, char* nm);
 char* id_esc_free_fn(int fn, char* nm);
@@ -4953,6 +4957,7 @@ static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
 static void idfr_Zip(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }
 static void idfr_GuiBd(IdList* p) { id_free_walk(p, "S3S3lsl.l.S3l.lsl.S3l.lsl."); }
 static void idfr_GuiCl(IdList* p) { id_free_walk(p, "S3l.lsl."); }
 static void idfr_GuiHm(IdList* p) { id_free_walk(p, "S3lsl.l."); }
@@ -35266,7 +35271,12 @@ int id_esc_mvarg(int fn, IdList* stmts, int i, int a) {
     int ok;
     ok = 1;
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, a)), ID_S("var")) == 0) && (id_esc_heap_ty(id_type_of(a)) == 1))) {
-        ok = id_esc_movable(fn, stmts, i, (char*)(intptr_t)(id_list_get(ns1, a)));
+IdList* idsq_27;
+char* idsq_25;
+int idsq_24;
+int idsq_19;
+int idsq_12;
+        ok = (idsq_27 = ns1, idsq_25 = (char*)(intptr_t)(id_list_get(idsq_27, a)), idsq_24 = id_esc_movable(fn, stmts, i, idsq_25), idsq_19 = id_esc_mvstr(stmts, i, a), idsq_12 = id_esc_mvsd(fn, stmts, i, a), (((idsq_24 & idsq_19) & idsq_12) & id_esc_mvrow(fn, stmts, i, a)));
     }
     return ok;
 }
@@ -35453,7 +35463,7 @@ int id_esc_mvel(int b, int v) {
     char* pm_ty;
     int ok;
     pm_ty = id_type_of(id_imp_root(b));
-    ok = (((strcmp((char*)(intptr_t)(id_list_get(nkind, v)), ID_S("var")) == 0) && (id_is_list_ty(id_type_of(v)) == 1)) && (id_esc_strong(pm_ty) == 0));
+    ok = ((strcmp((char*)(intptr_t)(id_list_get(nkind, v)), ID_S("var")) == 0) && (((id_is_list_ty(id_type_of(v)) == 1) && (id_esc_strong(pm_ty) == 0)) || (id_esc_mvsame(pm_ty, id_type_of(v)) == 1)));
     return ok;
 }
 
@@ -35464,6 +35474,12 @@ int id_esc_mvmask(int sn) {
         pm_msk = 67;
     }
     return pm_msk;
+}
+
+int id_esc_mvsame(char* lt, char* vt) {
+    int ok;
+    ok = ((strcmp(lt, id_concat(vt, ID_S("[]"))) == 0) && ((strcmp(vt, ID_S("string")) == 0) || ((id_is_list_ty(vt) == 0) && (id_esc_sbear(vt) == 1))));
+    return ok;
 }
 
 int id_esc_pushat(int fn, IdList* stmts, int i, char* nm) {
@@ -35527,6 +35543,29 @@ int id_esc_mvone(int fn, IdList* stmts, int i, char* nm) {
     return ok;
 }
 
+int id_esc_mvsd(int fn, IdList* stmts, int i, int a) {
+    int ok;
+    char* sd_kn;
+    ok = 1;
+    sd_kn = (char*)(intptr_t)(id_list_get(ns1, a));
+IdList* idsq_43;
+    if ((((idsq_43 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_43, (int)(id_list_get(stmts, i)))), ID_S("exprstmt")) == 0)) && (id_is_list_ty(id_type_of(a)) == 0)) && (id_esc_sbear(id_type_of(a)) == 1))) {
+        ok = (((id_esc_block((IdList*)(intptr_t)(id_list_get(nl2, fn)), sd_kn) & 172) == 0) && (id_esc_mvok(fn, sd_kn) == 1));
+    }
+    return ok;
+}
+
+int id_esc_mvrow(int fn, IdList* stmts, int i, int a) {
+    int ok;
+    char* rw_kn;
+    ok = 1;
+    rw_kn = (char*)(intptr_t)(id_list_get(ns1, a));
+    if (((id_is_list_ty(id_type_of(a)) == 1) && ((id_esc_block((IdList*)(intptr_t)(id_list_get(nl2, fn)), rw_kn) & 256) != 0))) {
+        ok = id_esc_mvok(fn, rw_kn);
+    }
+    return ok;
+}
+
 int id_esc_deepk(int fn, char* nm, int dz_k) {
     int f;
     int ok;
@@ -35537,6 +35576,18 @@ int id_esc_deepk(int fn, char* nm, int dz_k) {
     }
     if (((ok == 1) && ((f & 256) != 0))) {
         ok = id_esc_mvok(fn, nm);
+    }
+    return ok;
+}
+
+int id_esc_mvstr(IdList* stmts, int i, int a) {
+    int ok;
+    int dz_j;
+    ok = 1;
+    dz_j = id_esc_declat(stmts, i, (char*)(intptr_t)(id_list_get(ns1, a)));
+    if (((strcmp(id_type_of(a), ID_S("string")) == 0) && (dz_j >= 0))) {
+IdList* idsq_22;
+        ok = ((idsq_22 = ni1, (id_str_fresh_node((int)(id_list_get(idsq_22, (int)(id_list_get(stmts, dz_j))))) == 1)) && (id_esc_cntr(stmts, dz_j, i, (char*)(intptr_t)(id_list_get(ns1, a))) == 2));
     }
     return ok;
 }

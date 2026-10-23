@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

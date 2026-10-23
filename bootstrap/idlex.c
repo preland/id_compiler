@@ -1248,6 +1248,7 @@ static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
 static void idfr_Zip(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }
 static void idfr_GuiBd(IdList* p) { id_free_walk(p, "S3S3lsl.l.S3l.lsl.S3l.lsl."); }
 static void idfr_GuiCl(IdList* p) { id_free_walk(p, "S3l.lsl."); }
 static void idfr_GuiHm(IdList* p) { id_free_walk(p, "S3lsl.l."); }

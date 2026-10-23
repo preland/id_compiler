@@ -1,0 +1,18 @@
+// A struct built in a loop body and pushed once into a list of structs is
+// moved, not shared: it is declared in the same block as the push, built from a
+// string of its own, mentioned nowhere else and read by nobody afterwards, so
+// the list owns it and frees it, and its string, with itself. The list is then
+// moved into a holder struct, whose type-directed free walks it, so the three
+// structs and their strings are given back with the holder.
+build(int n) {
+  Pt[] pts = [];
+  int i = 0;
+  while(i < n) {
+    Pt p = Pt("k" + i, i + 1);
+    push(pts, p);
+    i = i + 1;
+  }
+} chain (int n) {
+  Bag b = Bag(pts, n);
+  int t = len(b.pts) + b.n;
+} return int t;

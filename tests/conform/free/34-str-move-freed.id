@@ -1,0 +1,21 @@
+// A string built in a loop body and pushed once into a list of strings is
+// moved, not shared: it is declared in the same block as the push, built by a
+// concatenation, mentioned nowhere else and read by nobody afterwards, so the
+// list owns it and frees it with itself. Three strings are moved in, and the
+// list is freed with them at the exit.
+build(int n) {
+  string[] names = [];
+  int i = 0;
+  while(i < n) {
+    string s = "k" + i;
+    push(names, s);
+    i = i + 1;
+  }
+} chain (int n) {
+  int t = len(names) + len(names[2]);
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

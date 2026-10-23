@@ -1,0 +1,44 @@
+// The programs the string move's cases run against, on top of esc_fix's:
+//
+//   ms_ok(int mn)  { string[] mnames = []; string ms = "k" + mn; push(mnames, ms); }              returns mn
+//   ms_lit(int mn) { string[] mnames = []; string ms = "k"; push(mnames, ms); }                   returns mn
+//   ms_asg(int mn) { string[] mnames = []; string ms = "k" + mn; ms = "k" + mn; push(mnames, ms); } returns mn
+//
+// ms_ok is the shape of a builder whose list takes over the string it made;
+// ms_lit pushes a literal, ms_asg assigns the name again before the push.
+// Only the statement lists are built: the string proof reads no more.
+
+esc_ms_a() {
+  add_var("mnames", "string[]", 0);
+  add_var("ms", "string", 0);
+  add_var("mn", "int", 0);
+} chain () {
+  export int ems_rv = node_txt("var", "mnames");
+  export int ems_sv = node_txt("var", "ms");
+  export int ems_nv = node_txt("var", "mn");
+} chain () {
+  export int ems_cat = node_txt2("bin", "+", node_txt("str", "k"), (import ems_nv));
+  export int ems_lit = node_txt("str", "k");
+  export int ems_dn = node_decl("string[]", "mnames", node_arr((import ef_none)), 0);
+} return void;
+given esc_ms_fix ():() then calls add_var:("mnames", "string[]", 0) then calls add_var:("ms", "string", 0) then calls add_var:("mn", "int", 0)
+given esc_ms_fix ():() then calls node_txt:("var", "mnames") then calls node_txt:("var", "ms") then calls node_txt:("var", "mn")
+given esc_ms_fix ():() then (import chkfail)[0]:(0)
+given esc_ms_fix ():() then init_units:(0)
+
+esc_ms_b() {
+  export int ems_ds = node_decl("string", "ms", (import ems_cat), 0);
+  export int ems_dl = node_decl("string", "ms", (import ems_lit), 0);
+  export int ems_as = node_txt1("assign", "ms", (import ems_cat));
+} chain () {
+  export int ems_pc = node_call("push", [(import ems_rv), (import ems_sv)]);
+  export int ems_ps = node_exprstmt((import ems_pc));
+  export int[] ems_body = [(import ems_dn), (import ems_ds), (import ems_ps)];
+} chain () {
+  export int[] ems_lbody = [(import ems_dn), (import ems_dl), (import ems_ps)];
+  export int[] ems_abody = [(import ems_dn), (import ems_ds), (import ems_as), (import ems_ps)];
+} return void;
+given esc_ms_fix ():() then calls node_decl:("string", "ms", (import ems_lit), 0) then calls node_txt1:("assign", "ms", (import ems_cat))
+given esc_ms_fix ():() then calls node_call:("push", [(import ems_rv), (import ems_sv)]) then calls node_exprstmt:((import ems_pc))
+given esc_ms_fix ():() then (import chkfail)[0]:(0)
+given esc_ms_fix ():() then init_units:(0)

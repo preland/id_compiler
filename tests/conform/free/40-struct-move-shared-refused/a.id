@@ -1,0 +1,10 @@
+// The struct holds a string that the caller owns, so freeing it with the list
+// would free the caller's string too. Not a move.
+build(string s) {
+  Pt[] pts = [];
+  Pt p = Pt(s, 1);
+  push(pts, p);
+} chain (string s) {
+  Bag b = Bag(pts, 1);
+  int t = len(b.pts) + len(s);
+} return int t;
