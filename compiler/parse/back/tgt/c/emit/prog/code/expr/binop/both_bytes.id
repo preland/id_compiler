@@ -1,0 +1,21 @@
+// Equality on two bytes buffers compares contents, as it does on two strings
+// (id has no identity comparison), so it takes the strcmp path with the
+// buffer-aware comparison id_bytes_cmp, which answers 0 for equal contents.
+
+both_bytes(int id) {
+  int ok = 0;
+  if(type_of((import ni1)[id]) == "bytes" && type_of((import ni2)[id]) == "bytes") {
+    ok = 1;
+  }
+} return int ok;
+given nz_bin_eq_fixture ((import nz_bin_eq)):(0)
+given nz_bin_add_fixture ((import nz_bin_add)):(0)
+
+compare_function(int compare_node) {
+  string compare_name = "strcmp";
+  if(type_of(compare_node) == "bytes") {
+    compare_name = "id_bytes_cmp";
+  }
+} return string compare_name;
+given nz_bin_eq_fixture ((import nz_strn)):("strcmp")
+given nz_bin_eq_fixture ((import nz_strn2)):("strcmp")

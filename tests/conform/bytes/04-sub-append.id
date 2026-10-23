@@ -1,0 +1,12 @@
+// bytes_sub copies a span, an empty one at the very end included; bytes_append
+// grows its first argument.
+edge(bytes a) {
+  bytes t = bytes_sub(a, 7, 0);
+  int n = len(t);
+} return int n;
+
+main(int argc, string[] argv) {
+  bytes a = bytes_of_string("hello");
+  bytes_append(a, bytes_sub(a, 1, 2));
+  print(string_of_bytes(a) + " " + edge(a));
+} return int 0;

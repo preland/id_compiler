@@ -8,7 +8,7 @@ given popcall_fixture ((import popcall_args), "int"):(2)
 given popcall_fixture ((import popcall_args), "word"):(2)
 
 lw_pop_tail(string elem, int v) {
-  int c = lw_callf("id_list_pop", "word", [v]);
+  int c = lw_callf(lw_bfn(v, "id_list_pop", "id_bytes_pop"), "word", [v]);
   int ret_i = lw_unbox(c, elem);
 } return int ret_i;
 given lw_env_fixture ("int", 0):(1)
@@ -17,7 +17,7 @@ given lw_env_fixture ("string", 0):(1)
 // The rest of lw_len, once the counted list's element type is known.
 lw_len_tail(int[] args, string t) {
   int a = lw_expr(args[0]);
-  string lw_lenfn_v = str_pick(t, "string", "id_len", "id_list_len");
+  string lw_lenfn_v = lw_bfn(a, str_pick(t, "string", "id_len", "id_list_len"), "id_bytes_len");
   int ret_i = lw_callf(lw_lenfn_v, "int", [a]);
 } return int ret_i;
 given lencall_fixture ((import lencall_args), "int"):(1)

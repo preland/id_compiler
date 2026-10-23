@@ -1,0 +1,6 @@
+// EXPECT: [E0641]
+// + on a byte buffer would copy it on every step; bytes_append appends in place
+main(int argc, string[] argv) {
+  bytes a = bytes_new(2);
+  bytes b = a + a;
+} return int 0;

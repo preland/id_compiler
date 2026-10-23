@@ -1,0 +1,36 @@
+// The text of one checked or covered access, built from the accessor prefix
+// cell_ns chose. Inside the guard a list or bytes cell is read as ->data[j]; a
+// bytes store keeps the 0..255 check there (id_byte_fit) unless the value is
+// already known to fit, because the guard covers the index and not the value.
+
+cell_get_text(string cbx_ns, string cbx_base, string cbx_index, int cbx_hit) {
+  string cbx_text = cbx_ns + "get(" + cbx_base + ", " + cbx_index + ")";
+  if(cbx_hit == 1) {
+    cbx_text = "(" + cbx_base + ")->data[" + cbx_index + "]";
+  }
+} return string cbx_text;
+("id_list_", "v", "j", 1):("(v)->data[j]")
+("id_bytes_", "w", "k", 0):("id_bytes_get(w, k)")
+
+cell_set_name(string cbx_ns, int cbx_fit) {
+  string cbx_name = cbx_ns + "set";
+  if(cbx_ns == "id_bytes_" && cbx_fit == 1) {
+    cbx_name = "id_bytes_store";
+  }
+} return string cbx_name;
+("id_bytes_", 1):("id_bytes_store")
+("id_bytes_", 0):("id_bytes_set")
+("id_list_", 1):("id_list_set")
+
+cell_set_rhs(string cbx_ns, string cbx_value, int cbx_fit) {
+  string cbx_rhs = cbx_value;
+  if(cbx_ns == "id_bytes_") {
+    cbx_rhs = "id_byte_fit(" + cbx_value + ")";
+    if(cbx_fit == 1) {
+      cbx_rhs = "(unsigned char)(" + cbx_value + ")";
+    }
+  }
+} return string cbx_rhs;
+("id_list_", "7", 0):("7")
+("id_bytes_", "7", 0):("id_byte_fit(7)")
+("id_bytes_", "7", 1):("(unsigned char)(7)")

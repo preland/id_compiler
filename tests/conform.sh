@@ -242,7 +242,7 @@ for src in conform/$area/*.id conform/$area/*/; do
     for target in $TARGETS; do
         run_case "$target" "$id" "$dir" "$base"
     done
-    if [ -f "$src" ] && [[ " $TARGETS " == *" llvm "* ]] && grep -q 'while' "$src"; then
+    if [ -f "$src" ] && [[ " $TARGETS " == *" llvm "* ]] && ! known_apart llvm "$(basename "$dir")" && grep -q 'while' "$src"; then
         versioned_agree "$src" "$id"
     fi
 done

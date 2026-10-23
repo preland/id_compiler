@@ -19,6 +19,8 @@ tc_compare(string ga, string gb, string type) {
     so = "idtc_eqs_" + type + "(" + ga + ", " + gb + ")";
   } else if(ty_is_func(type) == 1) {
     so = "id_fn_eq(" + ga + ", " + gb + ")";
+  } else if(type == "bytes") {
+    so = "(id_bytes_cmp(" + ga + ", " + gb + ") == 0)";
   }
 } return string so;
 given sd_note_fixture ("a", "b", "int"):("(a == b)")
@@ -26,6 +28,7 @@ given sd_note_fixture ("a", "b", "string"):("(strcmp(a, b) == 0)")
 given sd_note_fixture ("a", "b", "int[]"):("idtc_eq_int(a, b)")
 given sd_note_fixture ("a", "b", "P"):("idtc_eqs_P(a, b)")
 given sd_note_fixture ("a", "b", "func(int) return int"):("id_fn_eq(a, b)")
+given sd_note_fixture ("a", "b", "bytes"):("(id_bytes_cmp(a, b) == 0)")
 
 tc_show(string code, string type) {
   string so = show_scalar(code, type);
@@ -39,12 +42,15 @@ tc_show(string code, string type) {
 } chain (string code, string type) {
   if(ty_kind_is(type, "struct") == 1) {
     so = "idtc_shows_" + type + "(" + code + ");";
+  } else if(type == "bytes") {
+    so = "id_bytes_show(" + code + ");";
   }
 } return string so;
 given sd_note_fixture ("x", "int"):("fprintf(stderr, \"%d\", x);")
 given sd_note_fixture ("x", "int[]"):("idtc_show_int(x);")
 given sd_note_fixture ("f", "func(int) return int"):("fputs(\"a function value\", stderr);")
 given sd_note_fixture ("x", "P"):("idtc_shows_P(x);")
+given sd_note_fixture ("x", "bytes"):("id_bytes_show(x);")
 
 show_scalar(string code, string type) {
   string so = "fprintf(stderr, \"%d\", " + code + ");";

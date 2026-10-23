@@ -8,7 +8,7 @@
 //   float    exactly a float
 
 bi_wants(string name, int i) {
-  string s = bi_wants2(name, i);
+  string s = bi_wants_bytes(name, i, bi_wants2(name, i));
   if(name == "to_int" || name == "mem_of_str" || name == "fail" || (name == "character_code_at" || name == "str_sub") && i == 0) {
     s = "string";
   }
@@ -17,6 +17,8 @@ bi_wants(string name, int i) {
 ("push", 0):("list")
 ("fail", 0):("string")
 ("str_sub", 0):("string")
+("bytes_append", 1):("bytes")
+("bytes_of_string", 0):("string")
 
 // character_code_at's first argument was taken above, so what reaches here is its
 // second: the index, which idc.py words as an index rather than as a type.

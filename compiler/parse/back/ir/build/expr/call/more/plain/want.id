@@ -3,7 +3,7 @@
 // mem_of_str is the exception on both targets: its argument is a string.
 lw_bpty2(string name, int i) {
   string t = "";
-  if(is_syscall(name) == 1 && name != "mem_of_str") {
+  if(is_syscall(name) == 1 && name != "mem_of_str" || name == "bytes_of_memory" && i == 0) {
     t = "word";
   } else {
     t = lw_bpty3(name, i);
@@ -11,6 +11,8 @@ lw_bpty2(string name, int i) {
 } return string t;
 ("peek8", 0):("word")
 ("mem_of_str", 0):("string")
+("bytes_of_memory", 0):("word")
+("bytes_of_memory", 1):("")
 
 lw_bpty3(string name, int i) {
   string t = "";

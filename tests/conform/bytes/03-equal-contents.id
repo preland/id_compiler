@@ -1,0 +1,20 @@
+// == and != compare contents, not identity: equal text in two buffers is equal,
+// a zeroed buffer of the same length and a shorter prefix are not.
+same(bytes a, bytes b) {
+  int r = 0;
+  if (a == b) {
+    r = 1;
+  }
+} return int r;
+
+verdict(bytes a, bytes b) {
+  bytes zeros = bytes_new(3);
+  bytes prefix = bytes_sub(b, 0, 2);
+  string s = "" + same(a, b) + same(a, zeros) + same(a, prefix);
+} return string s;
+
+main(int argc, string[] argv) {
+  bytes a = bytes_of_string("abc");
+  bytes b = bytes_of_string("abc");
+  print(verdict(a, b));
+} return int 0;

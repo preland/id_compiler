@@ -815,6 +815,185 @@ static char* id_str_sub(const char* s, int i, int n) {
     }
     return id_str_from(n ? s + i : s, (size_t)n);
 }
+/* bytes: a mutable, growable buffer of bytes, one byte per cell, passed by
+   reference like a list. It is one pool block, a header (len, cap, data) with
+   the first cells inline; growth takes a separate block for the cells and the
+   first inline bytes then hold the capacity the header block was made with,
+   which is what gives the block back at the right size. A cell is read as
+   0..255 and a store outside that range traps. The capacity is never below 8
+   so the inline area can hold that number. */
+typedef struct { int len, cap; unsigned char* data; } IdBytes;
+typedef struct { IdBytes h; unsigned char c[8]; } IdBytesBlk;
+#define ID_BYTES_CELLS(B) (((IdBytesBlk*)(void*)(B))->c)
+#define ID_BYTES_BYTES(n) (__builtin_offsetof(IdBytesBlk, c) + (size_t)(n))
+static IdBytes* id_bytes_make(long long len, long long cap) {
+    id_nalloc++;
+    IdBytesBlk* B = (IdBytesBlk*)id_pool_blk(ID_BYTES_BYTES(cap));
+    B->h.len = (int)len; B->h.cap = (int)cap; B->h.data = B->c;
+    return &B->h;
+}
+static IdBytes* id_bytes_new(int n) {
+    if (n < 0 || n > INT_MAX) id_trap("bytes_new: length out of range");
+    IdBytes* B = id_bytes_make(n, n < 8 ? 8 : n);
+    memset(B->data, 0, (size_t)n);
+    return B;
+}
+static void id_bytes_free(IdBytes* B) {
+    if (!B) return;
+    id_nfree++;
+    if (id_fguard < 0) { const char* e = getenv("ID_FREE_GUARD"); id_fguard = (e && e[0] == '1'); }
+    if (id_fguard) {
+        if (B->cap == INT_MIN) id_freed_trap();
+        int c = B->cap < 0 ? -B->cap : B->cap;
+        memset(B->data, 0xDD, (size_t)c);
+        B->len = -1; B->cap = INT_MIN;
+        return;
+    }
+    size_t c = (size_t)(B->cap < 0 ? -B->cap : B->cap);
+    unsigned char* inl = ID_BYTES_CELLS(B);
+    if (B->data == inl) { id_pool_free(B, ID_BYTES_BYTES(c)); return; }
+    size_t ic;
+    memcpy(&ic, inl, sizeof ic);
+    id_pool_free(B->data, c);
+    id_pool_free(B, ID_BYTES_BYTES(ic));
+}
+static void id_bytes_mut_check(IdBytes* B) {
+    if (B->cap < 0) {
+        if (B->cap == INT_MIN) id_freed_trap();
+        id_trap("cannot mutate a constant bytes");
+    }
+}
+static _Noreturn void id_bytes_oob(IdBytes* B, long long i) {
+    if (B->cap == INT_MIN) id_freed_trap();
+    fprintf(stderr, "id: index %lld out of bounds (len %d)\n", i, B->len);
+    exit(1);
+}
+static _Noreturn void id_byte_range(long long v) {
+    fprintf(stderr, "id: byte value %lld out of range 0..255\n", v);
+    exit(1);
+}
+static unsigned char id_byte_fit(long long v) {
+    if (v < 0 || v > 255) id_byte_range(v);
+    return (unsigned char)v;
+}
+static int id_bytes_len(IdBytes* B) { if (!B) id_null_read(); if (B->len < 0) id_freed_trap(); return B->len; }
+static long long id_bytes_get(IdBytes* B, int i) {
+    if (!B) id_null_read();
+    if (i < 0 || i >= B->len) id_bytes_oob(B, i);
+    return B->data[i];
+}
+static void id_bytes_set(IdBytes* B, int i, long long v) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    if (i < 0 || i >= B->len) id_bytes_oob(B, i);
+    B->data[i] = id_byte_fit(v);
+}
+static void id_bytes_store(IdBytes* B, int i, long long v) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    if (i < 0 || i >= B->len) id_bytes_oob(B, i);
+    B->data[i] = (unsigned char)v;
+}
+static long long id_bytes_cell(IdBytes* B, int i) { return B->data[i]; }
+static void id_bytes_cell_set(IdBytes* B, int i, long long v) { B->data[i] = id_byte_fit(v); }
+static IdBytes* id_bytes_lit(int n, ...) {
+    IdBytes* R = id_bytes_make(n, n < 8 ? 8 : n);
+    va_list ap; va_start(ap, n);
+    for (int k = 0; k < n; k++) R->data[k] = id_byte_fit(va_arg(ap, long long));
+    va_end(ap);
+    return R;
+}
+static void id_bytes_show(IdBytes* B) {
+    fputs("[", stderr);
+    for (int i = 0; i < B->len; i++) fprintf(stderr, "%s0x%02X", i ? ", " : "", B->data[i]);
+    fputs("]", stderr);
+}
+static void id_bytes_reserve(IdBytes* B, size_t need) {
+    if ((size_t)B->cap >= need) return;
+    if (need > INT_MAX) id_trap("bytes capacity overflow");
+    size_t ncap = (size_t)B->cap * 2;
+    if (ncap < need) ncap = need;
+    if (ncap > INT_MAX) ncap = INT_MAX;
+    ID_MEM_CHARGE(ncap);
+    unsigned char* inl = ID_BYTES_CELLS(B);
+    if (B->data == inl) {
+        unsigned char* nd = (unsigned char*)id_pool_get(ncap);
+        size_t ic = (size_t)B->cap;
+        memcpy(nd, inl, (size_t)B->len);
+        memcpy(inl, &ic, sizeof ic);
+        B->data = nd;
+    } else {
+        B->data = (unsigned char*)id_realloc(B->data, (size_t)B->cap, ncap);
+    }
+    B->cap = (int)ncap;
+}
+static void id_bytes_push(IdBytes* B, long long v) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    unsigned char b = id_byte_fit(v);
+    if (B->len >= B->cap) id_bytes_reserve(B, (size_t)B->len + 1);
+    B->data[B->len++] = b;
+}
+static long long id_bytes_pop(IdBytes* B) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    if (B->len <= 0) id_trap("pop from empty bytes");
+    return B->data[--B->len];
+}
+static void id_bytes_append(IdBytes* D, IdBytes* S) {
+    if (!D || !S) id_null_read();
+    id_bytes_mut_check(D);
+    if (S->len < 0) id_freed_trap();
+    size_t n = (size_t)S->len;
+    if (n == 0) return;
+    id_bytes_reserve(D, id_add_check((size_t)D->len, n, "bytes_append"));
+    memmove(D->data + D->len, S->data, n);
+    D->len += (int)n;
+}
+static IdBytes* id_bytes_sub(IdBytes* B, int i, int n) {
+    if (!B) id_null_read();
+    if (B->len < 0) id_freed_trap();
+    if (i < 0 || n < 0 || (n > 0 && (unsigned long long)i + (unsigned long long)n > (unsigned long long)B->len)) {
+        fprintf(stderr, "id: bytes span out of bounds: i=%lld n=%lld in a bytes of length %d\n", i, n, B->len);
+        exit(1);
+    }
+    IdBytes* R = id_bytes_make(n, n < 8 ? 8 : n);
+    if (n) memcpy(R->data, B->data + i, (size_t)n);
+    return R;
+}
+static int id_bytes_cmp(IdBytes* A, IdBytes* B) {
+    if (!A || !B) id_null_read();
+    if (A->len < 0 || B->len < 0) id_freed_trap();
+    if (A->len != B->len) return 1;
+    return A->len ? memcmp(A->data, B->data, (size_t)A->len) : 0;
+}
+static IdBytes* id_bytes_of_string(const char* s) {
+    size_t n = id_slen(s);
+    if (n > INT_MAX) id_trap("bytes_of_string: string too long");
+    IdBytes* R = id_bytes_make((long long)n, n < 8 ? 8 : (long long)n);
+    memcpy(R->data, s, n);
+    return R;
+}
+static char* id_string_of_bytes(IdBytes* B) {
+    if (!B) id_null_read();
+    if (B->len < 0) id_freed_trap();
+    if (B->len > 0 && memchr(B->data, 0, (size_t)B->len)) id_trap("a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes");
+    return id_str_from((const char*)B->data, (size_t)B->len);
+}
+static IdBytes* id_bytes_of_memory(long long addr, int n) {
+    if (n < 0 || n > INT_MAX) id_trap("bytes_of_memory: length out of range");
+    unsigned char* p = id_at(addr, n);
+    IdBytes* R = id_bytes_make(n, n < 8 ? 8 : n);
+    memcpy(R->data, p, (size_t)n);
+    return R;
+}
+static long long id_memory_of_bytes(IdBytes* B) {
+    if (!B) id_null_read();
+    if (B->len < 0) id_freed_trap();
+    long long a = id_mem_alloc((long long)B->len);
+    if (B->len) memcpy(id_store + a, B->data, (size_t)B->len);
+    return a;
+}
 
 /* real-time terminal I/O: write without a newline, flush, poll a single key
    without blocking (raw mode is entered lazily and restored at exit), and
@@ -1239,6 +1418,7 @@ int id_lw_not_val(int node, int lhs, char* t);
 int id_lw_iszero(int v, char* t);
 int id_lw_iszero_cmp(int v, char* t, char* op);
 int id_lw_not(int node);
+char* id_lw_bfn(int bfn_value, char* bfn_list, char* bfn_bytes);
 int id_lw_concat_call(int node, int a, int b);
 int id_lw_concat_pick(int a, int b, int m);
 int id_lw_concat_f(int a, int b, int m);
@@ -1534,6 +1714,12 @@ void id_lp_bound(int lq_c);
 int id_lp_callbad(int lq_id, int lq_md);
 int id_lp_named(char* lq_nm, int lq_md);
 int id_lp_ucall(int lq_id);
+char* id_cell_get_text(char* cbx_ns, char* cbx_base, char* cbx_index, int cbx_hit);
+char* id_cell_set_name(char* cbx_ns, int cbx_fit);
+char* id_cell_set_rhs(char* cbx_ns, char* cbx_value, int cbx_fit);
+char* id_cell_set_text(char* cbx_ns, char* cbx_base, char* cbx_index, char* cbx_value, int cbx_hit, int cbx_fit);
+int id_cell_value_fits(int cbx_node);
+int id_cell_set_fit(char* cbx_ns, int cbx_node);
 int id_lp_cls(char* lq_nm);
 int id_lp_known(char* lq_nm);
 int id_lp_unleaf(int lq_fn);
@@ -1601,8 +1787,12 @@ void id_lp_ntok(IdList* lq_tk, int lq_nn);
 void id_lp_nul(int lq_nn);
 int id_lp_lit(int lq_b);
 int id_lp_one(int lq_b);
+int id_cell_literal_fits(char* cbx_text);
+int id_cell_int_fits(int cbx_node);
+int id_cell_derived_fits(int cbx_node);
 void id_emit_loop(int id, char* ind);
 void id_emit_loop_fast(int id, char* ind);
+int id_cell_mask_fits(int cbx_node);
 int id_lp_ok(int lq_id, int lq_jn, int lq_lo, int lq_hi);
 int id_lp_stable(int lq_id, int lq_bx, int lq_lo, int lq_hi);
 int id_lp_lim(int lq_bx, int lq_lo, int lq_hi);
@@ -1717,6 +1907,8 @@ int id_is_logic(int id);
 char* id_emit_bin(int id);
 char* id_emit_op2(int id);
 char* id_emit_infix(int id);
+int id_both_bytes(int id);
+char* id_compare_function(int compare_node);
 int id_both_str(int id);
 int id_is_i2_str(int id);
 char* id_infix_line(int id, int infix_lhs_id, char* infix_op_name);
@@ -1738,6 +1930,7 @@ char* id_tmp_join(char* tx_rt, char* tx_pre, char* tx_cl, char* tx_fr);
 char* id_tmp_decl(int id, int i);
 char* id_tmp_arg(int id, int i);
 char* id_tmp_free(int id, int i);
+void id_init_tyc_rows3(void);
 char* id_c_type(char* t);
 char* id_c_scalar(char* t);
 void id_emit_tc_helpers(void);
@@ -1993,7 +2186,7 @@ char* id_emit_len(int id);
 char* id_emit_len_form(int arg, char* len_list_type);
 char* id_emit_push(int id);
 char* id_emit_push_tail(IdList* args, char* push_list_type);
-char* id_push_code(IdList* args, char* elem);
+char* id_push_code(IdList* args, char* elem, char* push_ns);
 char* id_ec4(int id);
 char* id_emit_pop(int id);
 char* id_emit_pop_tail(int arg, char* pop_list_type);
@@ -2020,6 +2213,7 @@ char* id_size_leaf(int e);
 char* id_size_neg(int e);
 char* id_size_list(IdList* args);
 char* id_sizes_c(IdList* args);
+char* id_tc_list_head(IdList* xs, char* et, char* want);
 char* id_tc_import(int e, char* want);
 char* id_tc_fcells(IdList* xs, char* want);
 char* id_tc_fcell(int e, char* want, int sd_k);
@@ -2032,7 +2226,9 @@ char* id_tc_list(int e, char* want);
 char* id_tc_list_n(IdList* xs, char* et);
 char* id_box(char* code, char* type);
 char* id_wrap_by_type(char* code, char* type, char* key, char* pre, char* post, char* pre_alt, char* post_alt);
+char* id_list_elem_type(char* t);
 char* id_elem_type(char* t);
+char* id_cell_ns(char* cbx_type);
 char* id_unbox(char* code, char* type);
 char* id_unbox2(char* code, char* type);
 char* id_unbox3(char* code, char* type);
@@ -3644,6 +3840,7 @@ void id_chk_bi_args(int id);
 void id_chk_bi_arg(int id, int i);
 char* id_arg_type_at(int id, int i);
 char* id_bi_want_for(int id, int i);
+char* id_bi_wants_bytes(char* name, int i, char* bw_base);
 void id_fv_bi_args(int id);
 void id_fv_bi_arg(int id, int i);
 char* id_bi_wants(char* name, int i);
@@ -3963,7 +4160,6 @@ char* id_esc_init_code(char* nm);
 char* id_esc_slot_of(char* slot_ty);
 char* id_esc_slot_fn(int slot_fn, int slot_n);
 char* id_esc_slot_deep(int slot_fn, char* slot_nm);
-char* id_esc_slot_cty(char* cty_f);
 char* id_esc_slot_block(char* blk_f, char* blk_b, char* blk_i, char* blk_val);
 char* id_esc_slot_code(int code_n, char* code_b, char* code_i, char* code_val, char* code_plain);
 int id_esc_func(int fn, char* nm);
@@ -3978,7 +4174,8 @@ int id_esc_dup(int fn, char* nm, int e);
 char* id_esc_free_base(int fn, char* nm);
 char* id_esc_c_ty(char* nm);
 char* id_esc_val_code(char* nm, char* code, int e);
-char* id_esc_by_type(char* t, char* for_str, char* for_clo, char* for_list);
+char* id_esc_by_type(char* t, char* for_str, char* for_clo, char* for_list, char* for_bytes);
+char* id_esc_list_or_bytes(char* t, char* for_list, char* for_bytes);
 int id_esc_leaf(int e);
 int id_esc_cnt(int e, char* nm);
 int id_esc_cnt2(int e, char* nm);
@@ -4011,6 +4208,7 @@ void id_chk_literal_fit(int id, char* want, int e);
 int id_bad_init(char* want, char* got);
 int id_ty_known(char* t);
 int id_ty_pair_known(char* lt, char* rt);
+void id_chk_byte_fit(int el, char* want);
 int id_arr_el_at(char* want, int e, int i);
 void id_arr_el_check(char* want, int el, int i);
 int id_fv_typed(int e);
@@ -4180,6 +4378,7 @@ int id_str_fresh(int id);
 int id_str_fresh_node(int id);
 int id_str_mask(int id);
 int id_str_fresh_call(int id);
+char* id_bt6(char* name);
 char* id_call_shaped(int id, char* t);
 char* id_bt4(char* name);
 char* id_bt5(char* name);
@@ -4206,7 +4405,7 @@ char* id_type_of3(int id);
 
 /* exported variables */
 int idx_n = 251;  /* constant from conf.id */
-char* builtin_src = ID_SK("print input read_all len push pop to_int character_code_at chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint peek8s peek16s peek32s peek8u peek16u peek32u bits_of_float float_of_bits bits32_of_float float_of_bits32 fail bind str_sub character_code_at");  /* constant from conf.id */
+char* builtin_src = ID_SK("print input read_all len push pop to_int character_code_at chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint peek8s peek16s peek32s peek8u peek16u peek32u bits_of_float float_of_bits bits32_of_float float_of_bits32 fail bind str_sub character_code_at bytes_new bytes_sub bytes_append string_of_bytes bytes_of_string bytes_of_memory memory_of_bytes");  /* constant from conf.id */
 char* resv_names_src = ID_SK("add_check alloc arena_free_all arena_link arena_unlink at bits32_of_float bits_of_float box_f character_code_at chr clo_cell clo_copy clo_fn clo_make clo_new clo_set concat err_write exit fail float_of_bits float_of_bits32 flush fn_eq fn_plain fn_raw fprintf freed_trap getkey idiv imod input len list_adopt list_free list_free_deep list_free_strs fr_skip free_walk list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek16s peek16u peek32 peek32s peek32u peek64 peek8 peek8s peek8u peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore thread_enter thread_leave ticks to_int trap trap_arm trap_disarm trap_raise trap_text udiv ult umod unbox_f ushr arena_hook list_grow list_make list_sized pool_blk pool_carve pool_class pool_class_bytes pool_drop pool_free pool_get pool_has pool_large_alloc pool_large_free pool_oom pool_span str_free concat_f freed_str_trap str_dup list_cell list_cell_set list_len_raw list_cap_raw str_sub");  /* constant from conf.id */
 IdList* cache_file_natives;  /* constant from conf.id */
 IdList* cache_taint_natives;  /* constant from conf.id */
@@ -4236,8 +4435,8 @@ IdList* irop_fk;  /* constant from conf.id */
 IdList* irop_fv;  /* constant from conf.id */
 IdList* llrel_k;  /* constant from conf.id */
 IdList* llrel_v;  /* constant from conf.id */
-char* c_crt_text = ID_SK("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nID_TLS IdAllocHdr* id_arena_head = NULL;\nID_TLS int id_arena_hooked = 0;\nID_TLS long id_nfree = 0;\nID_TLS long id_nfree_s = 0;\nID_TLS long id_nalloc = 0;\nID_TLS long id_nalloc_s = 0;\nID_TLS void* id_pool_fl[ID_NCLASS];\nID_TLS char* id_pool_bump = NULL;\nID_TLS size_t id_pool_left = 0;\nID_TLS IdChunk* id_pool_chunks = NULL;\nuintptr_t id_pool_lo = UINTPTR_MAX;\nuintptr_t id_pool_hi = 0;\nvoid id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nvoid id_arena_free_all(void) {\n    if (getenv(\"ID_ALLOC_STATS\")) {\n        fprintf(stderr, \"id: allocated %ld lists\\n\", id_nalloc);\n        fprintf(stderr, \"id: allocated %ld strings\\n\", id_nalloc_s);\n    }\n    if (getenv(\"ID_FREE_STATS\")) {\n        fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n        if (id_nfree_s) fprintf(stderr, \"id: freed %ld strings\\n\", id_nfree_s);\n    }\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nvoid id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. The layout is the one prelude.id documents; an LLVM\n   module writes the count itself, in front of each literal's bytes, and\n   builds argv strings with id_str_of_cstr. */\nsize_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nsize_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nsize_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nvoid id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nint id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nvoid* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nvoid* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nvoid* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nvoid* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nvoid id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nvoid* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\nchar* id_str_new(size_t n) {\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nchar* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nIdList* id_list_make(int len, int cap) {\n    id_nalloc++;\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nIdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\nID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_str_trap(void) {\n    fprintf(stderr, \"id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\\n\");\n    exit(1);\n}\nvoid id_str_free(char* s) {\n    if (!s) return;\n    size_t n = id_slen(s);\n    id_nfree_s++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (n == SIZE_MAX) id_freed_str_trap();\n        memset(s, 0xDD, n + 1);\n        ((size_t*)(void*)s)[-1] = SIZE_MAX;\n        return;\n    }\n    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);\n}\nchar* id_str_dup(const char* s) { return id_str_from(s, id_slen(s)); }\nvoid id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nvoid id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nvoid id_list_free_strs(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_str_free((char*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic const char* id_fr_skip(const char* d) {\n    if (*d == 'l') return id_fr_skip(d + 1);\n    if (*d == 'S') { int n = d[1] - '0'; d += 2; while (n-- > 0) d = id_fr_skip(d); return d; }\n    if (*d == '@') { while (*d != ';') d++; return d + 1; }\n    return d + 1;\n}\ntypedef struct { void* p; const char* d; } IdFrWork;\nvoid id_free_walk(IdList* root, const char* base) {\n    IdFrWork loc[64];\n    IdFrWork* stk = loc;\n    size_t cap = 64, n = 0;\n    stk[n].p = root; stk[n].d = base; n++;\n    while (n > 0) {\n        n--;\n        void* p = stk[n].p;\n        const char* d = stk[n].d;\n        while (*d == '@') d = base + atoi(d + 1);\n        if (!p || *d == '.') continue;\n        if (*d == 's') { id_str_free((char*)p); continue; }\n        IdList* L = (IdList*)p;\n        if (L->cap != INT_MIN) {\n            int k = *d == 'S' \? d[1] - '0' : (d[1] == '.' \? 0 : L->len);\n            if (n + (size_t)k > cap) {\n                size_t nc = cap * 2;\n                while (nc < n + (size_t)k) nc *= 2;\n                IdFrWork* ns = (IdFrWork*)id_pool_blk(nc * sizeof(IdFrWork));\n                memcpy(ns, stk, n * sizeof(IdFrWork));\n                if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n                stk = ns; cap = nc;\n            }\n            if (*d == 'S') {\n                const char* f = d + 2;\n                for (int i = 0; i < k; i++) { if (*f != '.') { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = f; n++; } f = id_fr_skip(f); }\n            } else {\n                for (int i = 0; i < k; i++) { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = d + 1; n++; }\n            }\n        }\n        id_list_free(L);\n    }\n    if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n}\nvoid id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nvoid id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nvoid id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nvoid id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nlong long id_list_cell(IdList* L, int i) { return L->data[i]; }\nvoid id_list_cell_set(IdList* L, int i, long long v) { L->data[i] = v; }\nint id_list_len_raw(IdList* L) { return L \? L->len : -1; }\nint id_list_cap_raw(IdList* L) { return L \? L->cap : -1; }\nint id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nlong long id_bits_of_float(double d) { return id_box_f(d); }\ndouble id_float_of_bits(long long x) { return id_unbox_f(x); }\nlong long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\ndouble id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nchar* id_concat_f(char* a, char* b, int m) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    size_t n = id_add_check(la, lb, \"concat\");\n    char* r;\n    if (m & 1) {\n        size_t hb = id_add_check(n, sizeof(size_t) + 1, \"concat\");\n        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);\n        ((size_t*)(void*)r)[-1] = n;\n    } else {\n        r = id_str_new(n);\n        memcpy(r, a, la);\n    }\n    memcpy(r + la, b, lb);\n    r[n] = '\\0';\n    if (m & 2) id_str_free(b);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nchar* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nID_TLS unsigned char* id_store = NULL;\nID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nID_TLS long long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian (one memcpy on a little-endian host, byte at a time\n   elsewhere): the same bytes on every host, and no alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(&v, p, (size_t)width);\n#else\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n#endif\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(p, &v, (size_t)width);\n#else\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n#endif\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nlong long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nlong long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nlong long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nlong long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16u(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32u(long long a) { return id_peek_n(a, 4); }\nvoid id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one whole line from stdin, drop the trailing newline; \"\" on EOF.\n       The block doubles as the line grows (like read_all), so a line of any\n       length comes back whole and reading stays linear in its length */\n    size_t cap = 64, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    int ch;\n    while ((ch = getc(stdin)) != EOF && ch != '\\n') {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (input)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        r[h + n] = (char)ch;\n        n++;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* character_code_at's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nint id_character_code_at(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n/* The n bytes of s from i, as a block of their own: one bounds check, one\n   allocation, one copy. An empty span reads nothing, so it is inside wherever\n   i >= 0. */\nchar* id_str_sub(const char* s, int i, int n) {\n    size_t m = id_slen(s);\n    if (i < 0 || n < 0 || (n > 0 && (size_t)i + (size_t)n > m)) {\n        fprintf(stderr, \"id: str span out of bounds: i=%d n=%d in a string of length %zu; clamp i and n first (fixed_point_minimum, fixed_point_maximum)\\n\", i, n, m);\n        exit(1);\n    }\n    return id_str_from(n \? s + i : s, (size_t)n);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");  /* constant from conf.id */
-char* c_prelude_text = ID_SK("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#ifndef __wasi__\n#include <termios.h>\n#endif\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nstatic ID_TLS IdAllocHdr* id_arena_head = NULL;\nstatic ID_TLS int id_arena_hooked = 0;\nstatic ID_TLS long id_nfree = 0;\nstatic ID_TLS long id_nfree_s = 0;\nstatic ID_TLS long id_nalloc = 0;\nstatic ID_TLS long id_nalloc_s = 0;\nstatic ID_TLS void* id_pool_fl[ID_NCLASS];\nstatic ID_TLS char* id_pool_bump = NULL;\nstatic ID_TLS size_t id_pool_left = 0;\nstatic ID_TLS IdChunk* id_pool_chunks = NULL;\nstatic uintptr_t id_pool_lo = UINTPTR_MAX;\nstatic uintptr_t id_pool_hi = 0;\nstatic void id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nstatic void id_arena_free_all(void) {\n    if (getenv(\"ID_ALLOC_STATS\")) {\n        fprintf(stderr, \"id: allocated %ld lists\\n\", id_nalloc);\n        fprintf(stderr, \"id: allocated %ld strings\\n\", id_nalloc_s);\n    }\n    if (getenv(\"ID_FREE_STATS\")) {\n        fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n        if (id_nfree_s) fprintf(stderr, \"id: freed %ld strings\\n\", id_nfree_s);\n    }\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nstatic void id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. A string an id program holds is made one of three ways,\n   and each writes that count: id_str_new/id_str_from below (every runtime\n   allocator), ID_S (a literal in emitted code, counted to its first NUL, which\n   is where a strlen stopped), and id_str_of_cstr (a C string from the host,\n   such as argv). A native that only reads a `const char*` is unaffected,\n   because the bytes and their NUL are where they always were; one that\n   returns a string must build it with id_str_from. A NUL never enters a string\n   through any of these but a literal's `\\0`, which ends the literal there. */\nstatic size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nstatic size_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nstatic size_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nstatic void id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nstatic int id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nstatic void* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nstatic void* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nstatic void* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nstatic void* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nstatic void id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nstatic void* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\n/* The one place a heap string is born: n bytes, the count in front, the NUL after. */\nstatic char* id_str_new(size_t n) {\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nstatic IdList* id_list_make(int len, int cap) {\n    id_nalloc++;\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nstatic IdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\n/* A list the compiler proved unreachable (docs/MEMORY.md) is released by\n   id_list_free. With ID_FREE_GUARD=1 in the environment, and always in a test\n   harness, nothing goes back to malloc: the cells are filled with 0xDD and the\n   header is marked freed (len -1, cap INT_MIN), so a later use traps here\n   instead of reading whatever reused the block. */\nstatic ID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_str_trap(void) {\n    fprintf(stderr, \"id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\\n\");\n    exit(1);\n}\n/* A string block the compiler proved dead is given back by id_str_free; with the\n   guard on it is filled with 0xDD and its count becomes SIZE_MAX instead, so a\n   second free traps and a later use fails in the size checks. */\nstatic void id_str_free(char* s) {\n    if (!s) return;\n    size_t n = id_slen(s);\n    id_nfree_s++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (n == SIZE_MAX) id_freed_str_trap();\n        memset(s, 0xDD, n + 1);\n        ((size_t*)(void*)s)[-1] = SIZE_MAX;\n        return;\n    }\n    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);\n}\n/* A heap copy of a string, so a literal stored into a local the compiler frees\n   starts as a block of its own. */\nstatic char* id_str_dup(const char* s) { return id_str_from(s, id_slen(s)); }\nstatic void id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nstatic void id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic void id_list_free_strs(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_str_free((char*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic const char* id_fr_skip(const char* d) {\n    if (*d == 'l') return id_fr_skip(d + 1);\n    if (*d == 'S') { int n = d[1] - '0'; d += 2; while (n-- > 0) d = id_fr_skip(d); return d; }\n    if (*d == '@') { while (*d != ';') d++; return d + 1; }\n    return d + 1;\n}\ntypedef struct { void* p; const char* d; } IdFrWork;\nstatic void id_free_walk(IdList* root, const char* base) {\n    IdFrWork loc[64];\n    IdFrWork* stk = loc;\n    size_t cap = 64, n = 0;\n    stk[n].p = root; stk[n].d = base; n++;\n    while (n > 0) {\n        n--;\n        void* p = stk[n].p;\n        const char* d = stk[n].d;\n        while (*d == '@') d = base + atoi(d + 1);\n        if (!p || *d == '.') continue;\n        if (*d == 's') { id_str_free((char*)p); continue; }\n        IdList* L = (IdList*)p;\n        if (L->cap != INT_MIN) {\n            int k = *d == 'S' \? d[1] - '0' : (d[1] == '.' \? 0 : L->len);\n            if (n + (size_t)k > cap) {\n                size_t nc = cap * 2;\n                while (nc < n + (size_t)k) nc *= 2;\n                IdFrWork* ns = (IdFrWork*)id_pool_blk(nc * sizeof(IdFrWork));\n                memcpy(ns, stk, n * sizeof(IdFrWork));\n                if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n                stk = ns; cap = nc;\n            }\n            if (*d == 'S') {\n                const char* f = d + 2;\n                for (int i = 0; i < k; i++) { if (*f != '.') { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = f; n++; } f = id_fr_skip(f); }\n            } else {\n                for (int i = 0; i < k; i++) { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = d + 1; n++; }\n            }\n        }\n        id_list_free(L);\n    }\n    if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n}\nstatic void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nstatic void id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nstatic void id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nstatic void id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic long long id_list_cell(IdList* L, int i) { return L->data[i]; }\nstatic void id_list_cell_set(IdList* L, int i, long long v) { L->data[i] = v; }\nstatic int id_list_len_raw(IdList* L) { return L \? L->len : -1; }\nstatic int id_list_cap_raw(IdList* L) { return L \? L->cap : -1; }\nstatic int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic long long id_bits_of_float(double d) { return id_box_f(d); }\nstatic double id_float_of_bits(long long x) { return id_unbox_f(x); }\nstatic long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\nstatic double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\n/* `+` whose operand is an unnamed temporary (docs/MEMORY.md 3.3). Bit 1 of m: a\n   is fresh, so the result is built in a's block (a pool block grows in place\n   while its size class has room; a large one is realloc'd); bit 2: b is fresh\n   and is given back once copied. */\nstatic char* id_concat_f(char* a, char* b, int m) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    size_t n = id_add_check(la, lb, \"concat\");\n    char* r;\n    if (m & 1) {\n        size_t hb = id_add_check(n, sizeof(size_t) + 1, \"concat\");\n        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);\n        ((size_t*)(void*)r)[-1] = n;\n    } else {\n        r = id_str_new(n);\n        memcpy(r, a, la);\n    }\n    memcpy(r + la, b, lb);\n    r[n] = '\\0';\n    if (m & 2) id_str_free(b);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nstatic char* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic ID_TLS unsigned char* id_store = NULL;\nstatic ID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nstatic ID_TLS long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian (one memcpy on a little-endian host, byte at a time\n   elsewhere): the same bytes on every host, and no alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(&v, p, (size_t)width);\n#else\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n#endif\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(p, &v, (size_t)width);\n#else\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n#endif\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nstatic long long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nstatic long long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nstatic long long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nstatic long long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16u(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32u(long long a) { return id_peek_n(a, 4); }\nstatic void id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one whole line from stdin, drop the trailing newline; \"\" on EOF.\n       The block doubles as the line grows (like read_all), so a line of any\n       length comes back whole and reading stays linear in its length */\n    size_t cap = 64, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    int ch;\n    while ((ch = getc(stdin)) != EOF && ch != '\\n') {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (input)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        r[h + n] = (char)ch;\n        n++;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* character_code_at's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nstatic int id_character_code_at(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n/* The n bytes of s from i, as a block of their own: one bounds check, one\n   allocation, one copy. An empty span reads nothing, so it is inside wherever\n   i >= 0. */\nstatic char* id_str_sub(const char* s, int i, int n) {\n    size_t m = id_slen(s);\n    if (i < 0 || n < 0 || (n > 0 && (size_t)i + (size_t)n > m)) {\n        fprintf(stderr, \"id: str span out of bounds: i=%d n=%d in a string of length %zu; clamp i and n first (fixed_point_minimum, fixed_point_maximum)\\n\", i, n, m);\n        exit(1);\n    }\n    return id_str_from(n \? s + i : s, (size_t)n);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\n#ifndef __wasi__\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\n#else\nstatic void id_term_restore(void) {}\nstatic void id_term_raw(void) {}\nstatic int id_getkey(void) { return -1; }\n#endif\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");  /* constant from conf.id */
+char* c_crt_text = ID_SK("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nID_TLS IdAllocHdr* id_arena_head = NULL;\nID_TLS int id_arena_hooked = 0;\nID_TLS long id_nfree = 0;\nID_TLS long id_nfree_s = 0;\nID_TLS long id_nalloc = 0;\nID_TLS long id_nalloc_s = 0;\nID_TLS void* id_pool_fl[ID_NCLASS];\nID_TLS char* id_pool_bump = NULL;\nID_TLS size_t id_pool_left = 0;\nID_TLS IdChunk* id_pool_chunks = NULL;\nuintptr_t id_pool_lo = UINTPTR_MAX;\nuintptr_t id_pool_hi = 0;\nvoid id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nvoid id_arena_free_all(void) {\n    if (getenv(\"ID_ALLOC_STATS\")) {\n        fprintf(stderr, \"id: allocated %ld lists\\n\", id_nalloc);\n        fprintf(stderr, \"id: allocated %ld strings\\n\", id_nalloc_s);\n    }\n    if (getenv(\"ID_FREE_STATS\")) {\n        fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n        if (id_nfree_s) fprintf(stderr, \"id: freed %ld strings\\n\", id_nfree_s);\n    }\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nvoid id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. The layout is the one prelude.id documents; an LLVM\n   module writes the count itself, in front of each literal's bytes, and\n   builds argv strings with id_str_of_cstr. */\nsize_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nsize_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nsize_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nvoid id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nint id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nvoid* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nvoid* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nvoid* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nvoid* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nvoid id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nvoid* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\nchar* id_str_new(size_t n) {\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nchar* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nIdList* id_list_make(int len, int cap) {\n    id_nalloc++;\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nIdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\nID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_str_trap(void) {\n    fprintf(stderr, \"id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\\n\");\n    exit(1);\n}\nvoid id_str_free(char* s) {\n    if (!s) return;\n    size_t n = id_slen(s);\n    id_nfree_s++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (n == SIZE_MAX) id_freed_str_trap();\n        memset(s, 0xDD, n + 1);\n        ((size_t*)(void*)s)[-1] = SIZE_MAX;\n        return;\n    }\n    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);\n}\nchar* id_str_dup(const char* s) { return id_str_from(s, id_slen(s)); }\nvoid id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nvoid id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nvoid id_list_free_strs(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_str_free((char*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic const char* id_fr_skip(const char* d) {\n    if (*d == 'l') return id_fr_skip(d + 1);\n    if (*d == 'S') { int n = d[1] - '0'; d += 2; while (n-- > 0) d = id_fr_skip(d); return d; }\n    if (*d == '@') { while (*d != ';') d++; return d + 1; }\n    return d + 1;\n}\ntypedef struct { void* p; const char* d; } IdFrWork;\nvoid id_free_walk(IdList* root, const char* base) {\n    IdFrWork loc[64];\n    IdFrWork* stk = loc;\n    size_t cap = 64, n = 0;\n    stk[n].p = root; stk[n].d = base; n++;\n    while (n > 0) {\n        n--;\n        void* p = stk[n].p;\n        const char* d = stk[n].d;\n        while (*d == '@') d = base + atoi(d + 1);\n        if (!p || *d == '.') continue;\n        if (*d == 's') { id_str_free((char*)p); continue; }\n        IdList* L = (IdList*)p;\n        if (L->cap != INT_MIN) {\n            int k = *d == 'S' \? d[1] - '0' : (d[1] == '.' \? 0 : L->len);\n            if (n + (size_t)k > cap) {\n                size_t nc = cap * 2;\n                while (nc < n + (size_t)k) nc *= 2;\n                IdFrWork* ns = (IdFrWork*)id_pool_blk(nc * sizeof(IdFrWork));\n                memcpy(ns, stk, n * sizeof(IdFrWork));\n                if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n                stk = ns; cap = nc;\n            }\n            if (*d == 'S') {\n                const char* f = d + 2;\n                for (int i = 0; i < k; i++) { if (*f != '.') { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = f; n++; } f = id_fr_skip(f); }\n            } else {\n                for (int i = 0; i < k; i++) { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = d + 1; n++; }\n            }\n        }\n        id_list_free(L);\n    }\n    if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n}\nvoid id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nvoid id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nvoid id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nvoid id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nlong long id_list_cell(IdList* L, int i) { return L->data[i]; }\nvoid id_list_cell_set(IdList* L, int i, long long v) { L->data[i] = v; }\nint id_list_len_raw(IdList* L) { return L \? L->len : -1; }\nint id_list_cap_raw(IdList* L) { return L \? L->cap : -1; }\nint id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nlong long id_bits_of_float(double d) { return id_box_f(d); }\ndouble id_float_of_bits(long long x) { return id_unbox_f(x); }\nlong long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\ndouble id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nchar* id_concat_f(char* a, char* b, int m) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    size_t n = id_add_check(la, lb, \"concat\");\n    char* r;\n    if (m & 1) {\n        size_t hb = id_add_check(n, sizeof(size_t) + 1, \"concat\");\n        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);\n        ((size_t*)(void*)r)[-1] = n;\n    } else {\n        r = id_str_new(n);\n        memcpy(r, a, la);\n    }\n    memcpy(r + la, b, lb);\n    r[n] = '\\0';\n    if (m & 2) id_str_free(b);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nchar* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nID_TLS unsigned char* id_store = NULL;\nID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nID_TLS long long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian (one memcpy on a little-endian host, byte at a time\n   elsewhere): the same bytes on every host, and no alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(&v, p, (size_t)width);\n#else\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n#endif\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(p, &v, (size_t)width);\n#else\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n#endif\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nlong long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nlong long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nlong long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nlong long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16u(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32u(long long a) { return id_peek_n(a, 4); }\nvoid id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one whole line from stdin, drop the trailing newline; \"\" on EOF.\n       The block doubles as the line grows (like read_all), so a line of any\n       length comes back whole and reading stays linear in its length */\n    size_t cap = 64, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    int ch;\n    while ((ch = getc(stdin)) != EOF && ch != '\\n') {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (input)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        r[h + n] = (char)ch;\n        n++;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* character_code_at's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nint id_character_code_at(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n/* The n bytes of s from i, as a block of their own: one bounds check, one\n   allocation, one copy. An empty span reads nothing, so it is inside wherever\n   i >= 0. */\nchar* id_str_sub(const char* s, int i, int n) {\n    size_t m = id_slen(s);\n    if (i < 0 || n < 0 || (n > 0 && (size_t)i + (size_t)n > m)) {\n        fprintf(stderr, \"id: str span out of bounds: i=%d n=%d in a string of length %zu; clamp i and n first (fixed_point_minimum, fixed_point_maximum)\\n\", i, n, m);\n        exit(1);\n    }\n    return id_str_from(n \? s + i : s, (size_t)n);\n}\n/* bytes: a mutable, growable buffer of bytes, one byte per cell, passed by\n   reference like a list. It is one pool block, a header (len, cap, data) with\n   the first cells inline; growth takes a separate block for the cells and the\n   first inline bytes then hold the capacity the header block was made with,\n   which is what gives the block back at the right size. A cell is read as\n   0..255 and a store outside that range traps. The capacity is never below 8\n   so the inline area can hold that number. */\ntypedef struct { int len, cap; unsigned char* data; } IdBytes;\ntypedef struct { IdBytes h; unsigned char c[8]; } IdBytesBlk;\n#define ID_BYTES_CELLS(B) (((IdBytesBlk*)(void*)(B))->c)\n#define ID_BYTES_BYTES(n) (__builtin_offsetof(IdBytesBlk, c) + (size_t)(n))\nIdBytes* id_bytes_make(long long len, long long cap) {\n    id_nalloc++;\n    IdBytesBlk* B = (IdBytesBlk*)id_pool_blk(ID_BYTES_BYTES(cap));\n    B->h.len = (int)len; B->h.cap = (int)cap; B->h.data = B->c;\n    return &B->h;\n}\nIdBytes* id_bytes_new(int n) {\n    if (n < 0 || n > INT_MAX) id_trap(\"bytes_new: length out of range\");\n    IdBytes* B = id_bytes_make(n, n < 8 \? 8 : n);\n    memset(B->data, 0, (size_t)n);\n    return B;\n}\nvoid id_bytes_free(IdBytes* B) {\n    if (!B) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (B->cap == INT_MIN) id_freed_trap();\n        int c = B->cap < 0 \? -B->cap : B->cap;\n        memset(B->data, 0xDD, (size_t)c);\n        B->len = -1; B->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(B->cap < 0 \? -B->cap : B->cap);\n    unsigned char* inl = ID_BYTES_CELLS(B);\n    if (B->data == inl) { id_pool_free(B, ID_BYTES_BYTES(c)); return; }\n    size_t ic;\n    memcpy(&ic, inl, sizeof ic);\n    id_pool_free(B->data, c);\n    id_pool_free(B, ID_BYTES_BYTES(ic));\n}\nvoid id_bytes_mut_check(IdBytes* B) {\n    if (B->cap < 0) {\n        if (B->cap == INT_MIN) id_freed_trap();\n        id_trap(\"cannot mutate a constant bytes\");\n    }\n}\n_Noreturn void id_bytes_oob(IdBytes* B, long long i) {\n    if (B->cap == INT_MIN) id_freed_trap();\n    fprintf(stderr, \"id: index %lld out of bounds (len %d)\\n\", i, B->len);\n    exit(1);\n}\n_Noreturn void id_byte_range(long long v) {\n    fprintf(stderr, \"id: byte value %lld out of range 0..255\\n\", v);\n    exit(1);\n}\nunsigned char id_byte_fit(long long v) {\n    if (v < 0 || v > 255) id_byte_range(v);\n    return (unsigned char)v;\n}\nint id_bytes_len(IdBytes* B) { if (!B) id_null_read(); if (B->len < 0) id_freed_trap(); return B->len; }\nlong long id_bytes_get(IdBytes* B, int i) {\n    if (!B) id_null_read();\n    if (i < 0 || i >= B->len) id_bytes_oob(B, i);\n    return B->data[i];\n}\nvoid id_bytes_set(IdBytes* B, int i, long long v) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    if (i < 0 || i >= B->len) id_bytes_oob(B, i);\n    B->data[i] = id_byte_fit(v);\n}\nvoid id_bytes_store(IdBytes* B, int i, long long v) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    if (i < 0 || i >= B->len) id_bytes_oob(B, i);\n    B->data[i] = (unsigned char)v;\n}\nlong long id_bytes_cell(IdBytes* B, int i) { return B->data[i]; }\nvoid id_bytes_cell_set(IdBytes* B, int i, long long v) { B->data[i] = id_byte_fit(v); }\nIdBytes* id_bytes_lit(int n, ...) {\n    IdBytes* R = id_bytes_make(n, n < 8 \? 8 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) R->data[k] = id_byte_fit(va_arg(ap, long long));\n    va_end(ap);\n    return R;\n}\nvoid id_bytes_show(IdBytes* B) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < B->len; i++) fprintf(stderr, \"%s0x%02X\", i \? \", \" : \"\", B->data[i]);\n    fputs(\"]\", stderr);\n}\nvoid id_bytes_reserve(IdBytes* B, size_t need) {\n    if ((size_t)B->cap >= need) return;\n    if (need > INT_MAX) id_trap(\"bytes capacity overflow\");\n    size_t ncap = (size_t)B->cap * 2;\n    if (ncap < need) ncap = need;\n    if (ncap > INT_MAX) ncap = INT_MAX;\n    ID_MEM_CHARGE(ncap);\n    unsigned char* inl = ID_BYTES_CELLS(B);\n    if (B->data == inl) {\n        unsigned char* nd = (unsigned char*)id_pool_get(ncap);\n        size_t ic = (size_t)B->cap;\n        memcpy(nd, inl, (size_t)B->len);\n        memcpy(inl, &ic, sizeof ic);\n        B->data = nd;\n    } else {\n        B->data = (unsigned char*)id_realloc(B->data, (size_t)B->cap, ncap);\n    }\n    B->cap = (int)ncap;\n}\nvoid id_bytes_push(IdBytes* B, long long v) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    unsigned char b = id_byte_fit(v);\n    if (B->len >= B->cap) id_bytes_reserve(B, (size_t)B->len + 1);\n    B->data[B->len++] = b;\n}\nlong long id_bytes_pop(IdBytes* B) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    if (B->len <= 0) id_trap(\"pop from empty bytes\");\n    return B->data[--B->len];\n}\nvoid id_bytes_append(IdBytes* D, IdBytes* S) {\n    if (!D || !S) id_null_read();\n    id_bytes_mut_check(D);\n    if (S->len < 0) id_freed_trap();\n    size_t n = (size_t)S->len;\n    if (n == 0) return;\n    id_bytes_reserve(D, id_add_check((size_t)D->len, n, \"bytes_append\"));\n    memmove(D->data + D->len, S->data, n);\n    D->len += (int)n;\n}\nIdBytes* id_bytes_sub(IdBytes* B, int i, int n) {\n    if (!B) id_null_read();\n    if (B->len < 0) id_freed_trap();\n    if (i < 0 || n < 0 || (n > 0 && (unsigned long long)i + (unsigned long long)n > (unsigned long long)B->len)) {\n        fprintf(stderr, \"id: bytes span out of bounds: i=%lld n=%lld in a bytes of length %d\\n\", i, n, B->len);\n        exit(1);\n    }\n    IdBytes* R = id_bytes_make(n, n < 8 \? 8 : n);\n    if (n) memcpy(R->data, B->data + i, (size_t)n);\n    return R;\n}\nint id_bytes_cmp(IdBytes* A, IdBytes* B) {\n    if (!A || !B) id_null_read();\n    if (A->len < 0 || B->len < 0) id_freed_trap();\n    if (A->len != B->len) return 1;\n    return A->len \? memcmp(A->data, B->data, (size_t)A->len) : 0;\n}\nIdBytes* id_bytes_of_string(const char* s) {\n    size_t n = id_slen(s);\n    if (n > INT_MAX) id_trap(\"bytes_of_string: string too long\");\n    IdBytes* R = id_bytes_make((long long)n, n < 8 \? 8 : (long long)n);\n    memcpy(R->data, s, n);\n    return R;\n}\nchar* id_string_of_bytes(IdBytes* B) {\n    if (!B) id_null_read();\n    if (B->len < 0) id_freed_trap();\n    if (B->len > 0 && memchr(B->data, 0, (size_t)B->len)) id_trap(\"a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes\");\n    return id_str_from((const char*)B->data, (size_t)B->len);\n}\nIdBytes* id_bytes_of_memory(long long addr, int n) {\n    if (n < 0 || n > INT_MAX) id_trap(\"bytes_of_memory: length out of range\");\n    unsigned char* p = id_at(addr, n);\n    IdBytes* R = id_bytes_make(n, n < 8 \? 8 : n);\n    memcpy(R->data, p, (size_t)n);\n    return R;\n}\nlong long id_memory_of_bytes(IdBytes* B) {\n    if (!B) id_null_read();\n    if (B->len < 0) id_freed_trap();\n    long long a = id_mem_alloc((long long)B->len);\n    if (B->len) memcpy(id_store + a, B->data, (size_t)B->len);\n    return a;\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");  /* constant from conf.id */
+char* c_prelude_text = ID_SK("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#ifndef __wasi__\n#include <termios.h>\n#endif\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nstatic ID_TLS IdAllocHdr* id_arena_head = NULL;\nstatic ID_TLS int id_arena_hooked = 0;\nstatic ID_TLS long id_nfree = 0;\nstatic ID_TLS long id_nfree_s = 0;\nstatic ID_TLS long id_nalloc = 0;\nstatic ID_TLS long id_nalloc_s = 0;\nstatic ID_TLS void* id_pool_fl[ID_NCLASS];\nstatic ID_TLS char* id_pool_bump = NULL;\nstatic ID_TLS size_t id_pool_left = 0;\nstatic ID_TLS IdChunk* id_pool_chunks = NULL;\nstatic uintptr_t id_pool_lo = UINTPTR_MAX;\nstatic uintptr_t id_pool_hi = 0;\nstatic void id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nstatic void id_arena_free_all(void) {\n    if (getenv(\"ID_ALLOC_STATS\")) {\n        fprintf(stderr, \"id: allocated %ld lists\\n\", id_nalloc);\n        fprintf(stderr, \"id: allocated %ld strings\\n\", id_nalloc_s);\n    }\n    if (getenv(\"ID_FREE_STATS\")) {\n        fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n        if (id_nfree_s) fprintf(stderr, \"id: freed %ld strings\\n\", id_nfree_s);\n    }\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nstatic void id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. A string an id program holds is made one of three ways,\n   and each writes that count: id_str_new/id_str_from below (every runtime\n   allocator), ID_S (a literal in emitted code, counted to its first NUL, which\n   is where a strlen stopped), and id_str_of_cstr (a C string from the host,\n   such as argv). A native that only reads a `const char*` is unaffected,\n   because the bytes and their NUL are where they always were; one that\n   returns a string must build it with id_str_from. A NUL never enters a string\n   through any of these but a literal's `\\0`, which ends the literal there. */\nstatic size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nstatic size_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nstatic size_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nstatic void id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nstatic int id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nstatic void* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nstatic void* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nstatic void* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nstatic void* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nstatic void id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nstatic void* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\n/* The one place a heap string is born: n bytes, the count in front, the NUL after. */\nstatic char* id_str_new(size_t n) {\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nstatic IdList* id_list_make(int len, int cap) {\n    id_nalloc++;\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nstatic IdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\n/* A list the compiler proved unreachable (docs/MEMORY.md) is released by\n   id_list_free. With ID_FREE_GUARD=1 in the environment, and always in a test\n   harness, nothing goes back to malloc: the cells are filled with 0xDD and the\n   header is marked freed (len -1, cap INT_MIN), so a later use traps here\n   instead of reading whatever reused the block. */\nstatic ID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_str_trap(void) {\n    fprintf(stderr, \"id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\\n\");\n    exit(1);\n}\n/* A string block the compiler proved dead is given back by id_str_free; with the\n   guard on it is filled with 0xDD and its count becomes SIZE_MAX instead, so a\n   second free traps and a later use fails in the size checks. */\nstatic void id_str_free(char* s) {\n    if (!s) return;\n    size_t n = id_slen(s);\n    id_nfree_s++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (n == SIZE_MAX) id_freed_str_trap();\n        memset(s, 0xDD, n + 1);\n        ((size_t*)(void*)s)[-1] = SIZE_MAX;\n        return;\n    }\n    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);\n}\n/* A heap copy of a string, so a literal stored into a local the compiler frees\n   starts as a block of its own. */\nstatic char* id_str_dup(const char* s) { return id_str_from(s, id_slen(s)); }\nstatic void id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nstatic void id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic void id_list_free_strs(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_str_free((char*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic const char* id_fr_skip(const char* d) {\n    if (*d == 'l') return id_fr_skip(d + 1);\n    if (*d == 'S') { int n = d[1] - '0'; d += 2; while (n-- > 0) d = id_fr_skip(d); return d; }\n    if (*d == '@') { while (*d != ';') d++; return d + 1; }\n    return d + 1;\n}\ntypedef struct { void* p; const char* d; } IdFrWork;\nstatic void id_free_walk(IdList* root, const char* base) {\n    IdFrWork loc[64];\n    IdFrWork* stk = loc;\n    size_t cap = 64, n = 0;\n    stk[n].p = root; stk[n].d = base; n++;\n    while (n > 0) {\n        n--;\n        void* p = stk[n].p;\n        const char* d = stk[n].d;\n        while (*d == '@') d = base + atoi(d + 1);\n        if (!p || *d == '.') continue;\n        if (*d == 's') { id_str_free((char*)p); continue; }\n        IdList* L = (IdList*)p;\n        if (L->cap != INT_MIN) {\n            int k = *d == 'S' \? d[1] - '0' : (d[1] == '.' \? 0 : L->len);\n            if (n + (size_t)k > cap) {\n                size_t nc = cap * 2;\n                while (nc < n + (size_t)k) nc *= 2;\n                IdFrWork* ns = (IdFrWork*)id_pool_blk(nc * sizeof(IdFrWork));\n                memcpy(ns, stk, n * sizeof(IdFrWork));\n                if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n                stk = ns; cap = nc;\n            }\n            if (*d == 'S') {\n                const char* f = d + 2;\n                for (int i = 0; i < k; i++) { if (*f != '.') { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = f; n++; } f = id_fr_skip(f); }\n            } else {\n                for (int i = 0; i < k; i++) { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = d + 1; n++; }\n            }\n        }\n        id_list_free(L);\n    }\n    if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));\n}\nstatic void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nstatic void id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nstatic void id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nstatic void id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic long long id_list_cell(IdList* L, int i) { return L->data[i]; }\nstatic void id_list_cell_set(IdList* L, int i, long long v) { L->data[i] = v; }\nstatic int id_list_len_raw(IdList* L) { return L \? L->len : -1; }\nstatic int id_list_cap_raw(IdList* L) { return L \? L->cap : -1; }\nstatic int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic long long id_bits_of_float(double d) { return id_box_f(d); }\nstatic double id_float_of_bits(long long x) { return id_unbox_f(x); }\nstatic long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\nstatic double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\n/* `+` whose operand is an unnamed temporary (docs/MEMORY.md 3.3). Bit 1 of m: a\n   is fresh, so the result is built in a's block (a pool block grows in place\n   while its size class has room; a large one is realloc'd); bit 2: b is fresh\n   and is given back once copied. */\nstatic char* id_concat_f(char* a, char* b, int m) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    size_t n = id_add_check(la, lb, \"concat\");\n    char* r;\n    if (m & 1) {\n        size_t hb = id_add_check(n, sizeof(size_t) + 1, \"concat\");\n        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);\n        ((size_t*)(void*)r)[-1] = n;\n    } else {\n        r = id_str_new(n);\n        memcpy(r, a, la);\n    }\n    memcpy(r + la, b, lb);\n    r[n] = '\\0';\n    if (m & 2) id_str_free(b);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nstatic char* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic ID_TLS unsigned char* id_store = NULL;\nstatic ID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nstatic ID_TLS long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian (one memcpy on a little-endian host, byte at a time\n   elsewhere): the same bytes on every host, and no alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(&v, p, (size_t)width);\n#else\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n#endif\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__\n    memcpy(p, &v, (size_t)width);\n#else\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n#endif\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nstatic long long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nstatic long long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nstatic long long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nstatic long long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16u(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32u(long long a) { return id_peek_n(a, 4); }\nstatic void id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one whole line from stdin, drop the trailing newline; \"\" on EOF.\n       The block doubles as the line grows (like read_all), so a line of any\n       length comes back whole and reading stays linear in its length */\n    size_t cap = 64, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    int ch;\n    while ((ch = getc(stdin)) != EOF && ch != '\\n') {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (input)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        r[h + n] = (char)ch;\n        n++;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    id_nalloc_s++;\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* character_code_at's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nstatic int id_character_code_at(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n/* The n bytes of s from i, as a block of their own: one bounds check, one\n   allocation, one copy. An empty span reads nothing, so it is inside wherever\n   i >= 0. */\nstatic char* id_str_sub(const char* s, int i, int n) {\n    size_t m = id_slen(s);\n    if (i < 0 || n < 0 || (n > 0 && (size_t)i + (size_t)n > m)) {\n        fprintf(stderr, \"id: str span out of bounds: i=%d n=%d in a string of length %zu; clamp i and n first (fixed_point_minimum, fixed_point_maximum)\\n\", i, n, m);\n        exit(1);\n    }\n    return id_str_from(n \? s + i : s, (size_t)n);\n}\n/* bytes: a mutable, growable buffer of bytes, one byte per cell, passed by\n   reference like a list. It is one pool block, a header (len, cap, data) with\n   the first cells inline; growth takes a separate block for the cells and the\n   first inline bytes then hold the capacity the header block was made with,\n   which is what gives the block back at the right size. A cell is read as\n   0..255 and a store outside that range traps. The capacity is never below 8\n   so the inline area can hold that number. */\ntypedef struct { int len, cap; unsigned char* data; } IdBytes;\ntypedef struct { IdBytes h; unsigned char c[8]; } IdBytesBlk;\n#define ID_BYTES_CELLS(B) (((IdBytesBlk*)(void*)(B))->c)\n#define ID_BYTES_BYTES(n) (__builtin_offsetof(IdBytesBlk, c) + (size_t)(n))\nstatic IdBytes* id_bytes_make(long long len, long long cap) {\n    id_nalloc++;\n    IdBytesBlk* B = (IdBytesBlk*)id_pool_blk(ID_BYTES_BYTES(cap));\n    B->h.len = (int)len; B->h.cap = (int)cap; B->h.data = B->c;\n    return &B->h;\n}\nstatic IdBytes* id_bytes_new(int n) {\n    if (n < 0 || n > INT_MAX) id_trap(\"bytes_new: length out of range\");\n    IdBytes* B = id_bytes_make(n, n < 8 \? 8 : n);\n    memset(B->data, 0, (size_t)n);\n    return B;\n}\nstatic void id_bytes_free(IdBytes* B) {\n    if (!B) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (B->cap == INT_MIN) id_freed_trap();\n        int c = B->cap < 0 \? -B->cap : B->cap;\n        memset(B->data, 0xDD, (size_t)c);\n        B->len = -1; B->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(B->cap < 0 \? -B->cap : B->cap);\n    unsigned char* inl = ID_BYTES_CELLS(B);\n    if (B->data == inl) { id_pool_free(B, ID_BYTES_BYTES(c)); return; }\n    size_t ic;\n    memcpy(&ic, inl, sizeof ic);\n    id_pool_free(B->data, c);\n    id_pool_free(B, ID_BYTES_BYTES(ic));\n}\nstatic void id_bytes_mut_check(IdBytes* B) {\n    if (B->cap < 0) {\n        if (B->cap == INT_MIN) id_freed_trap();\n        id_trap(\"cannot mutate a constant bytes\");\n    }\n}\nstatic _Noreturn void id_bytes_oob(IdBytes* B, long long i) {\n    if (B->cap == INT_MIN) id_freed_trap();\n    fprintf(stderr, \"id: index %lld out of bounds (len %d)\\n\", i, B->len);\n    exit(1);\n}\nstatic _Noreturn void id_byte_range(long long v) {\n    fprintf(stderr, \"id: byte value %lld out of range 0..255\\n\", v);\n    exit(1);\n}\nstatic unsigned char id_byte_fit(long long v) {\n    if (v < 0 || v > 255) id_byte_range(v);\n    return (unsigned char)v;\n}\nstatic int id_bytes_len(IdBytes* B) { if (!B) id_null_read(); if (B->len < 0) id_freed_trap(); return B->len; }\nstatic long long id_bytes_get(IdBytes* B, int i) {\n    if (!B) id_null_read();\n    if (i < 0 || i >= B->len) id_bytes_oob(B, i);\n    return B->data[i];\n}\nstatic void id_bytes_set(IdBytes* B, int i, long long v) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    if (i < 0 || i >= B->len) id_bytes_oob(B, i);\n    B->data[i] = id_byte_fit(v);\n}\nstatic void id_bytes_store(IdBytes* B, int i, long long v) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    if (i < 0 || i >= B->len) id_bytes_oob(B, i);\n    B->data[i] = (unsigned char)v;\n}\nstatic long long id_bytes_cell(IdBytes* B, int i) { return B->data[i]; }\nstatic void id_bytes_cell_set(IdBytes* B, int i, long long v) { B->data[i] = id_byte_fit(v); }\nstatic IdBytes* id_bytes_lit(int n, ...) {\n    IdBytes* R = id_bytes_make(n, n < 8 \? 8 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) R->data[k] = id_byte_fit(va_arg(ap, long long));\n    va_end(ap);\n    return R;\n}\nstatic void id_bytes_show(IdBytes* B) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < B->len; i++) fprintf(stderr, \"%s0x%02X\", i \? \", \" : \"\", B->data[i]);\n    fputs(\"]\", stderr);\n}\nstatic void id_bytes_reserve(IdBytes* B, size_t need) {\n    if ((size_t)B->cap >= need) return;\n    if (need > INT_MAX) id_trap(\"bytes capacity overflow\");\n    size_t ncap = (size_t)B->cap * 2;\n    if (ncap < need) ncap = need;\n    if (ncap > INT_MAX) ncap = INT_MAX;\n    ID_MEM_CHARGE(ncap);\n    unsigned char* inl = ID_BYTES_CELLS(B);\n    if (B->data == inl) {\n        unsigned char* nd = (unsigned char*)id_pool_get(ncap);\n        size_t ic = (size_t)B->cap;\n        memcpy(nd, inl, (size_t)B->len);\n        memcpy(inl, &ic, sizeof ic);\n        B->data = nd;\n    } else {\n        B->data = (unsigned char*)id_realloc(B->data, (size_t)B->cap, ncap);\n    }\n    B->cap = (int)ncap;\n}\nstatic void id_bytes_push(IdBytes* B, long long v) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    unsigned char b = id_byte_fit(v);\n    if (B->len >= B->cap) id_bytes_reserve(B, (size_t)B->len + 1);\n    B->data[B->len++] = b;\n}\nstatic long long id_bytes_pop(IdBytes* B) {\n    if (!B) id_null_read();\n    id_bytes_mut_check(B);\n    if (B->len <= 0) id_trap(\"pop from empty bytes\");\n    return B->data[--B->len];\n}\nstatic void id_bytes_append(IdBytes* D, IdBytes* S) {\n    if (!D || !S) id_null_read();\n    id_bytes_mut_check(D);\n    if (S->len < 0) id_freed_trap();\n    size_t n = (size_t)S->len;\n    if (n == 0) return;\n    id_bytes_reserve(D, id_add_check((size_t)D->len, n, \"bytes_append\"));\n    memmove(D->data + D->len, S->data, n);\n    D->len += (int)n;\n}\nstatic IdBytes* id_bytes_sub(IdBytes* B, int i, int n) {\n    if (!B) id_null_read();\n    if (B->len < 0) id_freed_trap();\n    if (i < 0 || n < 0 || (n > 0 && (unsigned long long)i + (unsigned long long)n > (unsigned long long)B->len)) {\n        fprintf(stderr, \"id: bytes span out of bounds: i=%lld n=%lld in a bytes of length %d\\n\", i, n, B->len);\n        exit(1);\n    }\n    IdBytes* R = id_bytes_make(n, n < 8 \? 8 : n);\n    if (n) memcpy(R->data, B->data + i, (size_t)n);\n    return R;\n}\nstatic int id_bytes_cmp(IdBytes* A, IdBytes* B) {\n    if (!A || !B) id_null_read();\n    if (A->len < 0 || B->len < 0) id_freed_trap();\n    if (A->len != B->len) return 1;\n    return A->len \? memcmp(A->data, B->data, (size_t)A->len) : 0;\n}\nstatic IdBytes* id_bytes_of_string(const char* s) {\n    size_t n = id_slen(s);\n    if (n > INT_MAX) id_trap(\"bytes_of_string: string too long\");\n    IdBytes* R = id_bytes_make((long long)n, n < 8 \? 8 : (long long)n);\n    memcpy(R->data, s, n);\n    return R;\n}\nstatic char* id_string_of_bytes(IdBytes* B) {\n    if (!B) id_null_read();\n    if (B->len < 0) id_freed_trap();\n    if (B->len > 0 && memchr(B->data, 0, (size_t)B->len)) id_trap(\"a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes\");\n    return id_str_from((const char*)B->data, (size_t)B->len);\n}\nstatic IdBytes* id_bytes_of_memory(long long addr, int n) {\n    if (n < 0 || n > INT_MAX) id_trap(\"bytes_of_memory: length out of range\");\n    unsigned char* p = id_at(addr, n);\n    IdBytes* R = id_bytes_make(n, n < 8 \? 8 : n);\n    memcpy(R->data, p, (size_t)n);\n    return R;\n}\nstatic long long id_memory_of_bytes(IdBytes* B) {\n    if (!B) id_null_read();\n    if (B->len < 0) id_freed_trap();\n    long long a = id_mem_alloc((long long)B->len);\n    if (B->len) memcpy(id_store + a, B->data, (size_t)B->len);\n    return a;\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\n#ifndef __wasi__\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\n#else\nstatic void id_term_restore(void) {}\nstatic void id_term_raw(void) {}\nstatic int id_getkey(void) { return -1; }\n#endif\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");  /* constant from conf.id */
 char* c_crt_eprint = ID_SK("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }");  /* constant from conf.id */
 char* c_clo_types = ID_SK("/* closures: every function value is a pointer to one of these (docs/SPEC.md 1.1.1) */\ntypedef struct IdFn { void* fn; void* raw; long long n; } IdFn;\n#define ID_FNC(f) ((long long*)((char*)(f) + sizeof(IdFn)))\n#define ID_FNV(x) ({ extern IdFn idfn_o_##x; &idfn_o_##x; })");  /* constant from conf.id */
 char* c_clo_ops = ID_SK("ID_CLO IdFn* id_clo_make(void* fn, int n) {\n    IdFn* o = (IdFn*)id_alloc(id_add_check(sizeof(IdFn), id_mul_check(sizeof(long long), (size_t)n + 1, \"closure\"), \"closure\"));\n    memset(ID_FNC(o), 0, ((size_t)n + 1) * sizeof(long long));\n    o->fn = fn; o->raw = 0; o->n = n;\n    return o;\n}\nID_CLO IdFn* id_clo_new(const IdFn* t) { return id_clo_make(t->fn, (int)t->n); }\nID_CLO IdFn* id_clo_set(IdFn* o, int i, long long v) { ID_FNC(o)[i] = v; return o; }\nID_CLO IdFn* id_clo_setl(IdFn* o, int i, long long v) {\n    ID_FNC(o)[i] = v;\n    if (i < 63) ID_FNC(o)[o->n] |= 1LL << i;\n    return o;\n}\nID_CLO void id_clo_free(IdFn* o) {\n    if (!o) return;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (o->n < 0) id_freed_trap();\n    long long m = ID_FNC(o)[o->n];\n    for (int i = 0; i < 63 && i < o->n; i++) if ((m >> i) & 1) id_list_free((IdList*)(intptr_t)ID_FNC(o)[i]);\n    size_t cells = (size_t)o->n + 1;\n    if (id_fguard) { memset(ID_FNC(o), 0xDD, cells * sizeof(long long)); o->n = -1; return; }\n    id_pool_free(o, sizeof(IdFn) + cells * sizeof(long long));\n}\nID_CLO IdList* id_clo_copy(IdList* L) {\n    if (!L) id_null_read();\n    IdList* M = id_list_new();\n    for (int i = 0; i < L->len; i++) id_list_push(M, L->data[i]);\n    id_list_lock(M);\n    return M;\n}");  /* constant from conf.id */
@@ -4599,7 +4798,7 @@ static void idc_const_init(void) {
     id_list_lock(cache_taint_natives);
     cache_volatile_builtins = id_list_lit(2, (long long)(intptr_t)(ID_S("ticks")), (long long)(intptr_t)(ID_S("getkey")));
     id_list_lock(cache_volatile_builtins);
-    pure_builtins = id_list_lit(17, (long long)(intptr_t)(ID_S("len")), (long long)(intptr_t)(ID_S("push")), (long long)(intptr_t)(ID_S("pop")), (long long)(intptr_t)(ID_S("to_int")), (long long)(intptr_t)(ID_S("character_code_at")), (long long)(intptr_t)(ID_S("chr")), (long long)(intptr_t)(ID_S("udiv")), (long long)(intptr_t)(ID_S("umod")), (long long)(intptr_t)(ID_S("ult")), (long long)(intptr_t)(ID_S("ushr")), (long long)(intptr_t)(ID_S("fail")), (long long)(intptr_t)(ID_S("bind")), (long long)(intptr_t)(ID_S("bits_of_float")), (long long)(intptr_t)(ID_S("float_of_bits")), (long long)(intptr_t)(ID_S("bits32_of_float")), (long long)(intptr_t)(ID_S("float_of_bits32")), (long long)(intptr_t)(ID_S("str_sub")));
+    pure_builtins = id_list_lit(21, (long long)(intptr_t)(ID_S("len")), (long long)(intptr_t)(ID_S("push")), (long long)(intptr_t)(ID_S("pop")), (long long)(intptr_t)(ID_S("to_int")), (long long)(intptr_t)(ID_S("character_code_at")), (long long)(intptr_t)(ID_S("chr")), (long long)(intptr_t)(ID_S("udiv")), (long long)(intptr_t)(ID_S("umod")), (long long)(intptr_t)(ID_S("ult")), (long long)(intptr_t)(ID_S("ushr")), (long long)(intptr_t)(ID_S("fail")), (long long)(intptr_t)(ID_S("bind")), (long long)(intptr_t)(ID_S("bits_of_float")), (long long)(intptr_t)(ID_S("float_of_bits")), (long long)(intptr_t)(ID_S("bits32_of_float")), (long long)(intptr_t)(ID_S("float_of_bits32")), (long long)(intptr_t)(ID_S("str_sub")), (long long)(intptr_t)(ID_S("bytes_new")), (long long)(intptr_t)(ID_S("bytes_sub")), (long long)(intptr_t)(ID_S("string_of_bytes")), (long long)(intptr_t)(ID_S("bytes_of_string")));
     id_list_lock(pure_builtins);
     gd_plain = id_list_lit(5, (long long)(intptr_t)(ID_S("null")), (long long)(intptr_t)(ID_S("wide")), (long long)(intptr_t)(ID_S("len")), (long long)(intptr_t)(ID_S("cap")), (long long)(intptr_t)(ID_S("|")));
     id_list_lock(gd_plain);
@@ -4623,7 +4822,7 @@ static void idc_const_init(void) {
     id_list_lock(unops);
     shiftops = id_list_lit(2, (long long)(intptr_t)(ID_S("<<")), (long long)(intptr_t)(ID_S(">>")));
     id_list_lock(shiftops);
-    typewords = id_list_lit(7, (long long)(intptr_t)(ID_S("int")), (long long)(intptr_t)(ID_S("float")), (long long)(intptr_t)(ID_S("string")), (long long)(intptr_t)(ID_S("void")), (long long)(intptr_t)(ID_S("word")), (long long)(intptr_t)(ID_S("export")), (long long)(intptr_t)(ID_S("func")));
+    typewords = id_list_lit(8, (long long)(intptr_t)(ID_S("int")), (long long)(intptr_t)(ID_S("float")), (long long)(intptr_t)(ID_S("string")), (long long)(intptr_t)(ID_S("void")), (long long)(intptr_t)(ID_S("word")), (long long)(intptr_t)(ID_S("export")), (long long)(intptr_t)(ID_S("func")), (long long)(intptr_t)(ID_S("bytes")));
     id_list_lock(typewords);
     mutnames = id_list_lit(2, (long long)(intptr_t)(ID_S("push")), (long long)(intptr_t)(ID_S("pop")));
     id_list_lock(mutnames);
@@ -4637,7 +4836,7 @@ static void idc_const_init(void) {
     id_list_lock(arithops);
     pokefns = id_list_lit(4, (long long)(intptr_t)(ID_S("poke8")), (long long)(intptr_t)(ID_S("poke16")), (long long)(intptr_t)(ID_S("poke32")), (long long)(intptr_t)(ID_S("poke64")));
     id_list_lock(pokefns);
-    freshfns = id_list_lit(5, (long long)(intptr_t)(ID_S("chr")), (long long)(intptr_t)(ID_S("input")), (long long)(intptr_t)(ID_S("read_all")), (long long)(intptr_t)(ID_S("str_of_mem")), (long long)(intptr_t)(ID_S("str_sub")));
+    freshfns = id_list_lit(10, (long long)(intptr_t)(ID_S("chr")), (long long)(intptr_t)(ID_S("input")), (long long)(intptr_t)(ID_S("read_all")), (long long)(intptr_t)(ID_S("str_of_mem")), (long long)(intptr_t)(ID_S("str_sub")), (long long)(intptr_t)(ID_S("string_of_bytes")), (long long)(intptr_t)(ID_S("bytes_new")), (long long)(intptr_t)(ID_S("bytes_of_memory")), (long long)(intptr_t)(ID_S("bytes_of_string")), (long long)(intptr_t)(ID_S("bytes_sub")));
     id_list_lock(freshfns);
     castops = id_list_lit(7, (long long)(intptr_t)(ID_S("zext")), (long long)(intptr_t)(ID_S("sext")), (long long)(intptr_t)(ID_S("trunc")), (long long)(intptr_t)(ID_S("sitofp")), (long long)(intptr_t)(ID_S("fptosi")), (long long)(intptr_t)(ID_S("ptrtoint")), (long long)(intptr_t)(ID_S("inttoptr")));
     id_list_lock(castops);
@@ -6767,7 +6966,8 @@ int id_lw_index2(int node, int a, int i) {
     int c;
     int ret_i;
     elem = id_lw_index_elem(node);
-    lv_f = id_lv_callee(node, ID_S("id_list_get"), ID_S("id_list_cell"));
+char* idsq_26;
+    lv_f = (idsq_26 = id_lw_bfn(a, ID_S("id_list_get"), ID_S("id_bytes_get")), id_lv_callee(node, idsq_26, id_lw_bfn(a, ID_S("id_list_cell"), ID_S("id_bytes_cell"))));
     c = id_lw_callf(lv_f, ID_S("word"), id_list_lit(2, (long long)(a), (long long)(i)));
     ret_i = id_lw_unbox(c, elem);
     return ret_i;
@@ -6818,7 +7018,8 @@ void id_lw_iset(int node, int a, char* elem) {
     int lv_old;
     i = id_lw_index_idx(node);
     v = id_lw_iset_val(node, elem);
-    lv_f = id_lv_callee(node, ID_S("id_list_set"), ID_S("id_list_cell_set"));
+char* idsq_33;
+    lv_f = (idsq_33 = id_lw_bfn(a, ID_S("id_list_set"), ID_S("id_bytes_set")), id_lv_callee(node, idsq_33, id_lw_bfn(a, ID_S("id_list_cell_set"), ID_S("id_bytes_cell_set"))));
     lv_old = id_lw_slot_old(node, a, i, elem);
     id_lw_callf(lv_f, ID_S(""), id_list_lit(3, (long long)(a), (long long)(i), (long long)(v)));
     id_lw_slot_free(node, lv_old);
@@ -7221,7 +7422,7 @@ int id_lw_pop_mid(IdList* args, char* ety) {
 int id_lw_pop_tail(char* elem, int v) {
     int c;
     int ret_i;
-    c = id_lw_callf(ID_S("id_list_pop"), ID_S("word"), id_list_lit(1, (long long)(v)));
+    c = id_lw_callf(id_lw_bfn(v, ID_S("id_list_pop"), ID_S("id_bytes_pop")), ID_S("word"), id_list_lit(1, (long long)(v)));
     ret_i = id_lw_unbox(c, elem);
     return ret_i;
 }
@@ -7231,7 +7432,7 @@ int id_lw_len_tail(IdList* args, char* t) {
     char* lw_lenfn_v;
     int ret_i;
     a = id_lw_expr((int)(id_list_get(args, 0)));
-    lw_lenfn_v = id_str_pick(t, ID_S("string"), ID_S("id_len"), ID_S("id_list_len"));
+    lw_lenfn_v = id_lw_bfn(a, id_str_pick(t, ID_S("string"), ID_S("id_len"), ID_S("id_list_len")), ID_S("id_bytes_len"));
     ret_i = id_lw_callf(lw_lenfn_v, ID_S("int"), id_list_lit(1, (long long)(a)));
     return ret_i;
 }
@@ -7250,7 +7451,7 @@ int id_lw_push2_tail(int a, int v, char* elem) {
     int lw_box_v;
     int ret_i;
     lw_box_v = id_lw_box(v, elem);
-    ret_i = id_lw_callf(ID_S("id_list_push"), ID_S(""), id_list_lit(2, (long long)(a), (long long)(lw_box_v)));
+    ret_i = id_lw_callf(id_lw_bfn(a, ID_S("id_list_push"), ID_S("id_bytes_push")), ID_S(""), id_list_lit(2, (long long)(a), (long long)(lw_box_v)));
     return ret_i;
 }
 
@@ -7366,7 +7567,7 @@ char* id_lw_sysret(char* name) {
 char* id_lw_bpty2(char* name, int i) {
     char* t;
     t = ID_S("");
-    if (((id_is_syscall(name) == 1) && (strcmp(name, ID_S("mem_of_str")) != 0))) {
+    if ((((id_is_syscall(name) == 1) && (strcmp(name, ID_S("mem_of_str")) != 0)) || ((strcmp(name, ID_S("bytes_of_memory")) == 0) && (i == 0)))) {
         t = ID_S("word");
     } else {
         t = id_lw_bpty3(name, i);
@@ -7474,7 +7675,7 @@ int id_lw_cmp(int node) {
 int id_lw_cmp2(int node, char* t) {
     int v;
     v = (0 - 1);
-    if ((strcmp(t, ID_S("string")) == 0)) {
+    if (((strcmp(t, ID_S("string")) == 0) || (strcmp(t, ID_S("bytes")) == 0))) {
         v = id_lw_scmp(node);
     } else {
         v = id_lw_ncmp(node, t);
@@ -7829,6 +8030,15 @@ int id_lw_not(int node) {
     return ret_i;
 }
 
+char* id_lw_bfn(int bfn_value, char* bfn_list, char* bfn_bytes) {
+    char* bfn_out;
+    bfn_out = bfn_list;
+    if ((((bfn_value >= 0) && (bfn_value < id_list_len(ity))) && (strcmp((char*)(intptr_t)(id_list_get(ity, bfn_value)), ID_S("bytes")) == 0))) {
+        bfn_out = bfn_bytes;
+    }
+    return bfn_out;
+}
+
 int id_lw_concat_call(int node, int a, int b) {
     int m;
     int ret_i;
@@ -7894,7 +8104,7 @@ int id_lw_scmp_call(int node, int a, int b) {
     int lw_callf_v;
     int ret_i;
     lw_strcmp_v = id_lw_strcmp();
-    lw_callf_v = id_lw_callf(lw_strcmp_v, ID_S("int"), id_list_lit(2, (long long)(a), (long long)(b)));
+    lw_callf_v = id_lw_callf(id_lw_bfn(a, lw_strcmp_v, ID_S("id_bytes_cmp")), ID_S("int"), id_list_lit(2, (long long)(a), (long long)(b)));
     ret_i = id_lw_scmp2(node, lw_callf_v);
     return ret_i;
 }
@@ -10704,6 +10914,65 @@ int id_lp_ucall(int lq_id) {
     return lq_r;
 }
 
+char* id_cell_get_text(char* cbx_ns, char* cbx_base, char* cbx_index, int cbx_hit) {
+    char* cbx_text = NULL;
+    { char* idfe_o = cbx_text; cbx_text = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(cbx_ns, ID_S("get(")), cbx_base, 1), ID_S(", "), 1), cbx_index, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    if ((cbx_hit == 1)) {
+        { char* idfe_o = cbx_text; cbx_text = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), cbx_base), ID_S(")->data["), 1), cbx_index, 1), ID_S("]"), 1); id_str_free(idfe_o); }
+    }
+    return cbx_text;
+}
+
+char* id_cell_set_name(char* cbx_ns, int cbx_fit) {
+    char* cbx_name = NULL;
+    { char* idfe_o = cbx_name; cbx_name = id_concat(cbx_ns, ID_S("set")); id_str_free(idfe_o); }
+    if (((strcmp(cbx_ns, ID_S("id_bytes_")) == 0) && (cbx_fit == 1))) {
+        { char* idfe_o = cbx_name; cbx_name = id_str_dup(ID_S("id_bytes_store")); id_str_free(idfe_o); }
+    }
+    return cbx_name;
+}
+
+char* id_cell_set_rhs(char* cbx_ns, char* cbx_value, int cbx_fit) {
+    char* cbx_rhs;
+    cbx_rhs = cbx_value;
+    if ((strcmp(cbx_ns, ID_S("id_bytes_")) == 0)) {
+        cbx_rhs = id_concat_f(id_concat(ID_S("id_byte_fit("), cbx_value), ID_S(")"), 1);
+        if ((cbx_fit == 1)) {
+            cbx_rhs = id_concat_f(id_concat(ID_S("(unsigned char)("), cbx_value), ID_S(")"), 1);
+        }
+    }
+    return cbx_rhs;
+}
+
+char* id_cell_set_text(char* cbx_ns, char* cbx_base, char* cbx_index, char* cbx_value, int cbx_hit, int cbx_fit) {
+    char* cbx_text = NULL;
+    { char* idfe_o = cbx_text; cbx_text = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_cell_set_name(cbx_ns, cbx_fit), ID_S("("), 1), cbx_base, 1), ID_S(", "), 1), cbx_index, 1), ID_S(", "), 1), cbx_value, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    if ((cbx_hit == 1)) {
+        { char* idfe_o = cbx_text; cbx_text = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), cbx_base), ID_S(")->data["), 1), cbx_index, 1), ID_S("] = "), 1), id_cell_set_rhs(cbx_ns, cbx_value, cbx_fit), 1); id_str_free(idfe_o); }
+    }
+    return cbx_text;
+}
+
+int id_cell_value_fits(int cbx_node) {
+    int cbx_ok;
+    cbx_ok = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, cbx_node)), ID_S("int")) == 0)) {
+        cbx_ok = id_cell_int_fits(cbx_node);
+    } else {
+        cbx_ok = id_cell_derived_fits(cbx_node);
+    }
+    return cbx_ok;
+}
+
+int id_cell_set_fit(char* cbx_ns, int cbx_node) {
+    int cbx_ok;
+    cbx_ok = 0;
+    if ((strcmp(cbx_ns, ID_S("id_bytes_")) == 0)) {
+        cbx_ok = id_cell_value_fits((int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, cbx_node)), 0)));
+    }
+    return cbx_ok;
+}
+
 int id_lp_cls(char* lq_nm) {
     int lq_ix;
     int lq_r;
@@ -10718,7 +10987,7 @@ int id_lp_cls(char* lq_nm) {
 int id_lp_known(char* lq_nm) {
     int lq_r;
     lq_r = 1;
-    if ((((strcmp(lq_nm, ID_S("push")) != 0) && (strcmp(lq_nm, ID_S("pop")) != 0)) && ((id_is_builtin(lq_nm) == 1) || (id_find_str(sdname, lq_nm) >= 0)))) {
+    if (((((strcmp(lq_nm, ID_S("push")) != 0) && (strcmp(lq_nm, ID_S("pop")) != 0)) && (strcmp(lq_nm, ID_S("bytes_append")) != 0)) && ((id_is_builtin(lq_nm) == 1) || (id_find_str(sdname, lq_nm) >= 0)))) {
         lq_r = 0;
     }
     return lq_r;
@@ -11409,6 +11678,35 @@ int id_lp_one(int lq_b) {
     return lq_r;
 }
 
+int id_cell_literal_fits(char* cbx_text) {
+    int cbx_ok;
+    cbx_ok = 0;
+    if ((id_len(cbx_text) <= 3)) {
+        cbx_ok = (id_to_int(cbx_text) <= 255);
+    }
+    return cbx_ok;
+}
+
+int id_cell_int_fits(int cbx_node) {
+    int cbx_ok;
+    cbx_ok = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, cbx_node)), ID_S("int")) == 0)) {
+        cbx_ok = id_cell_literal_fits((char*)(intptr_t)(id_list_get(ns1, cbx_node)));
+    }
+    return cbx_ok;
+}
+
+int id_cell_derived_fits(int cbx_node) {
+    int cbx_ok;
+    cbx_ok = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, cbx_node)), ID_S("index")) == 0)) {
+        cbx_ok = (strcmp(id_type_of((int)(id_list_get(ni1, cbx_node))), ID_S("bytes")) == 0);
+    } else if (((strcmp((char*)(intptr_t)(id_list_get(nkind, cbx_node)), ID_S("bin")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, cbx_node)), ID_S("&")) == 0))) {
+        cbx_ok = id_cell_mask_fits(cbx_node);
+    }
+    return cbx_ok;
+}
+
 void id_emit_loop(int id, char* ind) {
     int lq_fast;
     lq_fast = id_lp_plan(id);
@@ -11431,6 +11729,12 @@ void id_emit_loop_fast(int id, char* ind) {
     id_emit_while(id, id_concat(ind, ID_S("    ")));
     id_print(id_concat(ind, ID_S("}")));
     return;
+}
+
+int id_cell_mask_fits(int cbx_node) {
+    int cbx_ok;
+    cbx_ok = (id_cell_int_fits((int)(id_list_get(ni1, cbx_node))) || id_cell_int_fits((int)(id_list_get(ni2, cbx_node))));
+    return cbx_ok;
 }
 
 int id_lp_ok(int lq_id, int lq_jn, int lq_lo, int lq_hi) {
@@ -11731,20 +12035,20 @@ int id_lp_hit(int lq_id) {
 }
 
 char* id_lp_get(int lq_id, char* lq_btxt, char* lq_xtxt) {
+    char* lq_ns;
     char* lq_s = NULL;
-    { char* idfe_o = lq_s; lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_get("), lq_btxt), ID_S(", "), 1), lq_xtxt, 1), ID_S(")"), 1); id_str_free(idfe_o); }
-    if ((id_lp_hit(lq_id) == 1)) {
-        { char* idfe_o = lq_s; lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), lq_btxt), ID_S(")->data["), 1), lq_xtxt, 1), ID_S("]"), 1); id_str_free(idfe_o); }
-    }
+    lq_ns = id_cell_ns(id_type_of((int)(id_list_get(ni1, lq_id))));
+    { char* idfe_o = lq_s; lq_s = id_cell_get_text(lq_ns, lq_btxt, lq_xtxt, id_lp_hit(lq_id)); id_str_free(idfe_o); }
     return lq_s;
 }
 
 char* id_lp_set(int lq_id, char* lq_btxt, char* lq_xtxt, char* lq_vtxt) {
+    char* lq_ns;
+    int lq_fit;
     char* lq_s;
-    lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_set("), lq_btxt), ID_S(", "), 1), lq_xtxt, 1), ID_S(", "), 1), lq_vtxt, 1), ID_S(")"), 1);
-    if ((id_lp_hit(lq_id) == 1)) {
-        lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), lq_btxt), ID_S(")->data["), 1), lq_xtxt, 1), ID_S("] = "), 1), lq_vtxt, 1);
-    }
+    lq_ns = id_cell_ns(id_type_of((int)(id_list_get(ni1, lq_id))));
+    lq_fit = id_cell_set_fit(lq_ns, lq_id);
+    lq_s = id_cell_set_text(lq_ns, lq_btxt, lq_xtxt, lq_vtxt, id_lp_hit(lq_id), lq_fit);
     lq_s = id_esc_slot_code(lq_id, lq_btxt, lq_xtxt, lq_vtxt, lq_s);
     return lq_s;
 }
@@ -12119,11 +12423,11 @@ void id_iassign2(int id, char* ind, char* ia_base_type) {
 
 void id_iassign3(int id, char* ind, char* elem, IdList* ia_arg_ids) {
     char* emit_expr_v;
-    char* val = NULL;
+    char* val;
     emit_expr_v = id_emit_expr((int)(id_list_get(ia_arg_ids, 0)));
-    { char* idfe_o = val; val = id_box(emit_expr_v, elem); id_str_free(idfe_o); }
+    val = id_box(emit_expr_v, elem);
     id_iassign4(id, ind, val);
-    { id_str_free(val); return; }
+    return;
 }
 
 void id_iassign4(int id, char* ind, char* val) {
@@ -12652,6 +12956,24 @@ char* id_emit_infix(int id) {
     return s;
 }
 
+int id_both_bytes(int id) {
+    int ok;
+    ok = 0;
+    if (((strcmp(id_type_of((int)(id_list_get(ni1, id))), ID_S("bytes")) == 0) && (strcmp(id_type_of((int)(id_list_get(ni2, id))), ID_S("bytes")) == 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+char* id_compare_function(int compare_node) {
+    char* compare_name;
+    compare_name = ID_S("strcmp");
+    if ((strcmp(id_type_of(compare_node), ID_S("bytes")) == 0)) {
+        compare_name = ID_S("id_bytes_cmp");
+    }
+    return compare_name;
+}
+
 int id_both_str(int id) {
     int ok;
     int i1_of_v;
@@ -12697,9 +13019,10 @@ char* id_strcmp_line(int id, int cmp_lhs_id, int cmp_rhs_id) {
     char* s1_of_v;
     char* s = NULL;
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
+char* idsq_27;
 char* idsq_21;
 char* idsq_15;
-    { char* idfe_o = s; s = (idsq_21 = id_emit_expr(cmp_lhs_id), idsq_15 = id_emit_expr(cmp_rhs_id), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(strcmp("), idsq_21), ID_S(", "), 1), idsq_15, 1), ID_S(") "), 1), id_str_pick(s1_of_v, ID_S("="), ID_S("=="), s1_of_v), 1), ID_S(" 0)"), 1)); id_str_free(idfe_o); }
+    { char* idfe_o = s; s = (idsq_27 = id_compare_function(cmp_lhs_id), idsq_21 = id_emit_expr(cmp_lhs_id), idsq_15 = id_emit_expr(cmp_rhs_id), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), idsq_27), ID_S("("), 1), idsq_21, 1), ID_S(", "), 1), idsq_15, 1), ID_S(") "), 1), id_str_pick(s1_of_v, ID_S("="), ID_S("=="), s1_of_v), 1), ID_S(" 0)"), 1)); id_str_free(idfe_o); }
     return s;
 }
 
@@ -12708,7 +13031,7 @@ int id_is_strcmp(int id) {
     char* s1_of_v;
     ok = 0;
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
-    if ((id_str_in(eqops, s1_of_v) && id_both_str(id))) {
+    if ((id_str_in(eqops, s1_of_v) && (id_both_str(id) || id_both_bytes(id)))) {
         ok = 1;
     }
     return ok;
@@ -12885,6 +13208,12 @@ char* id_tmp_free(int id, int i) {
         { char* idfe_o = tx_f; tx_f = id_concat_f(id_concat_f(id_concat(id_esc_tmp_fn(id, i), ID_S("(idft")), id_str_of_int(i), 3), ID_S("); "), 1); id_str_free(idfe_o); }
     }
     return tx_f;
+}
+
+void id_init_tyc_rows3(void) {
+    id_list_push(tyc, (long long)(intptr_t)(ID_S("void")));
+    id_list_push(tyc, (long long)(intptr_t)(ID_S("IdBytes*")));
+    return;
 }
 
 char* id_c_type(char* t) {
@@ -13245,7 +13574,7 @@ void id_init_tyc_rows(void) {
 void id_init_tyc_rows2(void) {
     id_list_push(tyc, (long long)(intptr_t)(ID_S("double")));
     id_list_push(tyc, (long long)(intptr_t)(ID_S("char*")));
-    id_list_push(tyc, (long long)(intptr_t)(ID_S("void")));
+    id_init_tyc_rows3();
     return;
 }
 
@@ -15444,7 +15773,8 @@ char* id_emit_len_form(int arg, char* len_list_type) {
     if ((strcmp(len_list_type, ID_S("string")) == 0)) {
         { char* idfe_o = s; s = id_concat_f(id_concat(ID_S("id_len("), id_emit_expr(arg)), ID_S(")"), 1); id_str_free(idfe_o); }
     } else {
-        { char* idfe_o = s; s = id_concat_f(id_concat(ID_S("id_list_len("), id_emit_expr(arg)), ID_S(")"), 1); id_str_free(idfe_o); }
+char* idsq_12;
+        { char* idfe_o = s; s = (idsq_12 = id_cell_ns(len_list_type), id_concat_f(id_concat_f(id_concat(idsq_12, ID_S("len(")), id_emit_expr(arg), 1), ID_S(")"), 1)); id_str_free(idfe_o); }
     }
     return s;
 }
@@ -15463,17 +15793,17 @@ char* id_emit_push_tail(IdList* args, char* push_list_type) {
     char* elem = NULL;
     char* ret_s = NULL;
     { char* idfe_o = elem; elem = id_elem_type(push_list_type); id_str_free(idfe_o); }
-    { char* idfe_o = ret_s; ret_s = id_push_code(args, elem); id_str_free(idfe_o); }
+    { char* idfe_o = ret_s; ret_s = id_push_code(args, elem, id_cell_ns(push_list_type)); id_str_free(idfe_o); }
     { id_str_free(elem); return ret_s; }
 }
 
-char* id_push_code(IdList* args, char* elem) {
+char* id_push_code(IdList* args, char* elem, char* push_ns) {
     char* emit_expr_v;
     char* ret_s = NULL;
     emit_expr_v = id_emit_expr((int)(id_list_get(args, 1)));
 int idsq_14;
 char* idsq_13;
-    { char* idfe_o = ret_s; ret_s = (idsq_14 = (int)(id_list_get(args, 0)), idsq_13 = id_emit_expr(idsq_14), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_push("), idsq_13), ID_S(", "), 1), id_box(emit_expr_v, elem), 3), ID_S(")"), 1)); id_str_free(idfe_o); }
+    { char* idfe_o = ret_s; ret_s = (idsq_14 = (int)(id_list_get(args, 0)), idsq_13 = id_emit_expr(idsq_14), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(push_ns, ID_S("push(")), idsq_13, 1), ID_S(", "), 1), id_box(emit_expr_v, elem), 3), ID_S(")"), 1)); id_str_free(idfe_o); }
     return ret_s;
 }
 
@@ -15504,7 +15834,7 @@ char* id_emit_pop_tail(int arg, char* pop_list_type) {
     char* ret_s = NULL;
     { char* idfe_o = elem; elem = id_elem_type(pop_list_type); id_str_free(idfe_o); }
     emit_expr_v = id_emit_expr(arg);
-    { char* idfe_o = ret_s; ret_s = id_unbox(id_concat_f(id_concat(ID_S("id_list_pop("), emit_expr_v), ID_S(")"), 1), elem); id_str_free(idfe_o); }
+    { char* idfe_o = ret_s; ret_s = id_unbox(id_concat_f(id_concat_f(id_concat(id_cell_ns(pop_list_type), ID_S("pop(")), emit_expr_v, 1), ID_S(")"), 1), elem); id_str_free(idfe_o); }
     { id_str_free(elem); return ret_s; }
 }
 
@@ -15607,7 +15937,7 @@ char* id_tc_neg(int e) {
 char* id_tc_lit(int e, char* want) {
     char* so;
     so = ID_S("");
-    if ((id_ty_is_list(want) == 1)) {
+    if (((id_ty_is_list(want) == 1) || (strcmp(want, ID_S("bytes")) == 0))) {
         so = id_tc_list(e, want);
     } else {
         so = id_tc_other(e, want);
@@ -15649,6 +15979,8 @@ char* id_tc_compare(char* ga, char* gb, char* type) {
         { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_eqs_"), type), ID_S("("), 1), ga, 1), ID_S(", "), 1), gb, 1), ID_S(")"), 1); id_str_free(idfe_o); }
     } else if ((id_ty_is_func(type) == 1)) {
         { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_fn_eq("), ga), ID_S(", "), 1), gb, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    } else if ((strcmp(type, ID_S("bytes")) == 0)) {
+        { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(id_bytes_cmp("), ga), ID_S(", "), 1), gb, 1), ID_S(") == 0)"), 1); id_str_free(idfe_o); }
     }
     { id_str_free(key); return so; }
 }
@@ -15666,6 +15998,8 @@ char* id_tc_show(char* code, char* type) {
     }
     if ((id_ty_kind_is(type, ID_S("struct")) == 1)) {
         { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_shows_"), type), ID_S("("), 1), code, 1), ID_S(");"), 1); id_str_free(idfe_o); }
+    } else if ((strcmp(type, ID_S("bytes")) == 0)) {
+        { char* idfe_o = so; so = id_concat_f(id_concat(ID_S("id_bytes_show("), code), ID_S(");"), 1); id_str_free(idfe_o); }
     }
     { id_str_free(key); return so; }
 }
@@ -15767,6 +16101,15 @@ char* id_sizes_c(IdList* args) {
     { id_str_free(parts); return so; }
 }
 
+char* id_tc_list_head(IdList* xs, char* et, char* want) {
+    char* so = NULL;
+    { char* idfe_o = so; so = id_tc_list_n(xs, et); id_str_free(idfe_o); }
+    if ((strcmp(want, ID_S("bytes")) == 0)) {
+        { char* idfe_o = so; so = id_concat_f(ID_S("id_bytes_lit"), id_str_sub(so, 11, (id_len(so) - 11)), 2); id_str_free(idfe_o); }
+    }
+    return so;
+}
+
 char* id_tc_import(int e, char* want) {
     char* so;
     char* ixc;
@@ -15862,8 +16205,8 @@ char* id_tc_list(int e, char* want) {
     char* et;
     char* so = NULL;
     xs = (IdList*)(intptr_t)(id_list_get(nl1, e));
-    et = id_list_elem(want);
-    { char* idfe_o = so; so = id_tc_list_n(xs, et); id_str_free(idfe_o); }
+    et = id_elem_type(want);
+    { char* idfe_o = so; so = id_tc_list_head(xs, et, want); id_str_free(idfe_o); }
     return so;
 }
 
@@ -15896,7 +16239,7 @@ char* id_wrap_by_type(char* code, char* type, char* key, char* pre, char* post, 
     return s;
 }
 
-char* id_elem_type(char* t) {
+char* id_list_elem_type(char* t) {
     char* out = NULL;
     int i;
     int charat_v;
@@ -15908,6 +16251,24 @@ char* id_elem_type(char* t) {
         i = (i + 1);
     }
     return out;
+}
+
+char* id_elem_type(char* t) {
+    char* out = NULL;
+    { char* idfe_o = out; out = id_str_dup(ID_S("int")); id_str_free(idfe_o); }
+    if ((strcmp(t, ID_S("bytes")) != 0)) {
+        { char* idfe_o = out; out = id_list_elem_type(t); id_str_free(idfe_o); }
+    }
+    return out;
+}
+
+char* id_cell_ns(char* cbx_type) {
+    char* cbx_ns;
+    cbx_ns = ID_S("id_list_");
+    if ((strcmp(cbx_type, ID_S("bytes")) == 0)) {
+        cbx_ns = ID_S("id_bytes_");
+    }
+    return cbx_ns;
 }
 
 char* id_unbox(char* code, char* type) {
@@ -16893,7 +17254,7 @@ void id_ll_declares(void) {
 
 void id_ll_decl_block(void) {
     id_ll_decl_cmp();
-    id_print(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_character_code_at(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare void @id_fail(ptr)"));
+    id_print(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_character_code_at(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare ptr @id_bytes_new(i32)\ndeclare void @id_bytes_free(ptr)\ndeclare i32 @id_bytes_len(ptr)\ndeclare i64 @id_bytes_get(ptr, i32)\ndeclare void @id_bytes_set(ptr, i32, i64)\ndeclare i64 @id_bytes_cell(ptr, i32)\ndeclare void @id_bytes_cell_set(ptr, i32, i64)\ndeclare void @id_bytes_push(ptr, i64)\ndeclare i64 @id_bytes_pop(ptr)\ndeclare void @id_bytes_append(ptr, ptr)\ndeclare ptr @id_bytes_sub(ptr, i32, i32)\ndeclare i32 @id_bytes_cmp(ptr, ptr)\ndeclare ptr @id_bytes_of_string(ptr)\ndeclare ptr @id_string_of_bytes(ptr)\ndeclare ptr @id_bytes_of_memory(i64, i32)\ndeclare i64 @id_memory_of_bytes(ptr)\ndeclare void @id_fail(ptr)"));
     id_print(ID_S(""));
     return;
 }
@@ -29742,7 +30103,7 @@ int idsq_12;
 void id_fit_value(int i, int e, char* want) {
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cfn")) == 0))) {
         id_fit_named(i, e, want);
-    } else if ((id_ty_is_list(want) == 1)) {
+    } else if (((id_ty_is_list(want) == 1) || (strcmp(want, ID_S("bytes")) == 0))) {
         id_fit_list(i, e, want);
     } else {
         id_fit_other(i, e, want);
@@ -29766,7 +30127,7 @@ void id_fit_elems(int i, int e, char* want) {
     char* et;
     int j;
     xs = (IdList*)(intptr_t)(id_list_get(nl1, e));
-    et = id_list_elem(want);
+    et = id_elem_type(want);
     j = 0;
     while ((j < id_list_len(xs))) {
         id_fit_value(i, (int)(id_list_get(xs, j)), et);
@@ -33022,8 +33383,11 @@ void id_chk_bi_arg(int id, int i) {
     nm = (char*)(intptr_t)(id_list_get(ns1, id));
     if (((((strcmp(nm, ID_S("print")) == 0) || (strcmp(nm, ID_S("eprint")) == 0)) || (strcmp(nm, ID_S("put")) == 0)) && (id_ty_is_list(t) == 1))) {
         id_tc_diag(id, ID_S("E0634"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take a list: argument "), 1), id_str_of_int(i), 3), ID_S(" is "), 1), t, 1), ID_S("; a list has no text form -- write its elements one at a time, as in "), 1), nm, 1), ID_S("(xs[0]) inside a while loop, or build a string from them"), 1), nm, id_concat_f(id_concat(ID_S("a list has no text form, so there is nothing for "), nm), ID_S(" to write"), 1), id_concat_f(id_concat(ID_S("write its elements one at a time, as in "), nm), ID_S("(xs[0]) inside a while loop, or build a string from them"), 1));
-    } else if ((((strcmp(nm, ID_S("put")) == 0) && (id_ty_known(t) == 1)) && (strcmp(t, ID_S("string")) != 0))) {
+    } else if (((((strcmp(nm, ID_S("put")) == 0) && (id_ty_known(t) == 1)) && (strcmp(t, ID_S("string")) != 0)) && (strcmp(t, ID_S("bytes")) != 0))) {
         id_tc_diag(id, ID_S("E0635"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("'put' takes a string, but argument "), id_str_of_int(i), 2), ID_S(" is "), 1), t, 1), ID_S("; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line"), 1), ID_S("put"), ID_S("put writes text exactly as given and does not convert"), ID_S("write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line"));
+    }
+    if (((((strcmp(nm, ID_S("print")) == 0) || (strcmp(nm, ID_S("eprint")) == 0)) || (strcmp(nm, ID_S("put")) == 0)) && (strcmp(t, ID_S("bytes")) == 0))) {
+        id_tc_diag(id, ID_S("E0643"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take bytes: argument "), 1), id_str_of_int(i), 3), ID_S(" is bytes; a byte buffer is binary, not text -- write print(string_of_bytes(b)) to print it as text (it stops if a byte is 0), or write its elements one at a time"), 1), nm, id_concat_f(id_concat(ID_S("bytes is binary, so there is nothing for "), nm), ID_S(" to write as text"), 1), id_concat_f(id_concat(ID_S("write "), nm), ID_S("(string_of_bytes(b)) to print it as text, or write its elements one at a time"), 1));
     }
     return;
 }
@@ -33041,6 +33405,22 @@ char* id_bi_want_for(int id, int i) {
     char* s;
     name = (char*)(intptr_t)(id_list_get(ns1, id));
     s = id_bi_wants(name, i);
+    return s;
+}
+
+char* id_bi_wants_bytes(char* name, int i, char* bw_base) {
+    char* s;
+    s = bw_base;
+    if ((((((strcmp(name, ID_S("bytes_sub")) == 0) && (i == 0)) || (strcmp(name, ID_S("bytes_append")) == 0)) || (strcmp(name, ID_S("string_of_bytes")) == 0)) || (strcmp(name, ID_S("memory_of_bytes")) == 0))) {
+        s = ID_S("bytes");
+    } else if ((((strcmp(name, ID_S("bytes_new")) == 0) || (strcmp(name, ID_S("bytes_sub")) == 0)) || ((strcmp(name, ID_S("bytes_of_memory")) == 0) && (i == 1)))) {
+        s = ID_S("int");
+    }
+    if (((strcmp(name, ID_S("bytes_of_memory")) == 0) && (i == 0))) {
+        s = ID_S("addr");
+    } else if ((strcmp(name, ID_S("bytes_of_string")) == 0)) {
+        s = ID_S("string");
+    }
     return s;
 }
 
@@ -33069,7 +33449,7 @@ void id_fv_bi_arg(int id, int i) {
 
 char* id_bi_wants(char* name, int i) {
     char* s;
-    s = id_bi_wants2(name, i);
+    s = id_bi_wants_bytes(name, i, id_bi_wants2(name, i));
     if (((((strcmp(name, ID_S("to_int")) == 0) || (strcmp(name, ID_S("mem_of_str")) == 0)) || (strcmp(name, ID_S("fail")) == 0)) || (((strcmp(name, ID_S("character_code_at")) == 0) || (strcmp(name, ID_S("str_sub")) == 0)) && (i == 0)))) {
         s = ID_S("string");
     }
@@ -33122,7 +33502,7 @@ char* id_bi_wants5(char* name) {
 int id_bi_ok(char* want, char* t) {
     int ok;
     ok = id_bi_ok2(want, t);
-    if ((((((strcmp(want, ID_S("string")) == 0) && (strcmp(t, ID_S("string")) != 0)) || ((strcmp(want, ID_S("int")) == 0) && (strcmp(t, ID_S("int")) != 0))) || ((strcmp(want, ID_S("index")) == 0) && (strcmp(t, ID_S("int")) != 0))) || ((strcmp(want, ID_S("float")) == 0) && (strcmp(t, ID_S("float")) != 0)))) {
+    if (((((((strcmp(want, ID_S("string")) == 0) && (strcmp(t, ID_S("string")) != 0)) || ((strcmp(want, ID_S("int")) == 0) && (strcmp(t, ID_S("int")) != 0))) || ((strcmp(want, ID_S("index")) == 0) && (strcmp(t, ID_S("int")) != 0))) || ((strcmp(want, ID_S("float")) == 0) && (strcmp(t, ID_S("float")) != 0))) || ((strcmp(want, ID_S("bytes")) == 0) && (strcmp(t, ID_S("bytes")) != 0)))) {
         ok = 0;
     }
     return ok;
@@ -33176,7 +33556,7 @@ int id_bi_arity(char* name) {
     } else if ((id_bi_one(name) == 1)) {
         n = 1;
     }
-    if ((strcmp(name, ID_S("str_sub")) == 0)) {
+    if (((strcmp(name, ID_S("str_sub")) == 0) || (strcmp(name, ID_S("bytes_sub")) == 0))) {
         n = 3;
     }
     return n;
@@ -33194,7 +33574,7 @@ int id_bi_zero(char* name) {
 int id_bi_one(char* name) {
     int ok;
     ok = 0;
-    if (((((((((((((((((strcmp(name, ID_S("print")) == 0) || (strcmp(name, ID_S("eprint")) == 0)) || (strcmp(name, ID_S("len")) == 0)) || (strcmp(name, ID_S("pop")) == 0)) || (strcmp(name, ID_S("to_int")) == 0)) || (strcmp(name, ID_S("chr")) == 0)) || (strcmp(name, ID_S("put")) == 0)) || (strcmp(name, ID_S("sleep_ms")) == 0)) || (strcmp(name, ID_S("mem_of_str")) == 0)) || (strcmp(name, ID_S("alloc")) == 0)) || (strcmp(name, ID_S("fail")) == 0)) || (strcmp(name, ID_S("bits_of_float")) == 0)) || (strcmp(name, ID_S("float_of_bits")) == 0)) || (strcmp(name, ID_S("bits32_of_float")) == 0)) || (strcmp(name, ID_S("float_of_bits32")) == 0)) || (id_str_in(peekfns, name) == 1))) {
+    if (((((((((((((((((((((strcmp(name, ID_S("print")) == 0) || (strcmp(name, ID_S("eprint")) == 0)) || (strcmp(name, ID_S("len")) == 0)) || (strcmp(name, ID_S("pop")) == 0)) || (strcmp(name, ID_S("to_int")) == 0)) || (strcmp(name, ID_S("chr")) == 0)) || (strcmp(name, ID_S("put")) == 0)) || (strcmp(name, ID_S("sleep_ms")) == 0)) || (strcmp(name, ID_S("mem_of_str")) == 0)) || (strcmp(name, ID_S("alloc")) == 0)) || (strcmp(name, ID_S("fail")) == 0)) || (strcmp(name, ID_S("bits_of_float")) == 0)) || (strcmp(name, ID_S("float_of_bits")) == 0)) || (strcmp(name, ID_S("bits32_of_float")) == 0)) || (strcmp(name, ID_S("float_of_bits32")) == 0)) || (strcmp(name, ID_S("bytes_new")) == 0)) || (strcmp(name, ID_S("string_of_bytes")) == 0)) || (strcmp(name, ID_S("bytes_of_string")) == 0)) || (strcmp(name, ID_S("memory_of_bytes")) == 0)) || (id_str_in(peekfns, name) == 1))) {
         ok = 1;
     }
     return ok;
@@ -33327,7 +33707,7 @@ void id_bi_arg_err3(int id, int i, char* want, char* t) {
 int id_bi_ok2(char* want, char* t) {
     int ok;
     ok = id_bi_ok3(want, t);
-    if (((strcmp(want, ID_S("list")) == 0) && (id_ty_is_list(t) == 0))) {
+    if ((((strcmp(want, ID_S("list")) == 0) && (id_ty_is_list(t) == 0)) && (strcmp(t, ID_S("bytes")) != 0))) {
         ok = 0;
     }
     return ok;
@@ -33347,7 +33727,7 @@ int id_bi_ok3(char* want, char* t) {
 int id_bi_strlist(char* t) {
     int ok;
     ok = 0;
-    if (((strcmp(t, ID_S("string")) == 0) || (id_ty_is_list(t) == 1))) {
+    if ((((strcmp(t, ID_S("string")) == 0) || (strcmp(t, ID_S("bytes")) == 0)) || (id_ty_is_list(t) == 1))) {
         ok = 1;
     }
     return ok;
@@ -33596,7 +33976,7 @@ void id_tc_g4(int id) {
 void id_chk_index(int id) {
     char* bt;
     bt = id_base_type(id);
-    if (((id_ty_known(bt) == 1) && (id_ty_is_list(bt) == 0))) {
+    if ((((id_ty_known(bt) == 1) && (id_ty_is_list(bt) == 0)) && (strcmp(bt, ID_S("bytes")) != 0))) {
         id_ix_err(id, id_concat_f(id_concat(ID_S("cannot index a "), bt), id_ix_hint(bt), 3));
     } else {
         id_chk_index2(id);
@@ -33709,7 +34089,7 @@ void id_chk_push2(int id, IdList* args, char* lt) {
     char* et;
     char* type_of_v;
     et = id_elem_type(lt);
-    if (((id_ty_is_list(lt) == 1) && (id_bad_store(et, (int)(id_list_get(args, 1))) == 1))) {
+    if ((((id_ty_is_list(lt) == 1) || (strcmp(lt, ID_S("bytes")) == 0)) && (id_bad_store(et, (int)(id_list_get(args, 1))) == 1))) {
         type_of_v = id_type_of((int)(id_list_get(args, 1)));
         id_tc_diag(id, ID_S("E0617"), id_concat_f(id_concat_f(id_concat(ID_S("cannot push a "), type_of_v), ID_S(" onto a "), 1), lt, 1), lt, ID_S("a list holds one element type, and id converts nothing silently"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("push a "), et), ID_S(" value, or declare the list as "), 1), type_of_v, 1), ID_S("[]"), 1));
     }
@@ -34096,13 +34476,16 @@ void id_fv_side(int id, int e, char* side) {
         id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), op), ID_S("' cannot take a function value: its "), 1), side, 1), ID_S(" operand is "), 1), t, 1), ID_S("; a function value can only be passed, stored or called"), 1));
     }
     if ((id_ty_kind_is(t, ID_S("struct")) == 1)) {
-IdList* idsq_37;
-char* idsq_35;
-IdList* idsq_22;
-char* idsq_19;
-IdList* idsq_15;
-char* idsq_13;
-        (idsq_37 = ns1, idsq_35 = (char*)(intptr_t)(id_list_get(idsq_37, id)), idsq_22 = sdfname, idsq_19 = id_sd_cell(idsq_22, t, 0), idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_35), ID_S("' cannot take a struct: its "), 1), side, 1), ID_S(" operand is "), 1), t, 1), ID_S("; a struct is compared and combined by field, as in a."), 1), idsq_19, 1), ID_S(" "), 1), idsq_13, 1), ID_S(" b."), 1), id_sd_cell(sdfname, t, 0), 1)));
+IdList* idsq_64;
+char* idsq_62;
+IdList* idsq_49;
+char* idsq_46;
+IdList* idsq_42;
+char* idsq_40;
+        (idsq_64 = ns1, idsq_62 = (char*)(intptr_t)(id_list_get(idsq_64, id)), idsq_49 = sdfname, idsq_46 = id_sd_cell(idsq_49, t, 0), idsq_42 = ns1, idsq_40 = (char*)(intptr_t)(id_list_get(idsq_42, id)), id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_62), ID_S("' cannot take a struct: its "), 1), side, 1), ID_S(" operand is "), 1), t, 1), ID_S("; a struct is compared and combined by field, as in a."), 1), idsq_46, 1), ID_S(" "), 1), idsq_40, 1), ID_S(" b."), 1), id_sd_cell(sdfname, t, 0), 1)));
+    }
+    if (((strcmp(t, ID_S("bytes")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("+")) == 0))) {
+        id_tc_diag(id, ID_S("E0641"), id_concat_f(id_concat(ID_S("'+' cannot take bytes: its "), side), ID_S(" operand is bytes; a byte buffer is not joined by +, which would copy it on every step -- append in place with bytes_append(dst, src), or convert it with string_of_bytes(b) to join it to text"), 1), ID_S("+"), ID_S("+ joins strings and adds numbers, and a byte buffer is neither"), ID_S("append in place with bytes_append(dst, src), or convert the buffer with string_of_bytes(b) before joining it to text"));
     }
     return;
 }
@@ -34353,7 +34736,7 @@ int id_cmp_bad(char* lt, char* rt, int okk) {
 int id_eq_ok(char* lt, char* rt) {
     int ok;
     ok = 0;
-    if ((((strcmp(lt, ID_S("string")) == 0) && (strcmp(rt, ID_S("string")) == 0)) || ((id_ty_num(lt) == 1) && (id_ty_num(rt) == 1)))) {
+    if (((((strcmp(lt, ID_S("string")) == 0) && (strcmp(rt, ID_S("string")) == 0)) || ((strcmp(lt, ID_S("bytes")) == 0) && (strcmp(rt, ID_S("bytes")) == 0))) || ((id_ty_num(lt) == 1) && (id_ty_num(rt) == 1)))) {
         ok = 1;
     }
     return ok;
@@ -35788,7 +36171,7 @@ int id_esc_fresh_val(int fn, int e) {
 
 int id_esc_heap_list(char* t) {
     int ok;
-    ok = ((id_is_list_ty(t) == 1) || (id_find_str(sdname, t) >= 0));
+    ok = (((id_is_list_ty(t) == 1) || (id_find_str(sdname, t) >= 0)) || (strcmp(t, ID_S("bytes")) == 0));
     return ok;
 }
 
@@ -36390,22 +36773,11 @@ char* id_esc_slot_deep(int slot_fn, char* slot_nm) {
     return slot_f;
 }
 
-char* id_esc_slot_cty(char* cty_f) {
-    char* cty_t;
-    cty_t = ID_S("IdList*");
-    if ((strcmp(cty_f, ID_S("id_str_free")) == 0)) {
-        cty_t = ID_S("char*");
-    }
-    return cty_t;
-}
-
 char* id_esc_slot_block(char* blk_f, char* blk_b, char* blk_i, char* blk_val) {
-    char* blk_t;
     char* blk_g = NULL;
     char* blk_s = NULL;
-    blk_t = id_esc_slot_cty(blk_f);
     { char* idfe_o = blk_g; blk_g = id_concat_f(id_concat(ID_S("id_list_get("), blk_b), ID_S(", idfe_i)"), 1); id_str_free(idfe_o); }
-    { char* idfe_o = blk_s; blk_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("({ int idfe_i = "), blk_i), ID_S("; "), 1), blk_t, 1), ID_S(" idfe_o = ("), 1), blk_t, 1), ID_S(")(intptr_t)"), 1), blk_g, 1), ID_S("; id_list_set("), 1), blk_b, 1), ID_S(", idfe_i, "), 1), blk_val, 1), ID_S("); "), 1), blk_f, 1), ID_S("(idfe_o); })"), 1); id_str_free(idfe_o); }
+    { char* idfe_o = blk_s; blk_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("({ int idfe_i = "), blk_i), ID_S("; void* idfe_o = (void*)(intptr_t)"), 1), blk_g, 1), ID_S("; id_list_set("), 1), blk_b, 1), ID_S(", idfe_i, "), 1), blk_val, 1), ID_S("); "), 1), blk_f, 1), ID_S("(idfe_o); })"), 1); id_str_free(idfe_o); }
     { id_str_free(blk_g); return blk_s; }
 }
 
@@ -36501,7 +36873,7 @@ char* id_esc_free_base(int fn, char* nm) {
     char* fname;
     fname = ID_S("id_list_free");
     if ((id_esc_on() == 1)) {
-        fname = id_esc_by_type(id_esc_decl_type((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm), ID_S("id_str_free"), ID_S("id_clo_free"), ID_S("id_list_free"));
+        fname = id_esc_by_type(id_esc_decl_type((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm), ID_S("id_str_free"), ID_S("id_clo_free"), ID_S("id_list_free"), ID_S("id_bytes_free"));
     }
     return fname;
 }
@@ -36512,7 +36884,7 @@ char* id_esc_c_ty(char* nm) {
     fn = id_esc_cur();
     cty = ID_S("IdList*");
     if ((id_esc_on() == 1)) {
-        cty = id_esc_by_type(id_esc_decl_type((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm), ID_S("char*"), ID_S("IdFn*"), ID_S("IdList*"));
+        cty = id_esc_by_type(id_esc_decl_type((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm), ID_S("char*"), ID_S("IdFn*"), ID_S("IdList*"), ID_S("IdBytes*"));
     }
     return cty;
 }
@@ -36528,13 +36900,22 @@ char* id_esc_val_code(char* nm, char* code, int e) {
     return s;
 }
 
-char* id_esc_by_type(char* t, char* for_str, char* for_clo, char* for_list) {
+char* id_esc_by_type(char* t, char* for_str, char* for_clo, char* for_list, char* for_bytes) {
     char* pick;
-    pick = for_list;
+    pick = id_esc_list_or_bytes(t, for_list, for_bytes);
     if ((strcmp(t, ID_S("string")) == 0)) {
         pick = for_str;
     } else if ((id_ty_is_func(t) == 1)) {
         pick = for_clo;
+    }
+    return pick;
+}
+
+char* id_esc_list_or_bytes(char* t, char* for_list, char* for_bytes) {
+    char* pick;
+    pick = for_list;
+    if ((strcmp(t, ID_S("bytes")) == 0)) {
+        pick = for_bytes;
     }
     return pick;
 }
@@ -36707,6 +37088,9 @@ char* id_esc_free_sh(int e) {
     if ((strcmp(id_type_of(e), ID_S("string")) == 0)) {
         etx_fn = ID_S("id_str_free");
     }
+    if ((strcmp(id_type_of(e), ID_S("bytes")) == 0)) {
+        etx_fn = ID_S("id_bytes_free");
+    }
     return etx_fn;
 }
 
@@ -36858,6 +37242,17 @@ int id_ty_pair_known(char* lt, char* rt) {
     return ok;
 }
 
+void id_chk_byte_fit(int el, char* want) {
+    int operand_node;
+    char* spelling;
+    operand_node = id_minus_operand(el);
+    if ((((strcmp(want, ID_S("bytes")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, operand_node)), ID_S("int")) == 0)) && ((operand_node != el) || (id_dec_val((char*)(intptr_t)(id_list_get(ns1, operand_node))) > 255)))) {
+        spelling = id_literal_spelling(el);
+        id_tc_diag(el, ID_S("E0642"), id_concat_f(id_concat(ID_S("the byte literal "), spelling), ID_S(" is outside 0 to 255"), 1), spelling, ID_S("a bytes buffer holds one byte per element, from 0 to 255"), ID_S("write each element as a number from 0 to 255"));
+    }
+    return;
+}
+
 int id_arr_el_at(char* want, int e, int i) {
     int el;
     int ret_i;
@@ -36878,6 +37273,7 @@ void id_arr_el_check(char* want, int el, int i) {
         id_tc_err(el, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("element "), id_str_of_int(i), 2), ID_S(" of a "), 1), want, 1), ID_S(" literal is a "), 1), type_of_v, 1));
     }
     id_chk_literal_fit(el, elem_type_v, el);
+    id_chk_byte_fit(el, want);
     return;
 }
 
@@ -36899,9 +37295,9 @@ void id_fv_elem_err(int el, int i) {
 int id_bad_arr(char* want, int e) {
     int ok;
     ok = 0;
-    if (((id_ty_known(want) == 1) && (id_ty_is_list(want) == 0))) {
+    if ((((id_ty_known(want) == 1) && (id_ty_is_list(want) == 0)) && (strcmp(want, ID_S("bytes")) != 0))) {
         ok = 1;
-    } else if ((id_ty_is_list(want) == 1)) {
+    } else if (((id_ty_is_list(want) == 1) || (strcmp(want, ID_S("bytes")) == 0))) {
         ok = id_arr_els(want, e);
     }
     return ok;
@@ -36919,7 +37315,7 @@ int id_arr_els(char* want, int e) {
 void id_chk_iassign(int id) {
     char* bt;
     bt = id_base_type(id);
-    if (((id_ty_known(bt) == 1) && (id_ty_is_list(bt) == 0))) {
+    if ((((id_ty_known(bt) == 1) && (id_ty_is_list(bt) == 0)) && (strcmp(bt, ID_S("bytes")) != 0))) {
         id_tc_err(id, id_concat_f(id_concat(ID_S("cannot index a "), bt), id_ix_hint(bt), 3));
     } else {
         id_chk_iassign2(id, bt);
@@ -38516,6 +38912,7 @@ void id_init_ty_rows2(void) {
 void id_init_ty_rows3(void) {
     id_ty_row(ID_S("string"), ID_S("ref"), 8, 0);
     id_ty_row(ID_S("void"), ID_S("unit"), 0, 0);
+    id_ty_row(ID_S("bytes"), ID_S("ref"), 8, 0);
     return;
 }
 
@@ -38662,6 +39059,22 @@ IdList* idsq_12;
     return ok;
 }
 
+char* id_bt6(char* name) {
+    char* t;
+    t = ID_S("\?");
+    if (((((strcmp(name, ID_S("bytes_new")) == 0) || (strcmp(name, ID_S("bytes_sub")) == 0)) || (strcmp(name, ID_S("bytes_of_string")) == 0)) || (strcmp(name, ID_S("bytes_of_memory")) == 0))) {
+        t = ID_S("bytes");
+    } else if ((strcmp(name, ID_S("bytes_append")) == 0)) {
+        t = ID_S("void");
+    }
+    if ((strcmp(name, ID_S("memory_of_bytes")) == 0)) {
+        t = ID_S("word");
+    } else if ((strcmp(name, ID_S("string_of_bytes")) == 0)) {
+        t = ID_S("string");
+    }
+    return t;
+}
+
 char* id_call_shaped(int id, char* t) {
     char* ret_s;
     ret_s = t;
@@ -38685,7 +39098,7 @@ char* id_bt4(char* name) {
 
 char* id_bt5(char* name) {
     char* t;
-    t = ID_S("\?");
+    t = id_bt6(name);
     if (id_str_in(pokefns, name)) {
         t = ID_S("void");
     } else if (((strcmp(name, ID_S("float_of_bits")) == 0) || (strcmp(name, ID_S("float_of_bits32")) == 0))) {

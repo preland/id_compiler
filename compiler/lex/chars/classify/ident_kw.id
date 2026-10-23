@@ -16,7 +16,7 @@ is_alnum(int c) {
 // name, but with no syntax of its own outside a case.
 is_kw(string w) {
   int ok = 0;
-  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain" || w == "blank" || w == "break" || w == "stdin" || w == "traps" || w == "timeout" || w == "struct" || w == "pure") {
+  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain" || w == "blank" || w == "break" || w == "stdin" || w == "traps" || w == "timeout" || w == "struct" || w == "pure" || w == "bytes") {
     ok = 1;
   }
 } return int ok;
@@ -27,6 +27,8 @@ is_kw(string w) {
 ("struct"):(1)
 ("pure"):(1)
 ("Struct"):(0)
+("bytes"):(1)
+("bytes_total"):(0)
 
 kindof(string w) {
   string kind = "ident";

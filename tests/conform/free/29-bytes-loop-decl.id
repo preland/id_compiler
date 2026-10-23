@@ -1,0 +1,16 @@
+// A bytes declared inside a loop is freed once per pass, and the one declared
+// before it at the return, as a list of scalars is: three passes plus the
+// outer buffer, with the guard trapping any use after a free.
+sum_to(int n) {
+  bytes base = bytes_new(2);
+  int t = 0;
+  while(t < n) {
+    bytes ys = bytes_new(t);
+    t = t + len(ys) + len(base);
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  int r = sum_to(5);
+  print("" + r);
+} return int 0;

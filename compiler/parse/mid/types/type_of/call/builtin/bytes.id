@@ -1,0 +1,24 @@
+// The byte-buffer builtins' return types. A buffer is made by four of them, the
+// fifth only writes into one, and the last two leave it for a string or the
+// flat store's address.
+
+bt6(string name) {
+  string t = "?";
+  if(name == "bytes_new" || name == "bytes_sub" || name == "bytes_of_string" || name == "bytes_of_memory") {
+    t = "bytes";
+  } else if(name == "bytes_append") {
+    t = "void";
+  }
+} chain (string name) {
+  if(name == "memory_of_bytes") {
+    t = "word";
+  } else if(name == "string_of_bytes") {
+    t = "string";
+  }
+} return string t;
+("bytes_new"):("bytes")
+("bytes_of_memory"):("bytes")
+("bytes_append"):("void")
+("memory_of_bytes"):("word")
+("string_of_bytes"):("string")
+("push"):("?")

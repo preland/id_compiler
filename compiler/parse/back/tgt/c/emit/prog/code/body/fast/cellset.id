@@ -1,0 +1,34 @@
+// A store into a list or a bytes buffer. cbx_fit says whether the value is
+// already known to be a byte, so the store can skip the range check: an int
+// literal of 0..255, a mask by one (`x & 255`), or a read of another bytes
+// buffer (every cell of one is a byte).
+
+cell_set_text(string cbx_ns, string cbx_base, string cbx_index, string cbx_value, int cbx_hit, int cbx_fit) {
+  string cbx_text = cell_set_name(cbx_ns, cbx_fit) + "(" + cbx_base + ", " + cbx_index + ", " + cbx_value + ")";
+  if(cbx_hit == 1) {
+    cbx_text = "(" + cbx_base + ")->data[" + cbx_index + "] = " + cell_set_rhs(cbx_ns, cbx_value, cbx_fit);
+  }
+} return string cbx_text;
+("id_list_", "v", "j", "7", 1, 0):("(v)->data[j] = 7")
+("id_bytes_", "v", "j", "7", 0, 1):("id_bytes_store(v, j, 7)")
+("id_bytes_", "v", "j", "q", 1, 0):("(v)->data[j] = id_byte_fit(q)")
+
+cell_value_fits(int cbx_node) {
+  int cbx_ok = 0;
+  if((import nkind)[cbx_node] == "int") {
+    cbx_ok = cell_int_fits(cbx_node);
+  } else {
+    cbx_ok = cell_derived_fits(cbx_node);
+  }
+} return int cbx_ok;
+given lpf_on ((import lpf_xa)):(0)
+given lpf_on ((import lpf_n0)):(1)
+
+cell_set_fit(string cbx_ns, int cbx_node) {
+  int cbx_ok = 0;
+  if(cbx_ns == "id_bytes_") {
+    cbx_ok = cell_value_fits((import nl1)[cbx_node][0]);
+  }
+} return int cbx_ok;
+("id_list_", 0):(0)
+given lpf_on ("id_list_", (import lpf_xa)):(0)

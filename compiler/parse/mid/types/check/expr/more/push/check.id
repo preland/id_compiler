@@ -12,7 +12,7 @@ given call2_scalar_setup ((import cm_push_scalar_call)):() then (import chkfail)
 // -- a different check -- so a non-list first argument is left alone here.
 chk_push2(int id, int[] args, string lt) {
   string et = elem_type(lt);
-  if(ty_is_list(lt) == 1 && bad_store(et, args[1]) == 1) {
+  if((ty_is_list(lt) == 1 || lt == "bytes") && bad_store(et, args[1]) == 1) {
     string type_of_v = type_of(args[1]);
     tc_diag(id, "E0617", "cannot push a " + type_of_v + " onto a " + lt, lt, "a list holds one element type, and id converts nothing silently", "push a " + et + " value, or declare the list as " + type_of_v + "[]");
   }

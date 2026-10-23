@@ -1,0 +1,12 @@
+// A list literal in a bytes slot of a case, as an argument and as the expected value.
+tail_from(bytes b, int i) {
+  bytes r = bytes_sub(b, i, len(b) - i);
+} return bytes r;
+([0x50, 0x4B], 1):([0x4B])
+([1, 2, 3], 0):([1, 2, 3])
+([7], 1):([])
+
+main(int argc, string[] argv) {
+  bytes b = tail_from(bytes_new(3), 2);
+  print("" + len(b));
+} return int 0;

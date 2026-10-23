@@ -1,0 +1,12 @@
+// A list literal in a bytes slot of a case is built by id_bytes_lit, which takes
+// the same pre-boxed cells id_list_lit does and checks each one is a byte, so
+// the text is the list literal's with the constructor's name swapped.
+tc_list_head(int[] xs, string et, string want) {
+  string so = tc_list_n(xs, et);
+  if(want == "bytes") {
+    so = "id_bytes_lit" + str_sub(so, 11, len(so) - 11);
+  }
+} return string so;
+given lit_cells_fixture ((import lit_cells_xs), "int", "bytes"):("id_bytes_lit(2, (long long)(5), (long long)(4))")
+given lit_cells_fixture ((import lit_cells_xs), "int", "int[]"):("id_list_lit(2, (long long)(5), (long long)(4))")
+([], "int", "bytes"):("id_bytes_lit(0)")

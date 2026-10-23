@@ -7,7 +7,7 @@
 fit_value(int i, int e, string want) {
   if((import nkind)[e] == "cimport" || (import nkind)[e] == "cfn") {
     fit_named(i, e, want);
-  } else if(ty_is_list(want) == 1) {
+  } else if(ty_is_list(want) == 1 || want == "bytes") {
     fit_list(i, e, want);
   } else {
     fit_other(i, e, want);
@@ -30,7 +30,7 @@ given fn_fixture ((import fixture_ci), (import fixture_zero), "int[]"):() then (
 
 fit_elems(int i, int e, string want) {
   int[] xs = (import nl1)[e];
-  string et = list_elem(want);
+  string et = elem_type(want);
   int j = 0;
 } chain (int i, int e, string want) {
   while(j < len(xs)) {
@@ -41,3 +41,5 @@ fit_elems(int i, int e, string want) {
 given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then (import chkfail)[0]:(0)
 given lit_arr_fixture given case_fixture_line (0, (import lit_arr_e), "string[]"):() then (import chkfail)[0]:(1)
 given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then calls fit_value:[2]
+given lit_arr_fixture (0, (import lit_arr_e), "bytes"):() then calls fit_value:[2]
+given lit_arr_fixture (0, (import lit_arr_e), "bytes"):() then (import chkfail)[0]:(0)

@@ -4,9 +4,10 @@
 // whether the callee returned a fresh one.
 
 esc_heap_list(string t) {
-  int ok = is_list_ty(t) == 1 || find_str((import sdname), t) >= 0;
+  int ok = is_list_ty(t) == 1 || find_str((import sdname), t) >= 0 || t == "bytes";
 } return int ok;
 given full_env ("int[]"):(1)
+given full_env ("bytes"):(1)
 given full_env ("int"):(0)
 given full_env ("func(int) return int[]"):(0)
 given esc_ffix ("FfPt"):(1)

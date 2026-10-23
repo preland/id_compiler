@@ -1,0 +1,26 @@
+// What argument `i` of a byte-buffer builtin must be. `base` is the answer the
+// other builtins' rules gave, which is returned for any name that is not one of
+// these: a buffer is "bytes", a length or a position "int", the flat store's
+// address "addr", and the text a buffer is made from "string".
+// bw_base: the answer so far.
+
+bi_wants_bytes(string name, int i, string bw_base) {
+  string s = bw_base;
+  if(name == "bytes_sub" && i == 0 || name == "bytes_append" || name == "string_of_bytes" || name == "memory_of_bytes") {
+    s = "bytes";
+  } else if(name == "bytes_new" || name == "bytes_sub" || name == "bytes_of_memory" && i == 1) {
+    s = "int";
+  }
+} chain (string name, int i, string bw_base) {
+  if(name == "bytes_of_memory" && i == 0) {
+    s = "addr";
+  } else if(name == "bytes_of_string") {
+    s = "string";
+  }
+} return string s;
+("bytes_sub", 0, ""):("bytes")
+("bytes_sub", 2, ""):("int")
+("bytes_of_memory", 0, ""):("addr")
+("bytes_of_memory", 1, ""):("int")
+("memory_of_bytes", 0, ""):("bytes")
+("push", 0, "list"):("list")

@@ -4,7 +4,7 @@
 
 tc_lit(int e, string want) {
   string so = "";
-  if(ty_is_list(want) == 1) {
+  if(ty_is_list(want) == 1 || want == "bytes") {
     so = tc_list(e, want);
   } else {
     so = tc_other(e, want);
@@ -12,6 +12,7 @@ tc_lit(int e, string want) {
 } return string so;
 given lit_int_fixture ((import lit_e), "int"):("5")
 given lit_arr_fixture ((import lit_arr_e), "int[]"):("id_list_lit(2, (long long)(5), (long long)(4))")
+given lit_arr_fixture ((import lit_arr_e), "bytes"):("id_bytes_lit(2, (long long)(5), (long long)(4))")
 
 // The values of a bind in a case (val/struct.id's tc_cbind), each built at the
 // type of the parameter it fixes by the rule every case value is, then copied

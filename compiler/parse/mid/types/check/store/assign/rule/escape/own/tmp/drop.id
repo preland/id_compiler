@@ -9,6 +9,9 @@ esc_free_sh(int e) {
   if(type_of(e) == "string") {
     etx_fn = "id_str_free";
   }
+  if(type_of(e) == "bytes") {
+    etx_fn = "id_bytes_free";
+  }
 } return string etx_fn;
 given esc_ffix ((import eff_cmk)):("id_list_free")
 given esc_ffix ((import eff_csr)):("id_str_free")

@@ -27,7 +27,7 @@ wrap_by_type(string code, string type, string key, string pre, string post, stri
 ("x", "int", "float", "A(", ")", "B(", ")"):("A(x)")
 ("x", "word", "word", "[", "]", "<", ">"):("<x>")
 
-elem_type(string t) {
+list_elem_type(string t) {
   string out = "";
   int i = 0;
   while(i < len(t) - 2) {

@@ -4,14 +4,27 @@
 // `IdFn*`, and everything else by id_list_free in an `IdList*`. Both questions
 // are the same three-way choice on the type, so the three answers are passed in.
 
-esc_by_type(string t, string for_str, string for_clo, string for_list) {
-  string pick = for_list;
+esc_by_type(string t, string for_str, string for_clo, string for_list, string for_bytes) {
+  string pick = esc_list_or_bytes(t, for_list, for_bytes);
   if(t == "string") {
     pick = for_str;
   } else if(ty_is_func(t) == 1) {
     pick = for_clo;
   }
 } return string pick;
-("string", "s", "c", "l"):("s")
-("func(int) return int", "s", "c", "l"):("c")
-("int[]", "s", "c", "l"):("l")
+("string", "s", "c", "l", "b"):("s")
+("func(int) return int", "s", "c", "l", "b"):("c")
+("int[]", "s", "c", "l", "b"):("l")
+("bytes", "s", "c", "l", "b"):("b")
+
+// A bytes buffer is its own block shape (IdBytes, freed by id_bytes_free), so
+// it takes the fourth answer where every other non-string, non-closure type
+// takes the third.
+esc_list_or_bytes(string t, string for_list, string for_bytes) {
+  string pick = for_list;
+  if(t == "bytes") {
+    pick = for_bytes;
+  }
+} return string pick;
+("bytes", "l", "b"):("b")
+("int[]", "l", "b"):("l")

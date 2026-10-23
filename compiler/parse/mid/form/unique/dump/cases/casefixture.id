@@ -4,7 +4,7 @@ incase_init() {
   varleaf_init();
   init_cases();
 } return void;
-():() then len((import tyname)):(5)
+():() then len((import tyname)):(6)
 ():() then len((import caseend)):(0)
 ():() then calls varleaf_init:[1]
 ():() then init_units:(0)

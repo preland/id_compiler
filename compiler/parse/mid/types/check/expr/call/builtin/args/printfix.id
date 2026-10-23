@@ -1,0 +1,18 @@
+// A print call whose one argument is a variable typed `bytes`, for the cases
+// that show chk_bi_arg refusing a byte buffer where text is written (E0643).
+bytes_print_fixture() {
+  call2_setup();
+  export int bp_print = node_call("print", [node_txt("var", "bpb")]);
+  tcache_set(6, "bytes");
+} return void;
+():() then calls node_txt:("var", "bpb")
+():() then calls tcache_set:(6, "bytes")
+():() then calls node_call:("print", [6])
+
+// The same bytes variable (node 6) as both operands of a `+`, for E0641.
+bytes_plus_fixture() {
+  bytes_print_fixture();
+  export int bq_plus = node_txt2("bin", "+", 6, 6);
+} return void;
+():() then calls node_txt2:("bin", "+", 6, 6)
+():() then calls tcache_set:(6, "bytes")

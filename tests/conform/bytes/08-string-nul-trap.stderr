@@ -1,0 +1,1 @@
+id: a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes

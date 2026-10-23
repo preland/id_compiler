@@ -23,9 +23,15 @@ chk_bi_arg(int id, int i) {
   string nm = (import ns1)[id];
   if((nm == "print" || nm == "eprint" || nm == "put") && ty_is_list(t) == 1) {
     tc_diag(id, "E0634", "'" + nm + "' cannot take a list: argument " + i + " is " + t + "; a list has no text form -- write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them", nm, "a list has no text form, so there is nothing for " + nm + " to write", "write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them");
-  } else if(nm == "put" && ty_known(t) == 1 && t != "string") {
+  } else if(nm == "put" && ty_known(t) == 1 && t != "string" && t != "bytes") {
     tc_diag(id, "E0635", "'put' takes a string, but argument " + i + " is " + t + "; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line", "put", "put writes text exactly as given and does not convert", "write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line");
   }
+} chain (int id, int i) {
+  if((nm == "print" || nm == "eprint" || nm == "put") && t == "bytes") {
+    tc_diag(id, "E0643", "'" + nm + "' cannot take bytes: argument " + i + " is bytes; a byte buffer is binary, not text -- write print(string_of_bytes(b)) to print it as text (it stops if a byte is 0), or write its elements one at a time", nm, "bytes is binary, so there is nothing for " + nm + " to write as text", "write " + nm + "(string_of_bytes(b)) to print it as text, or write its elements one at a time");
+  }
 } return void;
+given bytes_print_fixture ((import bp_print), 0):() then (import chkfail)[0]:(1)
+given bytes_print_fixture ((import cm_push_call), 0):() then (import chkfail)[0]:(0)
 given call2_setup ((import cm_push_call), 1):() then (import chkfail)[0]:(0)
 given bi_mismatch_setup ((import bi_mismatch_call), 0):() then calls bi_arg_err:((import bi_mismatch_call), 0, "list", "int")

@@ -22,7 +22,7 @@ casm_row_fixture() {
   llasm_row_fixture();
   init_tyc();
 } return void;
-():() then len((import tyc)):(5)
+():() then len((import tyc)):(6)
 ():() then calls node_param:("param", "int", "x")
 ():() then calls init_tyc:()
 ():() then init_units:(0)

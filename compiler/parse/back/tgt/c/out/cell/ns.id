@@ -1,0 +1,12 @@
+// The runtime prefix of a container's accessors: a list's are id_list_get,
+// id_list_set, id_list_push, and a bytes buffer's are id_bytes_*. Both are a
+// header with len and cap in front, which is why the loop guard can read
+// either's length the same way.
+cell_ns(string cbx_type) {
+  string cbx_ns = "id_list_";
+  if(cbx_type == "bytes") {
+    cbx_ns = "id_bytes_";
+  }
+} return string cbx_ns;
+("bytes"):("id_bytes_")
+("int[]"):("id_list_")

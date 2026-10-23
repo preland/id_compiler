@@ -26,7 +26,7 @@ bi_wants5(string name) {
 // the same order.
 bi_ok(string want, string t) {
   int ok = bi_ok2(want, t);
-  if(want == "string" && t != "string" || want == "int" && t != "int" || want == "index" && t != "int" || want == "float" && t != "float") {
+  if(want == "string" && t != "string" || want == "int" && t != "int" || want == "index" && t != "int" || want == "float" && t != "float" || want == "bytes" && t != "bytes") {
     ok = 0;
   }
 } return int ok;
@@ -34,3 +34,5 @@ bi_ok(string want, string t) {
 ("string", "int"):(0)
 ("float", "float"):(1)
 ("float", "int"):(0)
+("bytes", "bytes"):(1)
+("bytes", "int[]"):(0)

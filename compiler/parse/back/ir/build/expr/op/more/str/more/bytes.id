@@ -1,0 +1,19 @@
+// A bytes buffer is reached through its own runtime symbols, one for each a
+// list has (id_bytes_get beside id_list_get, and so on). The IR value's type is
+// what tells them apart, so the lowering of an index, a push, a pop, a length
+// or a comparison asks it here and keeps the rest of its code.
+lw_bfn(int bfn_value, string bfn_list, string bfn_bytes) {
+  string bfn_out = bfn_list;
+  if(bfn_value >= 0 && bfn_value < len((import ity)) && (import ity)[bfn_value] == "bytes") {
+    bfn_out = bfn_bytes;
+  }
+} return string bfn_out;
+given lw_bfn_fixture ("bytes") (2, "id_list_get", "id_bytes_get"):("id_bytes_get")
+given lw_bfn_fixture ("int[]") (2, "id_list_get", "id_bytes_get"):("id_list_get")
+
+lw_bfn_fixture(string bfx_type) {
+  lw_fixture(0);
+  int bfx_value = lw_alloca(bfx_type, "x");
+} return void;
+("bytes"):() then (import ity)[2]:("bytes")
+("int[]"):() then (import ity)[2]:("int[]")

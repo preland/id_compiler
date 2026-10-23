@@ -1,0 +1,16 @@
+// A list literal written where a bytes buffer is expected is a byte literal:
+// each element is one byte, so an integer literal outside 0..255 (a negative
+// one included) is refused here, at compile time, instead of trapping when the
+// buffer is built.
+
+chk_byte_fit(int el, string want) {
+  int operand_node = minus_operand(el);
+  if(want == "bytes" && (import nkind)[operand_node] == "int" && (operand_node != el || dec_val((import ns1)[operand_node]) > 255)) {
+    string spelling = literal_spelling(el);
+    tc_diag(el, "E0642", "the byte literal " + spelling + " is outside 0 to 255", spelling, "a bytes buffer holds one byte per element, from 0 to 255", "write each element as a number from 0 to 255");
+  }
+} return void;
+given wide_literal_fixture ((import literal_huge), "bytes"):() then (import chkfail)[0]:(1)
+given wide_literal_fixture ((import negated_edge), "bytes"):() then (import chkfail)[0]:(1)
+given wide_literal_fixture ((import lit_a), "bytes"):() then (import chkfail)[0]:(0)
+given wide_literal_fixture ((import literal_huge), "word"):() then (import chkfail)[0]:(0)

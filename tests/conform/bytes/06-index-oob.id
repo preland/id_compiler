@@ -1,0 +1,8 @@
+touch(bytes b) {
+  int y = b[5];
+} return void;
+
+main(int argc, string[] argv) {
+  bytes b = bytes_new(3);
+  touch(b);
+} return int 0;

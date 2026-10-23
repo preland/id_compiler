@@ -15,10 +15,11 @@ emit_len_form(int arg, string len_list_type) {
   if(len_list_type == "string") {
     s = "id_len(" + emit_expr(arg) + ")";
   } else {
-    s = "id_list_len(" + emit_expr(arg) + ")";
+    s = cell_ns(len_list_type) + "len(" + emit_expr(arg) + ")";
   }
 } return string s;
 given call_int_fixture ((import call_e1), "string"):("id_len(5)")
+given call_int_fixture ((import call_e1), "bytes"):("id_bytes_len(5)")
 given call_int_fixture ((import call_e2), "int[]"):("id_list_len(4)")
 
 emit_push(int id) {

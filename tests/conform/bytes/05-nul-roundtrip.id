@@ -1,0 +1,12 @@
+// A zero byte lives in bytes though not in a string; a span without it
+// converts back to the text it came from.
+head(bytes b) {
+  bytes h = bytes_sub(b, 0, 2);
+  string s = string_of_bytes(h);
+} return string s;
+
+main(int argc, string[] argv) {
+  bytes b = bytes_of_string("ab");
+  push(b, 0);
+  print("" + len(b) + " " + b[2] + " " + head(b));
+} return int 0;

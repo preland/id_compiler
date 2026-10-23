@@ -10,7 +10,7 @@ given pushcall_fixture ((import pushcall_node), (import pushcall_args), "word"):
 // The rest of lw_push2, once the value to push is converted.
 lw_push2_tail(int a, int v, string elem) {
   int lw_box_v = lw_box(v, elem);
-  int ret_i = lw_callf("id_list_push", "", [a, lw_box_v]);
+  int ret_i = lw_callf(lw_bfn(a, "id_list_push", "id_bytes_push"), "", [a, lw_box_v]);
 } return int ret_i;
 given lw_env_fixture (0, 0, "int"):(1)
 given lw_env_fixture (0, 1, "word"):(0)

@@ -2,7 +2,7 @@
 is_strcmp(int id) {
   int ok = 0;
   string s1_of_v = (import ns1)[id];
-  if(str_in((import eqops), s1_of_v) && both_str(id)) {
+  if(str_in((import eqops), s1_of_v) && (both_str(id) || both_bytes(id))) {
     ok = 1;
   }
 } return int ok;

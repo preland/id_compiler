@@ -29,6 +29,7 @@ arr_el_check(string want, int el, int i) {
   }
 } chain (string want, int el, int i) {
   chk_literal_fit(el, elem_type_v, el);
+  chk_byte_fit(el, want);
 } return void;
 given fnval_call_fixture ("int[]", (import fnval_call), 0):() then (import chkfail)[0]:(1)
 given leaves_fixture ("int[]", (import lit_a), 0):() then (import chkfail)[0]:(0)

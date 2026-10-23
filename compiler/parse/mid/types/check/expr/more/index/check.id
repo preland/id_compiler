@@ -23,7 +23,7 @@ given sd_use_fixture ((import sd_iz)):() then (import chkfail)[0]:(1)
 
 chk_index(int id) {
   string bt = base_type(id);
-  if(ty_known(bt) == 1 && ty_is_list(bt) == 0) {
+  if(ty_known(bt) == 1 && ty_is_list(bt) == 0 && bt != "bytes") {
     ix_err(id, "cannot index a " + bt + ix_hint(bt));
   } else {
     chk_index2(id);

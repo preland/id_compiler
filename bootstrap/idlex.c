@@ -815,6 +815,185 @@ static char* id_str_sub(const char* s, int i, int n) {
     }
     return id_str_from(n ? s + i : s, (size_t)n);
 }
+/* bytes: a mutable, growable buffer of bytes, one byte per cell, passed by
+   reference like a list. It is one pool block, a header (len, cap, data) with
+   the first cells inline; growth takes a separate block for the cells and the
+   first inline bytes then hold the capacity the header block was made with,
+   which is what gives the block back at the right size. A cell is read as
+   0..255 and a store outside that range traps. The capacity is never below 8
+   so the inline area can hold that number. */
+typedef struct { int len, cap; unsigned char* data; } IdBytes;
+typedef struct { IdBytes h; unsigned char c[8]; } IdBytesBlk;
+#define ID_BYTES_CELLS(B) (((IdBytesBlk*)(void*)(B))->c)
+#define ID_BYTES_BYTES(n) (__builtin_offsetof(IdBytesBlk, c) + (size_t)(n))
+static IdBytes* id_bytes_make(long long len, long long cap) {
+    id_nalloc++;
+    IdBytesBlk* B = (IdBytesBlk*)id_pool_blk(ID_BYTES_BYTES(cap));
+    B->h.len = (int)len; B->h.cap = (int)cap; B->h.data = B->c;
+    return &B->h;
+}
+static IdBytes* id_bytes_new(int n) {
+    if (n < 0 || n > INT_MAX) id_trap("bytes_new: length out of range");
+    IdBytes* B = id_bytes_make(n, n < 8 ? 8 : n);
+    memset(B->data, 0, (size_t)n);
+    return B;
+}
+static void id_bytes_free(IdBytes* B) {
+    if (!B) return;
+    id_nfree++;
+    if (id_fguard < 0) { const char* e = getenv("ID_FREE_GUARD"); id_fguard = (e && e[0] == '1'); }
+    if (id_fguard) {
+        if (B->cap == INT_MIN) id_freed_trap();
+        int c = B->cap < 0 ? -B->cap : B->cap;
+        memset(B->data, 0xDD, (size_t)c);
+        B->len = -1; B->cap = INT_MIN;
+        return;
+    }
+    size_t c = (size_t)(B->cap < 0 ? -B->cap : B->cap);
+    unsigned char* inl = ID_BYTES_CELLS(B);
+    if (B->data == inl) { id_pool_free(B, ID_BYTES_BYTES(c)); return; }
+    size_t ic;
+    memcpy(&ic, inl, sizeof ic);
+    id_pool_free(B->data, c);
+    id_pool_free(B, ID_BYTES_BYTES(ic));
+}
+static void id_bytes_mut_check(IdBytes* B) {
+    if (B->cap < 0) {
+        if (B->cap == INT_MIN) id_freed_trap();
+        id_trap("cannot mutate a constant bytes");
+    }
+}
+static _Noreturn void id_bytes_oob(IdBytes* B, long long i) {
+    if (B->cap == INT_MIN) id_freed_trap();
+    fprintf(stderr, "id: index %lld out of bounds (len %d)\n", i, B->len);
+    exit(1);
+}
+static _Noreturn void id_byte_range(long long v) {
+    fprintf(stderr, "id: byte value %lld out of range 0..255\n", v);
+    exit(1);
+}
+static unsigned char id_byte_fit(long long v) {
+    if (v < 0 || v > 255) id_byte_range(v);
+    return (unsigned char)v;
+}
+static int id_bytes_len(IdBytes* B) { if (!B) id_null_read(); if (B->len < 0) id_freed_trap(); return B->len; }
+static long long id_bytes_get(IdBytes* B, int i) {
+    if (!B) id_null_read();
+    if (i < 0 || i >= B->len) id_bytes_oob(B, i);
+    return B->data[i];
+}
+static void id_bytes_set(IdBytes* B, int i, long long v) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    if (i < 0 || i >= B->len) id_bytes_oob(B, i);
+    B->data[i] = id_byte_fit(v);
+}
+static void id_bytes_store(IdBytes* B, int i, long long v) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    if (i < 0 || i >= B->len) id_bytes_oob(B, i);
+    B->data[i] = (unsigned char)v;
+}
+static long long id_bytes_cell(IdBytes* B, int i) { return B->data[i]; }
+static void id_bytes_cell_set(IdBytes* B, int i, long long v) { B->data[i] = id_byte_fit(v); }
+static IdBytes* id_bytes_lit(int n, ...) {
+    IdBytes* R = id_bytes_make(n, n < 8 ? 8 : n);
+    va_list ap; va_start(ap, n);
+    for (int k = 0; k < n; k++) R->data[k] = id_byte_fit(va_arg(ap, long long));
+    va_end(ap);
+    return R;
+}
+static void id_bytes_show(IdBytes* B) {
+    fputs("[", stderr);
+    for (int i = 0; i < B->len; i++) fprintf(stderr, "%s0x%02X", i ? ", " : "", B->data[i]);
+    fputs("]", stderr);
+}
+static void id_bytes_reserve(IdBytes* B, size_t need) {
+    if ((size_t)B->cap >= need) return;
+    if (need > INT_MAX) id_trap("bytes capacity overflow");
+    size_t ncap = (size_t)B->cap * 2;
+    if (ncap < need) ncap = need;
+    if (ncap > INT_MAX) ncap = INT_MAX;
+    ID_MEM_CHARGE(ncap);
+    unsigned char* inl = ID_BYTES_CELLS(B);
+    if (B->data == inl) {
+        unsigned char* nd = (unsigned char*)id_pool_get(ncap);
+        size_t ic = (size_t)B->cap;
+        memcpy(nd, inl, (size_t)B->len);
+        memcpy(inl, &ic, sizeof ic);
+        B->data = nd;
+    } else {
+        B->data = (unsigned char*)id_realloc(B->data, (size_t)B->cap, ncap);
+    }
+    B->cap = (int)ncap;
+}
+static void id_bytes_push(IdBytes* B, long long v) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    unsigned char b = id_byte_fit(v);
+    if (B->len >= B->cap) id_bytes_reserve(B, (size_t)B->len + 1);
+    B->data[B->len++] = b;
+}
+static long long id_bytes_pop(IdBytes* B) {
+    if (!B) id_null_read();
+    id_bytes_mut_check(B);
+    if (B->len <= 0) id_trap("pop from empty bytes");
+    return B->data[--B->len];
+}
+static void id_bytes_append(IdBytes* D, IdBytes* S) {
+    if (!D || !S) id_null_read();
+    id_bytes_mut_check(D);
+    if (S->len < 0) id_freed_trap();
+    size_t n = (size_t)S->len;
+    if (n == 0) return;
+    id_bytes_reserve(D, id_add_check((size_t)D->len, n, "bytes_append"));
+    memmove(D->data + D->len, S->data, n);
+    D->len += (int)n;
+}
+static IdBytes* id_bytes_sub(IdBytes* B, int i, int n) {
+    if (!B) id_null_read();
+    if (B->len < 0) id_freed_trap();
+    if (i < 0 || n < 0 || (n > 0 && (unsigned long long)i + (unsigned long long)n > (unsigned long long)B->len)) {
+        fprintf(stderr, "id: bytes span out of bounds: i=%lld n=%lld in a bytes of length %d\n", i, n, B->len);
+        exit(1);
+    }
+    IdBytes* R = id_bytes_make(n, n < 8 ? 8 : n);
+    if (n) memcpy(R->data, B->data + i, (size_t)n);
+    return R;
+}
+static int id_bytes_cmp(IdBytes* A, IdBytes* B) {
+    if (!A || !B) id_null_read();
+    if (A->len < 0 || B->len < 0) id_freed_trap();
+    if (A->len != B->len) return 1;
+    return A->len ? memcmp(A->data, B->data, (size_t)A->len) : 0;
+}
+static IdBytes* id_bytes_of_string(const char* s) {
+    size_t n = id_slen(s);
+    if (n > INT_MAX) id_trap("bytes_of_string: string too long");
+    IdBytes* R = id_bytes_make((long long)n, n < 8 ? 8 : (long long)n);
+    memcpy(R->data, s, n);
+    return R;
+}
+static char* id_string_of_bytes(IdBytes* B) {
+    if (!B) id_null_read();
+    if (B->len < 0) id_freed_trap();
+    if (B->len > 0 && memchr(B->data, 0, (size_t)B->len)) id_trap("a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes");
+    return id_str_from((const char*)B->data, (size_t)B->len);
+}
+static IdBytes* id_bytes_of_memory(long long addr, int n) {
+    if (n < 0 || n > INT_MAX) id_trap("bytes_of_memory: length out of range");
+    unsigned char* p = id_at(addr, n);
+    IdBytes* R = id_bytes_make(n, n < 8 ? 8 : n);
+    memcpy(R->data, p, (size_t)n);
+    return R;
+}
+static long long id_memory_of_bytes(IdBytes* B) {
+    if (!B) id_null_read();
+    if (B->len < 0) id_freed_trap();
+    long long a = id_mem_alloc((long long)B->len);
+    if (B->len) memcpy(id_store + a, B->data, (size_t)B->len);
+    return a;
+}
 
 /* real-time terminal I/O: write without a newline, flush, poll a single key
    without blocking (raw mode is entered lazily and restored at exit), and
@@ -1132,7 +1311,7 @@ int id_is_alnum(int c) {
 int id_is_kw(char* w) {
     int ok;
     ok = 0;
-    if ((((((((((((((((((((((((((((strcmp(w, ID_S("int")) == 0) || (strcmp(w, ID_S("float")) == 0)) || (strcmp(w, ID_S("string")) == 0)) || (strcmp(w, ID_S("void")) == 0)) || (strcmp(w, ID_S("if")) == 0)) || (strcmp(w, ID_S("else")) == 0)) || (strcmp(w, ID_S("while")) == 0)) || (strcmp(w, ID_S("return")) == 0)) || (strcmp(w, ID_S("export")) == 0)) || (strcmp(w, ID_S("import")) == 0)) || (strcmp(w, ID_S("word")) == 0)) || (strcmp(w, ID_S("asm")) == 0)) || (strcmp(w, ID_S("native")) == 0)) || (strcmp(w, ID_S("given")) == 0)) || (strcmp(w, ID_S("then")) == 0)) || (strcmp(w, ID_S("func")) == 0)) || (strcmp(w, ID_S("prints")) == 0)) || (strcmp(w, ID_S("eprints")) == 0)) || (strcmp(w, ID_S("calls")) == 0)) || (strcmp(w, ID_S("chain")) == 0)) || (strcmp(w, ID_S("blank")) == 0)) || (strcmp(w, ID_S("break")) == 0)) || (strcmp(w, ID_S("stdin")) == 0)) || (strcmp(w, ID_S("traps")) == 0)) || (strcmp(w, ID_S("timeout")) == 0)) || (strcmp(w, ID_S("struct")) == 0)) || (strcmp(w, ID_S("pure")) == 0))) {
+    if (((((((((((((((((((((((((((((strcmp(w, ID_S("int")) == 0) || (strcmp(w, ID_S("float")) == 0)) || (strcmp(w, ID_S("string")) == 0)) || (strcmp(w, ID_S("void")) == 0)) || (strcmp(w, ID_S("if")) == 0)) || (strcmp(w, ID_S("else")) == 0)) || (strcmp(w, ID_S("while")) == 0)) || (strcmp(w, ID_S("return")) == 0)) || (strcmp(w, ID_S("export")) == 0)) || (strcmp(w, ID_S("import")) == 0)) || (strcmp(w, ID_S("word")) == 0)) || (strcmp(w, ID_S("asm")) == 0)) || (strcmp(w, ID_S("native")) == 0)) || (strcmp(w, ID_S("given")) == 0)) || (strcmp(w, ID_S("then")) == 0)) || (strcmp(w, ID_S("func")) == 0)) || (strcmp(w, ID_S("prints")) == 0)) || (strcmp(w, ID_S("eprints")) == 0)) || (strcmp(w, ID_S("calls")) == 0)) || (strcmp(w, ID_S("chain")) == 0)) || (strcmp(w, ID_S("blank")) == 0)) || (strcmp(w, ID_S("break")) == 0)) || (strcmp(w, ID_S("stdin")) == 0)) || (strcmp(w, ID_S("traps")) == 0)) || (strcmp(w, ID_S("timeout")) == 0)) || (strcmp(w, ID_S("struct")) == 0)) || (strcmp(w, ID_S("pure")) == 0)) || (strcmp(w, ID_S("bytes")) == 0))) {
         ok = 1;
     }
     return ok;

@@ -1,0 +1,10 @@
+// The element type of a container type: `T` for `T[]`, and `int` for a bytes
+// buffer, whose cells are bytes read and written as ints.
+elem_type(string t) {
+  string out = "int";
+  if(t != "bytes") {
+    out = list_elem_type(t);
+  }
+} return string out;
+("bytes"):("int")
+("string[]"):("string")

@@ -1,0 +1,9 @@
+// A store of a value outside 0..255 traps instead of truncating.
+poke(bytes b, int v) {
+  b[0] = v;
+} return void;
+
+main(int argc, string[] argv) {
+  bytes b = bytes_new(1);
+  poke(b, 256);
+} return int 0;

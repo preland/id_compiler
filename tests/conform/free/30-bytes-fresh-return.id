@@ -1,0 +1,11 @@
+// A bytes returned fresh from a callee is owned by the caller, which frees it
+// at its return; the callee's own temporary is dropped, not leaked.
+make(int n) {
+  bytes b = bytes_new(n);
+  b[0] = 9;
+} return bytes b;
+
+main(int argc, string[] argv) {
+  bytes b = make(3);
+  print("" + len(b) + " " + b[0]);
+} return int 0;

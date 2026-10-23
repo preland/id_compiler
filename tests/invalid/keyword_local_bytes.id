@@ -1,0 +1,6 @@
+// EXPECT: [E0312]
+// bytes is a type word, so it cannot also be a local name
+main(int argc, string[] argv) {
+  int bytes = 3;
+  print(bytes);
+} return int 0;

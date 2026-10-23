@@ -1,0 +1,14 @@
+// push grows the buffer past its first capacity and pop returns the last byte.
+fill(bytes b, int n) {
+  int i = 0;
+  while (i < n) {
+    push(b, i & 255);
+    i = i + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  bytes b = bytes_new(0);
+  fill(b, 300);
+  print("" + len(b) + " " + pop(b) + " " + len(b));
+} return int 0;

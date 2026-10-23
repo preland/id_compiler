@@ -1,0 +1,6 @@
+// bytes_new(n) gives n zero bytes, and a byte reads back as 0..255.
+main(int argc, string[] argv) {
+  bytes b = bytes_new(3);
+  b[1] = 255;
+  print("" + len(b) + " " + b[0] + " " + b[1]);
+} return int 0;

@@ -2,7 +2,7 @@
 lw_iset(int node, int a, string elem) {
   int i = lw_index_idx(node);
   int v = lw_iset_val(node, elem);
-  string lv_f = lv_callee(node, "id_list_set", "id_list_cell_set");
+  string lv_f = lv_callee(node, lw_bfn(a, "id_list_set", "id_bytes_set"), lw_bfn(a, "id_list_cell_set", "id_bytes_cell_set"));
 } chain (int node, int a, string elem) {
   int lv_old = lw_slot_old(node, a, i, elem);
   lw_callf(lv_f, "", [a, i, v]);

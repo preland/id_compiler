@@ -5,7 +5,7 @@
 esc_free_base(int fn, string nm) {
   string fname = "id_list_free";
   if(esc_on() == 1) {
-    fname = esc_by_type(esc_decl_type((import nl2)[fn], nm), "id_str_free", "id_clo_free", "id_list_free");
+    fname = esc_by_type(esc_decl_type((import nl2)[fn], nm), "id_str_free", "id_clo_free", "id_list_free", "id_bytes_free");
   }
 } return string fname;
 given esc_sfix ((import efs_acc), "s"):("id_str_free")
@@ -16,7 +16,7 @@ esc_c_ty(string nm) {
   int fn = esc_cur();
   string cty = "IdList*";
   if(esc_on() == 1) {
-    cty = esc_by_type(esc_decl_type((import nl2)[fn], nm), "char*", "IdFn*", "IdList*");
+    cty = esc_by_type(esc_decl_type((import nl2)[fn], nm), "char*", "IdFn*", "IdList*", "IdBytes*");
   }
 } return string cty;
 given esc_sfix ("s"):("char*")

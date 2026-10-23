@@ -1,0 +1,5 @@
+// EXPECT: [E0642]
+// a list literal in a bytes slot is a byte literal: every element is 0..255
+main(int argc, string[] argv) {
+  bytes b = [300];
+} return int 0;

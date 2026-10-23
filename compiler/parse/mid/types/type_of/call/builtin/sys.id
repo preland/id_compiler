@@ -13,7 +13,7 @@ bt4(string name) {
 ("bits32_of_float"):("word")
 
 bt5(string name) {
-  string t = "?";
+  string t = bt6(name);
   if(str_in((import pokefns), name)) {
     t = "void";
   } else if(name == "float_of_bits" || name == "float_of_bits32") {
@@ -29,6 +29,8 @@ bt5(string name) {
 ("float_of_bits"):("float")
 ("float_of_bits32"):("float")
 ("bind"):("func")
+("bytes_sub"):("bytes")
+("bytes_append"):("void")
 
 // Builtins yielding a machine word. `ult` is not among them -- it answers a
 // question, so it is an int like every other comparison.

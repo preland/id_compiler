@@ -1,0 +1,6 @@
+// EXPECT: [E0643]
+// a byte buffer is binary, so print refuses it; string_of_bytes makes text
+main(int argc, string[] argv) {
+  bytes b = bytes_of_string("hi");
+  print(b);
+} return int 0;

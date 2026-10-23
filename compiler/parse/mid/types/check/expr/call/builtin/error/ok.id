@@ -1,12 +1,13 @@
 
 bi_ok2(string want, string t) {
   int ok = bi_ok3(want, t);
-  if(want == "list" && ty_is_list(t) == 0) {
+  if(want == "list" && ty_is_list(t) == 0 && t != "bytes") {
     ok = 0;
   }
 } return int ok;
 ("list", "int[]"):(1)
 ("list", "int"):(0)
+("list", "bytes"):(1)
 
 bi_ok3(string want, string t) {
   int ok = 1;
@@ -24,9 +25,10 @@ given env_init ("word", "string"):(0)
 // though they are different C calls.
 bi_strlist(string t) {
   int ok = 0;
-  if(t == "string" || ty_is_list(t) == 1) {
+  if(t == "string" || t == "bytes" || ty_is_list(t) == 1) {
     ok = 1;
   }
 } return int ok;
 ("string"):(1)
 ("int"):(0)
+("bytes"):(1)

@@ -1,0 +1,32 @@
+// Whether an integer literal's text is a byte. Four or more characters is
+// either more than 255 or a prefixed form (0xFF), which is left to the
+// runtime check rather than parsed here.
+cell_literal_fits(string cbx_text) {
+  int cbx_ok = 0;
+  if(len(cbx_text) <= 3) {
+    cbx_ok = to_int(cbx_text) <= 255;
+  }
+} return int cbx_ok;
+("200"):(1)
+("256"):(0)
+("0xFF"):(0)
+
+cell_int_fits(int cbx_node) {
+  int cbx_ok = 0;
+  if((import nkind)[cbx_node] == "int") {
+    cbx_ok = cell_literal_fits((import ns1)[cbx_node]);
+  }
+} return int cbx_ok;
+given lpf_on ((import lpf_n0)):(1)
+given lpf_on ((import lpf_xa)):(0)
+
+cell_derived_fits(int cbx_node) {
+  int cbx_ok = 0;
+  if((import nkind)[cbx_node] == "index") {
+    cbx_ok = type_of((import ni1)[cbx_node]) == "bytes";
+  } else if((import nkind)[cbx_node] == "bin" && (import ns1)[cbx_node] == "&") {
+    cbx_ok = cell_mask_fits(cbx_node);
+  }
+} return int cbx_ok;
+given lpf_on ((import lpf_xa)):(0)
+given lpf_on ((import lpf_n0)):(0)

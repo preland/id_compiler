@@ -21,8 +21,8 @@ given clo_bind_fixture ((import clo_cfn), "func(int) return int"):("ID_FNV(fx_ta
 
 tc_list(int e, string want) {
   int[] xs = (import nl1)[e];
-  string et = list_elem(want);
-  string so = tc_list_n(xs, et);
+  string et = elem_type(want);
+  string so = tc_list_head(xs, et, want);
 } return string so;
 given lit_arr_fixture ((import lit_arr_e), "int[]"):("id_list_lit(2, (long long)(5), (long long)(4))")
 given lit_arr_fixture ((import lit_arr_e), "string[]"):("id_list_lit(2, (long long)(intptr_t)(5), (long long)(intptr_t)(4))")

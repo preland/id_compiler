@@ -1,0 +1,5 @@
+// string_of_bytes refuses a buffer holding a zero byte: strings are NUL-free.
+main(int argc, string[] argv) {
+  bytes b = bytes_new(2);
+  print(string_of_bytes(b));
+} return int 0;

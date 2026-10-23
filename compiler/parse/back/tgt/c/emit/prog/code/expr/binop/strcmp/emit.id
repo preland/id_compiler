@@ -12,7 +12,7 @@ given nz_bin_streq_fixture ((import nz_bin_streq)):("(strcmp(ID_S(\"hi\"), ID_S(
 
 strcmp_line(int id, int cmp_lhs_id, int cmp_rhs_id) {
   string s1_of_v = (import ns1)[id];
-  string s = "(strcmp(" + emit_expr(cmp_lhs_id) + ", " + emit_expr(cmp_rhs_id) + ") " + str_pick(s1_of_v, "=", "==", s1_of_v) + " 0)";
+  string s = "(" + compare_function(cmp_lhs_id) + "(" + emit_expr(cmp_lhs_id) + ", " + emit_expr(cmp_rhs_id) + ") " + str_pick(s1_of_v, "=", "==", s1_of_v) + " 0)";
 } return string s;
 given nz_bin_eq_fixture ((import nz_bin_eq), (import nz_strn), (import nz_strn2)):("(strcmp(ID_S(\"hi\"), ID_S(\"yo\")) == 0)")
 given nz_bin_streq_fixture ((import nz_bin_streq), (import nz_strn2), (import nz_strn)):("(strcmp(ID_S(\"yo\"), ID_S(\"hi\")) == 0)")

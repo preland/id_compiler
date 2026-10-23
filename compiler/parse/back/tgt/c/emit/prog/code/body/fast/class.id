@@ -21,12 +21,13 @@ given lpf_more ("nosuchfn"):(1)
 
 lp_known(string lq_nm) {
   int lq_r = 1;
-  if(lq_nm != "push" && lq_nm != "pop" && (is_builtin(lq_nm) == 1 || find_str((import sdname), lq_nm) >= 0)) {
+  if(lq_nm != "push" && lq_nm != "pop" && lq_nm != "bytes_append" && (is_builtin(lq_nm) == 1 || find_str((import sdname), lq_nm) >= 0)) {
     lq_r = 0;
   }
 } return int lq_r;
 given lpf_more ("push"):(1)
 given lpf_more ("pop"):(1)
+given lpf_more ("bytes_append"):(1)
 given lpf_more ("len"):(0)
 given lpf_more ("lpf_leaf"):(1)
 given lpf_more given sd_note("P", ["a"], ["int"], "p.id", 1) ("P"):(0)

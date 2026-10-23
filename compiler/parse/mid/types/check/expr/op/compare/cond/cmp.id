@@ -30,7 +30,13 @@ fv_side(int id, int e, string side) {
   if(ty_kind_is(t, "struct") == 1) {
     tc_err(id, "'" + (import ns1)[id] + "' cannot take a struct: its " + side + " operand is " + t + "; a struct is compared and combined by field, as in a." + sd_cell((import sdfname), t, 0) + " " + (import ns1)[id] + " b." + sd_cell((import sdfname), t, 0));
   }
+} chain (int id, int e, string side) {
+  if(t == "bytes" && (import ns1)[id] == "+") {
+    tc_diag(id, "E0641", "'+' cannot take bytes: its " + side + " operand is bytes; a byte buffer is not joined by +, which would copy it on every step -- append in place with bytes_append(dst, src), or convert it with string_of_bytes(b) to join it to text", "+", "+ joins strings and adds numbers, and a byte buffer is neither", "append in place with bytes_append(dst, src), or convert the buffer with string_of_bytes(b) before joining it to text");
+  }
 } return void;
+given bytes_plus_fixture ((import bq_plus), 6, "left"):() then (import chkfail)[0]:(1)
+given bytes_plus_fixture ((import bp_print), 6, "left"):() then (import chkfail)[0]:(0)
 given fnval_call_fixture ((import fnval_call), (import fnval_call), "left"):() then (import chkfail)[0]:(1)
 given cmp_fixture ((import bin_eq), (import lit_a), "left"):() then (import chkfail)[0]:(0)
 given sd_bi_fixture ((import sd_eq), (import sd_vp), "left"):() then prints:("<stdin>:1: error: '==' cannot take a struct: its left operand is P; a struct is compared and combined by field, as in a.x == b.x\n")

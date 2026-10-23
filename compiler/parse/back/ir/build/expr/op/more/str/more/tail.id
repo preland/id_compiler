@@ -10,7 +10,7 @@ given str_fixture2 ((import scmp_node), 5):(6)
 
 lw_scmp_call(int node, int a, int b) {
   string lw_strcmp_v = lw_strcmp();
-  int lw_callf_v = lw_callf(lw_strcmp_v, "int", [a, b]);
+  int lw_callf_v = lw_callf(lw_bfn(a, lw_strcmp_v, "id_bytes_cmp"), "int", [a, b]);
   int ret_i = lw_scmp2(node, lw_callf_v);
 } return int ret_i;
 given str_fixture ((import scmp_node), 3, 4):(5)

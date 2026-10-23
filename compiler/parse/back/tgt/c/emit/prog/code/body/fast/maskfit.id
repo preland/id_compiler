@@ -1,0 +1,7 @@
+// `x & 255` is a byte whatever x is: masking by a literal of 0..255 leaves
+// only bits that mask keeps, in either operand position.
+cell_mask_fits(int cbx_node) {
+  int cbx_ok = cell_int_fits((import ni1)[cbx_node]) || cell_int_fits((import ni2)[cbx_node]);
+} return int cbx_ok;
+given nz_bin_add_fixture ((import nz_bin_add)):(1)
+given nz_bin_eq_fixture ((import nz_bin_eq)):(0)

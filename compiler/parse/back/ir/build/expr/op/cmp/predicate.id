@@ -17,7 +17,7 @@ given lw_fix_bin ((import fix_bin_n)):(3) then (import chkfail)[0]:(0)
 
 lw_cmp2(int node, string t) {
   int v = 0 - 1;
-  if(t == "string") {
+  if(t == "string" || t == "bytes") {
     v = lw_scmp(node);
   } else {
     v = lw_ncmp(node, t);
@@ -25,3 +25,4 @@ lw_cmp2(int node, string t) {
 } return int v;
 given lw_fix_bin ((import fix_bin_n), "int"):(2)
 given lw_fix_bin ((import fix_bin_n), "string"):(4)
+given lw_fix_bin ((import fix_bin_n), "bytes"):(4)
