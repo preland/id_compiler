@@ -1,0 +1,10 @@
+// Whether `t` is a list of bytes buffers. Each buffer is its own block shape
+// (IdBytes), so a bytes[] that owns its elements frees them with id_bytes_free
+// where a list of lists frees rows with id_list_free.
+
+esc_bytes_list(string t) {
+  int ok = is_list_ty(t) == 1 && list_elem(t) == "bytes";
+} return int ok;
+("bytes[]"):(1)
+("int[]"):(0)
+("bytes"):(0)

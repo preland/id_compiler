@@ -1,0 +1,15 @@
+// A bytes[] built only from literals owns its buffers, so freeing it frees
+// each one, and the store into a slot frees the buffer it replaces. The guard
+// traps any later use of a freed buffer.
+build(int n) {
+  bytes[] rows = [[1, 2], [3]];
+  push(rows, [n]);
+  rows[0] = [n, n];
+} chain (int n) {
+  int s = len(rows) + rows[0][0];
+} return int s;
+
+main(int argc, string[] argv) {
+  int a = build(2);
+  print(a);
+} return int 0;

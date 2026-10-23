@@ -14,10 +14,15 @@ given bm_sized ((import bm_call_fn)):() then calls bytes_mark_args:((import bm_c
 bytes_mark_store(int i) {
   string bm_want = bytes_store_type(i);
   int bm_val = (import ni1)[i];
-  if(bm_want == "bytes" && (import nkind)[bm_val] == "arr") {
-    lset((import bytesmark), bm_val, 1);
+  if((import nkind)[i] == "iassign") {
+    bm_val = (import nl1)[i][0];
+    bm_want = elem_type(type_of((import ni1)[i]));
   }
+} chain (int i) {
+  bytes_mark_to(bm_val, bm_want);
 } return void;
+given bm_nest ((import bm_ia)):() then calls lset:((import bytesmark), (import bm_ia_arr), 1)
+given bm_nest ((import bm_dec_nest)):() then calls lset:((import bytesmark), (import bm_in_a), 1)
 given bm_sized ((import bm_dec_bytes)):() then calls lset:((import bytesmark), (import bm_arr_decl), 1)
 given bm_sized ((import bm_dec_plain)):() then calls lset:[0]
 given bm_sized ((import bm_asg_bytes)):() then calls lset:((import bytesmark), (import bm_arr_asg), 1)

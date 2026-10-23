@@ -18,10 +18,9 @@ bytes_mark_arg(int i, int bm_k) {
     bm_t = bytes_param_type(i, bm_k);
   }
 } chain (int i, int bm_k) {
-  if(bm_t == "bytes") {
-    lset((import bytesmark), bm_a, 1);
-  }
+  bytes_mark_to(bm_a, bm_t);
 } return void;
+given bm_nest ((import bm_push_call), 1):() then calls lset:((import bytesmark), (import bm_push_arr), 1)
 given bm_sized ((import bm_call_fn), 0):() then calls lset:((import bytesmark), (import bm_arr_fn), 1)
 given bm_sized ((import bm_call_ctor), 0):() then calls lset:((import bytesmark), (import bm_arr_ctor), 1)
 given bm_sized ((import bm_call_int), 0):() then calls lset:[0]
@@ -34,7 +33,11 @@ bytes_param_type(int i, int bm_k) {
   if(bm_fn >= 0 && bm_k < len(((import nl1)[bm_fn]))) {
     bm_t = (import ns1)[(import nl1)[bm_fn][bm_k]];
   }
+  if(is_push2(i) == 1 && bm_k == 1) {
+    bm_t = bytes_push_elem(i);
+  }
 } return string bm_t;
+given bm_nest ((import bm_push_call), 1):("bytes")
 given bm_fixture ((import bm_call_fn), 0):("bytes")
 given bm_fixture ((import bm_call_ctor), 0):("bytes")
 given bm_fixture ((import bm_call_fn), 1):("")

@@ -914,6 +914,11 @@ static void id_bytes_free(IdBytes* B) {
     id_pool_free(B->data, c);
     id_pool_free(B, ID_BYTES_BYTES(ic));
 }
+static void id_list_free_bytes(IdList* L) {
+    if (!L) return;
+    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_bytes_free((IdBytes*)(intptr_t)L->data[i]); }
+    id_list_free(L);
+}
 static void id_bytes_mut_check(IdBytes* B) {
     if (B->cap < 0) {
         if (B->cap == INT_MIN) id_freed_trap();
@@ -1248,7 +1253,10 @@ static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
 static void idfr_Zip(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_ZstdBlock(IdList* p) { id_free_walk(p, "S3..S3..."); }
+static void idfr_ZstdDecoded(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }
+static void idfr_ZstdWalk(IdList* p) { id_free_walk(p, "S3S3...S3...S3..."); }
 static void idfr_GuiBd(IdList* p) { id_free_walk(p, "S3S3lsl.l.S3l.lsl.S3l.lsl."); }
 static void idfr_GuiCl(IdList* p) { id_free_walk(p, "S3l.lsl."); }
 static void idfr_GuiHm(IdList* p) { id_free_walk(p, "S3lsl.l."); }

@@ -1,7 +1,8 @@
 // How a deep-owned local is freed, by its declared type (docs/MEMORY.md 3.2,
 // 3.5b): 1 a list of lists, whose rows are freed as lists; 2 a list of
 // strings, whose pieces are freed as strings; 3 a struct with something to
-// free, whose type says what each field is. 0 is anything else. Kinds 2 and 3
+// free, whose type says what each field is; 4 a list of bytes, whose buffers
+// are freed as bytes. 0 is anything else. Kinds 2, 3 and 4
 // free strings, so a build that owns none (a freestanding one) has neither.
 
 esc_dkind(string t) {
@@ -22,7 +23,12 @@ esc_dkind2(string t) {
   } else if(esc_sheap(t) == 1) {
     dz_k = 3;
   }
+} chain (string t) {
+  if(esc_bytes_list(t) == 1) {
+    dz_k = 4;
+  }
 } return int dz_k;
+given esc_ty_fix ("bytes[]"):(4)
 given esc_ty_fix ("string[]"):(2)
 given esc_ty_fix ("Pg"):(3)
 given esc_ty_fix ("Pt"):(0)
@@ -36,7 +42,12 @@ esc_dfn(string t) {
   } else if(esc_dkind(t) == 2) {
     dz_f = "id_list_free_strs";
   }
+} chain (string t) {
+  if(esc_dkind(t) == 4) {
+    dz_f = "id_list_free_bytes";
+  }
 } return string dz_f;
+given esc_ty_fix ("bytes[]"):("id_list_free_bytes")
 given esc_ty_fix ("int[][]"):("id_list_free_deep")
 given esc_ty_fix ("string[]"):("id_list_free_strs")
 given esc_ty_fix ("Tr"):("idfr_Tr")

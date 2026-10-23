@@ -1,0 +1,19 @@
+// A list literal inside a bytes[] literal, or stored into a bytes[] slot by an
+// index assignment, is a byte literal too: each element is a bytes buffer.
+sum(bytes b) {
+  int s = 0;
+  int i = 0;
+  while(i < len(b)) {
+    s = s + b[i];
+    i = i + 1;
+  }
+} return int s;
+
+main(int argc, string[] argv) {
+  bytes[] rows = [[1, 255], [2], [3, 4, 5]];
+  bytes[] more = [[9]];
+  more[0] = [200, 100];
+} chain (int argc, string[] argv) {
+  string line = len(rows) + " " + sum(rows[0]) + " " + sum(rows[1]) + " " + sum(rows[2]) + " " + sum(more[0]);
+  print(line);
+} return int 0;

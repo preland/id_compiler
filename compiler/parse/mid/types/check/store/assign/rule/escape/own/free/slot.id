@@ -11,7 +11,12 @@ esc_slot_of(string slot_ty) {
   } else if(esc_dkind(slot_ty) == 2) {
     slot_f = "id_str_free";
   }
+} chain (string slot_ty) {
+  if(esc_dkind(slot_ty) == 4) {
+    slot_f = "id_bytes_free";
+  }
 } return string slot_f;
+given esc_ty_fix ("bytes[]"):("id_bytes_free")
 given esc_ty_fix ("int[][]"):("id_list_free")
 given esc_ty_fix ("string[]"):("id_str_free")
 given esc_ty_fix ("int[]"):("")

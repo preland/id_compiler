@@ -1,0 +1,25 @@
+// Nodes for bytes_elem's cases: a bytes[] variable beside a literal of
+// literals, an index assignment, a push and a declaration that each hand it a
+// list type.
+
+bm_nest() {
+  bm_fixture();
+  add_var("bm_rows", "bytes[]", 0);
+  export int bm_in_a = node_arr([(import lit_a)]);
+} chain () {
+  export int bm_in_b = node_arr([(import lit_b)]);
+  export int bm_outer = node_arr([(import bm_in_a), (import bm_in_b)]);
+  export int bm_rows_var = node_txt("var", "bm_rows");
+} chain () {
+  export int bm_idx = node_index((import bm_rows_var), (import lit_a));
+  export int bm_ia_arr = node_arr([(import lit_a)]);
+  export int bm_ia = node_iassign((import bm_idx), (import bm_ia_arr));
+} chain () {
+  export int bm_push_arr = node_arr([(import lit_b)]);
+  export int bm_push_call = node_call("push", [(import bm_rows_var), (import bm_push_arr)]);
+  export int bm_dec_nest = node_decl("bytes[]", "bm_dn", (import bm_outer), 0);
+} chain () {
+  list_fill((import bytesmark), len((import nkind)), 0);
+} return void;
+():() then calls bm_fixture:[1]
+():() then (import chkfail)[0]:(0)

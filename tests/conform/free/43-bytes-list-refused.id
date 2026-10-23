@@ -1,0 +1,15 @@
+// A buffer read into a name is an alias, so the bytes[] is not deep-owned and
+// neither the store nor the exit frees its buffers: held still reads the old
+// one afterwards. A free here would be caught by ID_FREE_GUARD.
+keep(int n) {
+  bytes[] rows = [[1, 2], [3]];
+  bytes held = rows[0];
+  rows[0] = [n, n];
+} chain (int n) {
+  int s = held[0] + rows[0][0];
+} return int s;
+
+main(int argc, string[] argv) {
+  int a = keep(2);
+  print(a);
+} return int 0;
