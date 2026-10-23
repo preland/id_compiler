@@ -1,5 +1,5 @@
 main(int argc, string[] argv) {
   print(pair());
   print(rest());
-  print(bytes());
+  print(hi_text());
 } return int 0;

@@ -1,14 +1,14 @@
 // Read the whole text: set it, read every line, finish.
-ld_all(int[] bytes) {
-  ld_start(bytes);
+ld_all(int[] data) {
+  ld_start(data);
   ld_lines();
   ld_finish();
 } return void;
 given lb_boot given vb_boot ([98, 48, 58, 10, 32, 32, 114, 101, 116, 32, 118, 111, 105, 100, 10]):() then (import ex_cd):([7, 0, 0, 0, 0]) then (import ld_blk):([0])
 given lb_boot given vb_boot ([]):() then (import ex_cd):([])
 
-ld_start(int[] bytes) {
-  export int[] ld_b = bytes;
+ld_start(int[] data) {
+  export int[] ld_b = data;
 } return void;
 given lb_boot ([97]):() then ld_at:(97)
 given lb_boot ([]):() then ld_at:(-1)

@@ -1,4 +1,4 @@
-bytes() {
+hi_text() {
   word a = alloc(2);
   poke8(a, 104);
   poke8(a + 1, 105);

@@ -17119,11 +17119,11 @@ void id_ll_str_bytes(char* gname, char* s) {
 
 void id_ll_str_emit2(char* gname, char* s, int blen, int zl) {
     char* q = NULL;
-    char* bytes = NULL;
+    char* escaped = NULL;
     { char* idfe_o = q; q = id_chr(34); id_str_free(idfe_o); }
-    { char* idfe_o = bytes; bytes = id_ll_bytes(s); id_str_free(idfe_o); }
-    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(gname, ID_S(".d = private unnamed_addr constant <{ i64, [")), id_str_of_int(blen), 3), ID_S(" x i8] }> <{ i64 "), 1), id_str_of_int(zl), 3), ID_S(", ["), 1), id_str_of_int(blen), 3), ID_S(" x i8] c"), 1), q, 1), bytes, 1), q, 1), ID_S(" }>, align 8\n"), 1), gname, 1), ID_S(" = private alias i8, getelementptr inbounds (i8, ptr "), 1), gname, 1), ID_S(".d, i64 8)"), 1));
-    { id_str_free(q); id_str_free(bytes); return; }
+    { char* idfe_o = escaped; escaped = id_ll_bytes(s); id_str_free(idfe_o); }
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(gname, ID_S(".d = private unnamed_addr constant <{ i64, [")), id_str_of_int(blen), 3), ID_S(" x i8] }> <{ i64 "), 1), id_str_of_int(zl), 3), ID_S(", ["), 1), id_str_of_int(blen), 3), ID_S(" x i8] c"), 1), q, 1), escaped, 1), q, 1), ID_S(" }>, align 8\n"), 1), gname, 1), ID_S(" = private alias i8, getelementptr inbounds (i8, ptr "), 1), gname, 1), ID_S(".d, i64 8)"), 1));
+    { id_str_free(q); id_str_free(escaped); return; }
 }
 
 char* id_ll_zero(char* t) {

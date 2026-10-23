@@ -1,9 +1,9 @@
 // Load the IR text and run it. A loader diagnostic means nothing runs.
-dr_exec(int[] bytes, string[] pargs) {
+dr_exec(int[] data, string[] pargs) {
   lb_boot();
   vb_boot();
-  ld_all(bytes);
-} chain (int[] bytes, string[] pargs) {
+  ld_all(data);
+} chain (int[] data, string[] pargs) {
   int code = 2;
   if ((import ld_pr)[(import pr_err)] == 0) {
     code = dr_enter(ld_look("f:id_main"), pargs);
