@@ -3525,13 +3525,15 @@ CASE_CACHE_DIR="$CACHE_DIR/cases"
 CASE_KEEP="${IDC_CASE_KEYS:-200000}"
 CASE_MAX_AGE_DAYS="${IDC_CASE_MAX_AGE_DAYS:-7}"
 
-# case_cache_global -- the build's part of every case key: see above.
+# case_cache_global BACKENDHASH -- the build's part of every case key: see above.
+# BACKENDHASH covers the C and JS sources of the backends the harness's natives
+# link, so editing a shim reruns the cases of the programs that link it.
 case_cache_global() {
     local cc_path
     {
         sha256sum < "$IDLEX"
         sha256sum < "$IDPARSE"
-        printf '%s\0' "$CC" "$(host_triple)" "pass list v2: timestamped"
+        printf '%s\0' "$CC" "$(host_triple)" "pass list v3: backend sources" "${1:-}"
         cc_path="$(command -v "$CC" 2>/dev/null)"
         [ -n "$cc_path" ] && sha256sum < "$cc_path"
     } | sha256sum | cut -d' ' -f1
@@ -3702,7 +3704,8 @@ case_plan() {
     CASE_FILE="" CASE_MASK="" CASE_HITS=0 CASE_TODO=1 CASE_TRACK=0 CASE_BH=""
     [ "$CACHE_ON" -eq 1 ] || return 0
     grep -q '^// idtc key ' "$HARNESS_C" || return 0
-    CASE_FILE="$CASE_CACHE_DIR/$(case_cache_global)"
+    CASE_BH=$(case_backend_key)
+    CASE_FILE="$CASE_CACHE_DIR/$(case_cache_global "$CASE_BH")"
     local total plan
     total=$(sed -n 's/^#define IDTC_N //p' "$HARNESS_C")
     CASE_NOW=$(date +%s)
@@ -3717,7 +3720,6 @@ case_plan() {
     [ -z "${IDC_FRESH_CASES:-}" ] || CASE_FRESH=$(realpath -m "$IDC_FRESH_CASES")
     if grep -q '^// idtc key [0-9]* [^ ]* f$' "$HARNESS_C"; then
         CASE_TRACK=1
-        CASE_BH=$(case_backend_key)
     fi
     : > "$WORK/rd.want"
     plan=$(case_plan_awk "$total" "")
