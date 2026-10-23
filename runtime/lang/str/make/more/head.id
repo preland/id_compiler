@@ -3,7 +3,7 @@
 // them copied in behind the count.
 concat_alloc(string s, string r) {
   int len_v = len(s) + len(r);
-  word p = mem_alloc(len_v + 9);
+  word p = str_blk(len_v);
   st64(p, len_v);
 } return word p;
 

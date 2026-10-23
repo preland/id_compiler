@@ -1,0 +1,31 @@
+// Giving back a struct, or a list of whatever, by the shape its descriptor
+// says (the compiler calls this as id_free_walk, through idfr_NAME). The work
+// list is a list of its own, so depth in the data costs cells rather than
+// stack, which a kernel has little of. It frees itself last.
+
+free_walk(int[] fw_root, string fw_base) {
+  word fw_b = s2w(fw_base);
+  int[] fw_st = list_new();
+  list_push(fw_st, l2w(fw_root));
+} chain (int[] fw_root, string fw_base) {
+  list_push(fw_st, 0);
+  while(list_len(fw_st) > 0) {
+    word fw_o = list_pop_at(l2w(fw_st));
+    word fw_p = list_pop_at(l2w(fw_st));
+    fw_step(fw_st, fw_b, fw_p, fw_o);
+  }
+  list_free(fw_st);
+} return void;
+
+fw_kids_l(int[] fx_st, word fx_b, word fx_p, word fx_o) {
+  word fx_k = ld64(fx_p);
+  if(ld8(fx_b + fx_o + 1) == 46) {
+    fx_k = 0;
+  }
+  word fx_i = 0;
+} chain (int[] fx_st, word fx_b, word fx_p, word fx_o) {
+  while(fx_i < fx_k) {
+    fw_push(fx_st, fx_p, fx_i, fx_o + 1);
+    fx_i = fx_i + 1;
+  }
+} return void;

@@ -1,0 +1,5 @@
+probe_text(int tn) {
+  Tag tg = Tag("fixed", "k" + tn + "-" + tn, tn);
+  string tx = "" + tn;
+  int td = len(tg.kind) - 5 + len(tg.name) - 2 * len(tx) - 2;
+} return int td;

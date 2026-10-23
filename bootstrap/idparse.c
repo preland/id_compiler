@@ -5007,7 +5007,7 @@ static void idc_const_init(void) {
 }
 static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
-static void idfr_Zip(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_Zip(IdList* p) { id_free_walk(p, "S3.l.ls"); }
 static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_ZstdLoop(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdBlock(IdList* p) { id_free_walk(p, "S3..S3..."); }
@@ -8314,7 +8314,7 @@ int idsq_13;
 int id_lw_concat_pick(int a, int b, int m) {
     int ret_i;
     ret_i = 0;
-    if (((m > 0) && ((int)(id_list_get(fsc, 0)) == 0))) {
+    if ((m > 0)) {
         ret_i = id_lw_concat_f(a, b, m);
     } else {
         ret_i = id_lw_callf(ID_S("id_concat"), ID_S("string"), id_list_lit(2, (long long)(a), (long long)(b)));
@@ -36146,7 +36146,7 @@ char* id_esc_dscf(int dz_s, char* dz_a, IdList* dz_sn, IdList* dz_sp) {
 int id_esc_dkind(char* t) {
     int dz_k;
     dz_k = id_esc_list_of(t, 1);
-    if (((dz_k == 0) && (id_esc_hosted() == 1))) {
+    if ((dz_k == 0)) {
         dz_k = id_esc_dkind2(t);
     }
     return dz_k;
@@ -36160,7 +36160,7 @@ int id_esc_dkind2(char* t) {
     } else if ((id_esc_sheap(t) == 1)) {
         dz_k = 3;
     }
-    if ((id_esc_bytes_list(t) == 1)) {
+    if (((id_esc_bytes_list(t) == 1) && (id_esc_hosted() == 1))) {
         dz_k = 4;
     }
     return dz_k;
@@ -37809,7 +37809,7 @@ int id_esc_cntl(IdList* xs, char* nm) {
 int id_esc_sown(int fn, char* nm, char* t) {
     int ok;
     ok = 0;
-    if ((((strcmp(t, ID_S("string")) == 0) || (id_ty_is_func(t) == 1)) && (id_esc_hosted() == 1))) {
+    if (((strcmp(t, ID_S("string")) == 0) || ((id_ty_is_func(t) == 1) && (id_esc_hosted() == 1)))) {
         ok = id_esc_sflags(fn, nm);
     }
     return ok;

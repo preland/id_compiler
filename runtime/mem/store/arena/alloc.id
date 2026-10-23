@@ -4,15 +4,15 @@
 // docs/SPEC.md 6 says `alloc` is a bump pointer and that nothing is released
 // before the process exits. A kernel is the case where that stops being a
 // compromise -- there is no exit -- so a list freed by the compiler's escape
-// analysis goes onto a free list here. Strings and the flat store still only
-// bump.
+// analysis goes onto a free list here, and so does a string it frees. The flat store
+// still only bumps. Strings take classes of their own (lang/str/free/give.id).
 //
 // The pointer lives in the first eight bytes of the arena rather than in an
 // exported global, because only a global's declaring function may assign it
 // and there is no function the runtime could hang that on. Reading zero there
 // means nobody has allocated yet.
 //
-// The next 288 bytes are the heads of the list free lists, 36 size classes.
+// The next 640 bytes are the heads of the free lists, 80 size classes (lists 0-35, strings 36 up).
 // They live here for the same reason the pointer does, and they are reserved on
 // the first allocation rather than declared anywhere: a table at a known offset
 // needs no initialiser to be called, which matters because nothing in a
@@ -30,7 +30,7 @@ arena_top(word a) {
 // left above the kernel image would otherwise read as a block to reuse.
 arena_open(word a) {
   pool_wipe(a + 8, 0);
-  word ret_w = a + 296;
+  word ret_w = a + 648;
 } return word ret_w;
 
 // Rounded with `&` rather than `%`: a mask is one instruction, while `%` is a

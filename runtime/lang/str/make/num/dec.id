@@ -10,7 +10,7 @@
 // and therefore what a program compiled both ways has to see.
 
 str_of_word(word a) {
-  word p = mem_alloc(32);
+  word p = str_blk(23);
   st8(p + 31, 0);
   string ret_s = str_of_word_at(a, p);
 } return string ret_s;

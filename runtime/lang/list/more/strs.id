@@ -1,0 +1,24 @@
+// Giving back a list of strings and the strings in it (drop.id's list_free for
+// the pieces as well). The compiler calls list_free_strs (as id_list_free_strs)
+// for a local string list whose pieces it proved fresh and unshared. A list
+// already freed has cap -1 and frees nothing, as list_free_deep does.
+
+list_free_strs(int[] ls_xs) {
+  word ls_p = l2w(ls_xs);
+  list_free_each(ls_p);
+  list_free(ls_xs);
+} return void;
+
+list_free_each(word le_p) {
+  word le_k = 0;
+  while(le_p != 0 && ld64(le_p + 8) > 0 && le_k < ld64(le_p)) {
+    str_free_at(le_p, le_k);
+    le_k = le_k + 1;
+  }
+} return void;
+
+str_free_at(word sa_p, word sa_k) {
+  word sa_cells = ld64(sa_p + 16);
+  word sa_e = ld64(sa_cells + 8 * sa_k);
+  str_free(w2s(sa_e));
+} return void;

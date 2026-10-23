@@ -1,0 +1,24 @@
+// Size classes for string blocks, on the same free lists lists use
+// (mem/store/arena/more/pool.id). A string block is its count word, its bytes
+// and a NUL, rounded up to a power of two of at least 16; class 36 is 16 bytes
+// and each class after it doubles. The string is the address of the bytes, so
+// its block starts eight bytes before it, which is why every producer of a
+// string takes its block here and a freed string can be filed by its length.
+
+str_csz(word cz_c) {
+  word cz_z = 16;
+  word cz_i = 36;
+  while(cz_i < cz_c) {
+    cz_z = cz_z * 2;
+    cz_i = cz_i + 1;
+  }
+} return word cz_z;
+(36):(16)
+(37):(32)
+(38):(64)
+
+str_blk(word sb_n) {
+  word sb_c = pool_cls(16, 36, sb_n + 9);
+  word sb_z = str_csz(sb_c);
+  word sb_p = pool_take(sb_c, sb_z);
+} return word sb_p;

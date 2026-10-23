@@ -1,0 +1,24 @@
+// Giving a string back. The compiler calls str_free (as id_str_free) for a
+// local string it proved nothing else can reach, and str_dup for a literal it
+// stores into one, so every block freed here is one str_blk made. A second
+// free of the same block is not detected: the block's first word becomes a free
+// list link, so there is nowhere to mark it, unlike a list's header.
+
+str_free(string sf_s) {
+  word sf_w = s2w(sf_s);
+  if(sf_w != 0) {
+    str_give(sf_w - 8);
+  }
+} return void;
+
+str_give(word sg_b) {
+  word sg_n = ld64(sg_b);
+  word sg_c = pool_cls(16, 36, sg_n + 9);
+  pool_give(sg_c, sg_b);
+} return void;
+
+str_dup(string sd_s) {
+  word sd_w = s2w(sd_s);
+  word sd_n = len(sd_s);
+  string ret_s = str_of_mem(sd_w, sd_n);
+} return string ret_s;

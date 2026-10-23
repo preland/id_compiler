@@ -1,8 +1,9 @@
 // The tail of `str_of_word`, once the buffer is allocated and terminated:
-// writing the digits, their count in the word before the first, and wrapping
-// the address they start at as a string.
+// writing the digits, then copying them into a block of their own whose count
+// word sits right before them, so the string can be freed by its length. The
+// buffer, which starts the digits wherever they stopped, goes back at once.
 str_of_word_at(word a, word p) {
   word num_str_v = num_str(a, p + 31);
-  st64(num_str_v - 8, p + 31 - num_str_v);
-  string ret_s = w2s(num_str_v);
+  string ret_s = str_of_mem(num_str_v, p + 31 - num_str_v);
+  pool_give(pool_cls(16, 36, 32), p);
 } return string ret_s;

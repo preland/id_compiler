@@ -1,0 +1,31 @@
+// One item of the work list free_walk keeps: a value and the offset of its
+// descriptor. A string is freed on the spot; a list or a struct has its
+// children pushed and then goes back as a list. A list already freed (cap not
+// positive) is skipped, children and all, as list_free skips it.
+
+fw_step(int[] fs_st, word fs_b, word fs_p, word fs_o) {
+  word fs_n = fw_ref(fs_b, fs_o);
+  word fs_c = ld8(fs_b + fs_n);
+  if(fs_p != 0 && fs_c == 115) {
+    str_free(w2s(fs_p));
+  }
+} chain (int[] fs_st, word fs_b, word fs_p, word fs_o) {
+  if(fs_p != 0 && (fs_c == 108 || fs_c == 83)) {
+    fw_list(fs_st, fs_b, fs_p, fs_n);
+  }
+} return void;
+
+fw_list(int[] fl_st, word fl_b, word fl_p, word fl_o) {
+  if(ld64(fl_p + 8) > 0) {
+    fw_kids(fl_st, fl_b, fl_p, fl_o);
+    list_free(w2l(fl_p));
+  }
+} return void;
+
+fw_push(int[] fh_st, word fh_p, word fh_i, word fh_o) {
+  word fh_cells = ld64(fh_p + 16);
+  word fh_e = ld64(fh_cells + 8 * fh_i);
+  list_push(fh_st, fh_e);
+} chain (int[] fh_st, word fh_p, word fh_i, word fh_o) {
+  list_push(fh_st, fh_o);
+} return void;

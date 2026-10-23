@@ -1,17 +1,16 @@
 // A node whose operand is a fresh temporary (str_mask) calls the consuming
-// concat, which the runtime provides on a hosted build; a freestanding build
-// keeps the plain one, because its strings are bump-allocated and cannot be
-// given back.
+// concat, which the runtime provides on every target: a freestanding build
+// frees the temporary through the same free lists as a hosted one.
 lw_concat_call(int node, int a, int b) {
   int m = str_mask(node) + esc_cons_bit(node);
   int ret_i = lw_concat_pick(a, b, m);
 } return int ret_i;
 given cat_fixture ((import cat_l), 3, 4):(4) then calls lw_callf:("id_concat_f", "string", [3, 4, 3])
-given cat_fs1 ((import cat_l), 3, 4):(3) then calls lw_callf:("id_concat", "string", [3, 4])
+given cat_fs1 ((import cat_l), 3, 4):(4) then calls lw_callf:("id_concat_f", "string", [3, 4, 3])
 
 lw_concat_pick(int a, int b, int m) {
   int ret_i = 0;
-  if(m > 0 && (import fsc)[0] == 0) {
+  if(m > 0) {
     ret_i = lw_concat_f(a, b, m);
   } else {
     ret_i = lw_callf("id_concat", "string", [a, b]);

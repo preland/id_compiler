@@ -7,7 +7,7 @@
 // string is the address of the bytes.
 
 chr(int n) {
-  word p = mem_alloc(10);
+  word p = str_blk(1);
   st64(p, 1);
   string ret_s = chr_term(p, n);
 } return string ret_s;

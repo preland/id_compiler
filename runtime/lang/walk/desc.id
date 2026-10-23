@@ -1,0 +1,34 @@
+// Reading the descriptor string free_walk follows (the compiler's esc_desc,
+// docs/MEMORY.md 3.5b): `s` a string, `.` nothing to free, `l` then the
+// descriptor of the elements, `S` then a digit n and n field descriptors, and
+// `@N;` the node at offset N. Offsets are plain addresses into the descriptor's
+// bytes, so reading one needs no string allocation in a runtime that is
+// itself freeing strings.
+
+fw_skip(word fk_b, word fk_o) {
+  word fk_c = ld8(fk_b + fk_o);
+  word fk_r = fk_o + 1;
+  if(fk_c == 108) {
+    fk_r = fw_skip(fk_b, fk_o + 1);
+  }
+} chain (word fk_b, word fk_o) {
+  if(fk_c == 83) {
+    fk_r = fw_skip_n(fk_b, fk_o + 2, ld8(fk_b + fk_o + 1) - 48);
+  }
+  if(fk_c == 64) {
+    fk_r = fw_semi(fk_b, fk_o) + 1;
+  }
+} return word fk_r;
+
+fw_skip_n(word fn_b, word fn_o, word fn_n) {
+  while(fn_n > 0) {
+    fn_o = fw_skip(fn_b, fn_o);
+    fn_n = fn_n - 1;
+  }
+} return word fn_o;
+
+fw_semi(word fm_b, word fm_o) {
+  while(ld8(fm_b + fm_o) != 59) {
+    fm_o = fm_o + 1;
+  }
+} return word fm_o;

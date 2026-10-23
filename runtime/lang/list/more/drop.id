@@ -18,18 +18,9 @@ list_free(int[] xs) {
 list_give(word p) {
   word cap = ld64(p + 8);
   word cells = ld64(p + 16);
-  word cls = cell_cls(cap);
+  word cls = pool_cls(4, 1, cap);
 } chain (word p) {
   pool_give(cls, cells);
   st64(p + 8, 0 - 1);
   pool_give(0, p);
 } return void;
-
-cell_cls(word cap) {
-  word csz = 4;
-  word k = 1;
-  while(csz < cap) {
-    csz = csz * 2;
-    k = k + 1;
-  }
-} return word k;

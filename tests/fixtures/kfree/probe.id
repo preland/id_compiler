@@ -1,7 +1,7 @@
 probe_freed(int pn) {
   int[] pf = [pn, pn, pn, pn, pn, pn];
   int[][] pg = [[pn, pn, pn, pn, pn, pn], [pn, pn, pn, pn, pn, pn]];
-  int ps = pf[0] + pg[1][5];
+  int ps = pf[0] + pg[1][5] + probe_text(pn);
 } return int ps;
 
 probe_kept(int pm) {

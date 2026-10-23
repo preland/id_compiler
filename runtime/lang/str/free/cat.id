@@ -1,0 +1,14 @@
+// `+` whose operands the compiler knows are unnamed temporaries: bit 1 of the
+// mode says a is fresh, bit 2 that b is, and a fresh operand is given back once
+// copied. The hosted runtime builds the result in a's block when it can; here the
+// result is a new block and a's goes back, which frees the same bytes.
+
+concat_f(string cf_a, string cf_b, int cf_m) {
+  string cf_r = concat(cf_a, cf_b);
+  if((cf_m & 1) != 0) {
+    str_free(cf_a);
+  }
+  if((cf_m & 2) != 0) {
+    str_free(cf_b);
+  }
+} return string cf_r;

@@ -20,7 +20,7 @@ list_room(word p) {
 } return word p;
 
 list_grow(word p, word z) {
-  word cls = cell_cls(z);
+  word cls = pool_cls(4, 1, z);
   word a = pool_take(cls, z * 8);
   word ld64_v = ld64(p + 16);
 } chain (word p, word z) {

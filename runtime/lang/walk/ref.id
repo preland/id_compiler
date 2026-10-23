@@ -1,0 +1,16 @@
+// Following `@N;` back-references to the node they name, which is how a type
+// that holds itself ends. The number is read in place, digit by digit.
+
+fw_ref(word fr_b, word fr_o) {
+  while(ld8(fr_b + fr_o) == 64) {
+    fr_o = fw_num(fr_b, fr_o + 1);
+  }
+} return word fr_o;
+
+fw_num(word fq_b, word fq_o) {
+  word fq_n = 0;
+  while(ld8(fq_b + fq_o) != 59) {
+    fq_n = fq_n * 10 + ld8(fq_b + fq_o) - 48;
+    fq_o = fq_o + 1;
+  }
+} return word fq_n;

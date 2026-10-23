@@ -1,0 +1,30 @@
+// Queueing what a list or struct holds: every element of a list under the
+// element descriptor that follows `l`, and each field of a struct whose
+// descriptor is not `.` under its own.
+
+fw_kids(int[] fd_st, word fd_b, word fd_p, word fd_o) {
+  word fd_c = ld8(fd_b + fd_o);
+  if(fd_c == 83) {
+    fw_kids_s(fd_st, fd_b, fd_p, fd_o);
+  } else {
+    fw_kids_l(fd_st, fd_b, fd_p, fd_o);
+  }
+} return void;
+
+fw_kids_s(int[] fz_st, word fz_b, word fz_p, word fz_o) {
+  word fz_k = ld8(fz_b + fz_o + 1) - 48;
+  word fz_f = fz_o + 2;
+  word fz_i = 0;
+} chain (int[] fz_st, word fz_b, word fz_p, word fz_o) {
+  while(fz_i < fz_k) {
+    fz_f = fw_field(fz_st, fz_b, fz_p, fz_i, fz_f);
+    fz_i = fz_i + 1;
+  }
+} return void;
+
+fw_field(int[] fg_st, word fg_b, word fg_p, word fg_i, word fg_f) {
+  if(ld8(fg_b + fg_f) != 46) {
+    fw_push(fg_st, fg_p, fg_i, fg_f);
+  }
+  word fg_n = fw_skip(fg_b, fg_f);
+} return word fg_n;

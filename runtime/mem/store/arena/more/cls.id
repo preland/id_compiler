@@ -1,0 +1,17 @@
+// The size class of a request: classes start at class pc_c with blocks of pc_z
+// bytes (or cells) and each doubles the one before. Lists start at class 1 with
+// four cells and strings at class 36 with sixteen bytes, so one loop serves both
+// (more/pool.id has the heads).
+
+pool_cls(word pc_z, word pc_c, word pc_t) {
+  while(pc_z < pc_t) {
+    pc_z = pc_z * 2;
+    pc_c = pc_c + 1;
+  }
+} return word pc_c;
+(16, 36, 16):(36)
+(16, 36, 17):(37)
+(16, 36, 32):(37)
+(16, 36, 33):(38)
+(4, 1, 4):(1)
+(4, 1, 5):(2)

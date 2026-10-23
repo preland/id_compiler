@@ -5,7 +5,7 @@
 // Class 0 is the 24-byte list header. Class k >= 1 is a cell array of
 // 4 * 2^(k-1) cells, which are the only capacities a list ever has because it
 // starts at four and doubles. A freed block's first word links to the next
-// block of its class. Strings and the flat store never come from these lists.
+// block of its class. Classes 36 and up are string blocks (lang/str/free/give.id); the flat store never comes from these lists.
 
 pool_head(word cls) {
   word a = heap_ptr();
