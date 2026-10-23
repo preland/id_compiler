@@ -1,0 +1,20 @@
+// The declarations of the per-struct free steps (step.id), ahead of all their
+// definitions, because a step names the steps of the structs below it.
+
+emit_free_protos() {
+  int i = 0;
+  while(i < len((import sdname))) {
+    emit_free_proto((import sdname)[i]);
+    i = i + 1;
+  }
+} return void;
+given esc_fm_fix ():() then prints:("static void idfs_Tr(void*, IdFrSt*);\n")
+given full_env ():() then prints:("")
+
+emit_free_proto(string nm) {
+  if(esc_dkind(nm) == 3) {
+    print("static void idfs_" + nm + "(void*, IdFrSt*);");
+  }
+} return void;
+given esc_fm_fix ("Tr"):() then prints:("static void idfs_Tr(void*, IdFrSt*);\n")
+given esc_fm_fix ("int"):() then prints:("")

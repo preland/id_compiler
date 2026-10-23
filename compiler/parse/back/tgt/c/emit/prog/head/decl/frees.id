@@ -1,25 +1,31 @@
 // One free function per struct that has something to free below its own block
-// (docs/MEMORY.md 3.5b): `idfr_NAME(p)` hands the struct and its descriptor
-// (esc_desc) to the runtime's id_free_walk. The analysis names it
-// (esc_dfn) wherever a deep-owned struct is given back, so a wrapper exists
-// for exactly the structs it can ask for.
+// (docs/MEMORY.md 3.5b): `idfr_NAME(p)` hands the struct to the runtime's
+// work-stack drain id_frs_run with the struct's own step `idfs_NAME` (step.id),
+// which frees by the field types with no descriptor read at run time. The
+// analysis names idfr_NAME (esc_dfn) wherever a deep-owned struct is given
+// back, so a wrapper exists for exactly the structs it can ask for. The steps
+// are declared first because a struct's step names the steps of the structs
+// below it. The descriptor walk (id_free_walk) stays in the runtime for the
+// LLVM target, which still emits its wrappers from esc_desc.
 
 emit_frees() {
+  emit_free_protos();
   int i = 0;
   while(i < len((import sdname))) {
     emit_free_one((import sdname)[i]);
     i = i + 1;
   }
 } return void;
-given esc_fm_fix ():() then prints:("static void idfr_Tr(IdList* p) { id_free_walk(p, \"S1l@0;\"); }\n")
+given esc_fm_fix ():() then prints:("static void idfs_Tr(void*, IdFrSt*);\nstatic void idfs_Tr(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } } } id_list_free(L); }\nstatic void idfr_Tr(IdList* p) { id_frs_run(p, idfs_Tr); }\n")
 given esc_fm_fix ():() then calls emit_free_one:("Tr")
 given full_env ():() then prints:("")
 
 emit_free_one(string nm) {
   if(esc_dkind(nm) == 3) {
-    print("static void idfr_" + nm + "(IdList* p) { id_free_walk(p, \"" + esc_desc(nm) + "\"); }");
+    print(frs_step(nm));
+    print("static void idfr_" + nm + "(IdList* p) { id_frs_run(p, idfs_" + nm + "); }");
   }
 } return void;
-given esc_fm_fix ("Tr"):() then prints:("static void idfr_Tr(IdList* p) { id_free_walk(p, \"S1l@0;\"); }\n")
-given esc_fm_fix ("Tr"):() then calls esc_desc:("Tr")
+given esc_fm_fix ("Tr"):() then prints:("static void idfs_Tr(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } } } id_list_free(L); }\nstatic void idfr_Tr(IdList* p) { id_frs_run(p, idfs_Tr); }\n")
+given esc_fm_fix ("Tr"):() then calls frs_step:("Tr")
 given esc_fm_fix ("int"):() then prints:("")

@@ -1,0 +1,10 @@
+// The loop around a list's elements in the free steps (list.id), closed with
+// the free of the list's own block.
+
+frs_lfor(string fz_lv, string fz_i, string fz_inner) {
+  string fz_a = "for (int " + fz_i + " = 0; " + fz_i + " < " + fz_lv + "->len; ";
+  string fz_r = fz_a + fz_i + "++) { " + fz_inner + " } ";
+  fz_r = fz_r + "} id_list_free(" + fz_lv + "); } }";
+} return string fz_r;
+given esc_ty_fix ("V", "j", "x;"):("for (int j = 0; j < V->len; j++) { x; } } id_list_free(V); } }")
+given esc_ty_fix ("W", "k", ""):("for (int k = 0; k < W->len; k++) {  } } id_list_free(W); } }")

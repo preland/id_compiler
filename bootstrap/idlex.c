@@ -392,6 +392,29 @@ static const char* id_fr_skip(const char* d) {
     if (*d == '@') { while (*d != ';') d++; return d + 1; }
     return d + 1;
 }
+typedef struct IdFrSt IdFrSt;
+typedef void (*IdFrFn)(void*, IdFrSt*);
+typedef struct { void* p; IdFrFn f; } IdFrEnt;
+struct IdFrSt { IdFrEnt* v; size_t n, cap; int heap; };
+static inline void id_frs_push(IdFrSt* s, void* p, IdFrFn f) {
+    if (!p) return;
+    if (s->n == s->cap) {
+        size_t nc = s->cap * 2;
+        IdFrEnt* nv = (IdFrEnt*)id_pool_blk(nc * sizeof(IdFrEnt));
+        memcpy(nv, s->v, s->n * sizeof(IdFrEnt));
+        if (s->heap) id_pool_free(s->v, s->cap * sizeof(IdFrEnt));
+        s->v = nv; s->cap = nc; s->heap = 1;
+    }
+    s->v[s->n].p = p; s->v[s->n].f = f; s->n++;
+}
+void id_frs_run(void* root, IdFrFn f) {
+    IdFrEnt loc[64];
+    IdFrSt s;
+    s.v = loc; s.n = 0; s.cap = 64; s.heap = 0;
+    id_frs_push(&s, root, f);
+    while (s.n > 0) { s.n--; IdFrEnt e = s.v[s.n]; e.f(e.p, &s); }
+    if (s.heap) id_pool_free(s.v, s.cap * sizeof(IdFrEnt));
+}
 typedef struct { void* p; const char* d; } IdFrWork;
 static void id_free_walk(IdList* root, const char* base) {
     IdFrWork loc[64];
@@ -1262,39 +1285,105 @@ IdList* lexline;  /* exported by lex_setup() */
 IdList* lexbol;  /* exported by lex_setup() */
 IdList* lexcols;  /* exported by lex_cols() */
 
-static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
-static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
-static void idfr_Zip(IdList* p) { id_free_walk(p, "S3.l.ls"); }
-static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
-static void idfr_ZstdLoop(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
-static void idfr_ZstdBlock(IdList* p) { id_free_walk(p, "S3..S3..."); }
-static void idfr_ZstdDecoded(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
-static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }
-static void idfr_ZstdWalk(IdList* p) { id_free_walk(p, "S3S3...S3...S3..."); }
-static void idfr_BlendMesh(IdList* p) { id_free_walk(p, "S3..S3..."); }
-static void idfr_GuiBd(IdList* p) { id_free_walk(p, "S3S3lsl.l.S3l.lsl.S3l.lsl."); }
-static void idfr_GuiCl(IdList* p) { id_free_walk(p, "S3l.lsl."); }
-static void idfr_GuiHm(IdList* p) { id_free_walk(p, "S3lsl.l."); }
-static void idfr_GuiButton(IdList* p) { id_free_walk(p, "S3l.s."); }
-static void idfr_GuiToggle(IdList* p) { id_free_walk(p, "S3S3l.s..."); }
-static void idfr_GuiColors(IdList* p) { id_free_walk(p, "S3l.l.s"); }
-static void idfr_GuiCombo(IdList* p) { id_free_walk(p, "S3S3S3sS3..l.S2S2lsl.S2lsl.l.sS3lsl..S3lsl.s"); }
-static void idfr_GuiComboSet(IdList* p) { id_free_walk(p, "S3lsl.s"); }
-static void idfr_GuiDialog(IdList* p) { id_free_walk(p, "S3S3slslsl.l."); }
-static void idfr_GuiDialogText(IdList* p) { id_free_walk(p, "S3slsls"); }
-static void idfr_GuiDrop(IdList* p) { id_free_walk(p, "S3S3l.s.lsl."); }
-static void idfr_GuiFiles(IdList* p) { id_free_walk(p, "S3S3S3sS3..l.S2S2lsl.S2lsl.l.sS3lsssl."); }
-static void idfr_GuiFilesList(IdList* p) { id_free_walk(p, "S3lsss"); }
-static void idfr_GuiGallery(IdList* p) { id_free_walk(p, "S3lsl.."); }
-static void idfr_GuiMenu(IdList* p) { id_free_walk(p, "S3lsl.."); }
-static void idfr_GuiPop(IdList* p) { id_free_walk(p, "S1l."); }
-static void idfr_GuiScroll(IdList* p) { id_free_walk(p, "S3l..."); }
-static void idfr_GuiTextBox(IdList* p) { id_free_walk(p, "S3S3sS3..l.S2S2lsl.S2lsl.l.s"); }
-static void idfr_GuiTb(IdList* p) { id_free_walk(p, "S3sS3..l.S2S2lsl.S2lsl."); }
-static void idfr_GuiTbLog(IdList* p) { id_free_walk(p, "S2lsl."); }
-static void idfr_GuiTbSel(IdList* p) { id_free_walk(p, "S3..l."); }
-static void idfr_GuiTbHist(IdList* p) { id_free_walk(p, "S2S2lsl.S2lsl."); }
-static void idfr_GuiTip(IdList* p) { id_free_walk(p, "S2l.s"); }
+static void idfs_XmlR(void*, IdFrSt*);
+static void idfs_XmlW(void*, IdFrSt*);
+static void idfs_Zip(void*, IdFrSt*);
+static void idfs_ZipW(void*, IdFrSt*);
+static void idfs_ZstdLoop(void*, IdFrSt*);
+static void idfs_ZstdBlock(void*, IdFrSt*);
+static void idfs_ZstdDecoded(void*, IdFrSt*);
+static void idfs_ZstdOffset(void*, IdFrSt*);
+static void idfs_ZstdWalk(void*, IdFrSt*);
+static void idfs_BlendMesh(void*, IdFrSt*);
+static void idfs_GuiBd(void*, IdFrSt*);
+static void idfs_GuiCl(void*, IdFrSt*);
+static void idfs_GuiHm(void*, IdFrSt*);
+static void idfs_GuiButton(void*, IdFrSt*);
+static void idfs_GuiToggle(void*, IdFrSt*);
+static void idfs_GuiColors(void*, IdFrSt*);
+static void idfs_GuiCombo(void*, IdFrSt*);
+static void idfs_GuiComboSet(void*, IdFrSt*);
+static void idfs_GuiDialog(void*, IdFrSt*);
+static void idfs_GuiDialogText(void*, IdFrSt*);
+static void idfs_GuiDrop(void*, IdFrSt*);
+static void idfs_GuiFiles(void*, IdFrSt*);
+static void idfs_GuiFilesList(void*, IdFrSt*);
+static void idfs_GuiGallery(void*, IdFrSt*);
+static void idfs_GuiMenu(void*, IdFrSt*);
+static void idfs_GuiPop(void*, IdFrSt*);
+static void idfs_GuiScroll(void*, IdFrSt*);
+static void idfs_GuiTextBox(void*, IdFrSt*);
+static void idfs_GuiTb(void*, IdFrSt*);
+static void idfs_GuiTbLog(void*, IdFrSt*);
+static void idfs_GuiTbSel(void*, IdFrSt*);
+static void idfs_GuiTbHist(void*, IdFrSt*);
+static void idfs_GuiTip(void*, IdFrSt*);
+static void idfs_XmlR(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); { IdList* L1 = (void*)(intptr_t)L->data[2]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } } id_list_free(L); }
+static void idfr_XmlR(IdList* p) { id_frs_run(p, idfs_XmlR); }
+static void idfs_XmlW(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); { IdList* L1 = (void*)(intptr_t)L->data[1]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } } id_list_free(L); }
+static void idfr_XmlW(IdList* p) { id_frs_run(p, idfs_XmlW); }
+static void idfs_Zip(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[1]); { IdList* L1 = (void*)(intptr_t)L->data[2]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } } id_list_free(L); }
+static void idfr_Zip(IdList* p) { id_frs_run(p, idfs_Zip); }
+static void idfs_ZipW(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); { IdList* L1 = (void*)(intptr_t)L->data[2]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } } id_list_free(L); }
+static void idfr_ZipW(IdList* p) { id_frs_run(p, idfs_ZipW); }
+static void idfs_ZstdLoop(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_ZstdLoop(IdList* p) { id_frs_run(p, idfs_ZstdLoop); }
+static void idfs_ZstdBlock(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_ZstdBlock(IdList* p) { id_frs_run(p, idfs_ZstdBlock); }
+static void idfs_ZstdDecoded(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_ZstdDecoded(IdList* p) { id_frs_run(p, idfs_ZstdDecoded); }
+static void idfs_ZstdOffset(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_ZstdOffset(IdList* p) { id_frs_run(p, idfs_ZstdOffset); }
+static void idfs_ZstdWalk(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_ZstdWalk(IdList* p) { id_frs_run(p, idfs_ZstdWalk); }
+static void idfs_BlendMesh(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_BlendMesh(IdList* p) { id_frs_run(p, idfs_BlendMesh); }
+static void idfs_GuiBd(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiHm); id_frs_push(s, (void*)(intptr_t)L->data[1], idfs_GuiCl); id_frs_push(s, (void*)(intptr_t)L->data[2], idfs_GuiCl); } id_list_free(L); }
+static void idfr_GuiBd(IdList* p) { id_frs_run(p, idfs_GuiBd); }
+static void idfs_GuiCl(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); { IdList* L1 = (void*)(intptr_t)L->data[1]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiCl(IdList* p) { id_frs_run(p, idfs_GuiCl); }
+static void idfs_GuiHm(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_list_free((void*)(intptr_t)L->data[1]); id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiHm(IdList* p) { id_frs_run(p, idfs_GuiHm); }
+static void idfs_GuiButton(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_str_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_GuiButton(IdList* p) { id_frs_run(p, idfs_GuiButton); }
+static void idfs_GuiToggle(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiButton); } id_list_free(L); }
+static void idfr_GuiToggle(IdList* p) { id_frs_run(p, idfs_GuiToggle); }
+static void idfs_GuiColors(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); id_str_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiColors(IdList* p) { id_frs_run(p, idfs_GuiColors); }
+static void idfs_GuiCombo(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiTextBox); id_frs_push(s, (void*)(intptr_t)L->data[1], idfs_GuiMenu); id_frs_push(s, (void*)(intptr_t)L->data[2], idfs_GuiComboSet); } id_list_free(L); }
+static void idfr_GuiCombo(IdList* p) { id_frs_run(p, idfs_GuiCombo); }
+static void idfs_GuiComboSet(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_list_free((void*)(intptr_t)L->data[1]); id_str_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiComboSet(IdList* p) { id_frs_run(p, idfs_GuiComboSet); }
+static void idfs_GuiDialog(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiDialogText); id_list_free((void*)(intptr_t)L->data[1]); id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiDialog(IdList* p) { id_frs_run(p, idfs_GuiDialog); }
+static void idfs_GuiDialogText(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_str_free((void*)(intptr_t)L->data[0]); { IdList* L1 = (void*)(intptr_t)L->data[1]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } { IdList* L1 = (void*)(intptr_t)L->data[2]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } } id_list_free(L); }
+static void idfr_GuiDialogText(IdList* p) { id_frs_run(p, idfs_GuiDialogText); }
+static void idfs_GuiDrop(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiButton); { IdList* L1 = (void*)(intptr_t)L->data[1]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiDrop(IdList* p) { id_frs_run(p, idfs_GuiDrop); }
+static void idfs_GuiFiles(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiTextBox); id_frs_push(s, (void*)(intptr_t)L->data[1], idfs_GuiFilesList); id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiFiles(IdList* p) { id_frs_run(p, idfs_GuiFiles); }
+static void idfs_GuiFilesList(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_str_free((void*)(intptr_t)L->data[1]); id_str_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiFilesList(IdList* p) { id_frs_run(p, idfs_GuiFilesList); }
+static void idfs_GuiGallery(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_list_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_GuiGallery(IdList* p) { id_frs_run(p, idfs_GuiGallery); }
+static void idfs_GuiMenu(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_list_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_GuiMenu(IdList* p) { id_frs_run(p, idfs_GuiMenu); }
+static void idfs_GuiPop(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); } id_list_free(L); }
+static void idfr_GuiPop(IdList* p) { id_frs_run(p, idfs_GuiPop); }
+static void idfs_GuiScroll(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); } id_list_free(L); }
+static void idfr_GuiScroll(IdList* p) { id_frs_run(p, idfs_GuiScroll); }
+static void idfs_GuiTextBox(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiTb); id_list_free((void*)(intptr_t)L->data[1]); id_str_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiTextBox(IdList* p) { id_frs_run(p, idfs_GuiTextBox); }
+static void idfs_GuiTb(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_str_free((void*)(intptr_t)L->data[0]); id_frs_push(s, (void*)(intptr_t)L->data[1], idfs_GuiTbSel); id_frs_push(s, (void*)(intptr_t)L->data[2], idfs_GuiTbHist); } id_list_free(L); }
+static void idfr_GuiTb(IdList* p) { id_frs_run(p, idfs_GuiTb); }
+static void idfs_GuiTbLog(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_str_free((void*)(intptr_t)L1->data[i1]); } } id_list_free(L1); } } id_list_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_GuiTbLog(IdList* p) { id_frs_run(p, idfs_GuiTbLog); }
+static void idfs_GuiTbSel(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[2]); } id_list_free(L); }
+static void idfr_GuiTbSel(IdList* p) { id_frs_run(p, idfs_GuiTbSel); }
+static void idfs_GuiTbHist(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_frs_push(s, (void*)(intptr_t)L->data[0], idfs_GuiTbLog); id_frs_push(s, (void*)(intptr_t)L->data[1], idfs_GuiTbLog); } id_list_free(L); }
+static void idfr_GuiTbHist(IdList* p) { id_frs_run(p, idfs_GuiTbHist); }
+static void idfs_GuiTip(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_str_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
+static void idfr_GuiTip(IdList* p) { id_frs_run(p, idfs_GuiTip); }
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
     id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
     return;
