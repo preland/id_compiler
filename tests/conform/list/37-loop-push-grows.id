@@ -1,0 +1,14 @@
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3];
+  int s = 0;
+  int j = 0;
+} chain (int argc, string[] argv) {
+  while(j < len(xs)) {
+    if(len(xs) < 40) {
+      push(xs, j);
+    }
+    s = s + xs[j];
+    j = j + 1;
+  }
+  print("" + s + " " + len(xs));
+} return int 0;

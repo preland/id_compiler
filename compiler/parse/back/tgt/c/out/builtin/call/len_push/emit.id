@@ -16,6 +16,7 @@ emit_len_form(int arg, string len_list_type) {
     s = "id_len(" + emit_expr(arg) + ")";
   } else {
     s = cell_ns(len_list_type) + "len(" + emit_expr(arg) + ")";
+    s = lp_hlen(s, emit_expr(arg));
   }
 } return string s;
 given call_int_fixture ((import call_e1), "string"):("id_len(5)")

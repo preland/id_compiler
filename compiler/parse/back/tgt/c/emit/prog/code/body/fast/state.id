@@ -16,6 +16,8 @@
 //   lpj     the loop condition's bounds: the counter's name, and in lpn the
 //           node of the limit it is compared with
 //   lpbad   [1] when the condition holds something the guard cannot read
+//   lph     the lists whose header the guarded copy reads once, into a local
+//   lphn    the lists whose length it reads once, into a local
 //
 // The tokens are the contract between the targets, and each target spells them
 // itself: the C emitter's lp_pre prints them as one C condition, and the LLVM
@@ -44,6 +46,8 @@ lp_reset() {
   export int[] lpbad = [0];
 } chain () {
   export string[] lpg = [];
+  export string[] lph = [];
+  export string[] lphn = [];
 } return void export lpset;
 given lpf_on ():() then lpf_nset:(0)
 given lpf_on ():() then lpf_flag:(1)

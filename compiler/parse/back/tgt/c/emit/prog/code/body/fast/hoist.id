@@ -1,0 +1,42 @@
+// A guarded copy reads each list's header once. Everything that makes the
+// guard sound already makes this sound: no call in the body can push or pop
+// (lp_clean), and every covered list, and the list a `len(xs)` limit names, is
+// not reassigned (lp_held, lp_lim), so the data pointer and the length are the
+// same on every iteration. gcc cannot prove that from loads inside the loop,
+// and will not vectorise it. The header is copied into a local the loop reads
+// instead, and a length limit is taken once, by the same call that would have
+// trapped on a list that is not there, at the point the first test of the
+// condition would have. lp_hoist prints those locals just inside the guard.
+
+lp_hoist(int lq_w, string lq_ind) {
+  int lq_lo = (import ni1)[lq_w] + 1;
+  int lq_hi = lq_w - 1;
+  lp_hbases(lq_ind);
+} chain (int lq_w, string lq_ind) {
+  lp_hlens(lq_ind, lq_lo, lq_hi);
+} return void;
+given lpf_in(0) given lpf_planned ((import lpf_wa), "  "):() then prints:("  IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n")
+given lpf_in(0) given lpf_planb ((import lpf_wb), "  "):() then prints:("  IdList idh_c_lbv = *(lbv); IdList* idh_lbv = &idh_c_lbv;\n  int idh_n_lbv = id_list_len(lbv);\n")
+
+lp_hbases(string lq_ind) {
+  int lq_k = 0;
+  while(lq_k < len((import lpset))) {
+    lp_hbase((import lpset)[lq_k], lq_ind);
+    lq_k = lq_k + 1;
+  }
+} return void;
+given lpf_in(0) given lpf_planned (""):() then (import lph)[0]:("lav")
+given lpf_in(0) given lpf_planb (""):() then len((import lph)):(1)
+
+lp_hbase(int lq_id, string lq_ind) {
+  int lq_b = (import ni1)[lq_id];
+  string lq_nm = emit_expr(lq_b);
+  string lq_ty = lp_hty(type_of(lq_b));
+} chain (int lq_id, string lq_ind) {
+  if((import nkind)[lq_b] == "var" && find_str((import lph), lq_nm) < 0) {
+    push((import lph), lq_nm);
+    print(lq_ind + lq_ty + " idh_c_" + lq_nm + " = *(" + lq_nm + "); " + lq_ty + "* idh_" + lq_nm + " = &idh_c_" + lq_nm + ";");
+  }
+} return void;
+given lpf_in(0) given lpf_planned ((import lpf_xa), "  "):() then prints:("  IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n")
+given lpf_in(0) given lpf_planned ((import lpf_xa), ""):() then (import lph)[0]:("lav")

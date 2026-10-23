@@ -1,0 +1,24 @@
+// Fixtures for the header locals of a guarded copy: lpf_planb plans the loop
+// whose limit is `len(lbv)`, lpf_on_hdr turns the guarded copy on with LA's
+// list taken (so lp_hb gives its local), lpf_on_len with the length of "w" taken.
+
+lpf_planb() {
+  lp_plan((import lpf_wb));
+  lset((import lpon), 0, 1);
+} return void;
+given lpf_in(0) ():() then lpf_nset:(3)
+given lpf_in(0) ():() then len((import lpn)):(1)
+
+lpf_on_hdr() {
+  lpf_on();
+  push((import lph), "lav");
+} return void;
+given lpf_on ():() then len((import lph)):(1)
+given lpf_on ():() then (import lph)[0]:("lav")
+
+lpf_on_len() {
+  lpf_on();
+  push((import lphn), "w");
+} return void;
+given lpf_on ():() then len((import lphn)):(1)
+given lpf_on ():() then (import lphn)[0]:("w")

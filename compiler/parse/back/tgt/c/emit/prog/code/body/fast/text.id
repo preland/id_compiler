@@ -14,7 +14,7 @@ given lpf_more ((import lpf_xa)):(0)
 
 lp_get(int lq_id, string lq_btxt, string lq_xtxt) {
   string lq_ns = cell_ns(type_of((import ni1)[lq_id]));
-  string lq_s = cell_get_text(lq_ns, lq_btxt, lq_xtxt, lp_hit(lq_id));
+  string lq_s = cell_get_text(lq_ns, lp_hb(lq_btxt, lq_id), lq_xtxt, lp_hit(lq_id));
 } return string lq_s;
 given lpf_on ((import lpf_xa), "v", "j"):("(v)->data[j]")
 given lpf_on ((import lpf_xb), "w", "k"):("id_list_get(w, k)")
@@ -22,7 +22,7 @@ given lpf_on ((import lpf_xb), "w", "k"):("id_list_get(w, k)")
 lp_set(int lq_id, string lq_btxt, string lq_xtxt, string lq_vtxt) {
   string lq_ns = cell_ns(type_of((import ni1)[lq_id]));
   int lq_fit = cell_set_fit(lq_ns, lq_id);
-  string lq_s = cell_set_text(lq_ns, lq_btxt, lq_xtxt, lq_vtxt, lp_hit(lq_id), lq_fit);
+  string lq_s = cell_set_text(lq_ns, lp_hb(lq_btxt, lq_id), lq_xtxt, lq_vtxt, lp_hit(lq_id), lq_fit);
 } chain (int lq_id, string lq_btxt, string lq_xtxt, string lq_vtxt) {
   lq_s = esc_slot_code(lq_id, lq_btxt, lq_xtxt, lq_vtxt, lq_s);
 } return string lq_s;

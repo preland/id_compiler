@@ -1,0 +1,34 @@
+// The lengths a guarded copy reads once. A limit `len(xs)` of the loop
+// condition becomes `int idh_n_xs`, taken before the loop; lp_hlen then gives
+// that local in place of the call wherever the guarded copy asks for the
+// length of xs. Only a list the body does not write (lp_cnt) is taken, the
+// same test lp_lim makes of a limit, and a string is left alone.
+
+lp_hlens(string lq_ind, int lq_lo, int lq_hi) {
+  int lq_k = 0;
+  while(lq_k < len((import lpn))) {
+    lp_hlen1((import lpn)[lq_k], lq_ind, lq_lo, lq_hi);
+    lq_k = lq_k + 1;
+  }
+} return void;
+given lpf_in(0) given lpf_planb ("", (import lpf_lob), (import lpf_hib)):() then (import lphn)[0]:("lbv")
+given lpf_in(0) given lpf_planned ("", (import lpf_loa), (import lpf_hia)):() then len((import lphn)):(0)
+
+lp_hlen1(int lq_n, string lq_ind, int lq_lo, int lq_hi) {
+  string lq_nm = lp_lname(lq_n);
+  if((import nkind)[lq_n] == "call" && find_str((import lphn), lq_nm) < 0 && lp_cnt(lq_lo, lq_hi, lq_nm, 0) == 0) {
+    print(lq_ind + "int idh_n_" + lq_nm + " = " + emit_expr(lq_n) + ";");
+    push((import lphn), lq_nm);
+  }
+} return void;
+given lpf_in(0) given lpf_planb ((import lpf_nb), "  ", (import lpf_lob), (import lpf_hib)):() then prints:("  int idh_n_lbv = id_list_len(lbv);\n")
+given lpf_in(0) given lpf_planned ((import lpf_na), "  ", (import lpf_loa), (import lpf_hia)):() then len((import lphn)):(0)
+
+lp_hlen(string lq_s, string lq_nm) {
+  string lq_ht = lq_s;
+  if((import lpon)[0] == 1 && find_str((import lphn), lq_nm) >= 0) {
+    lq_ht = "idh_n_" + lq_nm;
+  }
+} return string lq_ht;
+given lpf_on ("id_list_len(w)", "w"):("id_list_len(w)")
+given lpf_on_len ("id_list_len(w)", "w"):("idh_n_w")

@@ -11,20 +11,21 @@ emit_loop(int id, string ind) {
     emit_while(id, ind);
   }
 } return void;
-given lpf_in(0) ((import lpf_wa), ""):() then prints:("if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n        laj = (laj + 1);\n    }\n} else {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n        laj = (laj + 1);\n    }\n}\n")
+given lpf_in(0) ((import lpf_wa), ""):() then prints:("if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n    IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)((idh_lav)->data[laj]));\n        laj = (laj + 1);\n    }\n} else {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n        laj = (laj + 1);\n    }\n}\n")
 given lpf_in(0) ((import lpf_wc), ""):() then prints:("while ((lcj < lcn)) {\n    id_list_push(lcv, (long long)(intptr_t)((IdList*)(intptr_t)(id_list_get(lcv, lcj))));\n    lcj = (lcj + 1);\n}\n")
 
 emit_loop_fast(int id, string ind) {
   string lq_pre = lp_pre();
   print(ind + "if (" + lq_pre + ") {");
-  lset((import lpon), 0, 1);
+  lp_hoist(id, ind + "    ");
 } chain (int id, string ind) {
+  lset((import lpon), 0, 1);
   emit_while(id, ind + "    ");
   lset((import lpon), 0, 0);
-  print(ind + "} else {");
 } chain (int id, string ind) {
+  print(ind + "} else {");
   emit_while(id, ind + "    ");
   print(ind + "}");
 } return void;
-given lpf_in(0) given lpf_planned ((import lpf_wa), ""):() then prints:("if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n        laj = (laj + 1);\n    }\n} else {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n        laj = (laj + 1);\n    }\n}\n")
-given lpf_in(0) given lpf_planned ((import lpf_wa), "  "):() then prints:("  if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n          laj = (laj + 1);\n      }\n  } else {\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n          laj = (laj + 1);\n      }\n  }\n")
+given lpf_in(0) given lpf_planned ((import lpf_wa), ""):() then prints:("if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n    IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)((idh_lav)->data[laj]));\n        laj = (laj + 1);\n    }\n} else {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n        laj = (laj + 1);\n    }\n}\n")
+given lpf_in(0) given lpf_planned ((import lpf_wa), "  "):() then prints:("  if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n      IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)((idh_lav)->data[laj]));\n          laj = (laj + 1);\n      }\n  } else {\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n          laj = (laj + 1);\n      }\n  }\n")
