@@ -38,4 +38,5 @@ fix_gcl_nodes() {
   int e2 = node_txt2("int", "2", 2, 0);
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_txt2:("int", "2", 2, 0)
 ():() then init_units:(0)

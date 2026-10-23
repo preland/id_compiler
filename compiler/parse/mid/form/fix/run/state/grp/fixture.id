@@ -20,6 +20,8 @@ fix_fixture2() {
   init_bnames();
   init_idx();
 } return void;
+given fix_push4_fixture ():() then len((import fixe_nm)):(0)
+given fix_fixture given sset((import bnames), 0, "zz") ():() then (import bnames)[0]:("print")
 given fix_fixture ():() then (import chkfail)[0]:(0)
 given fix_fixture ():() then init_units:(0)
 
@@ -30,5 +32,7 @@ fix_span_fixture5(int e) {
   push((import ttext), ")");
   fix_span_fixture6(e);
 } return void;
+given fix_span_fixture (0):() then calls fix_span_fixture6:(0)
+given fix_span_fixture (0):() then len((import ttext)):(5)
 given fix_span_fixture (0):() then (import chkfail)[0]:(0)
 given fix_span_fixture (0):() then init_units:(0)

@@ -10,6 +10,8 @@ fix_state() {
   fix_state2();
   fix_gcl();
 } return void;
+given fix_fixture given fix_take("baz", "int") ():() then (import fixd_nm):([])
+given fix_fixture given fix_note_tok(3, 4) ():() then (import fixd_lo):([])
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
@@ -18,6 +20,8 @@ fix_state1() {
   export string[] fixd_ty = [];
   export int[] fixd_seq = [0];
 } return void;
+given fix_fixture given fix_take("baz", "int") ():() then (import fixd_ty):([])
+given fix_fixture given lset((import fixd_seq), 0, 5) ():() then (import fixd_seq):([0])
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 

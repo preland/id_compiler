@@ -10,6 +10,8 @@ fix_state3() {
   export int[] fixd_lo = [];
   fix_state3b();
 } return void;
+given fix_fixture given fix_take("baz", "int") ():() then (import fixd_used):([])
+given fix_fixture given fix_note_tok(3, 4) ():() then (import fixd_lo):([])
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
@@ -23,6 +25,8 @@ fix_state3b() {
   export int[] fixd_hi = [];
   fix_rcache_reset();
 } return void;
+given fix_fixture given fix_note_tok(3, 4) ():() then (import fixd_hi):([])
+given fix_span_fixture given fix_rcache_add(0, "x") ():() then (import fixd_rk):([])
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
@@ -33,5 +37,7 @@ fix_span_fixture4(int e) {
   push((import ttext), "len");
   fix_span_fixture5(e);
 } return void;
+given fix_span_fixture (0):() then calls fix_span_fixture5:(0)
+given fix_span_fixture (0):() then len((import ttext)):(6)
 given fix_span_fixture (0):() then (import chkfail)[0]:(0)
 given fix_span_fixture (0):() then init_units:(0)

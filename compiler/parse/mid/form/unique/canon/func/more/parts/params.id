@@ -14,4 +14,5 @@ paramlist_begun_fixture() {
   uq_begin("f");
 } return void;
 ():() then calls uq_begin:("f")
+():() then calls node_param:("param", "int", "ret_i")
 ():() then init_units:(0)

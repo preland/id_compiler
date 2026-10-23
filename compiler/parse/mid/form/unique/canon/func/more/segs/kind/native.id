@@ -18,6 +18,7 @@ canon_begun_j_fixture() {
   uq_begin("f");
 } return void;
 ():() then calls uq_begin:("f")
+():() then calls node_txt:("var", "y")
 ():() then init_units:(0)
 
 unit_kind(int id) {

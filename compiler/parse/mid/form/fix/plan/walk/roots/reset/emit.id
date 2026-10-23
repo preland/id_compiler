@@ -32,6 +32,8 @@ fix_ev_reset5() {
   export string[] fixe_an = [];
   export int[] fixe_ru = [];
 } return void;
+given fix_mark_case_fixture ():() then len((import fixe_ru)):(0)
+given fix_mark_case_fixture ():() then len((import fixe_an)):(0)
 given fix_fixture ():() then (import chkfail)[0]:(0)
 given fix_fixture ():() then init_units:(0)
 

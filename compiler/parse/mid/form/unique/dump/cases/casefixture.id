@@ -24,5 +24,7 @@ incase_setup() {
   push((import casefn), 0 - 1);
   push((import casenode), 1000);
 } return void;
+given incase_init ():() then (import casenode)[0]:(1000)
+given incase_init ():() then (import casefn)[0]:(-1)
 given incase_init ():() then (import chkfail)[0]:(0)
 given incase_init ():() then init_units:(0)

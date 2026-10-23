@@ -17,4 +17,5 @@ cwv_setup() {
   export int cwv_func = node_func("f", "int[]", none, none, (import cwv_arr));
 } return void;
 ():() then calls cw_begin:("t")
+():() then calls node_txt:("str", "hi")
 ():() then init_units:(0)

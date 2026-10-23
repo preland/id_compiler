@@ -27,6 +27,7 @@ call_fp_fixture() {
   export int call_ushr = node_call("ushr", [cfx_x, lit0]);
 } return void;
 ():() then calls node_txt2:("int", "3", 3, 0)
+():() then calls node_txt2:("int", "7", 7, 0)
 ():() then init_units:(0)
 
 // canon_iassign's second case (../../../../stmt/more/decl.id) needs an
@@ -38,5 +39,7 @@ iassign2_fixture() {
   iafix();
   uq_begin("f");
 } return void;
+():() then calls uq_begin:("f")
+():() then calls node_txt2:("int", "2", 2, 0)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

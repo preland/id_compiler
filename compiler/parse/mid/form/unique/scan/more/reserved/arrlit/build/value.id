@@ -31,4 +31,5 @@ cwv_els_fixture() {
   export int[] cwv_mixed_els = [e0, fn];
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_txt:("str", "hi")
 ():() then init_units:(0)

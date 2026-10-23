@@ -30,6 +30,7 @@ canon_begun_fixture() {
   uq_begin("f");
 } return void;
 ():() then calls uq_begin:("f")
+():() then calls node_txt:("var", "y")
 ():() then init_units:(0)
 
 blank_stmts_fixture() {
@@ -41,4 +42,5 @@ blank_stmts_fixture() {
   export int[] kept_body = [(import lz_declid)];
 } return void;
 ():() then calls newleaf:("blank", 0, 0, "", "")
+():() then calls newleaf:("chain", 0, 0, "", "")
 ():() then init_units:(0)

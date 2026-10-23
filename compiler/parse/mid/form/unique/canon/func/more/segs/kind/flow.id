@@ -27,4 +27,5 @@ flow_canon_fixture() {
   export int canon_retv = newnode("ret", (import canon_lit), 0, "f", "int", canon_none, canon_none);
 } return void;
 ():() then calls newleaf:("break", -1, 0, "", "")
+():() then calls node_txt2:("int", "4", 4, 1)
 ():() then init_units:(0)

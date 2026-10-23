@@ -29,5 +29,7 @@ elif_begun_fixture() {
   elif_fixture();
   uq_begin("f");
 } return void;
+():() then calls node_if:(0, [1], [1], 2)
+():() then calls node_if:(0, [1], [5], 1)
 ():() then calls uq_begin:("f")
 ():() then init_units:(0)

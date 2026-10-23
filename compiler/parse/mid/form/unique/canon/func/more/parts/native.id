@@ -30,4 +30,5 @@ param_begun_fixture() {
   uq_begin("f");
 } return void;
 ():() then calls uq_begin:("f")
+():() then calls node_param:("param", "int", "a")
 ():() then init_units:(0)

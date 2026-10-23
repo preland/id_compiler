@@ -36,4 +36,5 @@ cw_decl_fixture() {
   export int[] cw_func_list = [(import cwv_func)];
 } return void;
 ():() then calls node_txt2:("int", "3", 3, 0)
+():() then calls cw_begin:("t")
 ():() then init_units:(0)
