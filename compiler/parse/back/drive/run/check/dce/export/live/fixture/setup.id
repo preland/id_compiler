@@ -25,6 +25,8 @@ cvl_setup() {
   add_func("main", "int", (import cvf_main));
   push((import prog), (import cvf_main));
 } return void;
+():() then calls lc_reg_int:("ca", "1", 1) then calls node_txt:("var", "ca") then calls lc_reg_int:("cc", "3", 3) then calls lc_reg_int:("cd", "4", 4)
+():() then calls node_func:("main", "int", [], [8], 9) then calls add_func:("main", "int", 10) then len((import prog)):(1)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 

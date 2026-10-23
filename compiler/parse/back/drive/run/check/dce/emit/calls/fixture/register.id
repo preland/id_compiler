@@ -7,6 +7,8 @@ edge_fixture_caller_register() {
   edge_fixture_caller_reg();
   edge_loc(20);
 } return void;
+given edge_fixture ():() then (import fnames)[2]:("edge_caller")
+given edge_fixture ():() then (import pline)[2]:(20) then (import pfile)[2]:("fixture.id")
 given edge_fixture ():() then (import chkfail)[0]:(0)
 given edge_fixture ():() then init_units:(0)
 
@@ -15,6 +17,8 @@ edge_fixture_caller_reg() {
   push((import fnodes), (import edge_caller_fn));
   push((import prog), (import edge_caller_fn));
 } return void;
+given edge_fixture ():() then (import fnames)[2]:("edge_caller")
+given edge_fixture ():() then len((import prog)):(3) then (import fnodes)[2]:(7)
 given edge_fixture ():() then (import chkfail)[0]:(0)
 given edge_fixture ():() then init_units:(0)
 

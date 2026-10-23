@@ -20,6 +20,7 @@ natcall_fixture() {
   natcall_fixture_reg();
 } return void;
 ():() then calls lw_env_fixture:[1] then (import natc)[0]:(1)
+():() then calls nat_init:(2, ["prog", "--natives"]) then calls newnode:("func", -1, 1, "nat_target", "int", [], [])
 ():() then init_units:(0)
 
 natcall_fixture_reg() {
@@ -27,6 +28,8 @@ natcall_fixture_reg() {
   int[] none = [];
   natcall_fixture_func(none);
 } return void;
+given natcall_fixture ():() then calls nat_init:(2, ["prog", "--natives"])
+given natcall_fixture ():() then calls newnode:("func", -1, 1, "nat_target", "int", [], [])
 given natcall_fixture ():() then (import chkfail)[0]:(0)
 given natcall_fixture ():() then init_units:(0)
 
@@ -35,5 +38,7 @@ natcall_fixture_func(int[] none) {
   int natfn = newnode("func", 0 - 1, 1, "nat_target", "int", none, none);
   natcall_fixture_tail(natfn, none);
 } return void;
+given natcall_fixture ([]):() then calls newnode:("func", -1, 1, "nat_target", "int", [], [])
+given natcall_fixture ([]):() then calls natcall_fixture_tail:(3, [])
 given natcall_fixture ([]):() then (import chkfail)[0]:(0)
 given natcall_fixture ([]):() then init_units:(0)

@@ -26,6 +26,8 @@ seed_cfn_fixture_node() {
   int[] args = [cfnid];
   seed_cfn_fixture_add(args);
 } return void;
+given fn_fixture ():() then calls newleaf:("cfn", 0, 0, "fx_target", "")
+given fn_fixture ():() then calls seed_cfn_fixture_add:([4]) then len((import casenode)):(2)
 given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)
 

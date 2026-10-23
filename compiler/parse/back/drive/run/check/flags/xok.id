@@ -9,6 +9,7 @@ lz_b() {
   export int lz_i1 = node_txt2("int", "3", 3, 0);
 } return void;
 ():() then calls node_txt:("var", "x")
+():() then calls node_txt2:("int", "3", 3, 0)
 ():() then init_units:(0)
 
 // Everything ut_why needs in one setup: the untestable tables seeded, a
@@ -27,6 +28,7 @@ ut_host_seeded() {
   arg_flags4(3, ["prog", "--host-triple", "x86_64-unknown-none"]);
 } return void;
 ():() then calls ut_add:("caller", "asm 'in8'", "port_byte")
+():() then calls arg_flags4:(3, ["prog", "--host-triple", "x86_64-unknown-none"])
 ():() then init_units:(0)
 
 arg_flag(int argc, string[] argv, int i, string name) {

@@ -22,6 +22,7 @@ lz_a() {
   export int lz_str = node_txt("str", "hi");
 } return void;
 ():() then calls uq_begin:("test")
+():() then calls node_txt:("str", "hi")
 ():() then init_units:(0)
 
 // The last step of seed_cfn_fixture (tests/more/clear.id, dce/export/
