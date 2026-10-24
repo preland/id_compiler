@@ -32,8 +32,8 @@ pass=0 fail=0
 # rule each one breaks is the one on its EXPECT line, not the two-case
 # minimum.
 check_one() {
-    local label="$1" f="$2" expect="$3" out rc
-    out=$("$BIN_IDC" "$f" --allow-untested -o "$TMP/out" 2>&1)
+    local label="$1" f="$2" expect="$3" flags="${4:-}" out rc
+    out=$("$BIN_IDC" "$f" $flags --allow-untested -o "$TMP/out" 2>&1)
     rc=$?
     if [ "$rc" -eq 0 ]; then
         echo "FAIL: $label (compiled successfully; expected error '$expect')"
@@ -68,7 +68,9 @@ done
 
 # A directory is a project: a struct is declared in a file of its own
 # (docs/SPEC.md, structs), so a program that uses one is not a single file. Its
-# `// EXPECT:` line is in whichever of its files carries it.
+# `// EXPECT:` line is in whichever of its files carries it, and an optional
+# `// FLAGS:` line there adds compiler flags (the word scan's path checks need
+# --word-scan).
 for d in invalid/*/; do
     [ -d "$d" ] || continue
     mine || continue
@@ -77,7 +79,8 @@ for d in invalid/*/; do
     if [ -z "$expect" ]; then
         echo "FAIL: $name (no '// EXPECT:' line in $d)"; fail=$((fail+1)); continue
     fi
-    check_one "$name" "${d%/}" "$expect"
+    flags=$(sed -n 's@^// FLAGS: @@p' "$d"*.id | head -1)
+    check_one "$name" "${d%/}" "$expect" "$flags"
 done
 
 # A name used with two types across the program (E0303) must be the FIRST thing

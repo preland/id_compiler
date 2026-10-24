@@ -1,0 +1,42 @@
+// The words of a path diagnostic (./pathreport.id): why the component fails and
+// how to fix it, for a piece that is not a word, a piece that is filler, or
+// both. A filler piece is a real word, so the remedy is not allowed.txt but a
+// name for what the files have in common.
+
+vocab_path_reason(string vocab_failed, string vocab_filler) {
+  string vocab_first_why = "";
+  string vocab_second_why = "";
+  if(vocab_failed != "") {
+    vocab_first_why = "is not spelled in words: " + vocab_failed;
+  }
+} chain (string vocab_failed, string vocab_filler) {
+  if(vocab_filler != "") {
+    vocab_second_why = "is filler that names nothing its files share: " + vocab_filler;
+  }
+  if(vocab_failed != "" && vocab_filler != "") {
+    vocab_first_why = vocab_first_why + " and ";
+  }
+  string vocab_text = vocab_first_why + vocab_second_why;
+} return string vocab_text;
+("fb", ""):("is not spelled in words: fb")
+("", "more"):("is filler that names nothing its files share: more")
+("fb", "more"):("is not spelled in words: fb and is filler that names nothing its files share: more")
+
+vocab_path_help(string vocab_failed, string vocab_filler) {
+  string vocab_first_help = "";
+  string vocab_second_help = "";
+  if(vocab_failed != "") {
+    vocab_first_help = "rename it so every part is a word, or add '" + vocab_first(vocab_failed) + "' to idc/data/words/allowed.txt if it is a real term";
+  }
+} chain (string vocab_failed, string vocab_filler) {
+  if(vocab_filler != "") {
+    vocab_second_help = "'" + vocab_first(vocab_filler) + "' is filler: name what the files in it have in common instead";
+  }
+  if(vocab_failed != "" && vocab_filler != "") {
+    vocab_first_help = vocab_first_help + "; ";
+  }
+  string vocab_text = vocab_first_help + vocab_second_help;
+} return string vocab_text;
+("fb", ""):("rename it so every part is a word, or add 'fb' to idc/data/words/allowed.txt if it is a real term")
+("", "more"):("'more' is filler: name what the files in it have in common instead")
+("fb", "more"):("rename it so every part is a word, or add 'fb' to idc/data/words/allowed.txt if it is a real term; 'more' is filler: name what the files in it have in common instead")

@@ -2231,18 +2231,42 @@ FE_HIT=0
 # two-letter words, and data/words/denied.txt the abbreviations the dictionary
 # lists that must still fail: it removes a word from english.txt only, so a word
 # allowed.txt or short.txt names is accepted. idparse checks every declared name
-# against the result (E0311). Only under the flag: no other build reads these files.
+# against the result (E0311). data/words/filler.txt travels as `wrd !WORD` lines,
+# which only file and directory names are checked against; those names travel as
+# `wrp KINDPATH` lines (KIND the letter d or f, PATH from the project root, a file
+# without its .id), one per distinct component of the files of the program's own
+# roots, the standard library's excluded. Only under the flag: no other build reads these files.
 WORD_HEAD=""
 if [ "$WORD_SCAN" -eq 1 ]; then
-    for wf in denied english short allowed; do
+    for wf in denied english short allowed filler; do
         [ -f "$ROOT/data/words/$wf.txt" ] || { echo "idc: --word-scan reads $ROOT/data/words/$wf.txt, which does not exist" >&2; exit 1; }
     done
     WORD_HEAD="$WORK/words.head"
-    awk 'FILENAME ~ /denied[.]txt$/ { if ($1 !~ /^#/ && NF > 0) denied[$1] = 1; next }
+    awk 'FILENAME ~ /filler[.]txt$/ { if ($1 !~ /^#/ && NF > 0) print "wrd !" $1; next }
+         FILENAME ~ /denied[.]txt$/ { if ($1 !~ /^#/ && NF > 0) denied[$1] = 1; next }
          /^#/ || NF == 0 { next }
          FILENAME ~ /english[.]txt$/ && ($1 in denied) { next }
          { print "wrd " $1 }' "$ROOT/data/words/denied.txt" "$ROOT/data/words/english.txt" \
-        "$ROOT/data/words/short.txt" "$ROOT/data/words/allowed.txt" > "$WORD_HEAD"
+        "$ROOT/data/words/short.txt" "$ROOT/data/words/allowed.txt" "$ROOT/data/words/filler.txt" > "$WORD_HEAD"
+    { printf '%s\n' "${SRC_ROOTS[@]}"; printf '%s\n' "${SRC_FILES[@]}"; } \
+    | awk -v nroots="${#SRC_ROOTS[@]}" -v nown="$STD_UNIT_START" '
+        NR <= nroots { root[NR - 1] = $0; next }
+        { best = -1; unit = 0
+          for (i = 0; i < nroots; i++) {
+              n = length(root[i])
+              if (n > best && substr($0, 1, n) == root[i]) { best = n; unit = i }
+          }
+          if (unit >= nown) next
+          rel = $0
+          if (length($0) > best) { rel = substr($0, best + 1); sub(/^\/+/, "", rel) }
+          else { k = split($0, base, "/"); rel = base[k] }
+          sub(/[.]id$/, "", rel)
+          n = split(rel, comp, "/"); acc = ""
+          for (k = 1; k <= n; k++) {
+              acc = (k > 1 ? acc "/" : "") comp[k]
+              key = (k < n ? "d" : "f") acc
+              if (!(key in seen)) { seen[key] = 1; print "wrp " key }
+          } }' >> "$WORD_HEAD"
 fi
 # Materialised unconditionally, cache on or off: capped_from (see capped(),
 # above) needs a real path for idlex's input regardless, since ccrun no

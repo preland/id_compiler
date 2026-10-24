@@ -9,6 +9,8 @@
 //                                     declared in a hundred functions is
 //                                     judged, and reported, once
 //   vocab_totals                      [names judged, names not spelled in words]
+//   vocab_paths                       the file and directory names to judge
+//                                     (./pathscan.id), each a kind letter and a path
 
 vocab_init() {
   export string[] vocab_keys = [];
@@ -30,6 +32,8 @@ vocab_init_seen() {
   export int[] vocab_seen_count = [];
   export int[] vocab_totals = [0, 0];
   hash_map_initialize((import vocab_seen_keys), (import vocab_seen_vals), (import vocab_seen_used), (import vocab_seen_count));
+} chain () {
+  export string[] vocab_paths = [];
 } return void export vocab_totals;
 ():() then (import vocab_seen_count)[0]:(0)
 ():() then (import vocab_totals)[1]:(0)

@@ -1,0 +1,37 @@
+// The filler lookup for path names: the pieces of one file or directory name
+// that data/words/filler.txt lists. bin/idc hands the list over as `wrd !word`
+// lines, so it lives in the vocabulary under a key no identifier can spell, and
+// the lookup ignores case like vocab_ok's.
+
+vocab_path_filler(string vocab_name) {
+  string[] vocab_pieces = str_split(vocab_name, "_");
+  string vocab_acc = "";
+  int vocab_i = 0;
+} chain (string vocab_name) {
+  while(vocab_i < len(vocab_pieces)) {
+    vocab_acc = vocab_filler_add(vocab_acc, vocab_pieces[vocab_i]);
+    vocab_i = vocab_i + 1;
+  }
+} return string vocab_acc;
+given full_env given vocab_path_words ("more"):("more")
+given full_env given vocab_path_words ("buffer_more"):("more")
+given full_env given vocab_path_words ("buffer_width"):("")
+given full_env given vocab_path_words (""):("")
+
+vocab_filler_add(string vocab_acc, string vocab_piece) {
+  string vocab_next = vocab_acc;
+  if(hash_map_has((import vocab_keys), (import vocab_used), "!" + str_lower(vocab_piece)) == 1) {
+    vocab_next = vocab_join(vocab_acc, vocab_piece);
+  }
+} return string vocab_next;
+given full_env given vocab_path_words ("", "More"):("More")
+given full_env given vocab_path_words ("", "buffer"):("")
+given full_env given vocab_path_words ("a", "more"):("a, more")
+
+vocab_path_words() {
+  vocab_words();
+  hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "more");
+  hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "!more");
+} return void;
+given full_env ():() then (import vocab_count)[0]:(5)
+given full_env ():() then (import chkfail)[0]:(0)

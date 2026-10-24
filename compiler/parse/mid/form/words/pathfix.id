@@ -1,0 +1,11 @@
+// The path table of the word scan with two components in it, a directory called
+// `more` (a filler word the dictionary knows) and one called `buffer`, over the
+// vocabulary vocab_path_words (./pathfiller.id) builds.
+
+vocab_path_rows() {
+  vocab_path_words();
+  push((import vocab_paths), "dmore");
+  push((import vocab_paths), "dbuffer");
+} return void;
+given full_env ():() then len((import vocab_paths)):(2)
+given full_env ():() then (import vocab_paths)[1]:("dbuffer")

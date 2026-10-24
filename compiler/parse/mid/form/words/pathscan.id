@@ -1,0 +1,40 @@
+// The path half of the word scan (E0311): the file and directory names of the
+// program. bin/idc, which alone sees the filesystem, hands idparse one
+// `wrp` line per distinct path component under --word-scan (kind letter `d` or
+// `f`, then the path from the project root, a file without its `.id`), and
+// push_tok4 (front/tokens/load/more/wrd.id) keeps them in vocab_paths. A
+// component is judged like a name, and also against the filler words
+// (data/words/filler.txt, held in the vocabulary as `!word`).
+
+vocab_scan_paths(int vocab_i) {
+  while(vocab_i < len((import vocab_paths))) {
+    vocab_path_check((import vocab_paths)[vocab_i]);
+    vocab_i = vocab_i + 1;
+  }
+} return void;
+given full_env given vocab_path_rows (0):() then (import vocab_totals)[1]:(1)
+given full_env given vocab_path_rows (1):() then (import vocab_totals)[0]:(1)
+
+vocab_path_check(string vocab_entry) {
+  string vocab_rel = slice(vocab_entry, 1, len(vocab_entry));
+  string vocab_name = vocab_path_name(vocab_rel);
+  string vocab_failed = vocab_bad(vocab_name);
+} chain (string vocab_entry) {
+  string vocab_filler = vocab_path_filler(vocab_name);
+  lset((import vocab_totals), 0, (import vocab_totals)[0] + 1);
+  if(vocab_failed != "" || vocab_filler != "") {
+    vocab_path_report(vocab_entry, vocab_name, vocab_failed, vocab_filler);
+  }
+} return void;
+given full_env given vocab_path_words ("dmore"):() then (import vocab_totals)[1]:(1)
+given full_env given vocab_path_words ("fsrc/fb"):() then (import vocab_totals)[1]:(1)
+given full_env given vocab_path_words ("dsrc/buffer_width"):() then (import vocab_totals)[1]:(0)
+given full_env given vocab_path_words ("dsrc/buffer_width"):() then (import vocab_totals)[0]:(1)
+
+vocab_path_name(string vocab_rel) {
+  string[] vocab_rel_parts = str_split(vocab_rel, "/");
+  string vocab_name = vocab_rel_parts[len(vocab_rel_parts) - 1];
+} return string vocab_name;
+("a/b/c"):("c")
+("more"):("more")
+("src/"):("")

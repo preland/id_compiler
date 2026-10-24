@@ -2997,6 +2997,7 @@ void id_push_real(char* kind, char* text);
 int id_src_line(void);
 void id_push_line(void);
 void id_push_tok3(char* kind, char* text);
+void id_push_tok4(char* kind, char* text);
 void id_proc_line(char* src, int i, int e);
 int id_find_space(char* src, int i, int e);
 void id_init_rest(void);
@@ -3603,6 +3604,16 @@ void id_vocab_judge(char* vocab_name, int vocab_kind, int vocab_row);
 char* id_vocab_loc(int vocab_kind, int vocab_row, char* vocab_name);
 char* id_vocab_loc_var(int vocab_kind, int vocab_row, char* vocab_name);
 char* id_vocab_loc_rest(int vocab_kind, int vocab_row, char* vocab_name);
+char* id_vocab_path_filler(char* vocab_name);
+char* id_vocab_filler_add(char* vocab_acc, char* vocab_piece);
+void id_vocab_path_report(char* vocab_entry, char* vocab_name, char* vocab_failed, char* vocab_filler);
+char* id_vocab_path_label(char* vocab_entry);
+char* id_vocab_path_place(char* vocab_entry);
+void id_vocab_scan_paths(int vocab_i);
+void id_vocab_path_check(char* vocab_entry);
+char* id_vocab_path_name(char* vocab_rel);
+char* id_vocab_path_reason(char* vocab_failed, char* vocab_filler);
+char* id_vocab_path_help(char* vocab_failed, char* vocab_filler);
 int id_vocab_ok(char* vocab_piece, int vocab_parts);
 char* id_vocab_bad_add(char* vocab_acc, char* vocab_piece, int vocab_parts);
 char* id_vocab_join(char* vocab_head, char* vocab_tail);
@@ -5044,6 +5055,7 @@ IdList* vocab_seen_vals;  /* exported by vocab_init_seen() */
 IdList* vocab_seen_used;  /* exported by vocab_init_seen() */
 IdList* vocab_seen_count;  /* exported by vocab_init_seen() */
 IdList* vocab_totals;  /* exported by vocab_init_seen() */
+IdList* vocab_paths;  /* exported by vocab_init_seen() */
 IdList* bnames;  /* exported by init_bnames() */
 IdList* rtc;  /* exported by init_rtc() */
 IdList* fsc;  /* exported by init_rtc() */
@@ -22424,6 +22436,15 @@ IdList* idsq_12;
 IdList* idsq_11;
         (idsq_13 = vocab_keys, idsq_12 = vocab_vals, idsq_11 = vocab_used, id_hash_set_add(idsq_13, idsq_12, idsq_11, vocab_count, text));
     } else {
+        id_push_tok4(kind, text);
+    }
+    return;
+}
+
+void id_push_tok4(char* kind, char* text) {
+    if ((strcmp(kind, ID_S("wrp")) == 0)) {
+        id_list_push(vocab_paths, (long long)(intptr_t)(text));
+    } else {
         id_push_real(kind, text);
     }
     return;
@@ -28869,6 +28890,136 @@ char* idsq_10;
     return vocab_where;
 }
 
+char* id_vocab_path_filler(char* vocab_name) {
+    IdList* vocab_pieces = NULL;
+    char* vocab_acc;
+    int vocab_i;
+    { IdList* idfe_o = vocab_pieces; vocab_pieces = id_str_split(vocab_name, ID_S("_")); id_list_free(idfe_o); }
+    vocab_acc = ID_S("");
+    vocab_i = 0;
+    while ((vocab_i < id_list_len(vocab_pieces))) {
+        vocab_acc = id_vocab_filler_add(vocab_acc, (char*)(intptr_t)(id_list_get(vocab_pieces, vocab_i)));
+        vocab_i = (vocab_i + 1);
+    }
+    { id_list_free(vocab_pieces); return vocab_acc; }
+}
+
+char* id_vocab_filler_add(char* vocab_acc, char* vocab_piece) {
+    char* vocab_next;
+    vocab_next = vocab_acc;
+IdList* idsq_17;
+IdList* idsq_16;
+    if ((idsq_17 = vocab_keys, idsq_16 = vocab_used, (({ char* idft2 = id_concat_f(ID_S("!"), id_str_lower(vocab_piece), 2); int idfr = id_hash_map_has(idsq_17, idsq_16, idft2); id_str_free(idft2); idfr; }) == 1))) {
+        vocab_next = id_vocab_join(vocab_acc, vocab_piece);
+    }
+    return vocab_next;
+}
+
+void id_vocab_path_report(char* vocab_entry, char* vocab_name, char* vocab_failed, char* vocab_filler) {
+    char* vocab_label;
+    char* vocab_msg = NULL;
+    char* vocab_help = NULL;
+IdList* idsq_47;
+    (idsq_47 = vocab_totals, id_lset(idsq_47, 1, ((int)(id_list_get(vocab_totals, 1)) + 1)));
+    vocab_label = id_vocab_path_label(vocab_entry);
+    { char* idfe_o = vocab_msg; vocab_msg = id_concat_f(id_concat_f(id_concat_f(id_concat(vocab_label, ID_S(" name '")), vocab_name, 1), ID_S("' "), 1), id_vocab_path_reason(vocab_failed, vocab_filler), 3); id_str_free(idfe_o); }
+    { char* idfe_o = vocab_help; vocab_help = id_vocab_path_help(vocab_failed, vocab_filler); id_str_free(idfe_o); }
+char* idsq_8;
+    (idsq_8 = id_vocab_path_place(vocab_entry), ({ char* idft1 = idsq_8; id_diag(ID_S("E0311"), idft1, vocab_msg, vocab_name, vocab_why, vocab_help); id_str_free(idft1); }));
+    { id_str_free(vocab_msg); id_str_free(vocab_help); return; }
+}
+
+char* id_vocab_path_label(char* vocab_entry) {
+    char* vocab_label;
+    vocab_label = ID_S("file");
+    if ((strcmp(id_slice(vocab_entry, 0, 1), ID_S("d")) == 0)) {
+        vocab_label = ID_S("directory");
+    }
+    return vocab_label;
+}
+
+char* id_vocab_path_place(char* vocab_entry) {
+    char* vocab_rel = NULL;
+    char* vocab_place = NULL;
+    { char* idfe_o = vocab_rel; vocab_rel = id_slice(vocab_entry, 1, id_len(vocab_entry)); id_str_free(idfe_o); }
+    { char* idfe_o = vocab_place; vocab_place = id_concat(vocab_rel, ID_S(".id")); id_str_free(idfe_o); }
+    if ((strcmp(id_slice(vocab_entry, 0, 1), ID_S("d")) == 0)) {
+        { char* idfe_o = vocab_place; vocab_place = id_concat(vocab_rel, ID_S("/")); id_str_free(idfe_o); }
+    }
+    { id_str_free(vocab_rel); return vocab_place; }
+}
+
+void id_vocab_scan_paths(int vocab_i) {
+    while ((vocab_i < id_list_len(vocab_paths))) {
+        id_vocab_path_check((char*)(intptr_t)(id_list_get(vocab_paths, vocab_i)));
+        vocab_i = (vocab_i + 1);
+    }
+    return;
+}
+
+void id_vocab_path_check(char* vocab_entry) {
+    char* vocab_rel = NULL;
+    char* vocab_name;
+    char* vocab_failed;
+    char* vocab_filler;
+    { char* idfe_o = vocab_rel; vocab_rel = id_slice(vocab_entry, 1, id_len(vocab_entry)); id_str_free(idfe_o); }
+    vocab_name = id_vocab_path_name(vocab_rel);
+    vocab_failed = id_vocab_bad(vocab_name);
+    vocab_filler = id_vocab_path_filler(vocab_name);
+IdList* idsq_25;
+    (idsq_25 = vocab_totals, id_lset(idsq_25, 0, ((int)(id_list_get(vocab_totals, 0)) + 1)));
+    if (((strcmp(vocab_failed, ID_S("")) != 0) || (strcmp(vocab_filler, ID_S("")) != 0))) {
+        id_vocab_path_report(vocab_entry, vocab_name, vocab_failed, vocab_filler);
+    }
+    { id_str_free(vocab_rel); return; }
+}
+
+char* id_vocab_path_name(char* vocab_rel) {
+    IdList* vocab_rel_parts = NULL;
+    char* vocab_name;
+    { IdList* idfe_o = vocab_rel_parts; vocab_rel_parts = id_str_split(vocab_rel, ID_S("/")); id_list_free(idfe_o); }
+    vocab_name = (char*)(intptr_t)(id_list_get(vocab_rel_parts, (id_list_len(vocab_rel_parts) - 1)));
+    { id_list_free(vocab_rel_parts); return vocab_name; }
+}
+
+char* id_vocab_path_reason(char* vocab_failed, char* vocab_filler) {
+    char* vocab_first_why = NULL;
+    char* vocab_second_why = NULL;
+    char* vocab_text = NULL;
+    { char* idfe_o = vocab_first_why; vocab_first_why = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    { char* idfe_o = vocab_second_why; vocab_second_why = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if ((strcmp(vocab_failed, ID_S("")) != 0)) {
+        { char* idfe_o = vocab_first_why; vocab_first_why = id_concat(ID_S("is not spelled in words: "), vocab_failed); id_str_free(idfe_o); }
+    }
+    if ((strcmp(vocab_filler, ID_S("")) != 0)) {
+        { char* idfe_o = vocab_second_why; vocab_second_why = id_concat(ID_S("is filler that names nothing its files share: "), vocab_filler); id_str_free(idfe_o); }
+    }
+    if (((strcmp(vocab_failed, ID_S("")) != 0) && (strcmp(vocab_filler, ID_S("")) != 0))) {
+        vocab_first_why = id_concat_f(vocab_first_why, ID_S(" and "), 1);
+    }
+    { char* idfe_o = vocab_text; vocab_text = id_concat(vocab_first_why, vocab_second_why); id_str_free(idfe_o); }
+    { id_str_free(vocab_first_why); id_str_free(vocab_second_why); return vocab_text; }
+}
+
+char* id_vocab_path_help(char* vocab_failed, char* vocab_filler) {
+    char* vocab_first_help = NULL;
+    char* vocab_second_help = NULL;
+    char* vocab_text = NULL;
+    { char* idfe_o = vocab_first_help; vocab_first_help = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    { char* idfe_o = vocab_second_help; vocab_second_help = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if ((strcmp(vocab_failed, ID_S("")) != 0)) {
+        { char* idfe_o = vocab_first_help; vocab_first_help = id_concat_f(id_concat(ID_S("rename it so every part is a word, or add '"), id_vocab_first(vocab_failed)), ID_S("' to idc/data/words/allowed.txt if it is a real term"), 1); id_str_free(idfe_o); }
+    }
+    if ((strcmp(vocab_filler, ID_S("")) != 0)) {
+        { char* idfe_o = vocab_second_help; vocab_second_help = id_concat_f(id_concat(ID_S("'"), id_vocab_first(vocab_filler)), ID_S("' is filler: name what the files in it have in common instead"), 1); id_str_free(idfe_o); }
+    }
+    if (((strcmp(vocab_failed, ID_S("")) != 0) && (strcmp(vocab_filler, ID_S("")) != 0))) {
+        vocab_first_help = id_concat_f(vocab_first_help, ID_S("; "), 1);
+    }
+    { char* idfe_o = vocab_text; vocab_text = id_concat(vocab_first_help, vocab_second_help); id_str_free(idfe_o); }
+    { id_str_free(vocab_first_help); id_str_free(vocab_second_help); return vocab_text; }
+}
+
 int id_vocab_ok(char* vocab_piece, int vocab_parts) {
     char* vocab_lower = NULL;
     int vocab_hit;
@@ -28956,6 +29107,7 @@ void id_vocab_run(void) {
     id_vocab_scan_vars(0);
     id_vocab_scan_exports(0);
     id_vocab_scan_structs(0);
+    id_vocab_scan_paths(0);
     id_vocab_summary();
     return;
 }
@@ -28989,10 +29141,11 @@ void id_vocab_init_seen(void) {
     vocab_seen_used = id_list_lit(0);
     vocab_seen_count = id_list_lit(0);
     vocab_totals = id_list_lit(2, (long long)(0), (long long)(0));
-IdList* idsq_7;
-IdList* idsq_6;
-IdList* idsq_5;
-    (idsq_7 = vocab_seen_keys, idsq_6 = vocab_seen_vals, idsq_5 = vocab_seen_used, id_hash_map_initialize(idsq_7, idsq_6, idsq_5, vocab_seen_count));
+IdList* idsq_10;
+IdList* idsq_9;
+IdList* idsq_8;
+    (idsq_10 = vocab_seen_keys, idsq_9 = vocab_seen_vals, idsq_8 = vocab_seen_used, id_hash_map_initialize(idsq_10, idsq_9, idsq_8, vocab_seen_count));
+    vocab_paths = id_list_lit(0);
     return;
 }
 

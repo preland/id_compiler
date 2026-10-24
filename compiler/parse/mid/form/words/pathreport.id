@@ -1,0 +1,35 @@
+// The diagnostic of a file or directory name that fails the word scan (E0311),
+// laid out as vocab_report's: where, what it is and why it fails, then the way
+// out (./pathtext.id). It is placed at its path, a directory with a trailing `/`.
+
+vocab_path_report(string vocab_entry, string vocab_name, string vocab_failed, string vocab_filler) {
+  lset((import vocab_totals), 1, (import vocab_totals)[1] + 1);
+  string vocab_label = vocab_path_label(vocab_entry);
+  string vocab_msg = vocab_label + " name '" + vocab_name + "' " + vocab_path_reason(vocab_failed, vocab_filler);
+} chain (string vocab_entry, string vocab_name, string vocab_failed, string vocab_filler) {
+  string vocab_help = vocab_path_help(vocab_failed, vocab_filler);
+  diag("E0311", vocab_path_place(vocab_entry), vocab_msg, vocab_name, (import vocab_why), vocab_help);
+} return void;
+given full_env ("dsrc/fb", "fb", "fb", ""):() then (import vocab_totals)[1]:(1)
+given full_env ("fmore", "more", "", "more"):() then (import vocab_totals)[1]:(1)
+given full_env ("dmore", "more", "", "more"):() then prints:("more/: error: directory name 'more' is filler that names nothing its files share: more [E0311]\n  at: more\n  why: a name is read by people who did not write it, so each part of it has to be a word they already know; an abbreviation means one thing to its author and another to everyone else\n  help: 'more' is filler: name what the files in it have in common instead\n")
+given full_env ("dsrc/fb", "fb", "fb", ""):() then prints:("src/fb/: error: directory name 'fb' is not spelled in words: fb [E0311]\n  at: fb\n  why: a name is read by people who did not write it, so each part of it has to be a word they already know; an abbreviation means one thing to its author and another to everyone else\n  help: rename it so every part is a word, or add 'fb' to idc/data/words/allowed.txt if it is a real term\n")
+
+vocab_path_label(string vocab_entry) {
+  string vocab_label = "file";
+  if(slice(vocab_entry, 0, 1) == "d") {
+    vocab_label = "directory";
+  }
+} return string vocab_label;
+("dsrc"):("directory")
+("fsrc/main"):("file")
+
+vocab_path_place(string vocab_entry) {
+  string vocab_rel = slice(vocab_entry, 1, len(vocab_entry));
+  string vocab_place = vocab_rel + ".id";
+  if(slice(vocab_entry, 0, 1) == "d") {
+    vocab_place = vocab_rel + "/";
+  }
+} return string vocab_place;
+("dsrc/more"):("src/more/")
+("fsrc/main"):("src/main.id")

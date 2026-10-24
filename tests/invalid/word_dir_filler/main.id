@@ -1,0 +1,5 @@
+// EXPECT: directory name 'more' is filler
+// FLAGS: --word-scan
+main(int argc, string[] argv) {
+  print(thing_value());
+} return int 0;

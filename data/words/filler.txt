@@ -1,0 +1,11 @@
+# Words that make a poor file or directory name: they say a thing is left over,
+# not what it is. A piece on this list fails for file and directory names only
+# (E0311); an identifier may still use one. Name what the files in the directory
+# have in common instead. One lowercase word per line; a line starting with '#'
+# and a blank line are comments.
+more
+rest
+tail
+misc
+extra
+other
