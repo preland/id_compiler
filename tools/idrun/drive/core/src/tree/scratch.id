@@ -18,4 +18,4 @@ dr_home(string a0) {
   }
 } return string home;
 ("/p/bin/idrun"):("/p/bin")
-given idstd_exec_t_tree given environment_put("PATH", (import idstd_exec_root)) ("a"):((import idstd_exec_root)) then idstd_exec_t_done:(1)
+given idstd_exec_fixture_tree given environment_put("PATH", (import idstd_exec_root)) ("a"):((import idstd_exec_root)) then idstd_exec_fixture_done:(1)
