@@ -1,0 +1,58 @@
+// Judging the mutants of the functions a change touched, and the verdict.
+
+// The verdict once every mutant ms_al has an answer in the out directory of
+// ms_cf: prints each survivor (file:line: function [operator] the change) and
+// answers 1, or says none survived and answers 0.
+ms_gt_fin(string[] ms_cf, string[] ms_al) {
+  string[] ms_qw_i = ms_rp_rows(ms_cf[(import ms_cf_out)]);
+  string ms_qy_i = ms_rg_muts(ms_gt_rows(ms_qw_i, ms_al), 0);
+  int ms_qz_i = 0;
+} chain (string[] ms_cf, string[] ms_al) {
+  if(len(ms_qy_i) > 0) {
+    put("mutscore gate: FAILED, these mutants survive (the cases do not notice these changes):\n" + ms_qy_i);
+    ms_qz_i = 1;
+  }
+  if(len(ms_qy_i) == 0) {
+    put("mutscore gate: passed, none of " + len(ms_al) + " mutants survived\n");
+  }
+} return int ms_qz_i;
+given ms_t_tree given ms_t_wrs ([(import ms_t_root), "", "", (import ms_t_work), "", "", "", "", "", "0/1", "40"], ["a.id\tf\t6\t7\tlit\t2", "a.id\tf\t3\t4\tcmp\t<="]):(1) then prints:("mutscore gate: FAILED, these mutants survive (the cases do not notice these changes):\na.id:5: f [lit]  z  =>  w\n")
+given ms_t_tree given ms_t_wrs ([(import ms_t_root), "", "", (import ms_t_work), "", "", "", "", "", "0/1", "40"], ["a.id\tf\t3\t4\tcmp\t<="]):(0) then prints:("mutscore gate: passed, none of 1 mutants survived\n")
+
+// Builds what is left of the mutants ms_al, then answers 10 (and says to run
+// again) when some are still unanswered, ms_gt_fin's verdict when all are, or
+// what ms_cm_next answers when it could not run.
+ms_gt_run(string[] ms_cf, string[] ms_al, int[] ms_sh, int ms_el) {
+  int ms_qz_j = ms_cm_next(ms_cf, ms_al, ms_sh, ms_el);
+  string[] ms_qk_j = ms_dr_done(ms_cm_pa(ms_cf, ms_sh));
+  int ms_qn_j = len(ms_dr_todo(ms_al, ms_sh, ms_qk_j));
+} chain (string[] ms_cf, string[] ms_al, int[] ms_sh, int ms_el) {
+  if(ms_qz_j == 0 && ms_qn_j > 0) {
+    eprint("mutscore gate: incomplete, " + ms_qn_j + " of " + len(ms_al) + " mutants are not judged yet; run the same command again (exit 10)");
+    ms_qz_j = 10;
+  }
+  if(ms_qz_j == 0 && ms_qn_j == 0) {
+    ms_qz_j = ms_gt_fin(ms_cf, ms_al);
+  }
+} return int ms_qz_j;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), "", "", "", "", "", "0/1", "40"], ["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0"], [0, 1], 0):(1) then prints:("mutscore: shard 0/1: built 2 of 2 mutants, 0 left\nmutscore gate: FAILED, these mutants survive (the cases do not notice these changes):\nsrc/a.id:3: add [ret0]  } return int s;  =>  } return int 0;\n")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), "", "", "", "", "", "0/1", "0"], ["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0"], [0, 1], 0):(10) then prints:("mutscore: shard 0/1: built 0 of 2 mutants, 2 left\n") then eprints:("mutscore gate: incomplete, 2 of 2 mutants are not judged yet; run the same command again (exit 10)\n")
+
+// Answers the verdict for the changed functions' mutants ms_al: points the
+// results at their own directory (ms_gt_key), then runs them, or says there is
+// nothing to judge and answers 0.
+ms_gt_go(string[] ms_cf, string[] ms_al, int[] ms_sh, int ms_el) {
+  int ms_qz_k = 0;
+  if(len(ms_al) == 0) {
+    put("mutscore gate: no changed function has a mutant; nothing to judge\n");
+  }
+  if(len(ms_al) > 0) {
+    ms_cf[(import ms_cf_out)] = path_join(ms_cf[(import ms_cf_out)], ms_gt_key(ms_cf[(import ms_cf_root)], ms_al));
+  }
+} chain (string[] ms_cf, string[] ms_al, int[] ms_sh, int ms_el) {
+  if(len(ms_al) > 0) {
+    ms_qz_k = ms_gt_run(ms_cf, ms_al, ms_sh, ms_el);
+  }
+} return int ms_qz_k;
+given ms_t_tree ([(import ms_t_root), "", "", (import ms_t_work), "", "", "", "", "", "0/1", "40"], [], [0, 1], 0):(0) then prints:("mutscore gate: no changed function has a mutant; nothing to judge\n")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), "", "", "", "", "", "0/1", "0"], ["src/a.id\tadd\t32\t33\tarith\t-"], [0, 1], 0):(10) then prints:("mutscore: shard 0/1: built 0 of 1 mutants, 1 left\n") then eprints:("mutscore gate: incomplete, 1 of 1 mutants are not judged yet; run the same command again (exit 10)\n")

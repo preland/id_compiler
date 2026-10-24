@@ -1,0 +1,41 @@
+// The `gate` command: mutation testing scoped to a change.
+
+// Why the gate cannot judge, or "": ms_qb and ms_qr are the fingerprint rows
+// of the tree before and after; none means idc printed nothing usable.
+ms_gt_why(string[] ms_qb_l, string[] ms_qr_l) {
+  string ms_qy_l = "";
+  if(len(ms_qb_l) == 0 || len(ms_qr_l) == 0) {
+    ms_qy_l = "mutscore: gate: `idc PATH --fingerprints` printed no function for BASE or for ROOT; check --idc and that both name project trees";
+  }
+} return string ms_qy_l;
+([], ["a\tf\tfp"]):("mutscore: gate: `idc PATH --fingerprints` printed no function for BASE or for ROOT; check --idc and that both name project trees")
+(["a\tf\tfp"], ["a\tf\tfp"]):("")
+
+// The `gate` command: mutants of only the functions that differ between the
+// tree BASE (ms_av[2]) and ROOT (ms_av[3]), judged in resumable steps. Answers
+// 0 when none survived, 1 with the survivors printed, 10 when it must be run
+// again, 2 for a call that cannot start, 3 or 4 for a red or unfinished
+// baseline.
+ms_cm_gate(string[] ms_av) {
+  int ms_t0 = ticks();
+  string[] ms_cf = ms_cm_cfg(ms_av, environment_text("PWD"));
+  string ms_qb_m = ms_cf[(import ms_cf_root)];
+} chain (string[] ms_av) {
+  ms_cf[(import ms_cf_root)] = ms_cl_abs(ms_av[3], environment_text("PWD"));
+  string[] ms_gfb = ms_gt_fps(ms_cf, ms_qb_m);
+  string[] ms_gfr = ms_gt_fps(ms_cf, ms_cf[(import ms_cf_root)]);
+} chain (string[] ms_av) {
+  string[] ms_chg = ms_gt_changed(ms_gfb, ms_gfr);
+  string[] ms_al = ms_gt_pick(ms_en_all(ms_cf[(import ms_cf_root)], ms_cf[(import ms_cf_area)]), ms_chg);
+  string ms_qy_m = ms_gt_why(ms_gfb, ms_gfr);
+} chain (string[] ms_av) {
+  int ms_rc = 2;
+  if(len(ms_qy_m) > 0) {
+    eprint(ms_qy_m);
+  }
+  if(len(ms_qy_m) == 0) {
+    ms_rc = ms_gt_go(ms_cf, ms_al, [0, 1], ticks() - ms_t0);
+  }
+} return int ms_rc;
+given ms_t_tree (["m", "gate", (import ms_t_w2), (import ms_t_root), "--out", (import ms_t_work), "--idc", "sh\n-c\ncase \"$2\" in --fingerprints) case \"$1\" in */proj) echo \"fp2	add	$1/src/a.id:1\";; *) echo \"fp1	add	$1/src/a.id:1\";; esac;; *) grep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0;; esac\nidc"]):(1) then prints:("mutscore: shard 0/1: built 3 of 3 mutants, 0 left\nmutscore gate: FAILED, these mutants survive (the cases do not notice these changes):\nsrc/a.id:3: add [ret1]  } return int s;  =>  } return int 1;\nsrc/a.id:3: add [ret0]  } return int s;  =>  } return int 0;\n")
+given ms_t_tree (["m", "gate", (import ms_t_root), (import ms_t_root), "--out", (import ms_t_work), "--idc", "sh\n-c\necho \"fp1	add	$1/src/a.id:1\"\nidc"]):(0) then prints:("mutscore gate: no changed function has a mutant; nothing to judge\n")

@@ -40,9 +40,9 @@ given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && 
 // Does what the command ms_cm of the command line ms_av says, or prints the
 // usage. Answers the exit status: 0, 1 when a report has no results, 2 for a
 // usage error or a run that could not start, 3 or 4 for a baseline that is
-// red or still building.
+// red or still building, 10 for a gate that must be run again.
 ms_cl_cmd(string[] ms_av, string ms_cm) {
-  int ms_ok = list_string_index((import ms_cmds), ms_cm) >= 0 && len(ms_av) >= 3 && (ms_cm != "run" || len(ms_cl_arg(ms_av, "--out")) > 0);
+  int ms_ok = list_string_index((import ms_cmds), ms_cm) >= 0 && len(ms_av) >= 3 && (ms_cm != "run" || len(ms_cl_arg(ms_av, "--out")) > 0) && (ms_cm != "gate" || (len(ms_av) >= 4 && str_starts(list_string_get_or(ms_av, 3, ""), "--") == 0 && len(ms_cl_arg(ms_av, "--out")) > 0));
   string ms_pt = ms_cl_abs(list_string_get_or(ms_av, 2, ""), environment_text("PWD"));
   int ms_rc = 2;
 } chain (string[] ms_av, string ms_cm) {
@@ -59,12 +59,16 @@ ms_cl_cmd(string[] ms_av, string ms_cm) {
   if(ms_ok == 1 && ms_cm == "report") {
     ms_rc = ms_cm_report(ms_pt, ms_cl_has(ms_av, "--tsv"));
   }
+  if(ms_ok == 1 && ms_cm == "gate") {
+    ms_rc = ms_cm_gate(ms_av);
+  }
   if(ms_ok == 1 && ms_cm == "run") {
     ms_rc = ms_cm_run(ms_av);
   }
 } return int ms_rc;
-(["m", "bogus", "x"], "bogus"):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
-(["m", "run", "/r"], "run"):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
+(["m", "bogus", "x"], "bogus"):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n       mutscore gate BASE ROOT --out DIR [--idc IDC] [--area SUB] [--std] [--budget SECONDS]\n")
+(["m", "run", "/r"], "run"):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n       mutscore gate BASE ROOT --out DIR [--idc IDC] [--area SUB] [--std] [--budget SECONDS]\n")
+(["m", "gate", "/b", "--out", "/o"], "gate"):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n       mutscore gate BASE ROOT --out DIR [--idc IDC] [--area SUB] [--std] [--budget SECONDS]\n")
 given ms_t_tree (["m", "list", (import ms_t_root)], "list"):(0) then prints:("mutscore: 3 mutants\n  cmp 0\n  arith 1\n  logic 0\n  lit 0\n  idx 0\n  del 0\n  ret0 1\n  ret1 1\n")
 given ms_t_tree (["m", "lint", (import ms_t_root)], "lint"):(0) then prints:("lint: 2 cases in 1 functions; silent 0, echo 0, bare 0, count 0, constant 0\n")
 (["m", "report", "/no/such/dir_ms"], "report"):(1) then eprints:("mutscore: no results in /no/such/dir_ms; run 'mutscore run ROOT --out /no/such/dir_ms --idc IDC' first\n")

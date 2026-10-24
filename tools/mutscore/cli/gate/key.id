@@ -1,0 +1,28 @@
+// Naming a gate's results so that a run on other text starts from nothing.
+
+// The text of the file the mutant line ms_qm is in, under the tree ms_root.
+ms_gt_src(string ms_root, string ms_qm_g) {
+  string[] ms_qf_g = str_split(ms_qm_g, "\t");
+  string ms_qa_g = path_join(ms_root, list_string_get_or(ms_qf_g, 0, ""));
+  string ms_qt_g = fs_read_text(ms_qa_g);
+} return string ms_qt_g;
+given ms_t_tree ((import ms_t_root), "src/a.id\tadd\t32\t33\tarith\t-"):("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+given ms_t_tree ((import ms_t_root), "src/b.txt\tx\t1\t2\tcmp\t<"):("x < y\n")
+
+// The name of the directory, inside the out directory, that holds the results
+// for the mutants ms_al of the tree ms_root: a hash of the mutants and of the
+// text of the files they are in, so that adding a case to a function (or any
+// other edit) gives results that are judged again, not found already done.
+ms_gt_key(string ms_root, string[] ms_al) {
+  string ms_qt_h = ms_cm_key(ms_al);
+  int ms_qp_h = 0;
+  int ms_qn_h = len(ms_al);
+} chain (string ms_root, string[] ms_al) {
+  while(ms_qp_h < ms_qn_h) {
+    ms_qt_h = ms_qt_h + str_hash(ms_gt_src(ms_root, ms_al[ms_qp_h]));
+    ms_qp_h = ms_qp_h + 1;
+  }
+  string ms_qk_h = "g-" + str_hash(ms_qt_h);
+} return string ms_qk_h;
+given ms_t_tree ((import ms_t_root), ["src/a.id\tadd\t32\t33\tarith\t-"]):("g-85339336")
+given ms_t_tree ((import ms_t_root), []):("g-1838287151")

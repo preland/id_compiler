@@ -1,0 +1,61 @@
+// Which functions a change touched: the compiler's own fingerprints of the
+// tree before and after, compared.
+
+// The row "file, name, fingerprint" (tab-separated, the file relative to the
+// tree ms_qd) for ms_ql, a line of `idc --fingerprints` (fingerprint, name,
+// file:line); "" for a line about a function outside ms_qd.
+ms_gt_row(string ms_ql_a, string ms_qd_a) {
+  string[] ms_qf_a = str_split(ms_ql_a, "\t");
+  string ms_qr_a = "";
+  string ms_qx_a = list_string_get_or(ms_qf_a, 2, "");
+} chain (string ms_ql_a, string ms_qd_a) {
+  int ms_qc_a = str_find(ms_qx_a, ".id:");
+  if(len(ms_qf_a) == 3 && str_starts(ms_qx_a, ms_qd_a + "/") == 1 && ms_qc_a >= len(ms_qd_a) + 1) {
+    ms_qr_a = str_sub(ms_qx_a, len(ms_qd_a) + 1, ms_qc_a + 2 - len(ms_qd_a)) + "\t" + ms_qf_a[1] + "\t" + ms_qf_a[0];
+  }
+} return string ms_qr_a;
+("fp\tf\t/r/a/b.id:7", "/r"):("a/b.id\tf\tfp")
+("fp\tf\t/q/b.id:7", "/r"):("")
+("fp\tf\t/rr/b.id:7", "/r"):("")
+("junk", "/r"):("")
+
+// The rows of ms_gt_row for every function under the tree ms_qd, as `idc
+// --fingerprints` (the idc command of the run's list ms_cf) prints them; []
+// when it prints none.
+ms_gt_fps(string[] ms_cf, string ms_qd_b) {
+  string ms_qv_b = ms_cf[(import ms_cf_idc)] + "\n" + ms_qd_b + "\n--fingerprints\n";
+  int[] ms_qi_b = [];
+  int[] ms_qu_b = [];
+} chain (string[] ms_cf, string ms_qd_b) {
+  int[] ms_qe_b = [];
+  int ms_qs_b = exec_run(ms_qv_b, 0, 0, ms_qi_b, ms_qu_b, ms_qe_b, 25000);
+  string[] ms_qn_b = str_lines(exec_text(ms_qu_b));
+} chain (string[] ms_cf, string ms_qd_b) {
+  string[] ms_qa_b = [];
+  int ms_qj_b = 0;
+  while(ms_qj_b < len(ms_qn_b)) {
+    if(len(ms_gt_row(ms_qn_b[ms_qj_b], ms_qd_b)) > 0) {
+      push(ms_qa_b, ms_gt_row(ms_qn_b[ms_qj_b], ms_qd_b));
+    }
+    ms_qj_b = ms_qj_b + 1;
+  }
+} return string[] ms_qa_b;
+(["", "", "sh\n-c\necho \"fp1	f	$1/a.id:3\"; echo \"fp2	g	/elsewhere/z.id:1\"\nidc", "", "", "", "", "", "", "", ""], "/d"):(["a.id\tf\tfp1"])
+(["", "", "sh\n-c\nexit 1\nidc", "", "", "", "", "", "", "", ""], "/d"):([])
+
+// The functions of the tree after (ms_qr) that the tree before (ms_qb) does
+// not have in the same form, as "file, name" keys: edited ones and new ones.
+// A function only ms_qb has is not listed.
+ms_gt_changed(string[] ms_qb_c, string[] ms_qr_c) {
+  string[] ms_qc_c = [];
+  int ms_qn_c = 0;
+  while(ms_qn_c < len(ms_qr_c)) {
+    if(list_string_index(ms_qb_c, ms_qr_c[ms_qn_c]) < 0) {
+      push(ms_qc_c, ms_gt_fn(ms_qr_c[ms_qn_c]));
+    }
+    ms_qn_c = ms_qn_c + 1;
+  }
+} return string[] ms_qc_c;
+(["a\tf\t1", "a\tg\t2"], ["a\tf\t1", "a\tg\t3", "b\th\t9"]):(["a\tg", "b\th"])
+(["a\tf\t1"], ["a\tf\t1"]):([])
+(["a\tf\t1"], []):([])

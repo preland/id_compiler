@@ -1,0 +1,39 @@
+// Narrowing the mutants and the results to the functions a change touched.
+
+// The first two tab-separated fields of ms_qw (the file and the function of a
+// mutant line or of a fingerprint row), tab-separated.
+ms_gt_fn(string ms_qw_d) {
+  string[] ms_qf_d = str_split(ms_qw_d, "\t");
+  string ms_qk_d = list_string_get_or(ms_qf_d, 0, "") + "\t" + list_string_get_or(ms_qf_d, 1, "");
+} return string ms_qk_d;
+("a.id\tf\t1\t2\tcmp\t<"):("a.id\tf")
+("a.id\tf\tfp"):("a.id\tf")
+
+// The mutant lines of ms_al whose function is among the keys ms_qh.
+ms_gt_pick(string[] ms_al, string[] ms_qh_e) {
+  string[] ms_qo_e = [];
+  int ms_qj_e = 0;
+  while(ms_qj_e < len(ms_al)) {
+    if(list_string_index(ms_qh_e, ms_gt_fn(ms_al[ms_qj_e])) >= 0) {
+      push(ms_qo_e, ms_al[ms_qj_e]);
+    }
+    ms_qj_e = ms_qj_e + 1;
+  }
+} return string[] ms_qo_e;
+(["a\tf\t1\t2\tcmp\t<", "a\tg\t3\t4\tcmp\t<", "b\tf\t1\t2\tcmp\t<"], ["a\tf"]):(["a\tf\t1\t2\tcmp\t<"])
+(["a\tf\t1\t2\tcmp\t<"], []):([])
+
+// The result rows of ms_qs that are about one of the mutants ms_al; rows left
+// in the out directory by other mutants are not counted.
+ms_gt_rows(string[] ms_qs_f, string[] ms_al) {
+  string[] ms_qo_f = [];
+  int ms_qj_f = 0;
+  while(ms_qj_f < len(ms_qs_f)) {
+    if(list_string_index(ms_al, ms_dr_key(ms_qs_f[ms_qj_f])) >= 0) {
+      push(ms_qo_f, ms_qs_f[ms_qj_f]);
+    }
+    ms_qj_f = ms_qj_f + 1;
+  }
+} return string[] ms_qo_f;
+(["survived\t2\ta\tf\t1\t2\tcmp\t<\tx", "killed\t3\ta\tg\t5\t6\tcmp\t<=\ty", "junk"], ["a\tf\t1\t2\tcmp\t<"]):(["survived\t2\ta\tf\t1\t2\tcmp\t<\tx"])
+([], ["a\tf\t1\t2\tcmp\t<"]):([])

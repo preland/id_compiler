@@ -51,7 +51,7 @@ int ms_cf_shard = 9;
 int ms_cf_budget = 10;
 
 // What mutscore says when it is called wrongly.
-string ms_usage = "usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]";
+string ms_usage = "usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n       mutscore gate BASE ROOT --out DIR [--idc IDC] [--area SUB] [--std] [--budget SECONDS]";
 
 // The commands mutscore knows.
-string[] ms_cmds = ["list", "run", "report", "lint"];
+string[] ms_cmds = ["list", "run", "report", "lint", "gate"];

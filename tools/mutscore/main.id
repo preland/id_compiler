@@ -5,6 +5,8 @@
 //                [--with A,B] [--std] [--budget SECONDS]
 //   mutscore report DIR [--tsv]
 //   mutscore lint ROOT [--area SUB] [--tsv]
+//   mutscore gate BASE ROOT --out DIR [--idc IDC] [--area SUB] [--std]
+//                [--budget SECONDS]
 //
 // `run` breaks one function of a scratch COPY of ROOT at a time (never ROOT
 // itself) and builds the copy with IDC: a mutant is killed when a case fails
@@ -17,8 +19,8 @@
 main(int argc, string[] argv) {
   int ms_rc = ms_cl_cmd(argv, list_string_get_or(argv, 1, ""));
 } return int ms_rc;
-(1, ["mutscore"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
-(3, ["mutscore", "run", "/r"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
+(1, ["mutscore"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n       mutscore gate BASE ROOT --out DIR [--idc IDC] [--area SUB] [--std] [--budget SECONDS]\n")
+(3, ["mutscore", "run", "/r"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n       mutscore gate BASE ROOT --out DIR [--idc IDC] [--area SUB] [--std] [--budget SECONDS]\n")
 
 // The `run` command: parses its options, checks the shard and that there are
 // mutants, then builds this shard's share (see ms_cm_next). Answers its exit
