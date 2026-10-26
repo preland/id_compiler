@@ -9,15 +9,15 @@ given wg_init given fs_temp_text("<a/>") ((import fs_temp_path)):() then wg_t_st
 // A document read to its end: every element is told to wg_step with its name and the five attributes the generator looks at (name, value, version, type, interface). A fault ends the loop, because xr_next answers 0 after one, and is reported on standard error.
 wg_walk(string vs_xml) {
   int[] vl_bytes = exec_bytes(vs_xml);
-  XmlR vr_r = xr_open(vl_bytes);
-  int vi_k = xr_next(vr_r);
+  XmlR vr_r = xml_reader_open(vl_bytes);
+  int vi_k = xml_reader_next(vr_r);
 } chain (string vs_xml) {
   while (vi_k != 0) {
-    string[] vz_a = [xr_attr(vr_r, "name"), xr_attr(vr_r, "value"), xr_attr(vr_r, "version"), xr_attr(vr_r, "type"), xr_attr(vr_r, "interface")];
-    wg_step(vi_k, xr_get(vr_r, (import xr_k_name)), vz_a);
-    vi_k = xr_next(vr_r);
+    string[] vz_a = [xml_reader_attr(vr_r, "name"), xml_reader_attr(vr_r, "value"), xml_reader_attr(vr_r, "version"), xml_reader_attr(vr_r, "type"), xml_reader_attr(vr_r, "interface")];
+    wg_step(vi_k, xml_reader_get(vr_r, (import xml_reader_k_name)), vz_a);
+    vi_k = xml_reader_next(vr_r);
   }
-  string vs_err = xr_get(vr_r, (import xr_k_error));
+  string vs_err = xml_reader_get(vr_r, (import xml_reader_k_error));
   if (len(vs_err) > 0) {
     eprint(vs_err);
   }
