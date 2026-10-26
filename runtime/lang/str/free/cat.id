@@ -12,3 +12,5 @@ concat_f(string cf_a, string cf_b, int cf_m) {
     str_free(cf_b);
   }
 } return string cf_r;
+("ab", "cd", 0):("abcd")
+("", "x", 0):("x")

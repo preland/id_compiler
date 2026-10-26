@@ -17,3 +17,5 @@ sub_span(string s, int i, int n) {
     fail("str span out of bounds: i=" + i + " n=" + n + " in a string of length " + len(s) + "; clamp i and n first (fixed_point_minimum, fixed_point_maximum)");
   }
 } return int n;
+("hello", 1, 3):(3)
+("hello", 4, 3):() then traps:("fail")

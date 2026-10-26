@@ -13,6 +13,8 @@ mul_checked(word a, word v) {
     fail("integer overflow");
   }
 } return word ck_p;
+(3, 4):(12)
+(4611686018427387904, 2):() then traps:("fail")
 
 mul_checked32(word a, word v) {
   word ck_p = a * v;
@@ -20,6 +22,8 @@ mul_checked32(word a, word v) {
     fail("integer overflow");
   }
 } return word ck_p;
+(46340, 46340):(2147395600)
+(65536, 32768):() then traps:("fail")
 
 mul_wrapped(word a, word v, word p) {
   word mw_r = 0;

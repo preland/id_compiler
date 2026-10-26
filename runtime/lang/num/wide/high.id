@@ -15,7 +15,11 @@ umul_hi(word a, word v) {
 } chain (word a, word v) {
   word ret_w = ushr(a, 32) * ushr(v, 32) + ushr(wh_lh, 32) + ushr(wh_hl, 32) + ushr(wh_mid, 32);
 } return word ret_w;
+(4294967296, 4294967296):(1)
+(-1, -1):(-2)
 
 uword_of_int(word a) {
   word ret_w = a & 4294967295;
 } return word ret_w;
+(-1):(4294967295)
+(5):(5)

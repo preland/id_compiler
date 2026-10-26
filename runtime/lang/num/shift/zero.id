@@ -12,6 +12,8 @@ shl(word a, word z) {
     v = shl_raw(a, z);
   }
 } return word v;
+(1, 4):(16)
+(1, 64):(0)
 
 ushr(word a, word z) {
   word v = 0;
@@ -19,3 +21,5 @@ ushr(word a, word z) {
     v = ushr_raw(a, z);
   }
 } return word v;
+(-1, 60):(15)
+(16, 64):(0)

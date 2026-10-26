@@ -12,6 +12,8 @@ rotl(word a, word v) {
   word rt_k = v & 63;
   word ret_w = (a << rt_k) | ushr(a, (64 - rt_k) & 63);
 } return word ret_w;
+(1, 1):(2)
+(-9223372036854775808, 1):(1)
 
 rotl32(word a, word v) {
   word rt_v = a & 4294967295;
@@ -20,3 +22,5 @@ rotl32(word a, word v) {
 } chain (word a, word v) {
   word ret_w = (rt_r ^ 2147483648) - 2147483648;
 } return word ret_w;
+(1, 1):(2)
+(1, 31):(-2147483648)

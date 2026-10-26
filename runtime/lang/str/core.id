@@ -12,6 +12,8 @@ len(string s) {
   word s2w_v = s2w(s);
   int ret_i = ld64(s2w_v - 8);
 } return int ret_i;
+("abc"):(3)
+(""):(0)
 
 character_code_at(string s, int i) {
   int c = 0 - 1;
@@ -20,3 +22,5 @@ character_code_at(string s, int i) {
     c = ld8(s2w_v + i);
   }
 } return int c;
+("a", 0):(97)
+("a", 1):(-1)

@@ -10,7 +10,11 @@
 idiv(int n, int i) {
   int ret_i = sdiv(n, i);
 } return int ret_i;
+(7, 2):(3)
+(-7, 2):(-3)
 
 imod(int n, int i) {
   int ret_i = smod(n, i);
 } return int ret_i;
+(7, 2):(1)
+(-7, 2):(-1)

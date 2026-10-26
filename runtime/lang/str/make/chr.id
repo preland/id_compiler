@@ -11,6 +11,8 @@ chr(int n) {
   st64(p, 1);
   string ret_s = chr_term(p, n);
 } return string ret_s;
+(65):("A")
+(97):("a")
 
 // `copy_bytes` answers with the count it copied, so the address just past each
 // half falls out of the copy rather than being computed twice.
@@ -18,6 +20,8 @@ concat(string s, string r) {
   word p = concat_alloc(s, r);
   string ret_s = concat_at(s, r, p);
 } return string ret_s;
+("ab", "cd"):("abcd")
+("", "x"):("x")
 
 chr_term(word p, int n) {
   st8(p + 8, n);

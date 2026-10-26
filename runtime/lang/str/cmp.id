@@ -15,7 +15,11 @@ strcmp(string s, string r) {
   }
   int ret_i = strcmp_at(s, r, n);
 } return int ret_i;
+("a", "c"):(-2)
+("ab", "a"):(99)
 
 strcmp_at(string s, string r, int n) {
   int ret_i = character_code_at(s, n) - character_code_at(r, n);
 } return int ret_i;
+("ab", "ac", 1):(-1)
+("ab", "ab", 0):(0)
