@@ -1,13 +1,5 @@
-// Identifier-continuation test and keyword recognition.
+// Keyword recognition.
 
-is_alnum(int c) {
-  int ok = 0;
-  if(is_alpha(c) || is_digit(c)) {
-    ok = 1;
-  }
-} return int ok;
-(48):(1)
-(32):(0)
 
 // The id keywords. One big boolean keeps this within the action limit.
 // `stdin` and `timeout` have meaning only in case position

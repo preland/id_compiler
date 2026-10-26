@@ -7,7 +7,7 @@
 
 is_hex(int c) {
   int ok = 0;
-  if(is_digit(c) || (c >= 97 && c <= 102) || (c >= 65 && c <= 70)) {
+  if(character_is_digit(c) || (c >= 97 && c <= 102) || (c >= 65 && c <= 70)) {
     ok = 1;
   }
 } return int ok;

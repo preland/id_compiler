@@ -1,7 +1,7 @@
 // decimal number, or hand off
 scan_decop(string src, int i) {
   int ni = 0;
-  if(is_digit_at(src, i)) {
+  if(idstd_chr_is_digit_at(src, i)) {
     ni = scan_number(src, i);
   } else {
     ni = scan_strop(src, i);

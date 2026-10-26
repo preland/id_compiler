@@ -4,23 +4,25 @@
 // imports, so a function's directory is a statement about meaning and not
 // about what can see it.
 
-is_alnum_at(string src, int i) {
-  int c = character_code_at(src, i);
-  int ok = is_alnum(c);
-} return int ok;
+is_name_part_at(string src, int i) {
+  int code = character_code_at(src, i);
+  int part = character_is_name_part(code);
+} return int part;
 ("a", 0):(1)
+("_", 0):(1)
+("7", 0):(1)
 (" ", 0):(0)
 
 is_hex_at(string src, int i) {
-  int c = character_code_at(src, i);
-  int ok = is_hex(c);
-} return int ok;
+  int code = character_code_at(src, i);
+  int hex = is_hex(code);
+} return int hex;
 ("f", 0):(1)
 ("g", 0):(0)
 
 is_bin_at(string src, int i) {
-  int c = character_code_at(src, i);
-  int ok = is_bin(c);
-} return int ok;
+  int code = character_code_at(src, i);
+  int bin = is_bin(code);
+} return int bin;
 ("1", 0):(1)
 ("2", 0):(0)

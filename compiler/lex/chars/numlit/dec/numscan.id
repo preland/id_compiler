@@ -4,7 +4,7 @@
 // fraction digit, is not part of the number).
 
 digit_run_end(string src, int i) {
-  while(is_digit_at(src, i)) {
+  while(idstd_chr_is_digit_at(src, i)) {
     i = i + 1;
   }
 } return int i;
@@ -13,7 +13,7 @@ digit_run_end(string src, int i) {
 
 has_frac(string src, int e) {
   int ok = 0;
-  if(character_code_at(src, e) == 46 && is_digit_at(src, e + 1)) {
+  if(character_code_at(src, e) == 46 && idstd_chr_is_digit_at(src, e + 1)) {
     ok = 1;
   }
 } return int ok;

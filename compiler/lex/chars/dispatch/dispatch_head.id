@@ -7,7 +7,7 @@
 // whitespace, or hand off
 scan_one(string src, int i) {
   int ni = 0;
-  if(is_space_at(src, i)) {
+  if(idstd_chr_is_space_at(src, i)) {
     ni = eat_space(src, i);
   } else {
     ni = scan_tok_span(src, i);
@@ -31,7 +31,7 @@ scan_word(string src, int i) {
 // identifier/keyword, or hand off
 scan_token(string src, int i) {
   int ni = 0;
-  if(is_alpha_at(src, i)) {
+  if(is_name_start_at(src, i)) {
     ni = scan_ident(src, i);
   } else {
     ni = scan_numop(src, i);

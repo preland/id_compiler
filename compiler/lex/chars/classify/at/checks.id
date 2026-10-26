@@ -6,23 +6,11 @@
 // once where the loop needs it every iteration. So the composition becomes a
 // function, which is what a loop condition wanted to be anyway.
 
-is_space_at(string src, int i) {
-  int c = character_code_at(src, i);
-  int ok = is_space(c);
-} return int ok;
-(" ", 0):(1)
-("a", 0):(0)
-
-is_digit_at(string src, int i) {
-  int c = character_code_at(src, i);
-  int ok = is_digit(c);
-} return int ok;
-("5", 0):(1)
-("a", 0):(0)
-
-is_alpha_at(string src, int i) {
-  int c = character_code_at(src, i);
-  int ok = is_alpha(c);
-} return int ok;
+is_name_start_at(string src, int i) {
+  int code = character_code_at(src, i);
+  int start = character_is_name_start(code);
+} return int start;
 ("a", 0):(1)
+("_", 0):(1)
 ("5", 0):(0)
+("", 0):(0)

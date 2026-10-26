@@ -21,8 +21,7 @@
 //   chars/dispatch/dispatch_tail.id  scan_numop / scan_strop (a comment ends at idstd's str_eol)
 //   scan/tokens.id               scan_ident / scan_number / scan_string
 //   scan/ops.id                  is_two_op / oplen / scan_op
-//   chars/classify/charclass.id  is_space / is_digit / is_alpha
-//   chars/classify/ident_kw.id   is_alnum / is_kw / kindof
+//   chars/classify/ident_kw.id   is_kw / kindof
 
 main(int argc, string[] argv) {
   lex_setup(argc, argv);
