@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_parse core_guard core_self core_rest invalid_1of4 invalid_2of4 invalid_3of4 invalid_4of4 diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build_demos self_host_build_link self_host_build_project_1 self_host_build_project_2 self_host_build_project_3 self_host_build_stage0 self_host_build_boot_cold self_host_build_expr backends_fs backends_fs_list backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib_import stdlib_dce stdlib_precheck wasm wasm_js wasm_js_std lib lib_csv opt conform_bytes conform_chan conform_eprint conform_float conform_flow conform_fn conform_free conform_int conform_list_1of2 conform_list_2of2 conform_order conform_store conform_str conform_struct conform_trap conform_closure conform_const conform_leak tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real_0 idstd_real_1 idstd_real_2 kernel_build kernel_boot kernel_kfree editor mutscore statusgen)
+SECTIONS=(core core_parse core_guard core_self core_rest invalid_1of4 invalid_2of4 invalid_3of4 invalid_4of4 diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build_demos self_host_build_link self_host_build_project_1 self_host_build_project_2 self_host_build_project_3 self_host_build_stage0 self_host_build_boot_cold self_host_build_expr backends_fs backends_fs_list backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib_import stdlib_dce stdlib_precheck wasm wasm_js wasm_js_std lib lib_csv opt conform_bytes conform_chan conform_eprint conform_float conform_flow conform_fn conform_free conform_int conform_list_1of2 conform_list_2of2 conform_order conform_store conform_str conform_struct conform_trap conform_closure conform_const conform_leak tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real_0 idstd_real_1 idstd_real_2 kernel_build kernel_boot kernel_kfree editor mutscore statusgen gui_1of4 gui_2of4 gui_3of4 gui_4of4)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word quillcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo idc/tools/idwhere trials/sqlq idc/tools/statusgen)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -1323,6 +1323,58 @@ if want statusgen; then
         fi
         [ "$fail" -eq 0 ] && mark_done statusgen
     fi
+fi
+
+# --- the GUI projects. Every project that opens a window or renders is
+#     checked against the rules (--check: parse, types, cases, no C), because
+#     the rename waves broke quillcheck for days without anyone building it.
+#     Then the two headless renders: uicheck's tiny page, and themecheck's
+#     rows page, whose rects must equal the pinned file (fixtures/gui). Four
+#     sections, because each project is a cold parse of idstd's kit/ui.
+#     IDSTD_GFX=none keeps every run off the screen.
+gui_check() { # section, trees...
+    local sec=$1 t out; shift
+    for t in "$@"; do
+        if out=$(env -u IDC_NO_STD ../bin/idc "../../$t" --check --allow-untested 2>&1); then
+            ok "gui: $t passes --check"
+        else
+            bad "gui: $t fails --check ($(printf '%s\n' "$out" | grep -v 'warning:' | head -1))"
+        fi
+    done
+}
+echo
+echo "--- the GUI projects (--check, uicheck page, themecheck render) ---"
+if want gui_1of4; then
+    gui_check gui_1of4 quill quillcheck uicheck themecheck iconcheck idtheme gym
+    [ "$fail" -eq 0 ] && mark_done gui_1of4
+fi
+if want gui_2of4; then
+    gui_check gui_2of4 blocks callgraph launcher demos/gfxdemo demos/gl3d demos/gl3dgame demos/solitaire demos/moonbuggy demos/flyover
+    [ "$fail" -eq 0 ] && mark_done gui_2of4
+fi
+if want gui_3of4; then
+    gui_check gui_3of4 idem/engine idem/editor demos/fpsmaze demos/galaxy demos/idview
+    [ "$fail" -eq 0 ] && mark_done gui_3of4
+fi
+if want gui_4of4; then
+    export IDSTD_GFX=none
+    if ! env -u IDC_NO_STD ../bin/idc ../../uicheck -o "$TMP/uicheck" >"$TMP/uicheck.log" 2>&1; then
+        bad "gui: uicheck builds ($(grep -v 'warning:' "$TMP/uicheck.log" | head -1))"
+    else
+        expect_output "gui: uicheck lays out its tiny page" $'0 0 200 100 Card c\n0 0 200 50 Row\n0 0 50 50 Spacer\n50 0 150 50 Text\n0 50 200 50 Spacer' "$("$TMP/uicheck" ../../uicheck/test_assets/tiny.idml --rects 200 100 2>&1)"
+    fi
+    if ! env -u IDC_NO_STD ../bin/idc ../../themecheck -o "$TMP/themecheck" >"$TMP/themecheck.log" 2>&1; then
+        bad "gui: themecheck builds ($(grep -v 'warning:' "$TMP/themecheck.log" | head -1))"
+    elif "$TMP/themecheck" render ../../themecheck/test_assets/rows.idml light 400 300 "$TMP/tcout" >"$TMP/tcout.log" 2>&1; then
+        if diff "$TMP/tcout/rects.txt" fixtures/gui/rows_light_400x300.rects >"$TMP/tcout.diff" 2>&1; then
+            ok "gui: themecheck renders rows.idml with the pinned rects"
+        else
+            bad "gui: themecheck rects differ from fixtures/gui/rows_light_400x300.rects ($(head -1 "$TMP/tcout.diff"))"
+        fi
+    else
+        bad "gui: themecheck render exits non-zero ($(head -1 "$TMP/tcout.log"))"
+    fi
+    [ "$fail" -eq 0 ] && mark_done gui_4of4
 fi
 
 # --- no test case leaves anything in /tmp. tools/tmpguard (an `id` program)
