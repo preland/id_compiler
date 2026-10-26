@@ -24,3 +24,10 @@ fail(string msg) {
   print(msg);
   fail_stop();
 } return void;
+
+asm "x86_64-unknown-linux-gnu" fail_stop() {
+  "movq $231, %%rax"
+  "movq $1, %%rdi"
+  "syscall"
+  "xorq %[ret], %[ret]"
+} return word ret;

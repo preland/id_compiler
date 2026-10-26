@@ -9,3 +9,11 @@
 asm "x86_64-unknown-none" heap_ptr() {
   "leaq heap_base(%%rip), %[ret]"
 } return word ret;
+
+asm "x86_64-unknown-linux-gnu" heap_ptr() {
+  ".pushsection .bss"
+  ".balign 4096"
+  "id_host_heap: .zero 16777216"
+  ".popsection"
+  "leaq id_host_heap(%%rip), %[ret]"
+} return word ret;

@@ -13,3 +13,12 @@ asm "x86_64-unknown-none" st16(word a, word v) {
   "movw %w[v], (%[a])"
   "xorq %[ret], %[ret]"
 } return word ret;
+
+asm "x86_64-unknown-linux-gnu" ld16(word a) {
+  "movzwq (%[a]), %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-linux-gnu" st16(word a, word v) {
+  "movw %w[v], (%[a])"
+  "xorq %[ret], %[ret]"
+} return word ret;

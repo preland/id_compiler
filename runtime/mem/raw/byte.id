@@ -22,3 +22,16 @@ asm "x86_64-unknown-none" st8(word a, word v) {
 asm "x86_64-unknown-none" s2w(string s) {
   "movq %[s], %[ret]"
 } return word ret;
+
+asm "x86_64-unknown-linux-gnu" ld8(word a) {
+  "movzbq (%[a]), %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-linux-gnu" st8(word a, word v) {
+  "movb %b[v], (%[a])"
+  "xorq %[ret], %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-linux-gnu" s2w(string s) {
+  "movq %[s], %[ret]"
+} return word ret;

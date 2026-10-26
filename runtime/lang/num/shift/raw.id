@@ -31,3 +31,30 @@ asm "x86_64-unknown-none" ushr_raw(word a, word z) {
   "shrq %%cl, %%rax"
   "movq %%rax, %[ret]"
 } return word ret;
+
+asm "x86_64-unknown-linux-gnu" shl_raw(word a, word z) {
+  "pushq %[a]"
+  "pushq %[z]"
+  "popq %%rcx"
+  "popq %%rax"
+  "shlq %%cl, %%rax"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-linux-gnu" sar_raw(word a, word z) {
+  "pushq %[a]"
+  "pushq %[z]"
+  "popq %%rcx"
+  "popq %%rax"
+  "sarq %%cl, %%rax"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-linux-gnu" ushr_raw(word a, word z) {
+  "pushq %[a]"
+  "pushq %[z]"
+  "popq %%rcx"
+  "popq %%rax"
+  "shrq %%cl, %%rax"
+  "movq %%rax, %[ret]"
+} return word ret;

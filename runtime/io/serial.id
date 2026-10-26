@@ -17,3 +17,15 @@ asm "x86_64-unknown-none" com1_out(word c) {
   "outb %%al, %%dx"
   "xorq %[ret], %[ret]"
 } return word ret;
+
+asm "x86_64-unknown-linux-gnu" com1_out(word c) {
+  "subq $136, %%rsp"
+  "movb %b[c], (%%rsp)"
+  "movq $1, %%rax"
+  "movq $1, %%rdi"
+  "movq %%rsp, %%rsi"
+  "movq $1, %%rdx"
+  "syscall"
+  "addq $136, %%rsp"
+  "xorq %[ret], %[ret]"
+} return word ret;

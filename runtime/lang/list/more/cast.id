@@ -12,3 +12,11 @@ asm "x86_64-unknown-none" w2l(word a) {
 asm "x86_64-unknown-none" l2w(int[] xs) {
   "movq %[xs], %[ret]"
 } return word ret;
+
+asm "x86_64-unknown-linux-gnu" w2l(word a) {
+  "movq %[a], %[ret]"
+} return int[] ret;
+
+asm "x86_64-unknown-linux-gnu" l2w(int[] xs) {
+  "movq %[xs], %[ret]"
+} return word ret;
