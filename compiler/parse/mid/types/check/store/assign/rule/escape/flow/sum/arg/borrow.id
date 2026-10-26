@@ -1,0 +1,33 @@
+// A `native`'s summary. Its body cannot be read, so every argument is kept
+// unless the declaration says otherwise: a parameter marked `borrows`
+// (front/parse/decl/top/decl/native/more/borrows/mark.id) promises that the C
+// does not keep it, so both of its bits are clear and a caller may free a list
+// it passed. A name that is no function, and one a case records, stay all
+// bits.
+
+esc_native_mask(int fn, string cname) {
+  int m = 0 - 1;
+  if(fn >= 0 && is_native(fn) == 1 && is_rec_target(cname) == 0) {
+    m = esc_borrow_mask(fn);
+  }
+} return int m;
+(-1, "nosuch"):(-1)
+given esc_fix ((import efa_fn), "fa_sink"):(-1)
+
+esc_borrow_mask(int fn) {
+  int[] ps = (import nl1)[fn];
+  int m = esc_borrow_loop(ps);
+} return int m;
+given esc_fix ((import efa_fn)):(-1)
+given esc_fix ((import efb_fn)):(-1)
+
+esc_borrow_loop(int[] ps) {
+  int m = 0 - 1;
+  int i = 0;
+  while(i < len(ps) && i < 15) {
+    m = esc_borrow_one(m, ps[i], i);
+    i = i + 1;
+  }
+} return int m;
+([]):(-1)
+given borrow_fixnode(4) ([4]):(-32770)

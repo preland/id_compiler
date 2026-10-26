@@ -1,0 +1,9 @@
+// A native that only reads the list it is given, to show what `borrows` buys
+// the caller (see ../main.id).
+string name = "nat";
+string c_header = "nat.h";
+
+string[] c_linux_sources = ["nat.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
+string[] wasm_wasi_sources = ["nat.c"];

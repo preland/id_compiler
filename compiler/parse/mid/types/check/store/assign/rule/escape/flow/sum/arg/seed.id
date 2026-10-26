@@ -20,6 +20,7 @@ esc_init() {
 } chain () {
   export int[] esc_cons = [0 - 1];
   export int[] esc_xm = [];
+  export int[] borrownode = [];
 } return void;
 ():() then esc_on:(0)
 given esc_fix ():() then esc_on:(0)

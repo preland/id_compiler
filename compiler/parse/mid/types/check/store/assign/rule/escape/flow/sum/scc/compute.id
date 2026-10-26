@@ -5,7 +5,7 @@
 esc_compute(int ix, string cname) {
   int fn = fn_node_of(cname);
   if(esc_opaque(fn, cname) == 1) {
-    esc_final(ix, 0 - 1);
+    esc_final(ix, esc_native_mask(fn, cname));
   } else {
     esc_scc(ix, fn);
   }

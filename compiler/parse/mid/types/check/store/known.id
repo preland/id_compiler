@@ -23,12 +23,13 @@ given init_tyreg ("int", "word"):(0)
 ty_known(string t) {
   int ok = 0;
   string ty_base_v = ty_base(t);
-  if(ty_kind(ty_base_v) != "?") {
+  if(ty_kind(ty_base_v) != "?" || ty_is_end(ty_base_v) == 1) {
     ok = 1;
   }
 } return int ok;
 given init_tyreg ("int"):(1)
 given init_tyreg ("nope"):(0)
+given init_tyreg ("sender(int)[]"):(1)
 
 ty_pair_known(string lt, string rt) {
   int ok = 0;

@@ -2755,6 +2755,12 @@ int id_ret_expr(IdList* pos, char* rt);
 char* id_parse_type(IdList* pos);
 char* id_type_tail(char* t, IdList* pos);
 char* id_add_brackets(char* t, IdList* pos);
+char* id_end_or_brackets(char* t, IdList* pos);
+char* id_parse_end_type(IdList* pos, char* t);
+void id_close_end(IdList* pos);
+void id_end_msg_ok(IdList* pos, char* mtype);
+void id_end_word_err(IdList* pos);
+void id_end_func_err(IdList* pos);
 char* id_parse_fn_type(IdList* pos);
 char* id_fn_type_rest(IdList* pos);
 char* id_fn_type_params(IdList* pos, char* out);
@@ -2813,6 +2819,11 @@ int id_push_asm(IdList* pos);
 int id_parse_fn(IdList* pos);
 int id_parse_native(IdList* pos);
 int id_native_sig(IdList* pos, char* name);
+int id_take_borrows(IdList* pos);
+void id_borrow_mark(IdList* pos, char* kind, int bflag, char* type, int node);
+void id_borrow_check(IdList* pos, char* kind, char* type, int node);
+int id_borrow_bad(char* kind, char* type);
+void id_borrow_refuse(IdList* pos, char* kind, char* type);
 int id_parse_fn_kind(IdList* pos);
 void id_pure_mark_param(IdList* pos, int pflag, int node);
 void id_pure_misplaced(IdList* pos, char* name, char* type);
@@ -4390,6 +4401,11 @@ int id_esc_alias(int fn, int sn, char* nm);
 int id_esc_bit(int m, int i);
 int id_esc_dbit(int m, int i);
 int id_esc_opaque(int fn, char* cname);
+int id_esc_native_mask(int fn, char* cname);
+int id_esc_borrow_mask(int fn);
+int id_esc_borrow_loop(IdList* ps);
+int id_esc_borrow_one(int m, int pn, int i);
+int id_borrow_has(int pn);
 int id_arg_ctx(char* cname, int i);
 int id_arg_ctx_b(char* cname, int i);
 int id_arg_ctx_u(char* cname, int i);
@@ -4583,6 +4599,7 @@ void id_void_arr_type(int id, char* t);
 int id_case_first_after(int id);
 void id_void_arr_pair(int id, char* t1, char* t2);
 char* id_sd_cell(IdList* sd_tab, char* sd_s, int sd_k);
+int id_ty_is_end(char* t);
 int id_fn_node_of(char* name);
 int id_fn_node_at(int idx);
 char* id_fn_sig_of(char* name);
@@ -5117,6 +5134,7 @@ IdList* esc_fx;  /* exported by esc_init() */
 IdList* purenode;  /* exported by esc_init() */
 IdList* esc_cons;  /* exported by esc_init() */
 IdList* esc_xm;  /* exported by esc_init() */
+IdList* borrownode;  /* exported by esc_init() */
 IdList* tkik;  /* exported by tk_maps() */
 IdList* tkiv;  /* exported by tk_maps() */
 IdList* tkiu;  /* exported by tk_maps() */
@@ -5170,7 +5188,7 @@ static void idc_const_init(void) {
     id_list_lock(unops);
     shiftops = id_list_lit(2, (long long)(intptr_t)(ID_S("<<")), (long long)(intptr_t)(ID_S(">>")));
     id_list_lock(shiftops);
-    typewords = id_list_lit(8, (long long)(intptr_t)(ID_S("int")), (long long)(intptr_t)(ID_S("float")), (long long)(intptr_t)(ID_S("string")), (long long)(intptr_t)(ID_S("void")), (long long)(intptr_t)(ID_S("word")), (long long)(intptr_t)(ID_S("export")), (long long)(intptr_t)(ID_S("func")), (long long)(intptr_t)(ID_S("bytes")));
+    typewords = id_list_lit(10, (long long)(intptr_t)(ID_S("int")), (long long)(intptr_t)(ID_S("float")), (long long)(intptr_t)(ID_S("string")), (long long)(intptr_t)(ID_S("void")), (long long)(intptr_t)(ID_S("word")), (long long)(intptr_t)(ID_S("export")), (long long)(intptr_t)(ID_S("func")), (long long)(intptr_t)(ID_S("bytes")), (long long)(intptr_t)(ID_S("sender")), (long long)(intptr_t)(ID_S("receiver")));
     id_list_lock(typewords);
     mutnames = id_list_lit(2, (long long)(intptr_t)(ID_S("push")), (long long)(intptr_t)(ID_S("pop")));
     id_list_lock(mutnames);
@@ -19978,15 +19996,18 @@ void id_fill_params(IdList* pos, IdList* params, char* kind) {
 
 int id_one_param(IdList* pos, char* kind) {
     int pure_v;
+    int bflag;
     char* type;
     char* name;
     int ret_i;
     pure_v = id_at_pure(pos);
     id_skip_pure(pos);
+    bflag = id_take_borrows(pos);
     type = id_parse_type(pos);
     name = id_read_name(pos);
     ret_i = id_node_param(kind, type, name);
     id_pure_mark_param(pos, pure_v, ret_i);
+    id_borrow_mark(pos, kind, bflag, type, ret_i);
     return ret_i;
 }
 
@@ -20058,7 +20079,7 @@ char* id_type_tail(char* t, IdList* pos) {
     if ((strcmp(t, ID_S("func")) == 0)) {
         s = id_parse_fn_type(pos);
     } else {
-        s = id_add_brackets(t, pos);
+        s = id_end_or_brackets(t, pos);
     }
     return s;
 }
@@ -20070,6 +20091,67 @@ char* id_add_brackets(char* t, IdList* pos) {
         t = id_concat(t, ID_S("[]"));
     }
     return t;
+}
+
+char* id_end_or_brackets(char* t, IdList* pos) {
+    char* s;
+    s = t;
+    if (((strcmp(t, ID_S("sender")) == 0) || (strcmp(t, ID_S("receiver")) == 0))) {
+        s = id_parse_end_type(pos, t);
+    } else {
+        s = id_add_brackets(t, pos);
+    }
+    return s;
+}
+
+char* id_parse_end_type(IdList* pos, char* t) {
+    char* mtype;
+    char* s = NULL;
+    id_expect_text(pos, ID_S("("));
+    id_advance(pos);
+    mtype = id_parse_type(pos);
+    id_end_msg_ok(pos, mtype);
+    id_close_end(pos);
+    { char* idfe_o = s; s = id_concat_f(id_concat_f(id_concat(t, ID_S("(")), mtype, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    return s;
+}
+
+void id_close_end(IdList* pos) {
+    id_expect_text(pos, ID_S(")"));
+    id_advance(pos);
+    return;
+}
+
+void id_end_msg_ok(IdList* pos, char* mtype) {
+    if ((strcmp(mtype, ID_S("word")) == 0)) {
+        id_end_word_err(pos);
+    }
+    if (((id_ty_is_func(mtype) == 1) || (strcmp(mtype, ID_S("void")) == 0))) {
+        id_end_func_err(pos);
+    }
+    return;
+}
+
+void id_end_word_err(IdList* pos) {
+    char* msg;
+    char* why;
+    char* help;
+    msg = ID_S("a channel cannot carry a 'word': a word is an address in the flat store, and the store belongs to one thread");
+    why = ID_S("the thread that receives the message has a different store, so the address would point at nothing or at the wrong memory");
+    help = ID_S("send the value the address refers to (an int, a string, or bytes), not the address");
+    id_syn_diag(pos, ID_S("E0809"), msg, ID_S("word"), why, help);
+    return;
+}
+
+void id_end_func_err(IdList* pos) {
+    char* msg;
+    char* why;
+    char* code;
+    msg = ID_S("a channel cannot carry a function value or void: a function value points into the thread that made it, and void is no value");
+    why = ID_S("a function value sent to another thread would call code and captured variables that belong to the sender");
+    code = ID_S("E0810");
+    id_syn_diag(pos, code, msg, ID_S("func"), why, ID_S("send an int that names the action, and let the receiving thread choose the function; or send a struct of plain values"));
+    return;
 }
 
 char* id_parse_fn_type(IdList* pos) {
@@ -20618,6 +20700,54 @@ int id_native_sig(IdList* pos, char* name) {
     params = id_parse_params(pos, ID_S("nparam"));
     ret_i = id_native_ret(pos, name, params);
     return ret_i;
+}
+
+int id_take_borrows(IdList* pos) {
+    int bflag;
+    bflag = 0;
+    if ((strcmp(id_cur_text(pos), ID_S("borrows")) == 0)) {
+        bflag = 1;
+        id_advance(pos);
+    }
+    return bflag;
+}
+
+void id_borrow_mark(IdList* pos, char* kind, int bflag, char* type, int node) {
+    if ((bflag == 1)) {
+        id_borrow_check(pos, kind, type, node);
+    }
+    return;
+}
+
+void id_borrow_check(IdList* pos, char* kind, char* type, int node) {
+    int bad;
+    bad = id_borrow_bad(kind, type);
+    if ((bad == 1)) {
+        id_borrow_refuse(pos, kind, type);
+    } else {
+        id_list_push(borrownode, (long long)(node));
+    }
+    return;
+}
+
+int id_borrow_bad(char* kind, char* type) {
+    int bad;
+    bad = 0;
+    if ((((strcmp(kind, ID_S("nparam")) != 0) || (strcmp(type, ID_S("int")) == 0)) || (strcmp(type, ID_S("float")) == 0))) {
+        bad = 1;
+    }
+    return bad;
+}
+
+void id_borrow_refuse(IdList* pos, char* kind, char* type) {
+    char* msg = NULL;
+    char* why;
+    char* help;
+    { char* idfe_o = msg; msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'borrows' cannot be written on a "), kind), ID_S(" of type "), 1), type, 1), ID_S("; it marks a string, list, bytes, struct or word parameter of a native"), 1); id_str_free(idfe_o); }
+    why = ID_S("'borrows' promises that the C behind a native does not keep the heap value it is given, and an int or float is not a heap value, nor is a parameter of a function that has a body");
+    help = ID_S("remove 'borrows' here, or move it to the string, list, bytes, struct or word parameter of the native that the C only reads during the call");
+    id_syn_diag(pos, ID_S("E0808"), msg, type, why, help);
+    { id_str_free(msg); return; }
 }
 
 int id_parse_fn_kind(IdList* pos) {
@@ -37599,6 +37729,58 @@ int id_esc_opaque(int fn, char* cname) {
     return r;
 }
 
+int id_esc_native_mask(int fn, char* cname) {
+    int m;
+    m = (0 - 1);
+    if ((((fn >= 0) && (id_is_native(fn) == 1)) && (id_is_rec_target(cname) == 0))) {
+        m = id_esc_borrow_mask(fn);
+    }
+    return m;
+}
+
+int id_esc_borrow_mask(int fn) {
+    IdList* ps;
+    int m;
+    ps = (IdList*)(intptr_t)(id_list_get(nl1, fn));
+    m = id_esc_borrow_loop(ps);
+    return m;
+}
+
+int id_esc_borrow_loop(IdList* ps) {
+    int m;
+    int i;
+    m = (0 - 1);
+    i = 0;
+    while (((i < id_list_len(ps)) && (i < 15))) {
+        m = id_esc_borrow_one(m, (int)(id_list_get(ps, i)), i);
+        i = (i + 1);
+    }
+    return m;
+}
+
+int id_esc_borrow_one(int m, int pn, int i) {
+    int r;
+    r = m;
+    if ((id_borrow_has(pn) == 1)) {
+        r = (m - (m & (id_shl(1, i) | id_shl(1, (15 + i)))));
+    }
+    return r;
+}
+
+int id_borrow_has(int pn) {
+    int r;
+    int i;
+    r = 0;
+    i = 0;
+    while ((i < id_list_len(borrownode))) {
+        if (((int)(id_list_get(borrownode, i)) == pn)) {
+            r = 1;
+        }
+        i = (i + 1);
+    }
+    return r;
+}
+
 int id_arg_ctx(char* cname, int i) {
     int c;
     c = 1;
@@ -37637,6 +37819,7 @@ void id_esc_init(void) {
     purenode = id_list_lit(0);
     esc_cons = id_list_lit(1, (long long)((0 - 1)));
     esc_xm = id_list_lit(0);
+    borrownode = id_list_lit(0);
     return;
 }
 
@@ -37937,7 +38120,7 @@ void id_esc_compute(int ix, char* cname) {
     int fn;
     fn = id_fn_node_of(cname);
     if ((id_esc_opaque(fn, cname) == 1)) {
-        id_esc_final(ix, (0 - 1));
+        id_esc_final(ix, id_esc_native_mask(fn, cname));
     } else {
         id_esc_scc(ix, fn);
     }
@@ -39016,7 +39199,7 @@ int id_ty_known(char* t) {
     char* ty_base_v;
     ok = 0;
     ty_base_v = id_ty_base(t);
-    if ((strcmp(id_ty_kind(ty_base_v), ID_S("\?")) != 0)) {
+    if (((strcmp(id_ty_kind(ty_base_v), ID_S("\?")) != 0) || (id_ty_is_end(ty_base_v) == 1))) {
         ok = 1;
     }
     return ok;
@@ -39561,6 +39744,15 @@ char* id_sd_cell(IdList* sd_tab, char* sd_s, int sd_k) {
         s = (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(sd_tab, sd_i)), sd_k));
     }
     return s;
+}
+
+int id_ty_is_end(char* t) {
+    int ok;
+    ok = 0;
+    if (((id_str_find(t, ID_S("sender(")) == 0) || (id_str_find(t, ID_S("receiver(")) == 0))) {
+        ok = 1;
+    }
+    return ok;
 }
 
 int id_fn_node_of(char* name) {

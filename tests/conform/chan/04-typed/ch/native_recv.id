@@ -1,0 +1,5 @@
+native ch_wait(receiver(int) rx) return int;
+
+native ch_take(receiver(int) rx) return int;
+
+native ch_close(sender(int) h) return void;

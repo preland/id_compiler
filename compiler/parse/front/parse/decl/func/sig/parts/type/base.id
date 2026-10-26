@@ -17,7 +17,7 @@ type_tail(string t, int[] pos) {
   if(t == "func") {
     s = parse_fn_type(pos);
   } else {
-    s = add_brackets(t, pos);
+    s = end_or_brackets(t, pos);
   }
 } return string s;
 given decl_tokens ("int", [3]):("int")

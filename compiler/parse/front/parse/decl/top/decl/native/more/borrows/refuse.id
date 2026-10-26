@@ -1,0 +1,24 @@
+// Where `borrows` is refused (E0808): on a parameter that is not a native's, or
+// whose type is int or float. Those are not heap values, so there is nothing
+// to borrow and the marker would promise nothing.
+
+borrow_bad(string kind, string type) {
+  int bad = 0;
+  if(kind != "nparam" || type == "int" || type == "float") {
+    bad = 1;
+  }
+} return int bad;
+("nparam", "string"):(0)
+("nparam", "int"):(1)
+("nparam", "float"):(1)
+("param", "string"):(1)
+
+borrow_refuse(int[] pos, string kind, string type) {
+  string msg = "'borrows' cannot be written on a " + kind + " of type " + type + "; it marks a string, list, bytes, struct or word parameter of a native";
+  string why = "'borrows' promises that the C behind a native does not keep the heap value it is given, and an int or float is not a heap value, nor is a parameter of a function that has a body";
+  string help = "remove 'borrows' here, or move it to the string, list, bytes, struct or word parameter of the native that the C only reads during the call";
+} chain (int[] pos, string kind, string type) {
+  syn_diag(pos, "E0808", msg, type, why, help);
+} return void;
+given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", "int"):() then (import synfail)[0]:(1)
+given full_env given push_toks(["ident"], ["g"]) ([0], "param", "float"):() then (import synfail)[0]:(1)

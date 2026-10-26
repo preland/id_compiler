@@ -1,0 +1,11 @@
+// A list handed to a native whose parameter is marked `borrows` is only read by
+// the C, so `run` gives it back when it returns: one list is freed. The twin
+// case, 61-borrows-undeclared-kept, differs in that one marker.
+run() {
+  int[] xs = [1, 2, 3];
+  int s = nat_sum(xs);
+} return int s;
+
+main(int argc, string[] argv) {
+  print(run());
+} return int 0;

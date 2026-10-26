@@ -1,0 +1,1 @@
+native nat_sum(borrows int[] xs) return int;

@@ -1,0 +1,1 @@
+native nat_sum(int[] xs) return int;

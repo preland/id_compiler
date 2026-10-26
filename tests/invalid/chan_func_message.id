@@ -1,0 +1,5 @@
+// EXPECT: a channel cannot carry a function value or void
+// EXPECT-IDCPY: expected a type
+feed(sender(func(int) return int) out) {
+  print(1);
+} return void;

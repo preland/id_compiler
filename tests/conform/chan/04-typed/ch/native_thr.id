@@ -1,0 +1,3 @@
+native th_spawn_tx(func(sender(int)) return int f, sender(int) arg) return int;
+
+native th_join(int h) return int;

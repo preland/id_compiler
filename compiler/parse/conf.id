@@ -169,7 +169,7 @@ string[] mulops = ["*", "/", "%"];
 string[] relops = ["==", "!=", "<", ">", "<=", ">=", "="];
 string[] unops = ["-", "!", "~"];
 string[] shiftops = ["<<", ">>"];
-string[] typewords = ["int", "float", "string", "void", "word", "export", "func", "bytes"];
+string[] typewords = ["int", "float", "string", "void", "word", "export", "func", "bytes", "sender", "receiver"];
 string[] mutnames = ["push", "pop"];
 // asgops: both spellings of equality; a statement that is one compares instead of
 // assigning. idc.py's parser folds `=` into `==` on the way in, so by the time

@@ -1,0 +1,41 @@
+// A channel end type: `sender(T)` or `receiver(T)`, the two ends of a channel
+// that carries messages of type T (docs/THREADS.md, P1.5a). Like a function
+// type it is kept as one canonical spelling, "sender(int)", so a name keeps
+// one type and two ends are the same type exactly when the spellings are the
+// same. The checker never needs to look inside: an end is a handle the
+// runtime owns, which the C target spells as an int.
+//
+// A message crosses to another thread, and the flat store, and so every
+// `word`, belongs to one thread; a function value is a pointer into the
+// sending thread. Neither can arrive meaningfully, so both are refused where
+// the type is written (E0809, E0810).
+
+end_or_brackets(string t, int[] pos) {
+  string s = t;
+  if(t == "sender" || t == "receiver") {
+    s = parse_end_type(pos, t);
+  } else {
+    s = add_brackets(t, pos);
+  }
+} return string s;
+given decl_tokens ("int", [3]):("int")
+given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ("sender", [38]):("sender(int)")
+
+parse_end_type(int[] pos, string t) {
+  expect_text(pos, "(");
+  advance(pos);
+  string mtype = parse_type(pos);
+} chain (int[] pos, string t) {
+  end_msg_ok(pos, mtype);
+  close_end(pos);
+  string s = t + "(" + mtype + ")";
+} return string s;
+given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([38], "receiver"):("receiver(int)")
+given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "string", ")", ""]) ([38], "sender"):("sender(string)")
+
+close_end(int[] pos) {
+  expect_text(pos, ")");
+  advance(pos);
+} return void;
+given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([40]):() then (import synfail)[0]:(0)
+given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([39]):() then (import synfail)[0]:(1)

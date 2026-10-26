@@ -1,0 +1,5 @@
+// EXPECT: a channel cannot carry a 'word'
+// EXPECT-IDCPY: expected a type
+feed(sender(word) out) {
+  print(1);
+} return void;

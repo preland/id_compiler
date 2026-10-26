@@ -1,0 +1,9 @@
+// The same native as 60-borrows-freed, declared without the marker (see
+// ../main.id).
+string name = "nat";
+string c_header = "nat.h";
+
+string[] c_linux_sources = ["nat.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
+string[] wasm_wasi_sources = ["nat.c"];

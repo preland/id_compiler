@@ -1,0 +1,26 @@
+// The same pipeline as 01, with the ends typed: the producer holds a sender(int) and can only send
+// and close, the main thread holds the receiver(int) and can only wait and take. The checker, not
+// the programmer, keeps a sender from receiving. A channel end is an int to the C target.
+producer(sender(int) tx) {
+  int i = 0;
+  while(i < 100) {
+    i = i + 1;
+    ch_send(tx, i);
+  }
+  ch_close(tx);
+} return int i;
+drain(receiver(int) rx) {
+  int t = 0;
+  while(ch_wait(rx)) {
+    t = t + ch_take(rx);
+  }
+} return int t;
+main(int argc, string[] argv) {
+  receiver(int) rx = ch_new(4);
+  sender(int) tx = ch_sender(rx);
+  int th = th_spawn_tx(producer, tx);
+} chain (int argc, string[] argv) {
+  int total = drain(rx);
+  int count = th_join(th);
+  print("sum " + total + " count " + count);
+} return int 0;

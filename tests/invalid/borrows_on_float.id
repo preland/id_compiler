@@ -1,0 +1,6 @@
+// EXPECT: 'borrows' cannot be written on a nparam of type float
+native weigh(borrows float x) return int;
+
+main(int argc, string[] argv) {
+  int r = weigh(1.5);
+} return int r;

@@ -1,0 +1,36 @@
+// The message type of a channel end, checked where `sender(T)` or
+// `receiver(T)` is written. A `word` is an address in the flat store, which is
+// per thread; a function value points into the sending thread. Both are
+// refused (E0809, E0810), and `void` carries nothing.
+
+end_msg_ok(int[] pos, string mtype) {
+  if(mtype == "word") {
+    end_word_err(pos);
+  }
+  if(ty_is_func(mtype) == 1 || mtype == "void") {
+    end_func_err(pos);
+  }
+} return void;
+given decl_tokens ([0], "int"):() then (import synfail)[0]:(0)
+given decl_tokens ([0], "word"):() then (import synfail)[0]:(1)
+given decl_tokens ([0], "func(int) return int"):() then (import synfail)[0]:(1)
+
+end_word_err(int[] pos) {
+  string msg = "a channel cannot carry a 'word': a word is an address in the flat store, and the store belongs to one thread";
+  string why = "the thread that receives the message has a different store, so the address would point at nothing or at the wrong memory";
+  string help = "send the value the address refers to (an int, a string, or bytes), not the address";
+} chain (int[] pos) {
+  syn_diag(pos, "E0809", msg, "word", why, help);
+} return void;
+given decl_tokens ([0]):() then (import synfail)[0]:(1)
+given decl_tokens ([5]):() then (import synfail)[0]:(1)
+
+end_func_err(int[] pos) {
+  string msg = "a channel cannot carry a function value or void: a function value points into the thread that made it, and void is no value";
+  string why = "a function value sent to another thread would call code and captured variables that belong to the sender";
+  string code = "E0810";
+} chain (int[] pos) {
+  syn_diag(pos, code, msg, "func", why, "send an int that names the action, and let the receiving thread choose the function; or send a struct of plain values");
+} return void;
+given decl_tokens ([0]):() then (import synfail)[0]:(1)
+given decl_tokens ([5]):() then (import synfail)[0]:(1)

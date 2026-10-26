@@ -1,0 +1,11 @@
+// The same call as 60-borrows-freed, but the native's parameter carries no
+// marker, so the C may have kept the list: `run` must not free it, and nothing
+// is freed.
+run() {
+  int[] xs = [1, 2, 3];
+  int s = nat_sum(xs);
+} return int s;
+
+main(int argc, string[] argv) {
+  print(run());
+} return int 0;

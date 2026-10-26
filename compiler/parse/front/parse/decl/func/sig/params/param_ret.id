@@ -3,11 +3,14 @@
 one_param(int[] pos, string kind) {
   int pure_v = at_pure(pos);
   skip_pure(pos);
-  string type = parse_type(pos);
+  int bflag = take_borrows(pos);
 } chain (int[] pos, string kind) {
+  string type = parse_type(pos);
   string name = read_name(pos);
   int ret_i = node_param(kind, type, name);
+} chain (int[] pos, string kind) {
   pure_mark_param(pos, pure_v, ret_i);
+  borrow_mark(pos, kind, bflag, type, ret_i);
 } return int ret_i;
 given decl_tokens ([2], "param"):(0)
 given decl_tokens ([5], "nparam"):(0)

@@ -1,0 +1,15 @@
+// A channel end type, "sender(int)" or "receiver(int)", has no row in the
+// registry either: the parser keeps it as one canonical spelling
+// (front/parse/decl/func/sig/parts/type/end.id), and ty_kind answers "?" for
+// it. It is still a type, so the declared-type check must not call it unknown.
+
+ty_is_end(string t) {
+  int ok = 0;
+  if(str_find(t, "sender(") == 0 || str_find(t, "receiver(") == 0) {
+    ok = 1;
+  }
+} return int ok;
+("sender(int)"):(1)
+("receiver(string)"):(1)
+("int"):(0)
+("sender"):(0)

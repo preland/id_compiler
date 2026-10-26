@@ -1,0 +1,36 @@
+// `borrows` (docs/SPEC.md, "Native contracts") is a marker written before the
+// type of a `native` parameter. It promises that the C behind the native does
+// not store the argument beyond the call, return it, or hand it to a thread
+// that outlives the call, so a caller may free a list it passed. The node it
+// marked is recorded in borrownode; the escape analysis reads it back when it
+// builds the native's summary (mid/types/check/store/assign/rule/escape/flow/
+// sum/arg/borrow.id). Without the marker a native keeps every argument.
+
+take_borrows(int[] pos) {
+  int bflag = 0;
+  if(cur_text(pos) == "borrows") {
+    bflag = 1;
+    advance(pos);
+  }
+} return int bflag;
+given full_env given push_toks(["ident", "kw"], ["borrows", "string"]) ([0]):(1)
+given full_env given push_toks(["kw", "ident"], ["string", "s"]) ([0]):(0)
+
+borrow_mark(int[] pos, string kind, int bflag, string type, int node) {
+  if(bflag == 1) {
+    borrow_check(pos, kind, type, node);
+  }
+} return void;
+given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", 0, "string", 4):() then len((import borrownode)):(0)
+given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", 1, "string", 4):() then (import borrownode)[0]:(4)
+
+borrow_check(int[] pos, string kind, string type, int node) {
+  int bad = borrow_bad(kind, type);
+  if(bad == 1) {
+    borrow_refuse(pos, kind, type);
+  } else {
+    push((import borrownode), node);
+  }
+} return void;
+given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", "int", 4):() then len((import borrownode)):(0)
+given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", "int[]", 4):() then (import borrownode)[0]:(4)
