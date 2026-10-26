@@ -10,6 +10,8 @@ call_env_fixture() {
   env_init();
   init_bnames();
   init_idx();
+} chain () {
+  init_rtc();
 } return void;
 ():() then (import bnames)[0]:("print")
 ():() then (import bnames)[4]:("push")

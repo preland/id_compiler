@@ -1,0 +1,22 @@
+// The C symbol a function of the program is emitted under.
+//
+// Every function is `id_<name>`. A --runtime tree defines functions named after
+// the host C runtime's own helpers (print, put, sdiv, list_len), and its cases
+// run in a harness built for the build host, which links that runtime: the
+// tree's `id_print` and the runtime's would be one symbol twice. So in a
+// --runtime build the tree's own functions are `idr_<name>` -- definition,
+// prototype and every call to it -- and a name the tree does not define (a
+// builtin it uses, a helper it calls) stays `id_<name>`, the host's. The C
+// emitter only ever serves the harness there; the object itself is LLVM.
+
+fn_sym(string name) {
+  string s = "id_" + name;
+  if((import rtc)[0] == 1) {
+    if(find_str((import fnames), name) >= 0) {
+      s = "idr_" + name;
+    }
+  }
+} return string s;
+given edge_fixture given init_rtc ("edge_caller"):("id_edge_caller")
+given edge_fixture given rt_fixture ("edge_caller"):("idr_edge_caller")
+given edge_fixture given rt_fixture ("not_a_function"):("id_not_a_function")

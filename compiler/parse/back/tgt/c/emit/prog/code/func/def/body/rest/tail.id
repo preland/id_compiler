@@ -17,7 +17,8 @@ given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")
 // `c_rettype id_NAME(params)`
 sig(int id) {
   string s2_of_v = (import ns2)[id];
-  string s = c_type(s2_of_v) + " id_" + (import ns1)[id] + "(" + param_str(id) + ")";
+  string sym_v = fn_sym((import ns1)[id]);
+  string s = c_type(s2_of_v) + " " + sym_v + "(" + param_str(id) + ")";
 } return string s;
 given nz_prog_fixture ((import nz_mainfn)):("int id_main(int argc)")
 given nz_prog_fixture ((import nz_plainfn)):("void id_run(void)")

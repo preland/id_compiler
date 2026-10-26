@@ -3,7 +3,7 @@
 emit_asm_one(int r) {
   string c_type_v = c_type((import afret)[r]);
   string list_params_v = list_params((import afparams)[r]);
-  print(c_type_v + " id_" + (import afname)[r] + "(" + list_params_v + ") {");
+  print(c_type_v + " " + fn_sym((import afname)[r]) + "(" + list_params_v + ") {");
 } chain (int r) {
   string c_type_v2 = c_type((import afret)[r]);
   print("    " + c_type_v2 + " " + (import afretn)[r] + ";");

@@ -21,6 +21,7 @@ lz_k() {
 casm_row_fixture() {
   llasm_row_fixture();
   init_tyc();
+  init_rtc();
 } return void;
 ():() then len((import tyc)):(6)
 ():() then calls node_param:("param", "int", "x")

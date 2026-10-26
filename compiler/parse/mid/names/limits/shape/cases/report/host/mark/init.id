@@ -4,11 +4,11 @@
 // A --freestanding build's cases run in a harness built for the machine doing
 // the build. A function that reaches, through the call graph, something with no
 // implementation there cannot run in it, so a case under it could never run.
-// Three things have none: an `asm` function with no body for the host's triple;
+// Two things have none: an `asm` function with no body for the host's triple;
 // a `native`, because a freestanding build links no backend and its
-// implementation is whatever the object is finally linked with; and, in a
-// --runtime build, a function named after a runtime helper, because the harness
-// takes that name from the host's C runtime rather than from this tree.
+// implementation is whatever the object is finally linked with. A --runtime
+// tree's functions named after runtime helpers are not among them: the harness
+// emits the tree's own functions under their own symbols (fn_sym).
 //
 // Decided from the source and the host's triple alone, once, before the case
 // checks read it. A hosted build's harness is built for the build's own triple,
@@ -33,7 +33,6 @@ ut_mark() {
 } chain () {
   export string[] utnote = [];
   if((import fsc)[0] == 1) {
-    ut_seed_self();
     ut_loop();
   }
 } return void;

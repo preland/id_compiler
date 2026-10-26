@@ -18,7 +18,8 @@ given clo_call_fixture ((import cv_call)):("((int (*)(IdFn*, int))cv->fn)(cv, 5)
 
 emit_gcall_named(int id) {
   int[] l1_of_v = (import nl1)[id];
-  string s = "id_" + (import ns1)[id] + "(" + emit_gcall_args(id, l1_of_v) + ")";
+  string sym_v = fn_sym((import ns1)[id]);
+  string s = sym_v + "(" + emit_gcall_args(id, l1_of_v) + ")";
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
 given call_names_fixture ((import call_e_len)):("id_len(5, 4)")

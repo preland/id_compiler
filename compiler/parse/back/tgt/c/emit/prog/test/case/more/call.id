@@ -7,7 +7,7 @@ emit_case_call(int ci) {
   string f1 = (import ns1)[fn];
 } chain (int ci) {
   if((import ns2)[fn] == "void") {
-    print("    id_" + f1 + "(" + cargs + ");");
+    print("    " + fn_sym(f1) + "(" + cargs + ");");
   } else {
     string rt = (import ns2)[fn];
     emit_ret_call(f1, rt, cargs);
@@ -42,7 +42,7 @@ void_call_fixture() {
 
 emit_ret_call(string f1, string rt, string cargs) {
   string ct = c_type(rt);
-  print("    " + ct + " idtc_got = id_" + f1 + "(" + cargs + ");");
+  print("    " + ct + " idtc_got = " + fn_sym(f1) + "(" + cargs + ");");
 } return void;
 given lc_env2 ("foo", "int", "1, 2"):() then prints:("    int idtc_got = id_foo(1, 2);\n")
 given lc_env2 ("bar", "string", "x"):() then prints:("    char* idtc_got = id_bar(x);\n")

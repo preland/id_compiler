@@ -1,0 +1,15 @@
+// The last clause of the error at a case under a function that cannot be
+// tested on the build host: for one that reaches a host-less asm it names the
+// body that makes the case runnable (../why/fix.id), for a native or a runtime
+// helper it says no case is needed.
+
+ut_case_tail(string name) {
+  int ut_k = find_str((import utname), name);
+  string ret_s = "this case would never run, and a function that cannot be tested needs none";
+  if(ut_asm_at(ut_k) == 1) {
+    string ut_fix_v = ut_fix_text(name);
+    ret_s = "this case would never run until the asm function has a body for the host: " + ut_fix_v;
+  }
+} return string ret_s;
+given ut_host_seeded ("port_byte"):("this case would never run until the asm function has a body for the host: adding asm \"x86_64-unknown-none\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)")
+given ut_host_seeded given ut_add("zz", "native 'zz'", "*") ("zz"):("this case would never run, and a function that cannot be tested needs none")

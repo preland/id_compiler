@@ -15,7 +15,7 @@ given chk_fixture (2, 0, "chk", (import fixture_chk_fn)):() then prints:("    in
 emit_then_want(int ci, int ti, string chk_nm, string rt, string ct) {
   int[] targs = (import nl2)[((import thennode)[ti])];
   string an = emit_then_args(ti, chk_nm, targs);
-  print("    " + ct + " idtc_chk" + ti + " = id_" + chk_nm + "(" + an + ");");
+  print("    " + ct + " idtc_chk" + ti + " = " + fn_sym(chk_nm) + "(" + an + ");");
 } chain (int ci, int ti, string chk_nm, string rt, string ct) {
   int[] items = (import nl1)[((import thennode)[ti])];
   emit_then_judge(ci, ti, then_label(chk_nm, targs), rt, items);

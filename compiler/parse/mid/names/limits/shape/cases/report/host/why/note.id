@@ -13,9 +13,12 @@ ut_because_at(string via_s, string what_s) {
 ("g", "asm 'in8'"):("it calls 'g', which reaches asm 'in8'")
 ("", "asm 'in8'"):("it reaches asm 'in8'")
 
-// A function short of two cases that cannot be tested on the build host is not
-// short: it needs none, and a note says why rather than the minimum being
-// lifted silently. One that has a case anyway already has an error at that case
+// A function short of two cases that reaches an `asm` function with no body for
+// the host's triple is short like any other, and its error also names the
+// asm function and the body that would make it testable (fix.id). A native or a
+// runtime helper has no such body, so a function reaching one is not short: it
+// needs none, and a note says why rather than the minimum being lifted
+// silently. One that has a case anyway already has an error at that case
 // (../cases/untestable.id), so it gets nothing more here.
 // `given` may now be repeated (docs/TESTS.md), so the "not exempt" branch
 // (ut_at(s1_of_v) < 0, the ordinary report_cases path) is cased below by
@@ -34,14 +37,23 @@ ut_because_at(string via_s, string what_s) {
 // covers it directly.
 cases_short(int i, int n) {
   string s1_of_v = (import ns1)[((import prog)[i])];
-  if(find_str((import utname), s1_of_v) < 0) {
+  int ut_k = find_str((import utname), s1_of_v);
+  int asm_k = ut_asm_at(ut_k);
+} chain (int i, int n) {
+  if(ut_k < 0 || asm_k == 1) {
     report_cases(i, n);
-  } else if(n == 0) {
+  }
+  if(asm_k == 1) {
+    ut_fix(i, s1_of_v);
+  }
+  if(ut_k >= 0 && asm_k == 0 && n == 0) {
     ut_note(i, s1_of_v);
   }
 } return void;
 given notes_base given edge_fixture (0, 0):() then calls report_cases:(0, 0) then calls ut_note:[0]
 given notes_base given edge_fixture (0, 2):() then calls report_cases:(0, 2) then calls ut_note:[0]
+given ut_host_seeded given edge_fixture given ut_add("fx_target", "asm 'in8'", "*") (0, 0):() then calls report_cases:(0, 0) then calls ut_fix:(0, "fx_target") then calls ut_note:[0]
+given ut_host_seeded given edge_fixture given ut_add("fx_target", "native 'nn'", "*") (0, 0):() then calls ut_note:(0, "fx_target") then calls ut_fix:[0]
 
 ut_note(int i, string name) {
   string note_at = (import pfile)[i] + ":" + (import pline)[i] + ": note: ";

@@ -11,3 +11,5 @@ eprint(string s) {
   put(s);
   com1_out(10);
 } return void;
+("ab"):() then prints:("ab\n")
+(""):() then prints:("\n")

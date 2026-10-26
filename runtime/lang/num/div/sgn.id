@@ -29,3 +29,23 @@ asm "x86_64-unknown-none" smod(word a, word v) {
   "idivq %%rcx"
   "movq %%rdx, %[ret]"
 } return word ret;
+
+asm "x86_64-unknown-linux-gnu" sdiv(word a, word v) {
+  "pushq %[a]"
+  "pushq %[v]"
+  "popq %%rcx"
+  "popq %%rax"
+  "cqto"
+  "idivq %%rcx"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-linux-gnu" smod(word a, word v) {
+  "pushq %[a]"
+  "pushq %[v]"
+  "popq %%rcx"
+  "popq %%rax"
+  "cqto"
+  "idivq %%rcx"
+  "movq %%rdx, %[ret]"
+} return word ret;

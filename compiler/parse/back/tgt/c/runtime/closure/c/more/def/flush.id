@@ -29,5 +29,5 @@ fv_object(string name, int nd) {
   string raw = fv_raw(name, nd);
   string s = "IdFn idfn_o_" + key + " = { (void*)idfn_a_" + key + ", " + raw + ", " + nd + " };";
 } return string s;
-("tick", 0):("IdFn idfn_o_tick__0 = { (void*)idfn_a_tick__0, (void*)id_tick, 0 };")
+given clo_fixture ("tick", 0):("IdFn idfn_o_tick__0 = { (void*)idfn_a_tick__0, (void*)id_tick, 0 };")
 ("tick", 2):("IdFn idfn_o_tick__2 = { (void*)idfn_a_tick__2, 0, 2 };")

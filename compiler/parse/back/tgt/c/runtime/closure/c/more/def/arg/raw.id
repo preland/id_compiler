@@ -8,10 +8,10 @@
 fv_raw(string name, int nd) {
   string s = "0";
   if(nd == 0) {
-    s = "(void*)id_" + name;
+    s = "(void*)" + fn_sym(name);
   }
 } return string s;
-("tick", 0):("(void*)id_tick")
+given clo_fixture ("tick", 0):("(void*)id_tick")
 ("tick", 3):("0")
 
 clo_fixture() {

@@ -38,7 +38,8 @@ given notes_base given void_call_fixture (1):() then calls ut_case_fn:(1, "bare"
 ut_case_fn(int ci, string name) {
   if(find_str((import utname), name) >= 0) {
     string ut_why_v = ut_why(name);
-    case_err(ci, "'" + name + "' " + ut_why_v + "; this case would never run, and a function that cannot be tested needs none");
+    string ut_tail_v = ut_case_tail(name);
+    case_err(ci, "'" + name + "' " + ut_why_v + "; " + ut_tail_v);
   }
 } return void;
 given ut_host_seeded given case_fixture given ut_add("fx_target", "asm 'in8'", "*") (0, "fx_target"):() then (import chkfail)[0]:(1)

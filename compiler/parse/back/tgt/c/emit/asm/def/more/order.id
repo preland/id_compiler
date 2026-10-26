@@ -31,6 +31,8 @@ casm_row2_fixture() {
   llasm_row2_fixture();
   init_tyc();
   push((import afretn), "out");
+} chain () {
+  init_rtc();
 } return void;
 ():() then (import afretn)[1]:("out")
 ():() then calls init_tyc:()

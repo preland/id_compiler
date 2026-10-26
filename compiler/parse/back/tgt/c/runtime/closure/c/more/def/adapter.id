@@ -5,7 +5,7 @@
 
 fv_adapter(int fn, string name, int nd) {
   string head = c_type((import ns2)[fn]) + " idfn_a_" + name + (import fv_sep) + nd + "(IdFn* c" + fv_params(fn, nd) + ") { ";
-  string call = "id_" + name + "(" + fv_args(fn, nd) + ");";
+  string call = fn_sym(name) + "(" + fv_args(fn, nd) + ");";
   string fv_retw = str_pick((import ns2)[fn], "void", "", "return ");
 } chain (int fn, string name, int nd) {
   string s = head + fv_retw + call + " }";

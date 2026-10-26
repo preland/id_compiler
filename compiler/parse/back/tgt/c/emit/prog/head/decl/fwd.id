@@ -33,7 +33,8 @@ given ll_natives_fixture2 ():() then prints:("")
 fwd_adopt_one(int id) {
   string rt = (import ns2)[id];
   if(is_native(id) == 1 && (ty_is_list(rt) == 1 || ty_kind_is(rt, "struct") == 1)) {
-    print("#define id_" + (import ns1)[id] + "(...) id_list_adopt(id_" + (import ns1)[id] + "(__VA_ARGS__))");
+    string fwd_sym = fn_sym((import ns1)[id]);
+    print("#define " + fwd_sym + "(...) id_list_adopt(" + fwd_sym + "(__VA_ARGS__))");
   }
 } return void;
 given lw_nl_fixture (1):() then prints:("#define id_nat(...) id_list_adopt(id_nat(__VA_ARGS__))\n")

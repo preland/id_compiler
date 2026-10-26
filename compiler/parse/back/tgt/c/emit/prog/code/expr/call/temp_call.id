@@ -16,7 +16,7 @@ given esc_ffix ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr =
 given esc_ffix ((import eff_cmk)):("id_ff_make(n)")
 
 tmp_text(int id) {
-  string tx_call = "id_" + (import ns1)[id] + "(" + tmp_all(id, 1) + ")";
+  string tx_call = fn_sym((import ns1)[id]) + "(" + tmp_all(id, 1) + ")";
   string tx_pre = tmp_all(id, 0);
   string tx_fr = tmp_all(id, 2);
 } chain (int id) {

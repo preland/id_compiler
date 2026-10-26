@@ -1,0 +1,39 @@
+// What fixes a function that cannot be tested on the build host because it
+// reaches an `asm` function with no body for the host's triple. That is not an
+// exemption: the function owes its two cases like any other, and the way to
+// make them runnable is a body for the host's triple on the asm function
+// (docs/ASM.md, "Overloading by platform"), which every function reaching it
+// then runs against. A native or a runtime helper has no such overload and
+// stays exempt (note.id).
+
+ut_asm_at(int ut_ki) {
+  int ret_i = 0;
+  if(ut_ki >= 0) {
+    ret_i = str_starts((import utwhat)[ut_ki], "asm '");
+  }
+} return int ret_i;
+given ut_host_seeded (0):(1)
+given ut_host_seeded given ut_add("zz", "native 'zz'", "*") (2):(0)
+given ut_host_seeded (1):(1)
+
+ut_fix_text(string name) {
+  int ut_k = find_str((import utname), name);
+  string ut_w = (import utwhat)[ut_k];
+  string ut_rest = str_sub(ut_w, 5, len(ut_w) - 5);
+} chain (string name) {
+  string[] ut_parts = str_split(ut_rest, "'");
+  string ut_host_v = (import hostc)[0];
+  string ret_s = "adding asm \"" + ut_host_v + "\" " + ut_parts[0] + "(...) makes it testable (docs/ASM.md, Overloading by platform)";
+} return string ret_s;
+given ut_host_seeded ("port_byte"):("adding asm \"x86_64-unknown-none\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)")
+given ut_host_seeded ("caller"):("adding asm \"x86_64-unknown-none\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)")
+
+ut_fix(int i, string name) {
+  string ut_why_v = ut_why(name);
+  string ut_fix_v = ut_fix_text(name);
+  string ut_loc_v = diag_prog_loc(i);
+} chain (int i, string name) {
+  diag_related(ut_loc_v, "function '" + name + "' " + ut_why_v + "; " + ut_fix_v);
+} return void;
+given ut_host_seeded given edge_fixture (0, "port_byte"):() then prints:("  related: fixture.id:7: note: function 'port_byte' cannot be tested on the build host (x86_64-unknown-none): it is asm 'in8'; adding asm \"x86_64-unknown-none\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)\n")
+given ut_host_seeded given edge_fixture (1, "caller"):() then prints:("  related: fixture.id:20: note: function 'caller' cannot be tested on the build host (x86_64-unknown-none): it calls 'port_byte', which reaches asm 'in8'; adding asm \"x86_64-unknown-none\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)\n")

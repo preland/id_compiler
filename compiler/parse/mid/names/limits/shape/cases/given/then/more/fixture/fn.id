@@ -13,6 +13,8 @@ fn_fixture() {
   case_fixture();
   fn_fixture_build();
   reqtests_init();
+} chain () {
+  init_rtc();
 } return void;
 ():() then calls node_param:("param", "int", "x")
 ():() then calls node_txt2:("int", "0", 0, 0)

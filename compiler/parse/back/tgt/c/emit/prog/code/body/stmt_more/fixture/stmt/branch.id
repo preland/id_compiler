@@ -24,6 +24,7 @@ given nz_if_fixture ():() then calls node_while:((import nz_int), [])
 nz_tyc_fixture() {
   nz_while_fixture();
   init_tyc();
+  init_rtc();
 } return void;
 ():() then calls nz_while_fixture:[1] then (import tyc)[0]:("int")
 ():() then (import tyc)[3]:("char*") then (import tyc)[4]:("void")

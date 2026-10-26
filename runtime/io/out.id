@@ -12,11 +12,17 @@ put(string s) {
     i = i + 1;
   }
 } return void;
+("ab"):() then prints:("ab")
+(""):() then prints:("")
 
 print(string s) {
   put(s);
   com1_out(10);
 } return void;
+("ab"):() then prints:("ab\n")
+(""):() then prints:("\n")
 
 flush() {
 } return void;
+():() then prints:("")
+():() then eprints:("")
