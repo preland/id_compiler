@@ -81,13 +81,13 @@ else
 fi
 
 # The kernel is built against idstd's core tier, staged by kbuild, and carries no copy
-# of what that tier has: lset, sset and wset are core's, not the kernel's own.
-if grep -qE '^lset\|.*/std_core/core/data/list/access\.id:[0-9]+\|' "$TMP/calls.out" \
-   && grep -qE '^sset\|.*/std_core/core/data/list/access\.id:[0-9]+\|' "$TMP/calls.out" \
-   && grep -qE '^wset\|.*/std_core/core/data/list/pick\.id:[0-9]+\|' "$TMP/calls.out"; then
-    ok "the kernel uses idstd core's lset, sset and wset"
+# of what that tier has: integer_list_set, string_list_set and word_list_set are core's, not the kernel's own.
+if grep -qE '^integer_list_set\|.*/std_core/core/data/list/access\.id:[0-9]+\|' "$TMP/calls.out" \
+   && grep -qE '^string_list_set\|.*/std_core/core/data/list/access\.id:[0-9]+\|' "$TMP/calls.out" \
+   && grep -qE '^word_list_set\|.*/std_core/core/data/list/pick\.id:[0-9]+\|' "$TMP/calls.out"; then
+    ok "the kernel uses idstd core's integer_list_set, string_list_set and word_list_set"
 else
-    bad "the kernel uses idstd core's lset, sset and wset"
+    bad "the kernel uses idstd core's integer_list_set, string_list_set and word_list_set"
 fi
 
 # Nothing in the image may have come from a C compiler. The runtime's own

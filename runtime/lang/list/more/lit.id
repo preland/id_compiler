@@ -1,0 +1,15 @@
+// A list literal or struct constructor. The compiler calls id_list_lit with
+// the count and then the cells as C varargs, which `id` cannot declare, so
+// kernel/boot/isr.S lays the cells out as one array and calls this. Cells are
+// pushed rather than copied into an exact-capacity array: list_grow assumes
+// every capacity is a power of two when it gives the old array back.
+
+list_lit_cells(int n, word cells) {
+  int[] xs = list_new();
+  int i = 0;
+  while(i < n) {
+    word cell = ld64(cells + i * 8);
+    list_push(xs, cell);
+    i = i + 1;
+  }
+} return int[] xs;
