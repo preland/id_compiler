@@ -119,3 +119,46 @@ ok
 elo
 fsrs
 retrievability
+
+# File formats, codecs and their own structural terms, named as their
+# specifications name them (zstd's Finite State Entropy, PNG's PLTE chunk and
+# Paeth filter, JPEG's minimum coded unit, the X keyboard extension).
+zstd
+jpeg
+jpg
+png
+plte
+paeth
+mcu
+huffman
+fse
+pbm
+gz
+tif
+xkb
+js
+dna
+
+# C and POSIX names a function binds to or reports by name.
+argv
+argc
+alloca
+strcmp
+sendto
+recv
+uname
+gdb
+
+# Compiler terms: the abstract syntax tree, the intermediate representation,
+# dead-code elimination, LLVM's replaceAllUsesWith, and the keywords of the
+# languages c2id reads.
+ast
+ir
+dce
+rauw
+goto
+elif
+
+# Words the dictionary lacks.
+despawn
+dequantize
