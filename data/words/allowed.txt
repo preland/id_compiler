@@ -95,6 +95,7 @@ callee
 radix
 postfix
 textbox
+endian
 atan2
 
 # Bit widths, read as numbers (cyclic_redundancy_check_32, a 64-bit count).
