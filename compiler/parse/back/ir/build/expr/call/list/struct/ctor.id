@@ -1,32 +1,31 @@
-// A struct constructor, lowered as the list it is at run time: a new list, then
-// one push per field, each value converted to the field's type and boxed to the
-// runtime's uniform cell -- the same steps a list literal takes (../lit/arr.id),
-// except that the element type is the field's own and differs from one cell to
-// the next.
+// A struct constructor, lowered as the list it is at run time: a single
+// id_list_lit call that allocates the exact capacity and fills every cell, as
+// the C target does (emit_ctor). Each value is converted to the field's type
+// and boxed to the runtime's uniform cell, so the element type is the field's
+// own and differs from one cell to the next.
 
 lw_ctor(int node) {
   string ty = lw_ety(node);
-  int a = lw_new(ty);
-  lw_ctor_els(node, a);
+  int[] lw_lit_cells = lw_ctor_cells(node);
+  int a = lw_callf("id_list_lit", ty, lw_lit_cells);
 } return int a;
-given sr_fixture ((import sr_ic2)):(0)
-given sr_fixture ((import sr_ic1)):(0)
+given sr_fixture ((import sr_ic2)):(5)
+given sr_fixture ((import sr_ic1)):(3)
 
-lw_ctor_els(int node, int a) {
+lw_ctor_cells(int node) {
+  int[] lw_lit_cells = lw_arr_head(node);
   int i = 0;
   while(lw_args_more(node, i)) {
-    i = lw_ctor_one(node, i, a);
+    push(lw_lit_cells, lw_ctor_one(node, i));
+    i = i + 1;
   }
-} return void;
-given sr_fixture ((import sr_ic2), 0):() then calls lw_ctor_one:((import sr_ic2), 0, 0)
-given sr_fixture ((import sr_ic1), 5):() then calls lw_ctor_one:((import sr_ic1), 0, 5)
-given sr_fixture ((import sr_ic2), 0):() then calls lw_ctor_one:[2]
-given sr_fixture ((import sr_ic1), 0):() then calls lw_ctor_one:[1]
+} return int[] lw_lit_cells;
+given sr_fixture ((import sr_ic2)):([0, 2, 4])
+given sr_fixture ((import sr_ic1)):([0, 2])
 
-lw_ctor_one(int node, int i, int a) {
+lw_ctor_one(int node, int i) {
   string sd_ft = sd_cell((import sdftype), ((import ns1)[node]), i);
-  lw_ctor_cell(node, i, a, sd_ft);
-  int ret_i = i + 1;
-} return int ret_i;
-given sr_fixture ((import sr_ic2), 0, 0):(1)
-given sr_fixture ((import sr_ic2), 1, 0):(2)
+  int boxed = lw_ctor_cell(node, i, sd_ft);
+} return int boxed;
+given sr_fixture ((import sr_ic2), 0):(1)
+given sr_fixture ((import sr_ic2), 1):(1)

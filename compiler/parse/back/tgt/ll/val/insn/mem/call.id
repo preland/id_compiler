@@ -10,3 +10,15 @@ ll_callee(int id) {
 } return string s;
 given fixture2 ((import ir_callee_sym)):("@myfunc")
 given fixture3 ((import ir_callee_val)):("5")
+
+// A call to a varargs function must carry the function's prototype after the
+// result type, or LLVM reads the call as fixed-arity: id_list_lit takes its
+// count and then any number of cells.
+ll_vsig(int id) {
+  string vsig_s = "";
+  if((import ia)[id] < 0 && (import istr)[id] == "id_list_lit") {
+    vsig_s = " (i32, ...)";
+  }
+} return string vsig_s;
+given fixture2 ((import ir_callee_sym)):("")
+given fixture3 ((import ir_callee_val)):("")

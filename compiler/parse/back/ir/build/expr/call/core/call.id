@@ -12,7 +12,7 @@ lw_call(int node) {
 } return int v;
 given ocall_fixture ((import ocall_node)):(0)
 given bicall_fixture ((import bicall_node)):(2)
-given sr_fixture ((import sr_ic2)):(0)
+given sr_fixture ((import sr_ic2)):(5)
 
 lw_ucall(int node) {
   string name = lw_ucall_name(node);

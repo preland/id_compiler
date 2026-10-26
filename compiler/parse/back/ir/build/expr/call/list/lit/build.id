@@ -1,0 +1,28 @@
+// Which way a literal lowers: one id_list_lit call when it has members (exact
+// capacity, no per-element push call left for the runtime to out-line), the
+// new-then-push shape otherwise.
+lw_arr_build(int node, string elem) {
+  int a = lw_arr_lit(node, elem);
+  if(a < 0) {
+    a = lw_arr_old(node, elem);
+  }
+} return int a;
+given lw_fix_arr ((import fix_arr_n), "int"):(3)
+given lw_fix_arr_empty ((import fix_arr_empty_n), "int"):(0)
+
+lw_arr_old(int node, string elem) {
+  int a = lw_arr_new(node);
+  lw_arr_els(node, a, elem);
+} return int a;
+given lw_fix_arr ((import fix_arr_n), "int"):(0)
+given lw_fix_arr_empty ((import fix_arr_empty_n), "int"):(0)
+
+lw_arr_lit(int node, string elem) {
+  int a = 0 - 1;
+  if(len((import nl1)[node]) > 0 && lw_ety(node) != "bytes") {
+    int[] lw_lit_cells = lw_arr_cells(node, elem);
+    a = lw_callf("id_list_lit", lw_ety(node), lw_lit_cells);
+  }
+} return int a;
+given lw_fix_arr ((import fix_arr_n), "int"):(3)
+given lw_fix_arr_empty ((import fix_arr_empty_n), "int"):(-1)

@@ -1317,17 +1317,19 @@ ID_CLO IdFn* id_fn_plain(void* fn, void* raw) {
 static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "%s\n", s); }
 /* forward declarations */
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
+int id_character_in(int idstd_range_code, int idstd_lo, int idstd_hi);
+int id_character_is_alpha(int idstd_alpha_code);
+int id_character_is_space(int idstd_space_code);
+int id_character_is_name_start(int idstd_name_start_code);
+int id_character_is_name_part(int idstd_name_part_code);
+int id_character_is_digit(int idstd_digit_code);
 int id_str_eol(char* idstd_s, int idstd_i);
-int id_is_space_at(char* src, int i);
-int id_is_digit_at(char* src, int i);
-int id_is_alpha_at(char* src, int i);
-int id_is_alnum_at(char* src, int i);
+int id_idstd_chr_is_digit_at(char* idstd_s, int idstd_i);
+int id_idstd_chr_is_space_at(char* idstd_s, int idstd_i);
+int id_is_name_start_at(char* src, int i);
+int id_is_name_part_at(char* src, int i);
 int id_is_hex_at(char* src, int i);
 int id_is_bin_at(char* src, int i);
-int id_is_space(int c);
-int id_is_digit(int c);
-int id_is_alpha(int c);
-int id_is_alnum(int c);
 int id_is_kw(char* w);
 char* id_kindof(char* w);
 int id_scan_one(char* src, int i);
@@ -1503,6 +1505,42 @@ void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
     return;
 }
 
+int id_character_in(int idstd_range_code, int idstd_lo, int idstd_hi) {
+    int idstd_ret_i;
+    idstd_ret_i = ((idstd_range_code >= idstd_lo) && (idstd_range_code <= idstd_hi));
+    return idstd_ret_i;
+}
+
+int id_character_is_alpha(int idstd_alpha_code) {
+    int idstd_ret_i;
+    idstd_ret_i = (id_character_in(idstd_alpha_code, 65, 90) || id_character_in(idstd_alpha_code, 97, 122));
+    return idstd_ret_i;
+}
+
+int id_character_is_space(int idstd_space_code) {
+    int idstd_ret_i;
+    idstd_ret_i = ((((idstd_space_code == 32) || (idstd_space_code == 9)) || (idstd_space_code == 10)) || (idstd_space_code == 13));
+    return idstd_ret_i;
+}
+
+int id_character_is_name_start(int idstd_name_start_code) {
+    int idstd_ret_i;
+    idstd_ret_i = (id_character_is_alpha(idstd_name_start_code) || (idstd_name_start_code == 95));
+    return idstd_ret_i;
+}
+
+int id_character_is_name_part(int idstd_name_part_code) {
+    int idstd_ret_i;
+    idstd_ret_i = (id_character_is_name_start(idstd_name_part_code) || id_character_is_digit(idstd_name_part_code));
+    return idstd_ret_i;
+}
+
+int id_character_is_digit(int idstd_digit_code) {
+    int idstd_ret_i;
+    idstd_ret_i = id_character_in(idstd_digit_code, 48, 57);
+    return idstd_ret_i;
+}
+
 int id_str_eol(char* idstd_s, int idstd_i) {
     while (((id_character_code_at(idstd_s, idstd_i) != 10) && (id_character_code_at(idstd_s, idstd_i) != (-1)))) {
         idstd_i = (idstd_i + 1);
@@ -1510,88 +1548,52 @@ int id_str_eol(char* idstd_s, int idstd_i) {
     return idstd_i;
 }
 
-int id_is_space_at(char* src, int i) {
-    int c;
-    int ok;
-    c = id_character_code_at(src, i);
-    ok = id_is_space(c);
-    return ok;
+int id_idstd_chr_is_digit_at(char* idstd_s, int idstd_i) {
+    int idstd_charat_v;
+    int idstd_ret_i;
+    idstd_charat_v = id_character_code_at(idstd_s, idstd_i);
+    idstd_ret_i = id_character_is_digit(idstd_charat_v);
+    return idstd_ret_i;
 }
 
-int id_is_digit_at(char* src, int i) {
-    int c;
-    int ok;
-    c = id_character_code_at(src, i);
-    ok = id_is_digit(c);
-    return ok;
+int id_idstd_chr_is_space_at(char* idstd_s, int idstd_i) {
+    int idstd_charat_v;
+    int idstd_ret_i;
+    idstd_charat_v = id_character_code_at(idstd_s, idstd_i);
+    idstd_ret_i = id_character_is_space(idstd_charat_v);
+    return idstd_ret_i;
 }
 
-int id_is_alpha_at(char* src, int i) {
-    int c;
-    int ok;
-    c = id_character_code_at(src, i);
-    ok = id_is_alpha(c);
-    return ok;
+int id_is_name_start_at(char* src, int i) {
+    int code;
+    int start;
+    code = id_character_code_at(src, i);
+    start = id_character_is_name_start(code);
+    return start;
 }
 
-int id_is_alnum_at(char* src, int i) {
-    int c;
-    int ok;
-    c = id_character_code_at(src, i);
-    ok = id_is_alnum(c);
-    return ok;
+int id_is_name_part_at(char* src, int i) {
+    int code;
+    int part;
+    code = id_character_code_at(src, i);
+    part = id_character_is_name_part(code);
+    return part;
 }
 
 int id_is_hex_at(char* src, int i) {
-    int c;
-    int ok;
-    c = id_character_code_at(src, i);
-    ok = id_is_hex(c);
-    return ok;
+    int code;
+    int hex;
+    code = id_character_code_at(src, i);
+    hex = id_is_hex(code);
+    return hex;
 }
 
 int id_is_bin_at(char* src, int i) {
-    int c;
-    int ok;
-    c = id_character_code_at(src, i);
-    ok = id_is_bin(c);
-    return ok;
-}
-
-int id_is_space(int c) {
-    int ok;
-    ok = 0;
-    if (((((c == 32) || (c == 9)) || (c == 10)) || (c == 13))) {
-        ok = 1;
-    }
-    return ok;
-}
-
-int id_is_digit(int c) {
-    int ok;
-    ok = 0;
-    if (((c >= 48) && (c <= 57))) {
-        ok = 1;
-    }
-    return ok;
-}
-
-int id_is_alpha(int c) {
-    int ok;
-    ok = 0;
-    if (((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || (c == 95))) {
-        ok = 1;
-    }
-    return ok;
-}
-
-int id_is_alnum(int c) {
-    int ok;
-    ok = 0;
-    if ((id_is_alpha(c) || id_is_digit(c))) {
-        ok = 1;
-    }
-    return ok;
+    int code;
+    int bin;
+    code = id_character_code_at(src, i);
+    bin = id_is_bin(code);
+    return bin;
 }
 
 int id_is_kw(char* w) {
@@ -1615,7 +1617,7 @@ char* id_kindof(char* w) {
 int id_scan_one(char* src, int i) {
     int ni;
     ni = 0;
-    if (id_is_space_at(src, i)) {
+    if (id_idstd_chr_is_space_at(src, i)) {
         ni = id_eat_space(src, i);
     } else {
         ni = id_scan_tok_span(src, i);
@@ -1637,7 +1639,7 @@ int id_scan_word(char* src, int i) {
 int id_scan_token(char* src, int i) {
     int ni;
     ni = 0;
-    if (id_is_alpha_at(src, i)) {
+    if (id_is_name_start_at(src, i)) {
         ni = id_scan_ident(src, i);
     } else {
         ni = id_scan_numop(src, i);
@@ -1720,7 +1722,7 @@ void id_span_out(char* src, int i, int ni) {
 int id_scan_decop(char* src, int i) {
     int ni;
     ni = 0;
-    if (id_is_digit_at(src, i)) {
+    if (id_idstd_chr_is_digit_at(src, i)) {
         ni = id_scan_number(src, i);
     } else {
         ni = id_scan_strop(src, i);
@@ -1829,7 +1831,7 @@ char* id_numkind(int e, int fe) {
 }
 
 int id_digit_run_end(char* src, int i) {
-    while (id_is_digit_at(src, i)) {
+    while (id_idstd_chr_is_digit_at(src, i)) {
         i = (i + 1);
     }
     return i;
@@ -1838,7 +1840,7 @@ int id_digit_run_end(char* src, int i) {
 int id_has_frac(char* src, int e) {
     int ok;
     ok = 0;
-    if (((id_character_code_at(src, e) == 46) && id_is_digit_at(src, (e + 1)))) {
+    if (((id_character_code_at(src, e) == 46) && id_idstd_chr_is_digit_at(src, (e + 1)))) {
         ok = 1;
     }
     return ok;
@@ -1942,7 +1944,7 @@ void id_print_number(char* src, int i, int e, long long v, int limit) {
 int id_is_hex(int c) {
     int ok;
     ok = 0;
-    if (((id_is_digit(c) || ((c >= 97) && (c <= 102))) || ((c >= 65) && (c <= 70)))) {
+    if (((id_character_is_digit(c) || ((c >= 97) && (c <= 102))) || ((c >= 65) && (c <= 70)))) {
         ok = 1;
     }
     return ok;
@@ -2176,7 +2178,7 @@ int id_scan_ident(char* src, int i) {
     char* ident = NULL;
     int charat_v;
     { char* idfe_o = ident; ident = id_str_dup(ID_S("")); id_str_free(idfe_o); }
-    while (id_is_alnum_at(src, i)) {
+    while (id_is_name_part_at(src, i)) {
         charat_v = id_character_code_at(src, i);
         ident = id_concat_f(ident, id_chr(charat_v), 3);
         i = (i + 1);

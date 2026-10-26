@@ -32,7 +32,7 @@ given phi_fixture ((import ir_phi)):("%v1 = phi i32 [ %v0, %b7 ]")
 // symbol or a function value (call.id).
 ll_call(int id) {
   string ir_ty_v = (import ity)[id];
-  string s = "call " + ll_ty(ir_ty_v) + " " + ll_callee(id) + "(" + ll_args(id) + ")";
+  string s = "call " + ll_ty(ir_ty_v) + ll_vsig(id) + " " + ll_callee(id) + "(" + ll_args(id) + ")";
   if(ll_ty(ir_ty_v) != "void") {
     s = "%v" + id + " = " + s;
   }

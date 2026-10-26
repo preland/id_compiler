@@ -1,15 +1,15 @@
 // One field of a struct constructor: converted to the field's type, copied to
 // the heap when the constructor's string literal must be a block of its own
-// (esc_cdup, the same question the C emitter asks), then boxed and pushed.
+// (esc_cdup, the same question the C emitter asks), then boxed for id_list_lit.
 
-lw_ctor_cell(int node, int i, int a, string elem) {
+lw_ctor_cell(int node, int i, string elem) {
   int[] els = (import nl1)[node];
   int v = lw_as(els[i], elem);
   if(esc_cdup((import ns1)[node], els, i) == 1) {
     v = lw_callf("id_str_dup", "string", [v]);
   }
-} chain (int node, int i, int a, string elem) {
-  lw_arr_push2(a, v, elem);
-} return void;
-given sr_fixture ((import sr_ic2), 0, 0, "int"):() then calls lw_arr_push2:(0, 0, "int")
-given sr_fixture ((import sr_ic2), 1, 5, "word"):() then calls lw_arr_push2:(5, 1, "word")
+} chain (int node, int i, string elem) {
+  int boxed = lw_box(v, elem);
+} return int boxed;
+given sr_fixture ((import sr_ic2), 0, "int"):(1)
+given sr_fixture ((import sr_ic2), 1, "word"):(1)

@@ -1,0 +1,27 @@
+// The operands of an id_list_lit call: the element count, then each member
+// converted to the element type and boxed to the runtime's uniform cell.
+lw_arr_cells(int node, string elem) {
+  int[] lw_lit_cells = lw_arr_head(node);
+  int i = 0;
+  while(lw_args_more(node, i)) {
+    push(lw_lit_cells, lw_arr_val(node, i, elem));
+    i = i + 1;
+  }
+} return int[] lw_lit_cells;
+given lw_fix_arr ((import fix_arr_n), "int"):([0, 2])
+given lw_fix_arr_empty ((import fix_arr_empty_n), "int"):([0])
+
+lw_arr_head(int node) {
+  string lw_lit_cnt = "" + len((import nl1)[node]);
+  int[] lw_lit_cells = [lw_const("int", lw_lit_cnt)];
+} return int[] lw_lit_cells;
+given lw_fix_arr ((import fix_arr_n)):([0])
+given lw_fix_arr_empty ((import fix_arr_empty_n)):([0])
+
+lw_arr_val(int node, int i, string elem) {
+  int[] els = (import nl1)[node];
+  int v = lw_as(els[i], elem);
+  int boxed = lw_box(v, elem);
+} return int boxed;
+given lw_fix_arr ((import fix_arr_n), 0, "int"):(1)
+given lw_fix_arr ((import fix_arr_n), 0, "word"):(1)

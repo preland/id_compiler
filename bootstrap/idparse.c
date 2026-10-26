@@ -1524,6 +1524,12 @@ int id_lw_native_list(int f, char* ety);
 int id_lw_arr(int node);
 void id_lw_arr_els(int node, int a, char* elem);
 int id_lw_arr_one(int node, int i, int a, char* elem);
+int id_lw_arr_build(int node, char* elem);
+int id_lw_arr_old(int node, char* elem);
+int id_lw_arr_lit(int node, char* elem);
+IdList* id_lw_arr_cells(int node, char* elem);
+IdList* id_lw_arr_head(int node);
+int id_lw_arr_val(int node, int i, char* elem);
 int id_lw_index(int node);
 int id_lw_index2(int node, int a, int i);
 void id_lw_iassign(int node);
@@ -1539,10 +1545,10 @@ char* id_lw_arr_elem(int node);
 int id_lw_iset_val(int node, char* elem);
 void id_lw_arr_push(int node, int i, int a, char* elem);
 void id_lw_arr_push2(int a, int v, char* elem);
-void id_lw_ctor_cell(int node, int i, int a, char* elem);
+int id_lw_ctor_cell(int node, int i, char* elem);
 int id_lw_ctor(int node);
-void id_lw_ctor_els(int node, int a);
-int id_lw_ctor_one(int node, int i, int a);
+IdList* id_lw_ctor_cells(int node);
+int id_lw_ctor_one(int node, int i);
 int id_lw_fpos(int node);
 int id_lw_box(int v, char* t);
 int id_lw_box2(int v, char* t);
@@ -2624,6 +2630,7 @@ char* id_ll_zero(char* t);
 void id_ll_strs(void);
 void id_ll_str_at(int i);
 char* id_ll_callee(int id);
+char* id_ll_vsig(int id);
 char* id_ll_t3(int id);
 char* id_ll_t4(int id);
 char* id_ll_call(int id);
@@ -7371,11 +7378,10 @@ int id_lw_native_list(int f, char* ety) {
 }
 
 int id_lw_arr(int node) {
-    int a;
     char* elem;
-    a = id_lw_arr_new(node);
+    int a;
     elem = id_lw_arr_elem(node);
-    id_lw_arr_els(node, a, elem);
+    a = id_lw_arr_build(node, elem);
     return a;
 }
 
@@ -7393,6 +7399,63 @@ int id_lw_arr_one(int node, int i, int a, char* elem) {
     id_lw_arr_push(node, i, a, elem);
     ret_i = (i + 1);
     return ret_i;
+}
+
+int id_lw_arr_build(int node, char* elem) {
+    int a;
+    a = id_lw_arr_lit(node, elem);
+    if ((a < 0)) {
+        a = id_lw_arr_old(node, elem);
+    }
+    return a;
+}
+
+int id_lw_arr_old(int node, char* elem) {
+    int a;
+    a = id_lw_arr_new(node);
+    id_lw_arr_els(node, a, elem);
+    return a;
+}
+
+int id_lw_arr_lit(int node, char* elem) {
+    int a;
+    IdList* lw_lit_cells;
+    a = (0 - 1);
+    if (((id_list_len((IdList*)(intptr_t)(id_list_get(nl1, node))) > 0) && (strcmp(id_lw_ety(node), ID_S("bytes")) != 0))) {
+        lw_lit_cells = id_lw_arr_cells(node, elem);
+        a = id_lw_callf(ID_S("id_list_lit"), id_lw_ety(node), lw_lit_cells);
+    }
+    return a;
+}
+
+IdList* id_lw_arr_cells(int node, char* elem) {
+    IdList* lw_lit_cells = NULL;
+    int i;
+    { IdList* idfe_o = lw_lit_cells; lw_lit_cells = id_lw_arr_head(node); id_list_free(idfe_o); }
+    i = 0;
+    while (id_lw_args_more(node, i)) {
+        id_list_push(lw_lit_cells, (long long)(id_lw_arr_val(node, i, elem)));
+        i = (i + 1);
+    }
+    return lw_lit_cells;
+}
+
+IdList* id_lw_arr_head(int node) {
+    char* lw_lit_cnt;
+    IdList* lw_lit_cells = NULL;
+    lw_lit_cnt = id_concat_f(ID_S(""), id_str_of_int(id_list_len((IdList*)(intptr_t)(id_list_get(nl1, node)))), 2);
+    { IdList* idfe_o = lw_lit_cells; lw_lit_cells = id_list_lit(1, (long long)(id_lw_const(ID_S("int"), lw_lit_cnt))); id_list_free(idfe_o); }
+    return lw_lit_cells;
+}
+
+int id_lw_arr_val(int node, int i, char* elem) {
+    IdList* els;
+    int v;
+    int boxed;
+    els = (IdList*)(intptr_t)(id_list_get(nl1, node));
+    v = id_lw_as((int)(id_list_get(els, i)), elem);
+    boxed = id_lw_box(v, elem);
+    return boxed;
 }
 
 int id_lw_index(int node) {
@@ -7547,44 +7610,48 @@ void id_lw_arr_push2(int a, int v, char* elem) {
     return;
 }
 
-void id_lw_ctor_cell(int node, int i, int a, char* elem) {
+int id_lw_ctor_cell(int node, int i, char* elem) {
     IdList* els;
     int v;
+    int boxed;
     els = (IdList*)(intptr_t)(id_list_get(nl1, node));
     v = id_lw_as((int)(id_list_get(els, i)), elem);
     if ((id_esc_cdup((char*)(intptr_t)(id_list_get(ns1, node)), els, i) == 1)) {
         v = id_lw_callf(ID_S("id_str_dup"), ID_S("string"), id_list_lit(1, (long long)(v)));
     }
-    id_lw_arr_push2(a, v, elem);
-    return;
+    boxed = id_lw_box(v, elem);
+    return boxed;
 }
 
 int id_lw_ctor(int node) {
     char* ty;
+    IdList* lw_lit_cells;
     int a;
     ty = id_lw_ety(node);
-    a = id_lw_new(ty);
-    id_lw_ctor_els(node, a);
+    lw_lit_cells = id_lw_ctor_cells(node);
+    a = id_lw_callf(ID_S("id_list_lit"), ty, lw_lit_cells);
     return a;
 }
 
-void id_lw_ctor_els(int node, int a) {
+IdList* id_lw_ctor_cells(int node) {
+    IdList* lw_lit_cells = NULL;
     int i;
+    { IdList* idfe_o = lw_lit_cells; lw_lit_cells = id_lw_arr_head(node); id_list_free(idfe_o); }
     i = 0;
     while (id_lw_args_more(node, i)) {
-        i = id_lw_ctor_one(node, i, a);
+        id_list_push(lw_lit_cells, (long long)(id_lw_ctor_one(node, i)));
+        i = (i + 1);
     }
-    return;
+    return lw_lit_cells;
 }
 
-int id_lw_ctor_one(int node, int i, int a) {
+int id_lw_ctor_one(int node, int i) {
     char* sd_ft;
-    int ret_i;
-IdList* idsq_19;
-    sd_ft = (idsq_19 = sdftype, id_sd_cell(idsq_19, (char*)(intptr_t)(id_list_get(ns1, node)), i));
-    id_lw_ctor_cell(node, i, a, sd_ft);
-    ret_i = (i + 1);
-    return ret_i;
+    int boxed;
+IdList* idsq_14;
+    sd_ft = (idsq_14 = sdftype, id_sd_cell(idsq_14, (char*)(intptr_t)(id_list_get(ns1, node)), i));
+    boxed = id_lw_ctor_cell(node, i, sd_ft);
+    return boxed;
 }
 
 int id_lw_fpos(int node) {
@@ -18311,7 +18378,7 @@ void id_ll_declares(void) {
 
 void id_ll_decl_block(void) {
     id_ll_decl_cmp();
-    id_print(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_list_free_bytes(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_character_code_at(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @llvm.fshl.i64(i64, i64, i64)\ndeclare i32 @llvm.fshl.i32(i32, i32, i32)\ndeclare i64 @id_add_checked(i64, i64)\ndeclare i64 @id_add_checked32(i64, i64)\ndeclare i64 @id_sub_checked(i64, i64)\ndeclare i64 @id_sub_checked32(i64, i64)\ndeclare i64 @id_mul_checked(i64, i64)\ndeclare i64 @id_mul_checked32(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare ptr @id_bytes_new(i32)\ndeclare void @id_bytes_free(ptr)\ndeclare i32 @id_bytes_len_raw(ptr)\ndeclare i32 @id_bytes_cap_raw(ptr)\ndeclare i32 @id_bytes_len(ptr)\ndeclare i64 @id_bytes_get(ptr, i32)\ndeclare void @id_bytes_set(ptr, i32, i64)\ndeclare i64 @id_bytes_cell(ptr, i32)\ndeclare void @id_bytes_cell_set(ptr, i32, i64)\ndeclare void @id_bytes_push(ptr, i64)\ndeclare i64 @id_bytes_pop(ptr)\ndeclare void @id_bytes_append(ptr, ptr)\ndeclare ptr @id_bytes_sub(ptr, i32, i32)\ndeclare i32 @id_bytes_cmp(ptr, ptr)\ndeclare ptr @id_bytes_of_string(ptr)\ndeclare ptr @id_string_of_bytes(ptr)\ndeclare ptr @id_bytes_of_memory(i64, i32)\ndeclare i64 @id_memory_of_bytes(ptr)\ndeclare void @id_fail(ptr)"));
+    id_print(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare ptr @id_list_lit(i32, ...)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_list_free_bytes(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_character_code_at(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @llvm.fshl.i64(i64, i64, i64)\ndeclare i32 @llvm.fshl.i32(i32, i32, i32)\ndeclare i64 @id_add_checked(i64, i64)\ndeclare i64 @id_add_checked32(i64, i64)\ndeclare i64 @id_sub_checked(i64, i64)\ndeclare i64 @id_sub_checked32(i64, i64)\ndeclare i64 @id_mul_checked(i64, i64)\ndeclare i64 @id_mul_checked32(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare ptr @id_bytes_new(i32)\ndeclare void @id_bytes_free(ptr)\ndeclare i32 @id_bytes_len_raw(ptr)\ndeclare i32 @id_bytes_cap_raw(ptr)\ndeclare i32 @id_bytes_len(ptr)\ndeclare i64 @id_bytes_get(ptr, i32)\ndeclare void @id_bytes_set(ptr, i32, i64)\ndeclare i64 @id_bytes_cell(ptr, i32)\ndeclare void @id_bytes_cell_set(ptr, i32, i64)\ndeclare void @id_bytes_push(ptr, i64)\ndeclare i64 @id_bytes_pop(ptr)\ndeclare void @id_bytes_append(ptr, ptr)\ndeclare ptr @id_bytes_sub(ptr, i32, i32)\ndeclare i32 @id_bytes_cmp(ptr, ptr)\ndeclare ptr @id_bytes_of_string(ptr)\ndeclare ptr @id_string_of_bytes(ptr)\ndeclare ptr @id_bytes_of_memory(i64, i32)\ndeclare i64 @id_memory_of_bytes(ptr)\ndeclare void @id_fail(ptr)"));
     id_print(ID_S(""));
     return;
 }
@@ -18654,6 +18721,15 @@ char* id_ll_callee(int id) {
     return s;
 }
 
+char* id_ll_vsig(int id) {
+    char* vsig_s;
+    vsig_s = ID_S("");
+    if ((((int)(id_list_get(ia, id)) < 0) && (strcmp((char*)(intptr_t)(id_list_get(istr, id)), ID_S("id_list_lit")) == 0))) {
+        vsig_s = ID_S(" (i32, ...)");
+    }
+    return vsig_s;
+}
+
 char* id_ll_t3(int id) {
     char* s = NULL;
     char* ir_ty_v;
@@ -18693,9 +18769,10 @@ char* id_ll_call(int id) {
     char* ir_ty_v;
     char* s = NULL;
     ir_ty_v = (char*)(intptr_t)(id_list_get(ity, id));
+char* idsq_36;
 char* idsq_32;
 char* idsq_26;
-    { char* idfe_o = s; s = (idsq_32 = id_ll_ty(ir_ty_v), idsq_26 = id_ll_callee(id), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("call "), idsq_32), ID_S(" "), 1), idsq_26, 1), ID_S("("), 1), id_ll_args(id), 3), ID_S(")"), 1)); id_str_free(idfe_o); }
+    { char* idfe_o = s; s = (idsq_36 = id_ll_ty(ir_ty_v), idsq_32 = id_ll_vsig(id), idsq_26 = id_ll_callee(id), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("call "), idsq_36), idsq_32, 1), ID_S(" "), 1), idsq_26, 1), ID_S("("), 1), id_ll_args(id), 3), ID_S(")"), 1)); id_str_free(idfe_o); }
     if ((strcmp(id_ll_ty(ir_ty_v), ID_S("void")) != 0)) {
         { char* idfe_o = s; s = id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = "), 1), s, 1); id_str_free(idfe_o); }
     }

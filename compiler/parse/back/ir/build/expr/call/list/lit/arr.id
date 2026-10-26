@@ -1,11 +1,11 @@
-// A list literal: a new list, then one push per element. An empty literal is
-// the same thing with no pushes, which is why `[]` needs no separate case.
+// A list literal: a non-empty one is a single id_list_lit call that allocates
+// the exact capacity and fills every cell, as the C target does; an empty one
+// is a new list with no pushes, which is why `[]` needs no separate case.
 lw_arr(int node) {
-  int a = lw_arr_new(node);
   string elem = lw_arr_elem(node);
-  lw_arr_els(node, a, elem);
+  int a = lw_arr_build(node, elem);
 } return int a;
-given lw_fix_arr ((import fix_arr_n)):(0)
+given lw_fix_arr ((import fix_arr_n)):(3)
 given lw_fix_arr_empty ((import fix_arr_empty_n)):(0)
 
 lw_arr_els(int node, int a, string elem) {
