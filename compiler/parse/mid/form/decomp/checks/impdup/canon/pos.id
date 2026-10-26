@@ -27,7 +27,7 @@ given lz_c ("cfg"):(0)
 given imp_seed_fixture ("cfg"):(1)
 
 imp_vec() {
-  string ret_s = str_join((import cimps), ",");
+  string ret_s = string_join((import cimps), ",");
 } return string ret_s;
 given imp_seed_fixture ():("first")
 given lz_c ():("")

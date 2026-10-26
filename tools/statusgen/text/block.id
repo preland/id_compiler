@@ -1,21 +1,21 @@
 // The heading line sgbk_head begins and the table that follows it: its rows are
 // the lines that start with "|". "" when the text has no such heading.
 sg_block(string sgbk_text, string sgbk_head) {
-  string[] sgbk_ls = str_split(sgbk_text, "\n");
+  string[] sgbk_ls = string_split(sgbk_text, "\n");
   string[] sgbk_out = [];
   int sgbk_i = 0;
 } chain (string sgbk_text, string sgbk_head) {
   while(sgbk_i < len(sgbk_ls) && len(sgbk_out) == 0) {
-    if(str_starts(sgbk_ls[sgbk_i], sgbk_head) == 1) {
+    if(string_starts_with(sgbk_ls[sgbk_i], sgbk_head) == 1) {
       push(sgbk_out, sgbk_ls[sgbk_i]);
     }
     sgbk_i = sgbk_i + 1;
   }
-  while(sgbk_i < len(sgbk_ls) && len(sgbk_out) > 0 && str_starts(sgbk_ls[sgbk_i], "|") == 1) {
+  while(sgbk_i < len(sgbk_ls) && len(sgbk_out) > 0 && string_starts_with(sgbk_ls[sgbk_i], "|") == 1) {
     push(sgbk_out, sgbk_ls[sgbk_i]);
     sgbk_i = sgbk_i + 1;
   }
-  string sgbk_txt = str_join(sgbk_out, "\n");
+  string sgbk_txt = string_join(sgbk_out, "\n");
 } return string sgbk_txt;
 ("x\n### H a\n| a |\n|--|\n| b |\n\nnot\n", "### H"):("### H a\n| a |\n|--|\n| b |")
 ("none", "### H"):("")

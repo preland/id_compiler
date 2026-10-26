@@ -7,7 +7,7 @@ ixw_refs(int ixw_lo, int ixw_hi) {
   string[] ixw_out = [];
   ixw_walk(ixw_out, ixw_own, ixw_lo, ixw_hi);
 } chain (int ixw_lo, int ixw_hi) {
-  string ixw_row = str_join(ixw_out, " ");
+  string ixw_row = string_join(ixw_out, " ");
 } return string ixw_row;
 given ixn_fx (0, 5):("foo zz gx Point int")
 given ixn_fx (0, 3):("foo zz gx")

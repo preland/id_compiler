@@ -22,7 +22,7 @@ given ms_t_tree given ms_t_wrs ():(3)
 
 // Test check: what the first shard's results file holds, tabs shown as ~.
 ms_t_rtxt() {
-  string ms_q = str_replace(fs_read_text((import ms_t_r0)), "\t", "~");
+  string ms_q = string_replace(fs_read_text((import ms_t_r0)), "\t", "~");
 } return string ms_q;
 given ms_t_tree ():("")
 given ms_t_tree given ms_t_wrs ():("killed~2~a.id~f~3~4~cmp~<=~x  =>  y\nsurvived~5~a.id~f~6~7~lit~2~z  =>  w\ninvalid~7~a.id~g~1~2~del~~q;  =>  \n")

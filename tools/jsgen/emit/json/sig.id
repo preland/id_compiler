@@ -9,7 +9,7 @@ jg_json_pairs(string[] jg_sr) {
     jg_i = jg_i + 2;
   }
 } chain (string[] jg_sr) {
-  string jg_all = "[" + str_join(jg_ps, ",") + "]";
+  string jg_all = "[" + string_join(jg_ps, ",") + "]";
 } return string jg_all;
 (["f", "int", "x:1", "a", "int", "s", "string[]"]):("[[\"a\",\"int\"],[\"s\",\"string[]\"]]")
 (["f", "int", "x:1"]):("[]")
@@ -30,7 +30,7 @@ jg_json_sigs(string[][] jg_sigs) {
     jg_i = jg_i + 1;
   }
 } chain (string[][] jg_sigs) {
-  string jg_all = "{" + str_join(jg_ps, ",") + "}";
+  string jg_all = "{" + string_join(jg_ps, ",") + "}";
 } return string jg_all;
 ([["f", "int", "x:1", "a", "int"], ["g", "void", "y:2"]]):("{\"f\":{\"params\":[[\"a\",\"int\"]],\"ret\":\"int\"},\"g\":{\"params\":[],\"ret\":\"void\"}}")
 ([]):("{}")

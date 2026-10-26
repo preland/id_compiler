@@ -39,10 +39,10 @@ esc_fd_h() {
   add_func("fd_look", "int", (import efd_look));
   esc_seed();
 } chain () {
-  lset((import sqbase), 0, (import efd_good));
+  integer_list_set((import sqbase), 0, (import efd_good));
 } return void;
 given esc_dfix ():() then calls add_func:("fd_peek", "int[]", (import efd_peek)) then calls add_func:("fd_look", "int", (import efd_look))
-given esc_dfix ():() then calls lset:((import sqbase), 0, (import efd_good))
+given esc_dfix ():() then calls integer_list_set:((import sqbase), 0, (import efd_good))
 given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)
 

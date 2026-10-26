@@ -10,10 +10,10 @@ pl_why(string pl_c, string pl_nm) {
     pl_wy = "callback parameter '" + pl_nm + "': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim";
   }
 } chain (string pl_c, string pl_nm) {
-  if (str_starts(pl_c, "S:") == 1) {
+  if (string_starts_with(pl_c, "S:") == 1) {
     pl_wy = "struct parameter '" + pl_nm + "' by value: id cannot build a C struct, so pass its fields as scalars and let a shim assemble it";
   }
-  if (str_starts(pl_c, "PS:") == 1) {
+  if (string_starts_with(pl_c, "PS:") == 1) {
     pl_wy = "parameter '" + pl_nm + "' points at a struct the caller must allocate and fill: id cannot, so wrap its creation, its fields and its use in a shim that keeps it behind a handle";
   }
   if (pl_c == "A" || pl_c == "?") {

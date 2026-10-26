@@ -10,7 +10,7 @@
 hex_of(int[] xs, int at, int n) {
   string[] strs = [];
   hex_parts(strs, xs, at, n);
-  string s = str_join(strs, "");
+  string s = string_join(strs, "");
 } return string s;
 ([0, 171, 255], 0, 3):("00abff")
 ([1, 2, 3], 1, 1):("02")

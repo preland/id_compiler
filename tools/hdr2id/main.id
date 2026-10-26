@@ -8,7 +8,7 @@ hd_go(string hd_pre, string hd_hdr, string hd_lib, string hd_out, string hd_text
 } chain (string hd_pre, string hd_hdr, string hd_lib, string hd_out, string hd_text) {
   hd_emit(hd_pre, hd_sg, hd_o);
   int hd_nf = hd_write(hd_pre, hd_hdr, hd_lib, hd_out, hd_o);
-  print(str_join(hd_o[(import out_rows)], "\n"));
+  print(string_join(hd_o[(import out_rows)], "\n"));
 } chain (string hd_pre, string hd_hdr, string hd_lib, string hd_out, string hd_text) {
   put(rp_sum(hd_o[(import out_rows)]));
 } return int hd_nf;

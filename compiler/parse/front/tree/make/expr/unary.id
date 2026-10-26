@@ -3,7 +3,7 @@
 // entry it left behind.
 mk_curtk(int mk_tk) {
   full_env();
-  lset((import curtk), 0, mk_tk);
+  integer_list_set((import curtk), 0, mk_tk);
   push_pos();
 } return void;
 (5):() then last_ntok:("ntok 5")

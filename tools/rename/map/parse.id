@@ -18,8 +18,8 @@ rename_take_pair(string[] rename_old_names, string[] rename_news, string[] renam
 // One line of the map: its pair appended to the two lists, or the problem with
 // it appended to the third; a line that is blank or a comment adds nothing.
 rename_parse_line(string rename_entry, string[] rename_old_names, string[] rename_news, string[] rename_problems, int rename_number) {
-  string rename_text = str_trim(rename_entry);
-  string[] rename_pair = str_words(rename_text);
+  string rename_text = string_trim(rename_entry);
+  string[] rename_pair = string_words(rename_text);
   string rename_problem = "";
 } chain (string rename_entry, string[] rename_old_names, string[] rename_news, string[] rename_problems, int rename_number) {
   if(rename_text != "" && character_code_at(rename_text, 0) != 35) {
@@ -37,7 +37,7 @@ rename_parse_line(string rename_entry, string[] rename_old_names, string[] renam
 // Every pair in a map text onto the two lists, and the problems found in it onto
 // the third.
 rename_parse_map(string rename_text, string[] rename_old_names, string[] rename_news, string[] rename_problems) {
-  string[] rename_entries = str_split(rename_text, "\n");
+  string[] rename_entries = string_split(rename_text, "\n");
   int rename_at = 0;
   while(rename_at < len(rename_entries)) {
     rename_parse_line(rename_entries[rename_at], rename_old_names, rename_news, rename_problems, rename_at + 1);

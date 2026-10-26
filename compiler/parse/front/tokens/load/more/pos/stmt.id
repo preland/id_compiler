@@ -4,11 +4,11 @@
 
 stmt_done(int id, int t0) {
   int n = tok_ln(t0);
-  lset((import nline), id, n);
-  lset((import nst), id, t0);
+  integer_list_set((import nline), id, n);
+  integer_list_set((import nst), id, t0);
 } return void;
-given mk_two_nodes (0, 0):() then calls lset:((import nline), 0, 1) then calls lset:((import nst), 0, 0)
-given mk_two_nodes (1, 5):() then calls lset:((import nline), 1, 1) then calls lset:((import nst), 1, 5)
+given mk_two_nodes (0, 0):() then calls integer_list_set:((import nline), 0, 1) then calls integer_list_set:((import nst), 0, 0)
+given mk_two_nodes (1, 5):() then calls integer_list_set:((import nline), 1, 1) then calls integer_list_set:((import nst), 1, 5)
 
 // The line of token t0, or 1 past the end of the store -- cur_ln's answer for
 // a token index rather than a cursor.

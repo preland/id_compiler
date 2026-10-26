@@ -2,7 +2,7 @@
 // clause is the tokens in lq_tk, which lpg takes with the "|" that ends it.
 
 lp_add(string[] lq_tk) {
-  string lq_key = str_join(lq_tk, " ");
+  string lq_key = string_join(lq_tk, " ");
   if(find_str((import lpcond), lq_key) < 0) {
     lp_put(lq_tk, lq_key);
   }

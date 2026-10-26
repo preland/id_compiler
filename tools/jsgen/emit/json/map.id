@@ -9,7 +9,7 @@ jg_json_map(string[] jg_ks, string[] jg_vs) {
     jg_i = jg_i + 1;
   }
 } chain (string[] jg_ks, string[] jg_vs) {
-  string jg_all = "{" + str_join(jg_ps, ",") + "}";
+  string jg_all = "{" + string_join(jg_ps, ",") + "}";
 } return string jg_all;
 (["fs_open", "fs_read"], ["fs", "fs"]):("{\"fs_open\":\"fs\",\"fs_read\":\"fs\"}")
 ([], []):("{}")
@@ -22,7 +22,7 @@ jg_json_be(string[] jg_ks) {
     jg_i = jg_i + 1;
   }
 } chain (string[] jg_ks) {
-  string jg_all = "{ " + str_join(jg_ps, ", ") + " }";
+  string jg_all = "{ " + string_join(jg_ps, ", ") + " }";
 } return string jg_all;
 (["fs", "my-env"]):("{ \"fs\": idw_be_fs, \"my-env\": idw_be_my_env }")
 ([]):("{  }")

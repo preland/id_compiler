@@ -13,7 +13,7 @@ given tf_stem given tf_mk0 ((import tf_stm), 0):((import tf_d1)) then tf_rmstem:
 // path's own directory; started by bare name, it is the $PATH entry holding it.
 dr_home(string a0) {
   string home = fs_dir_of(a0);
-  if (str_find(a0, "/") < 0) {
+  if (string_find(a0, "/") < 0) {
     home = dr_which(a0);
   }
 } return string home;

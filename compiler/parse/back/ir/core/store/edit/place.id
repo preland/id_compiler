@@ -7,14 +7,14 @@
 
 ir_add(int b, int id) {
   push((import binsn)[b], id);
-  lset((import ihome), id, b);
+  integer_list_set((import ihome), id, b);
 } return void;
 given ir_rows_chk1 (1, 1):() then chk_home:(1)
 given ir_rows (1, 0):() then chk_home:(1)
 
 ir_kill(int id) {
-  sset((import iop), id, "nop");
-  sset((import ity), id, "");
+  string_list_set((import iop), id, "nop");
+  string_list_set((import ity), id, "");
 } return void;
 given ir_rows (0):() then chk_op:("op nop") then chk_ty:("ty ")
 given ir_rows_chk1 (1):() then chk_op:("op nop") then chk_ty:("ty ")

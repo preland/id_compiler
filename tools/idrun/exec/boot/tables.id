@@ -64,7 +64,7 @@ vb_pools() {
 // "|". vm_b_concat reads two entries of it and a callee appends the result, so
 // a check of the pool's length alone would repeat part of its own read.
 vm_strs_text() {
-  string vm_strs_j = str_join((import ex_strs), "|");
+  string vm_strs_j = string_join((import ex_strs), "|");
   string vm_strs_s = "strs " + len((import ex_strs)) + ":" + vm_strs_j;
 } return string vm_strs_s;
 given vb_boot ():("strs 1:")

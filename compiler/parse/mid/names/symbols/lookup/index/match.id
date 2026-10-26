@@ -24,7 +24,7 @@ find_vix(int[] bucket, string name, int unit) {
 given fcall_reg_b ([0], "h", 0):(0)
 given fcall_reg_b ([0], "h", 5):(0)
 given vx_dup_fixture ([0, 1], "h", 0):(1)
-given vx_dup_fixture given lset((import vunit), 1, 7) ([0, 1], "h", 0):(0)
+given vx_dup_fixture given integer_list_set((import vunit), 1, 7) ([0, 1], "h", 0):(0)
 
 vx_hit(int[] bucket, int i, string name, int unit, int found) {
   int r = found;

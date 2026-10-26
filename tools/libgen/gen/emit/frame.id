@@ -4,7 +4,7 @@
 // The text before the declarations, with the library's name in.
 lg_top(string lg_mode, string[] lg_lines, string lg_lib) {
   string lg_hdtext = "";
-  string lg_joined = str_join(lg_lines, "\n");
+  string lg_joined = string_join(lg_lines, "\n");
   if (lg_mode == "header") {
     lg_hdtext = lg_sub(lg_joined, "@", lg_lib);
   }
@@ -16,7 +16,7 @@ lg_top(string lg_mode, string[] lg_lines, string lg_lib) {
 lg_bottom(string lg_mode, string[] lg_lines) {
   string lg_tltext = "";
   if (lg_mode == "header") {
-    lg_tltext = str_join(lg_lines, "\n");
+    lg_tltext = string_join(lg_lines, "\n");
   }
 } return string lg_tltext;
 ("header", ["}", "#endif"]):("}\n#endif")

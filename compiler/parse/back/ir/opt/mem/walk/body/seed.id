@@ -19,7 +19,7 @@ given m2r_row_fixture (0, 0):() then outv_sum:("outv 0")
 // in what it does.
 m2r_seed1(int i, int j) {
   int m2r_in_v = m2r_in(i, j);
-  lset((import outv)[i], j, m2r_in_v);
+  integer_list_set((import outv)[i], j, m2r_in_v);
   int ret_i = j + 1;
 } return int ret_i;
 given m2r_outv_fixture (0, 0):(1) then outv_sum:("outv 3")

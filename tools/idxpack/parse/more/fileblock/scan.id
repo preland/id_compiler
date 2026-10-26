@@ -9,7 +9,7 @@ fx_fill(string[] paths, string[][] blocks, string[] lines, int i) {
 
 fx_fill_step(string[] paths, string[][] blocks, string[] lines, int i) {
   string cur = lines[i];
-  int is_marker = str_starts(cur, "===F:");
+  int is_marker = string_starts_with(cur, "===F:");
   int ret_i = i + 1;
 } chain (string[] paths, string[][] blocks, string[] lines, int i) {
   if(is_marker == 1) {

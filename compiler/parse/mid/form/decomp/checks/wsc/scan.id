@@ -25,7 +25,7 @@ wsc_scan() {
 given wsc_pair ():() then calls wsc_at:(9)
 given wsc_pair ():() then calls wsc_at:(0)
 given env_init ():() then calls wsc_loop:[1]
-given env_init given lset((import chkfail), 0, 1) ():() then calls wsc_loop:[0]
+given env_init given integer_list_set((import chkfail), 0, 1) ():() then calls wsc_loop:[0]
 
 wsc_loop() {
   int wlp_i = 0;

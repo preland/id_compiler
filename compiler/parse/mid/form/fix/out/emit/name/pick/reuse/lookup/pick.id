@@ -9,7 +9,7 @@ fix_name_pick(int i) {
     name = fix_pick(i);
     fix_rcache_add(i, name);
   } else {
-    lset((import fixe_ru), i, 1);
+    integer_list_set((import fixe_ru), i, 1);
   }
 } return string name;
 given fix_rcache_find_hit (0):("cachedname") then calls fix_pick:[0]

@@ -5,10 +5,10 @@
 // native by name as plain text (scan/foreign.id).
 rename_file_spans(string rename_file, string rename_source) {
   int[] rename_spans = rename_native_file_spans(rename_file, rename_source);
-  if(str_ends(rename_file, ".id") == 1) {
+  if(string_ends_with(rename_file, ".id") == 1) {
     rename_spans = rename_name_spans(rename_source);
   }
-  if(str_ends(rename_file, ".md") == 1) {
+  if(string_ends_with(rename_file, ".md") == 1) {
     rename_spans = rename_markdown_spans(rename_source);
   }
 } return int[] rename_spans;

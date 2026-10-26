@@ -17,7 +17,7 @@ unit_t_two() {
   int[] upos = [0];
 } chain () {
   parse_program(upos);
-  lset((import unitc), 0, 1);
+  integer_list_set((import unitc), 0, 1);
   export int unit_t_fa = (import prog)[0];
 } chain () {
   export int unit_t_fb = (import prog)[1];
@@ -30,7 +30,7 @@ unit_t_two() {
 // passed it.
 unit_t_mark(int utm_at, int utm_val) {
   unit_t_two();
-  lset((import unitc), utm_at, utm_val);
+  integer_list_set((import unitc), utm_at, utm_val);
 } return void;
 (0, 0):() then (import chkfail)[0]:(0)
 (1, 1):() then ptok_span:(19)

@@ -39,10 +39,10 @@ main(int argc, string[] argv) {
 
 run(string text, string target) {
   string nl = chr(10);
-  string[] lines = str_split(text, nl);
+  string[] lines = string_split(text, nl);
   int e = idx_find_str(lines, "===EDGES===");
 } chain (string text, string target) {
-  int std_present = str_starts(lines[0], "===STD===");
+  int std_present = string_starts_with(lines[0], "===STD===");
   string std_root = "";
   if(std_present == 1) {
     int prefix_n = 9;

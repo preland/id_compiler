@@ -4,7 +4,7 @@
 // that binds a native by name (`.h`, `.c`, `.mjs`), or one of the two
 // markdown files that list a tree's names in tables (NAMES.md, NOTES.md).
 rename_wanted(string rename_file) {
-  int rename_yes = str_ends(rename_file, ".id") == 1 || rename_file == "NAMES.md" || rename_file == "NOTES.md" || str_ends(rename_file, ".h") == 1 || str_ends(rename_file, ".c") == 1 || str_ends(rename_file, ".mjs") == 1;
+  int rename_yes = string_ends_with(rename_file, ".id") == 1 || rename_file == "NAMES.md" || rename_file == "NOTES.md" || string_ends_with(rename_file, ".h") == 1 || string_ends_with(rename_file, ".c") == 1 || string_ends_with(rename_file, ".mjs") == 1;
 } return int rename_yes;
 ("a.id"):(1)
 ("NAMES.md"):(1)

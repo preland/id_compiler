@@ -18,7 +18,7 @@ given ccrun_fx_run_capped_true given ccrun_fx_empty_input given ccrun_fx_pump_on
 
 do_close_in() {
   int closed = proc_close_in((import cr_h));
-  lset((import cr_in_done), 0, 1);
+  integer_list_set((import cr_in_done), 0, 1);
 } return void;
 given ccrun_fx_run_capped_true ():() then (import cr_in_done)[0]:(1)
 given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then (import cr_in_done)[0]:(1)

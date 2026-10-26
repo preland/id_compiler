@@ -26,7 +26,7 @@ given fn_fixture ((import fixture_params), 1):(0)
 
 blank_tally(int[] acc, int id) {
   if((import nkind)[id] == "blank") {
-    lset(acc, 1, acc[1] + 1);
+    integer_list_set(acc, 1, acc[1] + 1);
   }
 } return void;
 given fn_fixture ([0, 0], 0):() then (import chkfail)[0]:(0)

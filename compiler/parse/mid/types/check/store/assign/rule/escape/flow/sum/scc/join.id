@@ -10,8 +10,8 @@ given esc_fix ((import efb_fn)):(-1073741823)
 esc_join(int ix, int esm) {
   int ejo = (import esc_pe)[ix] | esm;
   if(ejo != (import esc_pe)[ix]) {
-    lset((import esc_pe), ix, ejo);
-    lset((import esc_fx), 2, (import esc_fx)[2] + 1);
+    integer_list_set((import esc_pe), ix, ejo);
+    integer_list_set((import esc_fx), 2, (import esc_fx)[2] + 1);
   }
 } return void;
 given esc_fix (0, 6):() then (import esc_pe)[0]:(6)
@@ -19,9 +19,9 @@ given esc_fix (0, 6):() then (import esc_fx)[2]:(1)
 given esc_fix (0, 0):() then (import esc_fx)[2]:(0)
 
 esc_open(int ix, int esd) {
-  lset((import esc_st), ix, 1);
-  lset((import esc_dp), ix, esd);
-  lset((import esc_fx), 0, esd + 1);
+  integer_list_set((import esc_st), ix, 1);
+  integer_list_set((import esc_dp), ix, esd);
+  integer_list_set((import esc_fx), 0, esd + 1);
 } return void;
 given esc_fix (1, 4):() then (import esc_st)[1]:(1)
 given esc_fix (1, 4):() then (import esc_dp)[1]:(4)

@@ -11,7 +11,7 @@ fit_then(int ti) {
   fit_then_kind(kind, chk_node);
 } return void;
 given print_fixture (0):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
-given calls_node_fixture given lset((import thennode), 0, (import fixture_calls_bad)) (0):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
+given calls_node_fixture given integer_list_set((import thennode), 0, (import fixture_calls_bad)) (0):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
 given calls_node_fixture (0):() then prints:("")
 
 fit_then_kind(string kind, int chk_node) {
@@ -45,4 +45,4 @@ fit_then_traps_or_calls(string kind, int chk_node) {
 given traps_node_fixture ("thentraps", (import fixture_traps_node)):() then calls fit_then_traps:((import fixture_traps_node))
 given calls_node_fixture ("thencalls", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
 given then_imp_fixture ("int", 0, 0) ("thenimp", (import then_imp_node)):() then calls fit_then_imp:[1]
-given then_imp_fixture ("int[]", 0, 0) given sset((import nkind), (import then_imp_node), "thenlen") ("thenlen", (import then_imp_node)):() then calls fit_then_imp:[1]
+given then_imp_fixture ("int[]", 0, 0) given string_list_set((import nkind), (import then_imp_node), "thenlen") ("thenlen", (import then_imp_node)):() then calls fit_then_imp:[1]

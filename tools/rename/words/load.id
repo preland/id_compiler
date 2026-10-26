@@ -5,7 +5,7 @@
 // Adds one line of a word list to the table. A blank line and a `#` comment line
 // add nothing.
 rename_put_word(string rename_entry, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
-  string rename_word = str_lower(str_trim(rename_entry));
+  string rename_word = string_lower(string_trim(rename_entry));
   if(rename_word != "" && character_code_at(rename_word, 0) != 35) {
     hash_map_put(rename_word_keys, rename_word_values, rename_word_used, rename_word_count, rename_word, 1);
   }
@@ -16,7 +16,7 @@ given rename_test_words_empty ("  ", (import rename_test_word_keys), (import ren
 
 // Adds every line of a word list to the table.
 rename_put_words(string rename_text, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
-  string[] rename_lines = str_lines(rename_text);
+  string[] rename_lines = string_lines(rename_text);
   int rename_at = 0;
   while(rename_at < len(rename_lines)) {
     rename_put_word(rename_lines[rename_at], rename_word_keys, rename_word_values, rename_word_used, rename_word_count);

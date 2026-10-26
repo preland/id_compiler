@@ -9,7 +9,7 @@ ms_rp_files(string ms_out) {
   int ms_i = 0;
 } chain (string ms_out) {
   while(ms_i < len(ms_nms)) {
-    if(str_starts(ms_nms[ms_i], "r-") == 1 && str_ends(ms_nms[ms_i], ".tsv") == 1) {
+    if(string_starts_with(ms_nms[ms_i], "r-") == 1 && string_ends_with(ms_nms[ms_i], ".tsv") == 1) {
       push(ms_fl, ms_nms[ms_i]);
     }
     ms_i = ms_i + 1;
@@ -40,7 +40,7 @@ ms_rp_one(string[] ms_rows, string[] ms_ks, string ms_rl) {
 
 // Adds every result line of the file ms_pa to ms_rows (see ms_rp_one).
 ms_rp_add(string[] ms_rows, string[] ms_ks, string ms_pa) {
-  string[] ms_lns = str_lines(fs_read_text(ms_pa));
+  string[] ms_lns = string_lines(fs_read_text(ms_pa));
   int ms_i = 0;
   while(ms_i < len(ms_lns)) {
     ms_rp_one(ms_rows, ms_ks, ms_lns[ms_i]);

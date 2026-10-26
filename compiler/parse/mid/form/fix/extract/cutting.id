@@ -1,6 +1,6 @@
 fix_xcutat(int xcai) {
   int xcatotal = (import fixx_acc)[0] + stmt_actions((import fixx_hit)[xcai]);
-  lset((import fixx_acc), 0, xcatotal);
+  integer_list_set((import fixx_acc), 0, xcatotal);
   if(xcatotal == 3 && xcai < len((import fixx_hit)) - 1) {
     fix_xcutmark(xcai);
   }
@@ -12,7 +12,7 @@ given fix_xacctwo (3):() then calls fix_xcutmark:[0]
 fix_xcutmark(int xcmi) {
   string xcmat = fix_after(fix_xlast((import fixx_hit)[xcmi]));
   push((import fixx_cuts), xcmat);
-  lset((import fixx_acc), 0, 0);
+  integer_list_set((import fixx_acc), 0, 0);
 } return void;
 given fix_xplanned (2):() then (import fixx_cuts):(["7|7"])
 given fix_xplanned (3):() then (import fixx_cuts):(["7|7"])

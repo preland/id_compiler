@@ -30,7 +30,7 @@ given rename_test_seeded ("alpha(beta) // alpha\n\"beta\" alpha", (import rename
 // Counts the new names in one file: only a source file is read, because a name in
 // a registry's table is a copy of one declared in source.
 rename_count_file(string rename_file, string[] rename_count_keys, int[] rename_count_values, int[] rename_count_used, int[] rename_count_count) {
-  if(str_ends(rename_file, ".id") == 1) {
+  if(string_ends_with(rename_file, ".id") == 1) {
     rename_count_names(fs_read_text(rename_file), rename_count_keys, rename_count_values, rename_count_used, rename_count_count);
   }
 } return void;

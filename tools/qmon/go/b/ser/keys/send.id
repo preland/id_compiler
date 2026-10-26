@@ -10,7 +10,7 @@ given qmb_keys_empty_seed ():() then calls send_keys_list:[0]
 given qmb_keys_pause_seed ():() then calls send_keys_list:("| |")
 
 send_keys_list(string keys) {
-  string[] toks = str_split(keys, " ");
+  string[] toks = string_split(keys, " ");
   send_keys_loop(toks, 0);
 } return void;
 ("|"):() then calls send_keys_loop:(["|"], 0)

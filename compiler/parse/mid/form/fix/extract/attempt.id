@@ -3,7 +3,7 @@
 
 fix_xattempt(int xaf, int xalo, int xaskip) {
   fix_xreset();
-  lset((import fixx_skip), 0, xaskip);
+  integer_list_set((import fixx_skip), 0, xaskip);
   fix_xfind((import nl2)[xaf], 0);
 } chain (int xaf, int xalo, int xaskip) {
   if(len((import fixx_hit)) > 0 && (import fixx_mark)[0] == (import fixd_seq)[0]) {

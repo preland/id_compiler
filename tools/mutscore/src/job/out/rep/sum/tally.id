@@ -34,7 +34,7 @@ ms_rp_key(string[] ms_fd, int ms_lv) {
 // Adds the group of the row ms_rw (at level ms_lv) to ms_ks unless it is
 // there already.
 ms_rp_note(string[] ms_ks, string ms_rw, int ms_lv) {
-  string[] ms_fd = str_split(ms_rw, "\t");
+  string[] ms_fd = string_split(ms_rw, "\t");
   string ms_ky = ms_rp_key(ms_fd, ms_lv);
   if(list_string_index(ms_ks, ms_ky) < 0) {
     push(ms_ks, ms_ky);

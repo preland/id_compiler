@@ -2,7 +2,7 @@
 
 // The path of each wanted file directly inside a directory, in name order.
 rename_directory_files(string rename_directory) {
-  string[] rename_names = str_lines(fs_list_kind(rename_directory, 1));
+  string[] rename_names = string_lines(fs_list_kind(rename_directory, 1));
   string[] rename_paths = [];
   int rename_at = 0;
 } chain (string rename_directory) {
@@ -18,7 +18,7 @@ given rename_test_tree ("sub"):(["sub/NOTES.md", "sub/b.id"])
 // The path of each subdirectory of a directory that is part of the tree's
 // source, in name order.
 rename_directory_children(string rename_directory) {
-  string[] rename_names = str_lines(fs_list_kind(rename_directory, 2));
+  string[] rename_names = string_lines(fs_list_kind(rename_directory, 2));
   string[] rename_paths = [];
   int rename_at = 0;
 } chain (string rename_directory) {

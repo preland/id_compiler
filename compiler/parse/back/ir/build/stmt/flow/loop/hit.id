@@ -6,7 +6,7 @@
 
 lv_hit() {
   lp_reset();
-  lset((import lpon), 0, 1);
+  integer_list_set((import lpon), 0, 1);
   push((import lpset), 7);
 } return void;
 ():() then (import lpon)[0]:(1)

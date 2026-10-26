@@ -5,7 +5,7 @@ ms_cm_nop(string[] ms_al, string ms_op) {
   int ms_n = 0;
   int ms_i = 0;
   while(ms_i < len(ms_al)) {
-    ms_n = ms_n + (str_find(ms_al[ms_i], "\t" + ms_op + "\t") >= 0);
+    ms_n = ms_n + (string_find(ms_al[ms_i], "\t" + ms_op + "\t") >= 0);
     ms_i = ms_i + 1;
   }
 } return int ms_n;

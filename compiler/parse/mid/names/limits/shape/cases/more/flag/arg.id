@@ -21,7 +21,7 @@ arg_reqtests(int argc, string[] argv, int i, int ok) {
 // three-function cap and this directory was at the since-dropped three-entry one.
 reqtests_flagged() {
   flags_setup();
-  lset((import reqc), 0, 1);
+  integer_list_set((import reqc), 0, 1);
 } return void;
 ():() then (import reqc)[0]:(1)
 ():() then (import reqc)[2]:(2)

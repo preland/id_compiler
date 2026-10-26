@@ -17,8 +17,8 @@
 // 1 when the clauses ms_rs (after the expected values) are nothing but
 // `then prints:("")` and `then eprints:("")`, and there is at least one.
 ms_lt_quiet(string ms_rs) {
-  string ms_q = str_replace(str_replace(ms_rs, "then prints:(\"\")", ""), "then eprints:(\"\")", "");
-  int ms_ok = len(ms_rs) > 0 && len(str_trim(ms_q)) == 0;
+  string ms_q = string_replace(string_replace(ms_rs, "then prints:(\"\")", ""), "then eprints:(\"\")", "");
+  int ms_ok = len(ms_rs) > 0 && len(string_trim(ms_q)) == 0;
 } return int ms_ok;
 ("then prints:(\"\")"):(1)
 ("then prints:(\"\") then eprints:(\"\")"):(1)

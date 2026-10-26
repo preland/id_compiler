@@ -29,7 +29,7 @@ dr_cline(string line) {
   string frag = "";
   if (dr_isconst(line) == 1) {
     frag = "printf '#const\\n%s\\n' " + dr_q(line) + "; ";
-  } else if (str_starts(line, "import") == 1) {
+  } else if (string_starts_with(line, "import") == 1) {
     eprint("idrun: conf.id imports are not supported yet: " + line);
   }
 } return string frag;

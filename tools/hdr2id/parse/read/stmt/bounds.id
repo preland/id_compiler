@@ -32,7 +32,7 @@ sm_stop(string[] sm_t, int sm_s, int sm_j, int sm_d) {
   if (sm_d == 0 && (sm_t[sm_j] == ";" || (sm_t[sm_j] == "}" && sm_body(sm_t, sm_s) == 1))) {
     sm_e = sm_j + 1;
   }
-  if (sm_j == sm_s && str_starts(sm_t[sm_j], "@") == 1) {
+  if (sm_j == sm_s && string_starts_with(sm_t[sm_j], "@") == 1) {
     sm_e = sm_s + 1;
   }
 } return int sm_e;

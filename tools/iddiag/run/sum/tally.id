@@ -21,7 +21,7 @@ dg_summary(string[] dg_su_b, int dg_su_j) {
 dg_sum_json(int dg_sj_e, string[] dg_sj_c) {
   string dg_sj_l = "";
   if(len(dg_sj_c) > 0) {
-    dg_sj_l = "\"" + str_join(dg_sj_c, "\",\"") + "\"";
+    dg_sj_l = "\"" + string_join(dg_sj_c, "\",\"") + "\"";
   }
   string dg_sj_r = "{\"kind\":\"summary\",\"errors\":" + dg_sj_e + ",\"codes\":[" + dg_sj_l + "]}";
 } return string dg_sj_r;
@@ -34,7 +34,7 @@ dg_sum_text(int dg_st_e, string[] dg_st_c) {
     dg_st_r = "error: aborting due to 1 previous error";
   }
   if(len(dg_st_c) > 0) {
-    dg_st_r = dg_st_r + "\nSome errors have detailed explanations: " + str_join(dg_st_c, ", ") + ".\nFor more information about an error, try `idc --explain " + dg_st_c[0] + "`.";
+    dg_st_r = dg_st_r + "\nSome errors have detailed explanations: " + string_join(dg_st_c, ", ") + ".\nFor more information about an error, try `idc --explain " + dg_st_c[0] + "`.";
   }
 } return string dg_st_r;
 (3, []):("error: aborting due to 3 previous errors")

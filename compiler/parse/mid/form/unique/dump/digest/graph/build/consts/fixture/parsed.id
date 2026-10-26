@@ -37,7 +37,7 @@ dg_t_cbuilt() {
 
 dg_cflip(int dgtok, int dgc) {
   string dgk1 = dg_case_key(dgc);
-  sset((import ttext), dgtok, (import ttext)[dgtok] + "0");
+  string_list_set((import ttext), dgtok, (import ttext)[dgtok] + "0");
   dg_build();
 } chain (int dgtok, int dgc) {
   string dgk2 = dg_case_key(dgc);

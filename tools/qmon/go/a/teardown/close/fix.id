@@ -32,7 +32,7 @@ qa_buf_hi() {
 qa_check_bufhi() {
   int qa_n = len((import qm_buf));
   string qa_s = bytes_str((import qm_buf), qa_n);
-  int qa_ok = str_cmp(qa_s, "hi") == 0;
+  int qa_ok = string_compare(qa_s, "hi") == 0;
 } chain () {
   qa_reap_spawn();
   int qa_final = qa_ok;

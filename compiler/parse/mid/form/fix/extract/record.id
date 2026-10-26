@@ -11,7 +11,7 @@ fix_xreset4() {
 
 fix_xrecord(int[] xblock, int xinloop) {
   if((import fixx_skip)[0] > 0) {
-    lset((import fixx_skip), 0, (import fixx_skip)[0] - 1);
+    integer_list_set((import fixx_skip), 0, (import fixx_skip)[0] - 1);
   } else {
     fix_xadopt(xblock, xinloop);
   }
@@ -24,7 +24,7 @@ given fix_xskipping ([7, 8], 0):() then (import fixx_skip):([0])
 
 fix_xmark() {
   export int[] fixx_mark = [0];
-  lset((import fixx_mark), 0, (import fixd_seq)[0]);
+  integer_list_set((import fixx_mark), 0, (import fixd_seq)[0]);
 } return void;
 given fix_seq_once ():() then (import fixx_mark):([1])
 given fix_fixture ():() then (import fixx_mark)[0]:(0)

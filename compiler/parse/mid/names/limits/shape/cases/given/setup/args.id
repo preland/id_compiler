@@ -40,11 +40,11 @@ given_arg(int i, int sfn, int[] items, int j) {
   if((import nkind)[(items[j])] == "cfn") {
     case_diag(i, "E0516", "a setup's arguments are literals or (import NAME); '" + (import ns1)[(items[j])] + "' is a function name, which only a case's own arguments may pass", "a setup runs before the case, with values only; a function can be passed as an argument of the function under test, not of a 'given'", "write a literal, or (import NAME) for an exported variable, in place of " + (import ns1)[(items[j])]);
   } else {
-    lset((import setupargs), 0, 1);
+    integer_list_set((import setupargs), 0, 1);
     fit_value(i, items[j], pt);
   }
 } chain (int i, int sfn, int[] items, int j) {
-  lset((import setupargs), 0, 0);
+  integer_list_set((import setupargs), 0, 0);
 } return void;
 given fn_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0):() then (import chkfail)[0]:(0) then (import setupargs)[0]:(0)
 given cfn_fixture ((import fixture_ci), (import fixture_fn), [(import cfn_e)], 0):() then prints:("fixture.id:4: error: a setup's arguments are literals or (import NAME); 'fx_target' is a function name, which only a case's own arguments may pass [E0516]\n  why: a setup runs before the case, with values only; a function can be passed as an argument of the function under test, not of a 'given'\n  help: write a literal, or (import NAME) for an exported variable, in place of fx_target\n")

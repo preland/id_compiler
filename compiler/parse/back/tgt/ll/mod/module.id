@@ -5,7 +5,7 @@
 
 emit_llvm(string triple, int lvl) {
   fv_init();
-  lset((import lvc), 0, lvl);
+  integer_list_set((import lvc), 0, lvl);
   ir_lower();
 } chain (string triple, int lvl) {
   ir_opt(lvl);

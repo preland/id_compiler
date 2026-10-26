@@ -3,7 +3,7 @@
 
 ixw_put(string[] ixw_cols) {
   string ixw_tab = chr(9);
-  string ixw_line = str_join(ixw_cols, ixw_tab);
+  string ixw_line = string_join(ixw_cols, ixw_tab);
   print(ixw_line);
 } return void;
 (["F", "f", "1"]):() then prints:("F\tf\t1\n")

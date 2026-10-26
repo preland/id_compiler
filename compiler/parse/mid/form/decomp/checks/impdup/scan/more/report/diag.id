@@ -16,7 +16,7 @@ given imd_pair_base given imd_fill (1, 0):() then prints:("<stdin>:1: error: fun
 
 // The `imd_tab` as one string, so a case can see what imd_fill filed.
 imd_dump() {
-  string ret_s = str_join((import imd_tab), "~");
+  string ret_s = string_join((import imd_tab), "~");
 } return string ret_s;
 given lz_p ():("23:()->int=>v0{d:int 0=I5}~~23:()->int=>v0{d:int 0=I9}~")
 given lz_empty ():("")

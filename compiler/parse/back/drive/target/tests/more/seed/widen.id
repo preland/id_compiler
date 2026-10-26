@@ -11,7 +11,7 @@ given rfnfx_setup ([], []):() then len((import prog)):(0)
 test_widen2(string[] rkeep) {
   clear_strs((import rfn));
   keep_strs(rkeep, (import rfn));
-  lset((import dphase), 0, 1);
+  integer_list_set((import dphase), 0, 1);
 } chain (string[] rkeep) {
   rfn_reindex();
 } return void;

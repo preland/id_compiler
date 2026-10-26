@@ -30,14 +30,14 @@ pl_cparams(string[] pl_s) {
   string[] pl_w = [];
   int pl_j = 1;
   while (pl_j < len(pl_s)) {
-    string[] pl_f = str_split(pl_s[pl_j], "|");
+    string[] pl_f = string_split(pl_s[pl_j], "|");
     push(pl_w, pl_ctype(pl_f[0], 0) + " p" + pl_j);
     pl_j = pl_j + 1;
   }
 } chain (string[] pl_s) {
   string pl_r = "void";
   if (len(pl_w) > 0) {
-    pl_r = str_join(pl_w, ", ");
+    pl_r = string_join(pl_w, ", ");
   }
 } return string pl_r;
 (["f|i4|int", "s|s|const char *", "i8|n|long"]):("const char* p1, long long p2")

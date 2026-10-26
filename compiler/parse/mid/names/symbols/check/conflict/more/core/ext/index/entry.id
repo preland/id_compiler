@@ -37,7 +37,7 @@ ixw_begin() {
   export string[] ixw_file_cell = [""];
   int ixw_base_v = const_base();
 } chain () {
-  lset((import ixw_c), 0, ixw_base_v);
+  integer_list_set((import ixw_c), 0, ixw_base_v);
 } return void;
 given cvl_setup ():() then (import ixw_c)[0]:(8)
 given lc_dce_init ():() then (import ixw_c)[0]:(0)

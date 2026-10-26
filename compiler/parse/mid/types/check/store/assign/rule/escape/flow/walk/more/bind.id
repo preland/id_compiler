@@ -4,7 +4,7 @@
 // Lists are copied by `bind` and keep nothing, which arg_ctx already says.
 esc_bindc(string cname, int i, int a) {
   int c = 0;
-  if(cname == "bind" && i > 0 && (type_of(a) == "string" || str_starts(type_of(a), "func") == 1)) {
+  if(cname == "bind" && i > 0 && (type_of(a) == "string" || string_starts_with(type_of(a), "func") == 1)) {
     c = 1;
   }
 } return int c;

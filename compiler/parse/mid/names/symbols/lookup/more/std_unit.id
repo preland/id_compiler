@@ -27,8 +27,8 @@ case_is_std(int ci) {
     r = 1;
   }
 } return int r;
-given case_unit_fixture given lset((import stdunit), 0, 0) (0):(1)
-given case_unit_fixture given lset((import stdunit), 0, 9) given lset((import exclunit), 0, 0) (1):(0)
+given case_unit_fixture given integer_list_set((import stdunit), 0, 0) (0):(1)
+given case_unit_fixture given integer_list_set((import stdunit), 0, 9) given integer_list_set((import exclunit), 0, 0) (1):(0)
 given case_unit_fixture (0):(0)
 given case_unit_fixture (1):(1)
 
@@ -47,8 +47,8 @@ unit_excluded(int ci) {
     r = 1;
   }
 } return int r;
-given case_unit_fixture given lset((import exclunit), 0, 0) (0):(1)
-given case_unit_fixture given lset((import exclunit), 0, 0) (1):(0)
+given case_unit_fixture given integer_list_set((import exclunit), 0, 0) (0):(1)
+given case_unit_fixture given integer_list_set((import exclunit), 0, 0) (1):(0)
 given case_unit_fixture (0):(0)
 given case_unit_fixture (1):(1)
 
@@ -57,7 +57,7 @@ given case_unit_fixture (1):(1)
 // it. vidx_add (../index/table/add.id) reads the table's length itself, so a
 // check of that same length would repeat its own read.
 vnames_state() {
-  string vns_j = str_join((import vnames), "|");
+  string vns_j = string_join((import vnames), "|");
   string vns_s = "vars " + len((import vnames)) + ":" + vns_j;
 } return string vns_s;
 given call2_setup ():("vars 0:")

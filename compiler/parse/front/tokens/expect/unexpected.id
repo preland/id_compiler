@@ -39,7 +39,7 @@ unexpected_msg(string t) {
 syn_err_tail(string err_file, int err_line, string msg) {
   print(err_file + ":" + err_line + ": error: " + msg);
   note_failure();
-  lset((import synfail), 0, 1);
+  integer_list_set((import synfail), 0, 1);
 } return void;
 given full_env ("f.id", 3, "bad"):() then prints:("f.id:3: error: bad\n") then (import chkfail)[0]:(1)
 given full_env ("g.id", 7, "oops"):() then prints:("g.id:7: error: oops\n") then (import chkfail)[0]:(1)

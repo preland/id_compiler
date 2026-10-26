@@ -37,15 +37,15 @@ fix_xnodes() {
 fix_xplanned() {
   fix_xnodes();
   fix_xrecord([1, 2, 3, 4], 0);
-  lset((import nst), 1, 1);
+  integer_list_set((import nst), 1, 1);
 } chain () {
-  lset((import ntok), 2, 5);
-  lset((import ntok), 3, 6);
-  lset((import ntok), 4, 6);
+  integer_list_set((import ntok), 2, 5);
+  integer_list_set((import ntok), 3, 6);
+  integer_list_set((import ntok), 4, 6);
 } chain () {
-  lset((import ntok), 7, 16);
-  lset((import nst), 5, 1);
-  lset((import ntok), 8, 2);
+  integer_list_set((import ntok), 7, 16);
+  integer_list_set((import nst), 5, 1);
+  integer_list_set((import ntok), 8, 2);
 } return void;
 ():() then (import fixx_hit):([1, 2, 3, 4])
 ():() then (import ntok)[7]:(16)

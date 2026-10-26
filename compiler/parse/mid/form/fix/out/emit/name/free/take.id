@@ -8,7 +8,7 @@ given fix_fixture ("qux", "string"):() then last_fixd_nm:("qux")
 
 fix_prefixed(string stem) {
   string s = stem;
-  if((import fixd_std)[0] == 1 && str_starts(stem, "idstd_") == 0) {
+  if((import fixd_std)[0] == 1 && string_starts_with(stem, "idstd_") == 0) {
     s = "idstd_" + stem;
   }
 } return string s;

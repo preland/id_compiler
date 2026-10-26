@@ -30,22 +30,22 @@ imp_owner(int i, string imp_nm, int ek, string want) {
   if(imp_conf(ek) == 1 && (import setupargs)[0] == 0) {
     case_err(i, "(import " + imp_nm + ") is a conf.id constant, and a case's own argument or expected value cannot name one: a conf.id constant is accepted as an argument of a given setup, as in given f((import " + imp_nm + ")), as an argument of a then check, as in then g((import " + imp_nm + ")):(value), and as a then check's index; write its value here as a literal");
   } else if(imp_conf(ek) == 0 && setups_miss((import casegiven)[i], ek) == 1) {
-    case_err(i, "(import " + imp_nm + "): '" + imp_nm + "' is exported by '" + (import eowners)[ek] + "', which the setup '" + str_trim((import casegiven)[i]) + "' does not reach, so nothing sets it before the call");
+    case_err(i, "(import " + imp_nm + "): '" + imp_nm + "' is exported by '" + (import eowners)[ek] + "', which the setup '" + string_trim((import casegiven)[i]) + "' does not reach, so nothing sets it before the call");
   } else if((import etypes)[ek] != want) {
     case_err(i, "this case gives (import " + imp_nm + "), a " + (import etypes)[ek] + ", where a " + want + " is required");
   }
 } return void;
 given impcase_empty ((import fixture_ci), "x", 0, "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
-given impcase_empty given sset((import eowners), 0, "conf.id") ((import fixture_ci), "x", 0, "int"):() then prints:("fixture.id:4: error: (import x) is a conf.id constant, and a case's own argument or expected value cannot name one: a conf.id constant is accepted as an argument of a given setup, as in given f((import x)), as an argument of a then check, as in then g((import x)):(value), and as a then check's index; write its value here as a literal\n")
+given impcase_empty given string_list_set((import eowners), 0, "conf.id") ((import fixture_ci), "x", 0, "int"):() then prints:("fixture.id:4: error: (import x) is a conf.id constant, and a case's own argument or expected value cannot name one: a conf.id constant is accepted as an argument of a given setup, as in given f((import x)), as an argument of a then check, as in then g((import x)):(value), and as a then check's index; write its value here as a literal\n")
 given impcase_empty ((import fixture_ci), "x", 0, "int"):() then prints:("")
-given impcase_empty given sset((import eowners), 0, "conf.id") given lset((import setupargs), 0, 1) ((import fixture_ci), "x", 0, "int"):() then prints:("")
-given impcase_empty given sset((import eowners), 0, "conf.id") given lset((import setupargs), 0, 2) ((import fixture_ci), "x", 0, "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
+given impcase_empty given string_list_set((import eowners), 0, "conf.id") given integer_list_set((import setupargs), 0, 1) ((import fixture_ci), "x", 0, "int"):() then prints:("")
+given impcase_empty given string_list_set((import eowners), 0, "conf.id") given integer_list_set((import setupargs), 0, 2) ((import fixture_ci), "x", 0, "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
 
 // A `given` may name several setups, so the requirement is that ONE of them
 // reaches the export's owner. Reported only when a setup exists and none do:
 // a name that is no function at all is given_fn's error, not this one.
 setups_miss(string entry, int ek) {
-  string[] setups = str_split(entry, " ");
+  string[] setups = string_split(entry, " ");
   int si = 0;
   int seen = 0;
 } chain (string entry, int ek) {

@@ -16,7 +16,7 @@ pl_post(string[] pl_s) {
 pl_posts(string[] pl_s, int pl_j) {
   string pl_c = pl_field(pl_s[pl_j], 0);
   string pl_r = "";
-  if (str_starts(pl_c, "PH:") == 1) {
+  if (string_starts_with(pl_c, "PH:") == 1) {
     string pl_hc = str_sub(pl_c, 1, len(pl_c) - 1);
     pl_r = "    *(int*)id_store_span(p" + pl_j + ", 4) = o" + pl_j + " ? h_put(&h_" + pl_tag(pl_hc) + ", o" + pl_j + ") : -1;\n";
   }

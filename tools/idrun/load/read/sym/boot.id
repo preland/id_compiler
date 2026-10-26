@@ -51,4 +51,4 @@ ld_pr_text() {
   string ld_pr_s = "parse " + len((import ld_pr)) + ":" + ld_pr_t;
 } return string ld_pr_s;
 given lb_boot ():("parse 8:0,0,0,0,0,0,0,0")
-given lb_boot given lset((import ld_pr), 0, 3) ():("parse 8:3,0,0,0,0,0,0,0")
+given lb_boot given integer_list_set((import ld_pr), 0, 3) ():("parse 8:3,0,0,0,0,0,0,0")

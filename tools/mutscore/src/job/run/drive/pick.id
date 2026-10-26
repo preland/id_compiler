@@ -3,7 +3,7 @@
 
 // The shard spelled ms_sp ("I/N", 0 <= I < N) as [I, N]; [] when it is not.
 ms_dr_sh(string ms_sp) {
-  string[] ms_ps = str_split(ms_sp, "/");
+  string[] ms_ps = string_split(ms_sp, "/");
   int[] ms_sv = [];
   if(len(ms_ps) == 2 && to_int(ms_ps[1]) > 0 && to_int(ms_ps[0]) >= 0 && to_int(ms_ps[0]) < to_int(ms_ps[1])) {
     push(ms_sv, to_int(ms_ps[0]));
@@ -29,7 +29,7 @@ ms_dr_mine(int ms_ix, int[] ms_sh) {
 // writes it (file, function, start, end, operator, replacement); "" for a
 // line that is not a result.
 ms_dr_key(string ms_rl) {
-  string[] ms_fd = str_split(ms_rl, "\t");
+  string[] ms_fd = string_split(ms_rl, "\t");
   string ms_ky = "";
   if(len(ms_fd) >= 8) {
     ms_ky = ms_fd[2] + "\t" + ms_fd[3] + "\t" + ms_fd[4] + "\t" + ms_fd[5] + "\t" + ms_fd[6] + "\t" + ms_fd[7];

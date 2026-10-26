@@ -3,11 +3,11 @@
 
 // 1 when sgl_e is a directory whose own name is filler.
 sg_isfill(string sgl_e) {
-  string[] sgl_p = str_split(sgl_e, "/");
+  string[] sgl_p = string_split(sgl_e, "/");
   int sgl_k = len(sgl_p) - 2;
   int sgl_r = 0;
 } chain (string sgl_e) {
-  if(str_ends(sgl_e, "/") == 1 && sgl_k >= 0) {
+  if(string_ends_with(sgl_e, "/") == 1 && sgl_k >= 0) {
     sgl_r = sg_fillname(sgl_p[sgl_k]);
   }
 } return int sgl_r;
@@ -19,7 +19,7 @@ sg_isfill(string sgl_e) {
 // One entry: a source file counts in the file cell and in its depth's cell, a
 // filler directory in the filler cell.
 sg_tone(int[] sgt_t, string sgt_e) {
-  int sgt_f = str_ends(sgt_e, ".id");
+  int sgt_f = string_ends_with(sgt_e, ".id");
   int sgt_d = sg_depth(sgt_e);
   int sgt_l = sg_isfill(sgt_e);
 } chain (int[] sgt_t, string sgt_e) {

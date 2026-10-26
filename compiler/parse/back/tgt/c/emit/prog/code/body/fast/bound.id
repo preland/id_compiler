@@ -7,7 +7,7 @@ lp_bound(int lq_c) {
     push((import lpj), (import ns1)[lq_l]);
     push((import lpn), (import ni2)[lq_c]);
   } else {
-    lset((import lpbad), 0, 1);
+    integer_list_set((import lpbad), 0, 1);
   }
 } return void;
 given lpf_more ((import lpf_ca)):() then (import lpj)[0]:("laj")

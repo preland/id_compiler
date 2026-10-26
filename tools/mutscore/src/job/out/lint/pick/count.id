@@ -7,13 +7,13 @@
 // when it is empty or the silent `prints:("")` / `eprints:("")`, 1 when it is
 // a call count `calls F:[n]`, 1000 for anything else.
 ms_lt_part(string ms_wzx) {
-  string ms_wzq = str_trim(ms_wzx);
+  string ms_wzq = string_trim(ms_wzx);
   int ms_wzk = 1000;
   if(len(ms_wzq) == 0 || ms_wzq == "prints:(\"\")" || ms_wzq == "eprints:(\"\")") {
     ms_wzk = 0;
   }
 } chain (string ms_wzx) {
-  if(str_starts(ms_wzq, "calls ") == 1 && str_find(ms_wzq, ":[") > 6 && str_sub(ms_wzq, len(ms_wzq) - 1, 1) == "]") {
+  if(string_starts_with(ms_wzq, "calls ") == 1 && string_find(ms_wzq, ":[") > 6 && str_sub(ms_wzq, len(ms_wzq) - 1, 1) == "]") {
     ms_wzk = 1;
   }
 } return int ms_wzk;
@@ -28,7 +28,7 @@ ms_lt_part(string ms_wzx) {
 // 1 when the clauses ms_rs of a case are at least one `then calls F:[n]` and
 // nothing else but other counts and the silent prints.
 ms_lt_counted(string ms_rs) {
-  string[] ms_wzl = str_split(ms_rs, "then ");
+  string[] ms_wzl = string_split(ms_rs, "then ");
   int ms_wzn = 0;
   int ms_wzi = 0;
 } chain (string ms_rs) {

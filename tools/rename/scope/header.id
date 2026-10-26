@@ -20,9 +20,9 @@ rename_earlier(int rename_first, int rename_second) {
 // that starts with a newline: the bare header, `pure NAME(`, `native NAME(` or
 // `pure native NAME(`, whichever comes first; -1 when the text declares none.
 rename_function_header(string rename_padded, string rename_function) {
-  int rename_hit = rename_earlier(str_find(rename_padded, "\n" + rename_function + "("), str_find(rename_padded, "\npure " + rename_function + "("));
-  rename_hit = rename_earlier(rename_hit, str_find(rename_padded, "\nnative " + rename_function + "("));
-  rename_hit = rename_earlier(rename_hit, str_find(rename_padded, "\npure native " + rename_function + "("));
+  int rename_hit = rename_earlier(string_find(rename_padded, "\n" + rename_function + "("), string_find(rename_padded, "\npure " + rename_function + "("));
+  rename_hit = rename_earlier(rename_hit, string_find(rename_padded, "\nnative " + rename_function + "("));
+  rename_hit = rename_earlier(rename_hit, string_find(rename_padded, "\npure native " + rename_function + "("));
 } return int rename_hit;
 ("\npure f(int x) {\n}", "f"):(0)
 ("\nx\nnative f(int x) return int;", "f"):(2)

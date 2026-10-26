@@ -12,7 +12,7 @@ qa_check_serial_file() {
   int qa_close = fs_close(qa_h);
 } chain () {
   int qa_rm = fs_remove(qa_p);
-  int qa_ok = str_cmp(qa_got, "hello") == 0;
+  int qa_ok = string_compare(qa_got, "hello") == 0;
 } return int qa_ok;
 given qa_init_serial ():(0)
 given qa_init_serial ():(0) then qa_check_serial_file:(0)

@@ -13,7 +13,7 @@ m2rphi_setup() {
 m2rphi_make() {
   int[] bl = [];
   export int m2rphi_id = ir_insn("phi", "int", 7, 7, "", [7, 7], bl);
-  lset((import chk_id), 0, m2rphi_id);
+  integer_list_set((import chk_id), 0, m2rphi_id);
 } return void;
 given ir_rows ():() then (import chkfail)[0]:(0)
 given ir_rows ():() then (import m2rphi_id):(2)

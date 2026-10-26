@@ -3,7 +3,7 @@
 
 jg_prefix(string jg_wp, string jg_op) {
   string jg_pre = jg_op;
-  if (jg_op == "" && str_ends(jg_wp, ".wasm") == 1) {
+  if (jg_op == "" && string_ends_with(jg_wp, ".wasm") == 1) {
     jg_pre = str_sub(jg_wp, 0, len(jg_wp) - 5);
   } else if (jg_op == "") {
     jg_pre = jg_wp;

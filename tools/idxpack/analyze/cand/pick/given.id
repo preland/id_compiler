@@ -69,9 +69,9 @@ given rev_edge_fixture ("p", ["q"]):(1)
 is_zero_void(string name) {
   string[] body = func_body_lines(name);
   int out_i = 0;
-  if(len(body) >= 1 && str_find(body[0], "()") >= 0) {
-    string joined = str_join(body, "\n");
-    if(str_find(joined, "} return void") >= 0) {
+  if(len(body) >= 1 && string_find(body[0], "()") >= 0) {
+    string joined = string_join(body, "\n");
+    if(string_find(joined, "} return void") >= 0) {
       out_i = 1;
     }
   }

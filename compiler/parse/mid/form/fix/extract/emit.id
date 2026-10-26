@@ -18,7 +18,7 @@ given fix_xplanned (7, 0, 1, 6, ""):() then calls fix_xemit:(7, 0, 1, 6)
 fix_xrefuse(int xrt, string xrwhy) {
   string xrline = "@N|" + (import fixd_file)[0] + "|" + (import tline)[xrt] + "|" + xrwhy;
   print(xrline);
-  lset((import fixx_again), 0, 1);
+  integer_list_set((import fixx_again), 0, 1);
 } return void;
 given fix_xplanned (1, "why"):() then prints:("@N||7|why\n")
 given fix_xplanned (2, "no"):() then prints:("@N||7|no\n")

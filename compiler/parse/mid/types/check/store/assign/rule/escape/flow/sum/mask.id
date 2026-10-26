@@ -45,7 +45,7 @@ given esc_fix (1, "fa_loc"):(-1073741823)
 esc_low(int ix) {
   int elo = (import esc_dp)[ix];
   if((import esc_st)[ix] != 3 && elo < (import esc_fx)[1]) {
-    lset((import esc_fx), 1, elo);
+    integer_list_set((import esc_fx), 1, elo);
   }
 } return void;
 given esc_scx (0, 1, 4) (0):() then (import esc_fx)[1]:(4)

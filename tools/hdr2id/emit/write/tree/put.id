@@ -32,7 +32,7 @@ wr_leaf(string[] wr_lines, int wr_k) {
     wr_i = wr_i + 1;
   }
 } chain (string[] wr_lines, int wr_k) {
-  string wr_tx = str_join(wr_one, "\n\n") + "\n";
+  string wr_tx = string_join(wr_one, "\n\n") + "\n";
 } return string wr_tx;
 (["na", "nb", "nc", "nd"], 0):("na\n\nnb\n\nnc\n")
 (["na", "nb", "nc", "nd"], 1):("nd\n")

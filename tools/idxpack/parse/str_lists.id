@@ -17,7 +17,7 @@ idx_find_str(string[] xs, string s) {
 
 idx_find_str_step(string[] xs, string s, int i, int out_i) {
   int ret_i = out_i;
-  if(out_i < 0 && str_cmp(xs[i], s) == 0) {
+  if(out_i < 0 && string_compare(xs[i], s) == 0) {
     ret_i = i;
   }
 } return int ret_i;

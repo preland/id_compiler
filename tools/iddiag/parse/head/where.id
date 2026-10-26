@@ -15,7 +15,7 @@ dg_prefix(string dg_xh) {
 // diagnostic with no line to show.
 dg_ln(string dg_nh) {
   string dg_np = dg_prefix(dg_nh);
-  string[] dg_nl = str_split(dg_np, ":");
+  string[] dg_nl = string_split(dg_np, ":");
   string dg_nt = dg_nl[len(dg_nl) - 1];
 } chain (string dg_nh) {
   int dg_nv = to_int(dg_nt);
@@ -33,7 +33,7 @@ dg_ln(string dg_nh) {
 // colon in it survives.
 dg_file(string dg_wh) {
   string dg_wx = dg_prefix(dg_wh);
-  string[] dg_wl = str_split(dg_wx, ":");
+  string[] dg_wl = string_split(dg_wx, ":");
   int dg_wn = len(dg_wx) - len(dg_wl[len(dg_wl) - 1]) - 1;
 } chain (string dg_wh) {
   string dg_wr = "";

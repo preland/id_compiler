@@ -25,8 +25,8 @@ bytes_marks() {
     i = i + 1;
   }
 } return void;
-given bm_fixture ():() then calls lset:((import bytesmark), (import bm_arr_fn), 1)
-given bm_fixture ():() then calls lset:[4]
+given bm_fixture ():() then calls integer_list_set:((import bytesmark), (import bm_arr_fn), 1)
+given bm_fixture ():() then calls integer_list_set:[4]
 
 bm_sized() {
   bm_fixture();

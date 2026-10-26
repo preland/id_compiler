@@ -3,7 +3,7 @@ sg_pick(string[] sgj_ls, string sgj_p) {
   string sgj_r = "";
   int sgj_i = 0;
   while(sgj_i < len(sgj_ls) && sgj_r == "") {
-    if(str_starts(sgj_ls[sgj_i], sgj_p) == 1) {
+    if(string_starts_with(sgj_ls[sgj_i], sgj_p) == 1) {
       sgj_r = sgj_ls[sgj_i];
     }
     sgj_i = sgj_i + 1;
@@ -15,7 +15,7 @@ sg_pick(string[] sgj_ls, string sgj_p) {
 // The vacuous cases mutscore lint counted, from the summary row of its output.
 sg_tlint(int[] sgs_t, string[] sgs_rows) {
   string sgs_row = sg_pick(sgs_rows, "summary\t");
-  string[] sgs_p = str_split(sgs_row, "\t");
+  string[] sgs_p = string_split(sgs_row, "\t");
   if(len(sgs_p) > 5) {
     sgs_t[(import sg_k_sil)] = to_int(sgs_p[3]);
     sgs_t[(import sg_k_ech)] = to_int(sgs_p[4]);

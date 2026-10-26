@@ -8,14 +8,14 @@ sv_fx(string sv_ty) {
   reg_push("x", sv_ty, "g", 0, 2);
   push((import dvline), 20);
 } chain (string sv_ty) {
-  lset((import stdunit), 0, 2);
+  integer_list_set((import stdunit), 0, 2);
 } return void;
 ("string"):() then (import dvline)[1]:(20)
 ("int"):() then (import dvtype)[1]:("int")
 
 sv_xfx(string sv_ty) {
   regrow_d();
-  lset((import stdunit), 0, 2);
+  integer_list_set((import stdunit), 0, 2);
   ext_line("V\tx\t" + sv_ty + "\tlib.id\t7");
 } return void;
 ("string"):() then (import ext_vt)[0]:("string")

@@ -27,7 +27,7 @@ given ixw_fx given ixw_begin given ixw_func(0) stdin "file 0|x.id\nline 1\nident
 ixw_file(int ixw_f) {
   string ixw_path = (import pfile)[ixw_f];
   if(ixw_path != (import ixw_file_cell)[0]) {
-    sset((import ixw_file_cell), 0, ixw_path);
+    string_list_set((import ixw_file_cell), 0, ixw_path);
     ixw_put(["@", ixw_path]);
   }
 } return void;

@@ -21,7 +21,7 @@ case_skeleton_args(int dgn_np, int dgn_j) {
     dgn_p = dgn_p + 1;
   }
 } chain (int dgn_np, int dgn_j) {
-  string dgn_joined = str_join(dgn_parts, ", ");
+  string dgn_joined = string_join(dgn_parts, ", ");
 } return string dgn_joined;
 (2, 1):("ARG1_1, ARG1_2")
 (0, 1):("")

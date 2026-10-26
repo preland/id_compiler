@@ -13,7 +13,7 @@ key_or_pause(string[] toks, int i) {
 given qmb_qmp_peer("hello") (["ret", "x"], 0):(1) then calls send_key_tok:(["ret", "x"], 0)
 
 send_key_tok(string[] toks, int i) {
-  string msg = str_wrap((import qm_key_pre), (import qm_key_post), toks[i]);
+  string msg = string_wrap((import qm_key_pre), (import qm_key_post), toks[i]);
   qmp_cmd(msg);
   int j = after_pause(i, 30);
 } return int j;

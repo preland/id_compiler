@@ -8,7 +8,7 @@
 index_take(int[] pos, int v) {
   if(cur_text(pos) == "[" && (import ixargs)[0] == 1) {
     advance(pos);
-    lset((import ni1), v, case_item(pos) + 1);
+    integer_list_set((import ni1), v, case_item(pos) + 1);
     eat_text(pos, "]");
   }
 } return void;
@@ -18,7 +18,7 @@ given index_fix (["op", "int", "op"], ["[", "2", "]"], 0) ([0], 0):([0]) then (i
 index_fix(string[] kinds, string[] texts, int raised) {
   toks_env(kinds, texts);
   newleaf("cimport", 0, 0, "zz", "");
-  lset((import ixargs), 0, raised);
+  integer_list_set((import ixargs), 0, raised);
 } return void;
 (["op"], ["["], 1):() then len((import ni1)):(1)
 (["op"], ["["], 0):() then (import ixargs)[0]:(0)

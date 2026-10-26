@@ -11,7 +11,7 @@
 m2r_phi_make(int i, int j) {
   string ir_ty_v = (import ity)[((import pra)[j])];
   int ph = ir_leaf("phi", ir_ty_v, 0 - 1, 0 - 1, "");
-  lset((import phiof)[i], j, ph);
+  integer_list_set((import phiof)[i], j, ph);
 } return int ph;
 given m2r_outv_fixture (0, 0):(3) then phiof_sum:("phiof 3")
 given m2r_outv_fixture (0, 0):(3) then (import chkfail)[0]:(0)
@@ -25,7 +25,7 @@ m2r_phi_place(int f, int i, int ph) {
   int len_v = len(blk_ins_v);
   m2r_shift(blk_ins_v, len_v - 1);
 } chain (int f, int i, int ph) {
-  lset((import ihome), ph, b);
+  integer_list_set((import ihome), ph, b);
 } return void;
 given ir_rows_chk1 (0, 0, 1):() then chk_home:(0)
 given ir_rows_chk1 (1, 0, 1):() then chk_home:(1)

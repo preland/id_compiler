@@ -24,7 +24,7 @@ fit_case(int i) {
   }
 } return void;
 given traps_case_fixture ((import fixture_ci)):() then prints:(":4: error: a case with 'traps' may not also give an expected return value\n")
-given wrap_fixture given lset((import casefn), 0, (import fixture_zero)) ((import fixture_ci)):() then prints:(":4: error: this case passes 1 argument(s) to '0', which takes 0 [E0503]\n  why: a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares\n  help: write one literal per parameter in the case's first tuple: 0()\n")
+given wrap_fixture given integer_list_set((import casefn), 0, (import fixture_zero)) ((import fixture_ci)):() then prints:(":4: error: this case passes 1 argument(s) to '0', which takes 0 [E0503]\n  why: a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares\n  help: write one literal per parameter in the case's first tuple: 0()\n")
 given wrap_fixture ((import fixture_ci)):() then prints:("")
 given wrap_fixture ((import fixture_ci)):() then calls fit_body:[1]
 given traps_case_fixture ((import fixture_ci)):() then calls fit_traps:[1]

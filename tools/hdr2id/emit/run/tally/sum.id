@@ -10,7 +10,7 @@ rp_cats(string[] rp_rows) {
     rp_line(rp_rows, rp_i, rp_ls);
     rp_i = rp_i + 1;
   }
-  string rp_r = str_join(rp_ls, "");
+  string rp_r = string_join(rp_ls, "");
 } return string rp_r;
 (["U a variable arguments x", "U b callback parameter y", "U c callback parameter z", "H d"]):("  variable arguments: 1\n  callback: 2\n")
 (["H a"]):("")

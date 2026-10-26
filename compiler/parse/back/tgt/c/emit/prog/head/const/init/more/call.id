@@ -28,10 +28,10 @@ list_consts_cached() {
   int kept_n = (import kept_lists)[0];
   if(kept_n < 0) {
     kept_n = list_consts_kept();
-    lset((import kept_lists), 0, kept_n);
+    integer_list_set((import kept_lists), 0, kept_n);
   }
 } return int kept_n;
 given lc_dce_setup ():(1) then (import kept_lists)[0]:(1)
 given lc_dce_setup2 ():(0) then (import kept_lists)[0]:(0)
-given lc_dce_setup given lset((import kept_lists), 0, 4) ():(4)
-given lc_dce_setup2 given lset((import kept_lists), 0, 6) ():(6)
+given lc_dce_setup given integer_list_set((import kept_lists), 0, 4) ():(4)
+given lc_dce_setup2 given integer_list_set((import kept_lists), 0, 6) ():(6)

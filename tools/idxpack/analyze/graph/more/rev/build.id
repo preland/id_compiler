@@ -13,7 +13,7 @@ rev_counts(int fcount) {
 } chain (int fcount) {
   while(ei < len((import ix_ekind))) {
     int ci = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
-    if(str_cmp((import ix_ekind)[ei], "call") == 0 && ci >= 0) {
+    if(string_compare((import ix_ekind)[ei], "call") == 0 && ci >= 0) {
       counts[ci] = counts[ci] + 1;
     }
     ei = ei + 1;

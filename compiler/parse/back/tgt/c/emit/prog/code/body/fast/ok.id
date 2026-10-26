@@ -38,6 +38,6 @@ lp_lim(int lq_bx, int lq_lo, int lq_hi) {
   }
 } return int lq_r;
 given lpf_cs(0) (0, (import lpf_loa), (import lpf_hia)):(1)
-given lpf_cs(0) given lset((import lpn), 0, (import lpf_n0)) (0, (import lpf_loa), (import lpf_hia)):(1)
+given lpf_cs(0) given integer_list_set((import lpn), 0, (import lpf_n0)) (0, (import lpf_loa), (import lpf_hia)):(1)
 given lpf_cs(1) (0, (import lpf_lob), (import lpf_hib)):(1)
 given lpf_cs(5) (0, (import lpf_lor), (import lpf_hir)):(0)

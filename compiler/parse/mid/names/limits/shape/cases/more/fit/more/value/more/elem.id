@@ -30,7 +30,7 @@ then_imp_type(int chk_node) {
     vt = "int";
   }
 } return string vt;
-given then_imp_fixture ("int[]", 0, 0) given sset((import nkind), (import then_imp_node), "thenlen") ((import then_imp_node)):("int")
+given then_imp_fixture ("int[]", 0, 0) given string_list_set((import nkind), (import then_imp_node), "thenlen") ((import then_imp_node)):("int")
 given then_imp_fixture ("int[]", 0, 0) ((import then_imp_node)):("int[]")
 given then_imp_fixture ("int[]", 0, 1) ((import then_imp_node)):("int")
 given then_imp_fixture ("int", 0, 1) ((import then_imp_node)):("int")

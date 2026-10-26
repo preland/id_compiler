@@ -41,7 +41,7 @@ given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n")
 given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n") then (import chkfail)[0]:(0)
 
 emit_test_unit(string triple) {
-  lset((import harn), 0, 1);
+  integer_list_set((import harn), 0, 1);
   emit_test_head();
   emit_test_body(triple);
 } return void;

@@ -3,7 +3,7 @@
 // The row ms_rw in the form to read, file:line: function: shape: case, when
 // its shape is not "case"; "" otherwise.
 ms_lt_one(string ms_rw) {
-  string[] ms_fd = str_split(ms_rw, "\t");
+  string[] ms_fd = string_split(ms_rw, "\t");
   string ms_ln = "";
   if(len(ms_fd) >= 5 && ms_fd[0] != "case") {
     ms_ln = ms_fd[1] + ":" + ms_fd[3] + ": " + ms_fd[2] + ": " + ms_fd[0] + ": " + ms_fd[4] + "\n";

@@ -9,7 +9,7 @@ lp_cond(int lq_c) {
   if((import nkind)[lq_c] == "bin") {
     lp_bin(lq_c);
   } else {
-    lset((import lpbad), 0, 1);
+    integer_list_set((import lpbad), 0, 1);
   }
 } return void;
 given lpf_more ((import lpf_andn)):() then len((import lpj)):(2)
@@ -33,7 +33,7 @@ lp_cmp(int lq_c) {
   if((import ns1)[lq_c] == "<") {
     lp_bound(lq_c);
   } else {
-    lset((import lpbad), 0, 1);
+    integer_list_set((import lpbad), 0, 1);
   }
 } return void;
 given lpf_more ((import lpf_ca)):() then (import lpbad)[0]:(0)

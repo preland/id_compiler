@@ -2,10 +2,10 @@
 wg_begin(string vs_mname) {
   string[] vz_cur = (import wg_cur);
   string vs_pre = list_string_last((import wg_ifn));
-  sset(vz_cur, 0, vs_pre + "_" + vs_mname);
+  string_list_set(vz_cur, 0, vs_pre + "_" + vs_mname);
 } chain (string vs_mname) {
-  sset(vz_cur, 1, "");
-  sset(vz_cur, 2, "");
+  string_list_set(vz_cur, 1, "");
+  string_list_set(vz_cur, 2, "");
 } return void;
 given wg_init given wg_iface("a", "1") ("go"):() then wg_t_cur:(["a_go", "", "", ""])
 given wg_init given wg_iface("a", "1") given wg_arg("uint", "") ("go"):() then wg_t_cur:(["a_go", "", "", ""])
@@ -14,10 +14,10 @@ given wg_init given wg_iface("a", "1") given wg_arg("uint", "") ("go"):() then w
 wg_arg(string vs_ty, string vs_target) {
   string[] vz_cur = (import wg_cur);
   string vs_letter = wg_letter(vs_ty);
-  sset(vz_cur, 1, vz_cur[1] + vs_letter);
+  string_list_set(vz_cur, 1, vz_cur[1] + vs_letter);
 } chain (string vs_ty, string vs_target) {
   if (vs_ty == "new_id") {
-    sset(vz_cur, 2, vs_target);
+    string_list_set(vz_cur, 2, vs_target);
   }
 } return void;
 given wg_init ("uint", ""):() then wg_t_cur:(["", "u", "", ""])

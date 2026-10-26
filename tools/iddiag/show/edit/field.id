@@ -7,7 +7,7 @@
 // so each edit stays on the one line a stream of diagnostics is cut by.
 
 dg_ef(string dg_ef_e, int dg_ef_k) {
-  string[] dg_ef_l = str_split(dg_ef_e, "\t");
+  string[] dg_ef_l = string_split(dg_ef_e, "\t");
   string dg_ef_r = "";
   if(dg_ef_k < len(dg_ef_l)) {
     dg_ef_r = dg_ef_l[dg_ef_k];
@@ -18,11 +18,11 @@ dg_ef(string dg_ef_e, int dg_ef_k) {
 ("machine\treplace", 4):("")
 
 dg_unesc(string dg_ue_s) {
-  string dg_ue_a = str_replace(dg_ue_s, "\\\\", chr(1));
-  string dg_ue_b = str_replace(dg_ue_a, "\\n", "\n");
-  string dg_ue_c = str_replace(dg_ue_b, "\\t", "\t");
+  string dg_ue_a = string_replace(dg_ue_s, "\\\\", chr(1));
+  string dg_ue_b = string_replace(dg_ue_a, "\\n", "\n");
+  string dg_ue_c = string_replace(dg_ue_b, "\\t", "\t");
 } chain (string dg_ue_s) {
-  string dg_ue_d = str_replace(dg_ue_c, chr(1), "\\");
+  string dg_ue_d = string_replace(dg_ue_c, chr(1), "\\");
 } return string dg_ue_d;
 ("a\\nb"):("a\nb")
 ("a\\tb"):("a\tb")

@@ -28,7 +28,7 @@ sm_join(string[] sm_t, int sm_s, int sm_e) {
     push(sm_w, sm_t[sm_s]);
     sm_s = sm_s + 1;
   }
-  string sm_r = str_join(sm_w, " ");
+  string sm_r = string_join(sm_w, " ");
 } return string sm_r;
 (["a", "b", "c"], 0, 2):("a b")
 (["a", "b", "c"], 1, 3):("b c")
@@ -44,7 +44,7 @@ sm_take(string[] sm_t, int sm_s, int sm_e, int sm_cur, string[] sm_out, int[] sm
     sm_side = 0;
   }
 } chain (string[] sm_t, int sm_s, int sm_e, int sm_cur, string[] sm_out, int[] sm_in) {
-  if (str_starts(sm_t[sm_s], "@") == 0) {
+  if (string_starts_with(sm_t[sm_s], "@") == 0) {
     push(sm_out, sm_join(sm_t, sm_s, sm_e));
     push(sm_in, sm_cur);
   }

@@ -16,12 +16,12 @@ pl_params(string[] pl_s) {
   string[] pl_w = [];
   int pl_j = 1;
   while (pl_j < len(pl_s)) {
-    string[] pl_f = str_split(pl_s[pl_j], "|");
+    string[] pl_f = string_split(pl_s[pl_j], "|");
     push(pl_w, pl_idtype(pl_f[0]) + " " + pl_pname(pl_f[1]));
     pl_j = pl_j + 1;
   }
 } chain (string[] pl_s) {
-  string pl_r = str_join(pl_w, ", ");
+  string pl_r = string_join(pl_w, ", ");
 } return string pl_r;
 (["f|i4|int", "s|path|const char *", "i8|n|long"]):("string path, word n")
 (["f|i4|int"]):("")

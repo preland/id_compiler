@@ -13,7 +13,7 @@ wg_walk(string vs_xml) {
   int vi_k = xml_reader_next(vr_r);
 } chain (string vs_xml) {
   while (vi_k != 0) {
-    string[] vz_a = [xml_reader_attr(vr_r, "name"), xml_reader_attr(vr_r, "value"), xml_reader_attr(vr_r, "version"), xml_reader_attr(vr_r, "type"), xml_reader_attr(vr_r, "interface")];
+    string[] vz_a = [xml_reader_attribute(vr_r, "name"), xml_reader_attribute(vr_r, "value"), xml_reader_attribute(vr_r, "version"), xml_reader_attribute(vr_r, "type"), xml_reader_attribute(vr_r, "interface")];
     wg_step(vi_k, xml_reader_get(vr_r, (import xml_reader_k_name)), vz_a);
     vi_k = xml_reader_next(vr_r);
   }

@@ -19,7 +19,7 @@ dg_body(string dg_bo_b, string dg_bo_h, int dg_bo_on) {
 ("sample.txt:2: error: x\n  at: count\n  why: y", "sample.txt:2: error: x", 0):("\n  |\n2 |   int count = 1;\n  |       ^^^^^\n  = why: y")
 
 dg_notes(string dg_nt_b, int dg_nt_w, int dg_nt_on) {
-  string[] dg_nt_l = str_split(dg_nt_b, "\n");
+  string[] dg_nt_l = string_split(dg_nt_b, "\n");
   string[] dg_nt_o = [];
   int dg_nt_i = 1;
 } chain (string dg_nt_b, int dg_nt_w, int dg_nt_on) {
@@ -30,7 +30,7 @@ dg_notes(string dg_nt_b, int dg_nt_w, int dg_nt_on) {
     }
     dg_nt_i = dg_nt_i + 1;
   }
-  string dg_nt_r = str_join(dg_nt_o, "\n");
+  string dg_nt_r = string_join(dg_nt_o, "\n");
 } return string dg_nt_r;
 ("h\n  why: a\n  at: x\n  help: b", 2, 0):("   = why: a\n   = help: b")
 ("h", 2, 0):("")
@@ -40,7 +40,7 @@ dg_notes(string dg_nt_b, int dg_nt_w, int dg_nt_on) {
 dg_note(string dg_no_l, int dg_no_w, int dg_no_on) {
   string dg_no_k = dg_key(dg_no_l);
   string dg_no_v = dg_kv(dg_no_l);
-  string dg_no_p = str_repeat(" ", dg_no_w) + " = ";
+  string dg_no_p = string_repeat(" ", dg_no_w) + " = ";
 } chain (string dg_no_l, int dg_no_w, int dg_no_on) {
   string dg_no_r = "";
   if(dg_no_k == "why") {
@@ -54,7 +54,7 @@ dg_note(string dg_no_l, int dg_no_w, int dg_no_on) {
     dg_no_r = dg_no_p + dg_paint("note", "1;36", dg_no_on) + ": " + dg_msg(dg_no_v) + " (" + dg_prefix(dg_no_v) + ")";
   }
   if(dg_no_k == "edit") {
-    dg_no_r = dg_edit_text(dg_no_v, str_repeat(" ", dg_no_w), dg_no_on);
+    dg_no_r = dg_edit_text(dg_no_v, string_repeat(" ", dg_no_w), dg_no_on);
   }
   if(dg_no_k == "follows") {
     dg_no_r = dg_no_p + dg_paint("note", "1;36", dg_no_on) + ": follows from the error at " + dg_prefix(dg_no_v) + " above";

@@ -6,7 +6,7 @@ ty_wrap(string ty_c, int ty_cf) {
   if (ty_c == "c1" && ty_cf == 1) {
     ty_r = "s";
   }
-  if (str_starts(ty_r, "PO:") == 1) {
+  if (string_starts_with(ty_r, "PO:") == 1) {
     ty_r = "H:" + str_sub(ty_r, 3, len(ty_r) - 3);
   }
 } return string ty_r;

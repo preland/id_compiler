@@ -41,7 +41,7 @@ given full_env ():() then esc_on:(0)
 // inside before it asks esc_own about that function's locals.
 esc_enter(int fn) {
   if(esc_on() == 1) {
-    lset((import sqbase), 0, fn);
+    integer_list_set((import sqbase), 0, fn);
   }
 } return void;
 given esc_fix (-5):() then esc_cur:(-5)

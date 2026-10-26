@@ -16,7 +16,7 @@ ms_rp_keys(string[] ms_rows, int ms_lv) {
 // Adds one to the slot for row ms_rw's answer in the counts ms_cn, whose
 // groups are ms_ks, at level ms_lv.
 ms_rp_tick(int[] ms_cn, string[] ms_ks, string ms_rw, int ms_lv) {
-  string[] ms_fd = str_split(ms_rw, "\t");
+  string[] ms_fd = string_split(ms_rw, "\t");
   int ms_at = 4 * list_string_index(ms_ks, ms_rp_key(ms_fd, ms_lv)) + ms_rp_cls(ms_fd[0]);
   ms_cn[ms_at] = ms_cn[ms_at] + 1;
 } return void;

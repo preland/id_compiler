@@ -25,7 +25,7 @@ emit_print_final(int ci, string lab, string cnd, string shown, string lt) {
 // the three-function limit.
 then_imp_get(int node) {
   string rd = checked_read((import ns1)[node]);
-  string[] steps = str_split((import ns2)[node], ".");
+  string[] steps = string_split((import ns2)[node], ".");
   string pt = (import etypes)[find_str((import enames), (import ns1)[node])];
 } chain (int node) {
   int pi = 1;
@@ -36,5 +36,5 @@ then_imp_get(int node) {
   }
 } return string rd;
 given then_imp_fixture ("int", 0, 0) ((import then_imp_node)):("((void)(idtc_set_gx || (id_null_read(), 0)), gx)")
-given then_imp_fixture ("P", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given sset((import ns2), (import then_imp_node), ".y") ((import then_imp_node)):("(int)(id_list_get(((void)(idtc_set_gx || (id_null_read(), 0)), gx), 1))")
-given then_imp_fixture ("R", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given sd_note("R", ["p", "q"], ["P", "int"], "r.id", 9) given sset((import ns2), (import then_imp_node), ".p.y") ((import then_imp_node)):("(int)(id_list_get((IdList*)(intptr_t)(id_list_get(((void)(idtc_set_gx || (id_null_read(), 0)), gx), 0)), 1))")
+given then_imp_fixture ("P", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given string_list_set((import ns2), (import then_imp_node), ".y") ((import then_imp_node)):("(int)(id_list_get(((void)(idtc_set_gx || (id_null_read(), 0)), gx), 1))")
+given then_imp_fixture ("R", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given sd_note("R", ["p", "q"], ["P", "int"], "r.id", 9) given string_list_set((import ns2), (import then_imp_node), ".p.y") ((import then_imp_node)):("(int)(id_list_get((IdList*)(intptr_t)(id_list_get(((void)(idtc_set_gx || (id_null_read(), 0)), gx), 0)), 1))")

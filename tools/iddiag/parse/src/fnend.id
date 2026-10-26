@@ -5,7 +5,7 @@
 // or 0 when no return clause follows N.
 
 dg_fn_end(string dg_gt, int dg_gn) {
-  string[] dg_gl = str_lines(dg_gt);
+  string[] dg_gl = string_lines(dg_gt);
   int dg_gr = dg_ret_line(dg_gl, dg_gn);
   int dg_gk = dg_gr;
 } chain (string dg_gt, int dg_gn) {
@@ -19,7 +19,7 @@ dg_fn_end(string dg_gt, int dg_gn) {
 
 dg_ret_line(string[] dg_ql, int dg_qn) {
   int dg_qi = dg_qn - 1;
-  while(dg_qi >= 0 && dg_qi < len(dg_ql) && str_starts(dg_ql[dg_qi], "} return") == 0) {
+  while(dg_qi >= 0 && dg_qi < len(dg_ql) && string_starts_with(dg_ql[dg_qi], "} return") == 0) {
     dg_qi = dg_qi + 1;
   }
   int dg_qr = 0;
@@ -34,10 +34,10 @@ dg_ret_line(string[] dg_ql, int dg_qn) {
 
 dg_is_case(string dg_ol) {
   int dg_oc = 0;
-  if(str_starts(dg_ol, "(") == 1 || str_starts(dg_ol, "given ") == 1) {
+  if(string_starts_with(dg_ol, "(") == 1 || string_starts_with(dg_ol, "given ") == 1) {
     dg_oc = 1;
   }
-  if(str_starts(dg_ol, "stdin ") == 1 || str_starts(dg_ol, "timeout ") == 1) {
+  if(string_starts_with(dg_ol, "stdin ") == 1 || string_starts_with(dg_ol, "timeout ") == 1) {
     dg_oc = 1;
   }
 } return int dg_oc;

@@ -24,8 +24,8 @@ pump_in(int timeout_ms) {
     pending = got;
     eof = got == 0;
   }
-  lset((import cr_pending_n), 0, pending);
-  lset((import cr_in_eof), 0, eof);
+  integer_list_set((import cr_pending_n), 0, pending);
+  integer_list_set((import cr_in_eof), 0, eof);
 } chain (int timeout_ms) {
   maybe_close_in();
 } return void;

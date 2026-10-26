@@ -4,7 +4,7 @@
 lg_entries(string lg_hd) {
   string[] lg_es = [];
   if (lg_hd != "") {
-    lg_es = str_split(lg_hd, ",");
+    lg_es = string_split(lg_hd, ",");
   }
 } return string[] lg_es;
 ("int[] 0,int 1"):(["int[] 0", "int 1"])

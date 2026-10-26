@@ -21,11 +21,11 @@ bytes_mark_store(int i) {
 } chain (int i) {
   bytes_mark_to(bm_val, bm_want);
 } return void;
-given bm_nest ((import bm_ia)):() then calls lset:((import bytesmark), (import bm_ia_arr), 1)
-given bm_nest ((import bm_dec_nest)):() then calls lset:((import bytesmark), (import bm_in_a), 1)
-given bm_sized ((import bm_dec_bytes)):() then calls lset:((import bytesmark), (import bm_arr_decl), 1)
-given bm_sized ((import bm_dec_plain)):() then calls lset:[0]
-given bm_sized ((import bm_asg_bytes)):() then calls lset:((import bytesmark), (import bm_arr_asg), 1)
+given bm_nest ((import bm_ia)):() then calls integer_list_set:((import bytesmark), (import bm_ia_arr), 1)
+given bm_nest ((import bm_dec_nest)):() then calls integer_list_set:((import bytesmark), (import bm_in_a), 1)
+given bm_sized ((import bm_dec_bytes)):() then calls integer_list_set:((import bytesmark), (import bm_arr_decl), 1)
+given bm_sized ((import bm_dec_plain)):() then calls integer_list_set:[0]
+given bm_sized ((import bm_asg_bytes)):() then calls integer_list_set:((import bytesmark), (import bm_arr_asg), 1)
 
 bytes_store_type(int i) {
   string bm_t = "";

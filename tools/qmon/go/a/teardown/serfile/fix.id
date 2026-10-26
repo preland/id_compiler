@@ -23,7 +23,7 @@ qa_scratch_check() {
   int qa_close = fs_close(qa_h);
 } chain () {
   int qa_rm = fs_remove(qa_p);
-  int qa_ok = str_cmp(qa_got, "hi") == 0;
+  int qa_ok = string_compare(qa_got, "hi") == 0;
 } return int qa_ok;
 given qa_scratch_file ():(0)
 given qa_scratch_file ():(0) then qa_scratch_check:(0)

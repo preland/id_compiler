@@ -12,7 +12,7 @@ jg_str_end(string jg_t, int jg_i) {
 
 jg_line(string jg_t, int jg_k) {
   string jg_head = str_sub(jg_t, 0, jg_k);
-  string[] jg_ls = str_split(jg_head, "\n");
+  string[] jg_ls = string_split(jg_head, "\n");
   int jg_n = len(jg_ls);
 } return int jg_n;
 ("a\nb\nc", 4):(3)

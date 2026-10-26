@@ -5,7 +5,7 @@
 // build itself failed, its status -- a failed build's count proves nothing.
 tg_report(string tg_tree_path, int tg_rc, string[] tg_fresh) {
   string tg_line = tg_tree_path + ": " + len(tg_fresh) + " new entries";
-  string tg_names = str_join(tg_fresh, " ");
+  string tg_names = string_join(tg_fresh, " ");
   if (len(tg_fresh) > 0) {
     tg_line = tg_line + ": " + tg_names;
   }

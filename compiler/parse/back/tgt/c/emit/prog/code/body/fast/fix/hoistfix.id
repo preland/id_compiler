@@ -4,7 +4,7 @@
 
 lpf_planb() {
   lp_plan((import lpf_wb));
-  lset((import lpon), 0, 1);
+  integer_list_set((import lpon), 0, 1);
 } return void;
 given lpf_in(0) ():() then lpf_nset:(3)
 given lpf_in(0) ():() then len((import lpn)):(1)

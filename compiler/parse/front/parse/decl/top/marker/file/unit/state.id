@@ -58,7 +58,7 @@ given full_env ([0], "other.id"):([1])
 
 take_file_unit(int[] pos, string unit_text) {
   int file_unit_v = file_unit(unit_text);
-  lset((import ucur), 0, file_unit_v);
+  integer_list_set((import ucur), 0, file_unit_v);
   advance(pos);
 } return void;
 given full_env ([0], "2|foo"):([1])

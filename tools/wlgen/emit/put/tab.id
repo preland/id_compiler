@@ -1,6 +1,6 @@
 // A list as a constant declaration, one line.
 wg_put_s(string vs_name, string[] vz_xs) {
-  string vs_body = str_join(wg_quote(vz_xs), ", ");
+  string vs_body = string_join(wg_quote(vz_xs), ", ");
   put("string[] " + vs_name + " = [" + vs_body + "];\n");
 } return void;
 ("n", ["a", "b\""]):() then prints:("string[] n = [\"a\", \"b\\\"\"];\n")

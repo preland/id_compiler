@@ -4,7 +4,7 @@
 // no `_` is its own single piece.
 
 vocab_bad(string vocab_name) {
-  string[] vocab_pieces = str_split(vocab_name, "_");
+  string[] vocab_pieces = string_split(vocab_name, "_");
   string vocab_acc = "";
   int vocab_i = 0;
 } chain (string vocab_name) {

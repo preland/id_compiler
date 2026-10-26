@@ -38,7 +38,7 @@ main(int argc, string[] argv) {
 eat_space(string src, int i) {
   if(character_code_at(src, i) == 10) {
     bump_line();
-    lset((import lexbol), 0, i + 1);
+    integer_list_set((import lexbol), 0, i + 1);
   }
   int ret_i = i + 1;
 } return int ret_i;

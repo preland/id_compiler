@@ -4,7 +4,7 @@
 // The index of IDC_ROOT in argv: 2 after a leading --stdin, otherwise 1.
 br_first(int argc, string[] argv) {
   int at = 1;
-  if (argc > 1 && str_cmp(argv[1], "--stdin") == 0) {
+  if (argc > 1 && string_compare(argv[1], "--stdin") == 0) {
     at = 2;
   }
 } return int at;

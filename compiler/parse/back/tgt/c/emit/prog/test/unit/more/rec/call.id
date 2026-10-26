@@ -26,7 +26,7 @@ given fn_fixture ((import fixture_fn), "other"):() then prints:("    idtc_rec_ot
 call_fixture() {
   calls_node_fixture();
   harn_init();
-  lset((import harn), 0, 1);
+  integer_list_set((import harn), 0, 1);
 } return void;
 ():() then (import harn)[0]:(1)
 ():() then len((import thennode)):(1)

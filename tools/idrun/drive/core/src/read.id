@@ -12,7 +12,7 @@ dr_str(int[] buf, int a, int e) {
 
 // The first directory on $PATH that holds name, or "." when none does.
 dr_which(string name) {
-  string[] dirs = str_split(environment_text("PATH"), ":");
+  string[] dirs = string_split(environment_text("PATH"), ":");
   string pdir = "";
   int i = 0;
 } chain (string name) {

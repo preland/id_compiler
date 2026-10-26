@@ -32,7 +32,7 @@ lay_is_generic(string name) {
 // anything else (not a *.id file at all, so no check below ever sees it).
 lay_file_kind(string name) {
   int kind = 5;
-  if(str_ends(name, ".id") == 1) {
+  if(string_ends_with(name, ".id") == 1) {
     kind = 4;
   }
   if(name == "conf.id") {

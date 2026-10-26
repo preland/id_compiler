@@ -7,7 +7,7 @@ fix_xadopt(int[] xblock, int xinloop) {
     push((import fixx_hit), xblock[xrc]);
     xrc = xrc + 1;
   }
-  lset((import fixx_loop), 0, xinloop);
+  integer_list_set((import fixx_loop), 0, xinloop);
 } return void;
 given fix_xfixture ([7, 8], 1):() then (import fixx_hit):([7, 8])
 given fix_xfixture ([7, 8], 1):() then (import fixx_loop):([1])
@@ -15,7 +15,7 @@ given fix_xfixture ([], 0):() then (import fixx_hit):([])
 
 fix_xskipping() {
   fix_xfixture();
-  lset((import fixx_skip), 0, 1);
+  integer_list_set((import fixx_skip), 0, 1);
 } return void;
 ():() then (import fixx_skip):([1])
 ():() then len((import tkind)):(17)

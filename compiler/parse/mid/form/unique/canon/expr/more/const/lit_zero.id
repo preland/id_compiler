@@ -4,7 +4,7 @@
 
 lit_arith_fixture() {
   arith_fixture();
-  lset((import cloose), 0, 1);
+  integer_list_set((import cloose), 0, 1);
 } return void;
 ():() then (import bin_node):(3)
 ():() then (import cloose)[0]:(1)
@@ -24,7 +24,7 @@ lit_zero_base() {
 
 lit_zero_fixture() {
   lit_zero_base();
-  lset((import cloose), 0, 1);
+  integer_list_set((import cloose), 0, 1);
 } return void;
 ():() then calls node_txt2:("int", "0", 0, 0)
 ():() then (import cloose)[0]:(1)

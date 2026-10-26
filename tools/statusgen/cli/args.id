@@ -16,7 +16,7 @@ sg_arg(string[] sga_argv, string sga_name) {
 // there is none, which asks for every tree.
 sg_tree_arg(string[] sgt_argv) {
   string sgt_v = sg_arg(sgt_argv, "--untested");
-  if(str_starts(sgt_v, "--") == 1) {
+  if(string_starts_with(sgt_v, "--") == 1) {
     sgt_v = "";
   }
 } return string sgt_v;
@@ -29,7 +29,7 @@ sg_tree_arg(string[] sgt_argv) {
 sg_root(string[] sgr_argv, string sgr_pwd) {
   string sgr_a = sg_arg(sgr_argv, "--root");
   string sgr_r = sg_or(sgr_a, sgr_pwd);
-  if(sgr_a != "" && str_starts(sgr_a, "/") == 0) {
+  if(sgr_a != "" && string_starts_with(sgr_a, "/") == 0) {
     sgr_r = path_join(sgr_pwd, sgr_a);
   }
 } return string sgr_r;

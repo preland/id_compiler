@@ -3,7 +3,7 @@
 
 keep_export_fixture_harn_on() {
   keep_export_fixture();
-  lset((import harn), 0, 1);
+  integer_list_set((import harn), 0, 1);
   keep_export_fixture_tail();
 } return void;
 ():() then (import harn)[0]:(1)

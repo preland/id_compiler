@@ -37,6 +37,6 @@ tk_units(int tkf) {
 } chain (int tkf) {
   int tkuv = tkup * 65536 + tkun;
 } return int tkuv;
-given tk_t_prep given lset((import nunit), 6, 3) given lset((import nunit), 21, 2) (1):(196610)
+given tk_t_prep given integer_list_set((import nunit), 6, 3) given integer_list_set((import nunit), 21, 2) (1):(196610)
 given tk_t_prep (1):(0)
 given tk_t_prep (0):(0)

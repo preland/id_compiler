@@ -3,7 +3,7 @@
 // sgdi_std.
 sg_dir(string sgdi_root, string sgdi_std, string sgdi_label) {
   string sgdi_d = path_join(sgdi_root, sgdi_label);
-  if(str_starts(sgdi_label, "idstd/") == 1) {
+  if(string_starts_with(sgdi_label, "idstd/") == 1) {
     string sgdi_rel = str_sub(sgdi_label, 6, len(sgdi_label) - 6);
     sgdi_d = path_join(sgdi_std, sgdi_rel);
   }

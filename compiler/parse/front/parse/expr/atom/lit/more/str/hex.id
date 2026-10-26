@@ -6,8 +6,8 @@
 // parser refuses a `\x` that is not followed by two digits (hexcheck.id).
 
 hex_escape_at(string text, int at) {
-  int hex_high = url_hexval(character_code_at(text, at + 2));
-  int hex_low = url_hexval(character_code_at(text, at + 3));
+  int hex_high = url_hex_value(character_code_at(text, at + 2));
+  int hex_low = url_hex_value(character_code_at(text, at + 3));
   int hex_ok = 0;
 } chain (string text, int at) {
   if(character_code_at(text, at) == 92 && character_code_at(text, at + 1) == 120 && hex_high >= 0 && hex_low >= 0) {
@@ -21,8 +21,8 @@ hex_escape_at(string text, int at) {
 ("\\\\x41", 0):(0)
 
 hex_escape_byte(string text, int at) {
-  int hex_high = url_hexval(character_code_at(text, at + 2));
-  int hex_low = url_hexval(character_code_at(text, at + 3));
+  int hex_high = url_hex_value(character_code_at(text, at + 2));
+  int hex_low = url_hex_value(character_code_at(text, at + 3));
   int hex_byte = hex_high * 16 + hex_low;
 } return int hex_byte;
 ("\\x41", 0):(65)

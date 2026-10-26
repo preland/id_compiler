@@ -15,7 +15,7 @@ rename_markdown_row(string rename_source, int rename_start, int rename_end, int 
 
 // One line: its names when it is a table row. Answers where the next line starts.
 rename_markdown_line(string rename_source, int rename_start, int rename_line, int[] rename_spans) {
-  int rename_end = str_eol(rename_source, rename_start);
+  int rename_end = string_end_of_line(rename_source, rename_start);
   if(character_code_at(rename_source, rename_start) == 124) {
     rename_markdown_row(rename_source, rename_start, rename_end, rename_line, rename_spans);
   }

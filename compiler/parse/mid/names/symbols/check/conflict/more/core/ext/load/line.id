@@ -12,7 +12,7 @@
 
 ext_line(string xe_text) {
   string xe_sep = chr(9);
-  string[] xe_f = str_split(xe_text, xe_sep);
+  string[] xe_f = string_split(xe_text, xe_sep);
   ext_route(xe_f[0], xe_f);
 } return void;
 given env_init ("M\tlazy"):() then (import ext_mode)[0]:(1)

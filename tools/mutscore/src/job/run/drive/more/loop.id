@@ -7,10 +7,10 @@
 // next run.
 ms_dr_step(string[] ms_cf, string ms_ml, int ms_lim, int ms_first) {
   string ms_res = ms_rn_one(ms_cf, ms_ml, ms_lim);
-  if(str_starts(ms_res, "timeout") == 1 && ms_first == 0) {
+  if(string_starts_with(ms_res, "timeout") == 1 && ms_first == 0) {
     ms_res = "";
   }
-  if(str_starts(ms_res, "timeout") == 1) {
+  if(string_starts_with(ms_res, "timeout") == 1) {
     ms_res = "hang" + str_sub(ms_res, 7, len(ms_res) - 7);
   }
 } return string ms_res;

@@ -22,7 +22,7 @@ given unit_t_mark(0, 0) ((import unit_t_fb)):() then prints:("")
 
 unit_mark_at(string uf) {
   if(uf != (import unitlast)[0]) {
-    sset((import unitlast), 0, uf);
+    string_list_set((import unitlast), 0, uf);
     print("/* idc unit: " + uf + " */");
   }
 } return void;
@@ -38,7 +38,7 @@ unit_file(int id) {
   while(uc < len((import pnodes)) && (import pnodes)[uc] != id) {
     uc = uc + 1;
   }
-  lset((import unitc), 1, uc);
+  integer_list_set((import unitc), 1, uc);
 } chain (int id) {
   string uf = "";
   if(uc < len((import pfile))) {

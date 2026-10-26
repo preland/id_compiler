@@ -17,7 +17,7 @@ emit_test_kept(string triple) {
   keep_ints((import prog), pkeep);
 } chain (string triple) {
   keep_strs((import rfn), rkeep);
-  lset((import dphase), 0, 0);
+  integer_list_set((import dphase), 0, 0);
   seed_tested();
 } chain (string triple) {
   reach_mark();

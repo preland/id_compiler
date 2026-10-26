@@ -10,7 +10,7 @@ rename_note_piece(string[] rename_failing, string rename_piece, int rename_piece
   if(rename_piece == "") {
     rename_shown = "(empty)";
   }
-  if(hash_map_has(rename_word_keys, rename_word_used, str_lower(rename_piece)) == 0 && str_is_axis_piece(str_lower(rename_piece), rename_piece_count) == 0) {
+  if(hash_map_has(rename_word_keys, rename_word_used, string_lower(rename_piece)) == 0 && string_is_axis_piece(string_lower(rename_piece), rename_piece_count) == 0) {
     push(rename_failing, rename_shown);
   }
 } return void;
@@ -23,7 +23,7 @@ given rename_test_words_filled ([], "q", 2, (import rename_test_word_keys), (imp
 
 // The pieces of a name that are not words, as `a, b`; "" when every piece is.
 rename_bad_pieces(string rename_name, string[] rename_word_keys, int[] rename_word_used) {
-  string[] rename_pieces = str_split(rename_name, "_");
+  string[] rename_pieces = string_split(rename_name, "_");
   string[] rename_bad = [];
   int rename_at = 0;
 } chain (string rename_name, string[] rename_word_keys, int[] rename_word_used) {
@@ -31,7 +31,7 @@ rename_bad_pieces(string rename_name, string[] rename_word_keys, int[] rename_wo
     rename_note_piece(rename_bad, rename_pieces[rename_at], len(rename_pieces), rename_word_keys, rename_word_used);
     rename_at = rename_at + 1;
   }
-  string rename_listed_pieces = str_join(rename_bad, ", ");
+  string rename_listed_pieces = string_join(rename_bad, ", ");
 } return string rename_listed_pieces;
 given rename_test_words_filled ("alpha_beta", (import rename_test_word_keys), (import rename_test_word_used)):("")
 given rename_test_words_filled ("alpha_q_gamma_beta", (import rename_test_word_keys), (import rename_test_word_used)):("q, gamma")

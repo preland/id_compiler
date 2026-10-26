@@ -46,7 +46,7 @@ case_unit_fixture() {
   int fn_lo = node_func("cu_lo", "void", none, none, 0 - 1);
 } chain () {
   int fn_hi = node_func("cu_hi", "void", none, none, 0 - 1);
-  lset((import nunit), fn_hi, 5);
+  integer_list_set((import nunit), fn_hi, 5);
   push((import casefn), fn_lo);
 } chain () {
   push((import casefn), fn_hi);

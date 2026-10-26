@@ -11,8 +11,8 @@ imd_sentence(string imd_nx, string imd_ydef, string imd_vs) {
 ("p", "'q' (defined at b.id:7)", "W"):("function 'p' and 'q' (defined at b.id:7) differ only in the imported value they read (W)")
 
 imd_vals_of(string imd_va, string imd_vb) {
-  string[] imd_xa = str_split(imd_va, ",");
-  string[] imd_xb = str_split(imd_vb, ",");
+  string[] imd_xa = string_split(imd_va, ",");
+  string[] imd_xb = string_split(imd_vb, ",");
   int imd_k = imd_first(imd_xa, imd_xb);
 } chain (string imd_va, string imd_vb) {
   string ret_s = "(import " + imd_xa[imd_k] + ") in one, (import " + imd_xb[imd_k] + ") in the other";

@@ -14,7 +14,7 @@ br_t_leaked() {
   int n = 0;
   int i = 0;
   while (i < len(names)) {
-    n = n + str_starts(names[i], "buildrun_probe_");
+    n = n + string_starts_with(names[i], "buildrun_probe_");
     i = i + 1;
   }
 } return int n;

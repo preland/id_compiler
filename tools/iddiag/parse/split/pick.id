@@ -12,7 +12,7 @@ dg_take(string[] dg_ta, string dg_tl, string dg_tk) {
 (["a"], "  help: h", "why"):(["a"])
 
 dg_head(string dg_hb) {
-  string[] dg_hl = str_split(dg_hb, "\n");
+  string[] dg_hl = string_split(dg_hb, "\n");
   string dg_hr = dg_hl[0];
 } return string dg_hr;
 ("a.id:1: error: x\n  why: y"):("a.id:1: error: x")

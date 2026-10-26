@@ -9,7 +9,7 @@
 ut_asm_at(int ut_ki) {
   int ret_i = 0;
   if(ut_ki >= 0) {
-    ret_i = str_starts((import utwhat)[ut_ki], "asm '");
+    ret_i = string_starts_with((import utwhat)[ut_ki], "asm '");
   }
 } return int ret_i;
 given ut_host_seeded (0):(1)
@@ -21,7 +21,7 @@ ut_fix_text(string name) {
   string ut_w = (import utwhat)[ut_k];
   string ut_rest = str_sub(ut_w, 5, len(ut_w) - 5);
 } chain (string name) {
-  string[] ut_parts = str_split(ut_rest, "'");
+  string[] ut_parts = string_split(ut_rest, "'");
   string ut_host_v = (import hostc)[0];
   string ret_s = "adding asm \"" + ut_host_v + "\" " + ut_parts[0] + "(...) makes it testable (docs/ASM.md, Overloading by platform)";
 } return string ret_s;

@@ -20,7 +20,7 @@ ty_struct(string[] ty_t) {
 
 // Reads the statement ty_st, tokens joined by single spaces, into the table: a struct or union with a body is recorded under struct:tag (the typedef's own name when it has no tag), a typedef adds its name with the class of its type, F for a function pointer. Any other statement adds nothing.
 ty_def(string ty_st, string[] ty_tn, string[] ty_tc) {
-  string[] ty_t = ty_unbody(str_split(ty_st, " "));
+  string[] ty_t = ty_unbody(string_split(ty_st, " "));
   int ty_a = ty_declname(ty_t);
   int ty_td = ty_t[0] == "typedef";
 } chain (string ty_st, string[] ty_tn, string[] ty_tc) {

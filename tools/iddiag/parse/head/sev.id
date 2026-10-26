@@ -3,8 +3,8 @@
 // two find where the severity marker sits and which severity it is.
 
 dg_sevpos(string dg_sh) {
-  int dg_se = str_find(dg_sh, ": error: ");
-  int dg_sn = str_find(dg_sh, ": note: ");
+  int dg_se = string_find(dg_sh, ": error: ");
+  int dg_sn = string_find(dg_sh, ": note: ");
   int dg_sp = dg_se;
 } chain (string dg_sh) {
   if(dg_sn >= 0 && (dg_sp < 0 || dg_sn < dg_sp)) {
@@ -18,7 +18,7 @@ dg_sevpos(string dg_sh) {
 
 dg_sev(string dg_vh) {
   int dg_vp = dg_sevpos(dg_vh);
-  int dg_vq = str_findat(dg_vh, ":", dg_vp + 2);
+  int dg_vq = string_find_from(dg_vh, ":", dg_vp + 2);
   string dg_vw = "";
 } chain (string dg_vh) {
   if(dg_vp >= 0) {

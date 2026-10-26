@@ -14,7 +14,7 @@ given lpf_conds (0):("")
 given lpf_conds (6):("k:0")
 
 lp_rleaf(string[] lr_st, string lr_tok) {
-  if(str_starts(lr_tok, "k:") == 1) {
+  if(string_starts_with(lr_tok, "k:") == 1) {
     push(lr_st, gt_tail(lr_tok));
   } else {
     push(lr_st, "(" + gt_tail(lr_tok) + ")");

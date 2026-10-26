@@ -24,7 +24,7 @@ given dg_t_scc (4, 3):() then (import dg_ctr)[1]:(4)
 
 dg_lower(int dgv, int dglv) {
   if(dglv < (import dg_low)[dgv]) {
-    lset((import dg_low), dgv, dglv);
+    integer_list_set((import dg_low), dgv, dglv);
   }
 } return void;
 given dg_t_graph (0, -1):() then (import dg_low)[0]:(-1)

@@ -9,7 +9,7 @@
 // So does -O0, whose IR is the plain lowering.
 
 lv_plan(int lv_n) {
-  lset((import sqbase), 0, (import fnnode)[(import lwfn)[0]]);
+  integer_list_set((import sqbase), 0, (import fnnode)[(import lwfn)[0]]);
   int lv_r = 0;
   if((import fsc)[0] == 0 && (import lvc)[0] > 0) {
     lv_r = lp_plan(lv_n);
@@ -20,8 +20,8 @@ lv_plan(int lv_n) {
   }
 } return int lv_r;
 given lv_fix ((import lpf_wa)):(1) then len((import lpg)):(16)
-given lv_fix given lset((import fsc), 0, 1) ((import lpf_wa)):(0)
-given lv_fix given lset((import lvc), 0, 0) ((import lpf_wa)):(0)
+given lv_fix given integer_list_set((import fsc), 0, 1) ((import lpf_wa)):(0)
+given lv_fix given integer_list_set((import lvc), 0, 0) ((import lpf_wa)):(0)
 
 lv_callee(int lv_n, string lv_plain, string lv_cell) {
   string lv_f = lv_plain;
@@ -35,11 +35,11 @@ given lp_reset (7, "id_list_set", "id_list_cell_set"):("id_list_set")
 
 lv_copy(int lv_n, int lv_b, int lv_jn, int lv_on) {
   lw_go(lv_b);
-  lset((import lpon), 0, lv_on);
+  integer_list_set((import lpon), 0, lv_on);
   lh_hoist(lv_n, lv_on);
 } chain (int lv_n, int lv_b, int lv_jn, int lv_on) {
   lw_while(lv_n);
-  lset((import lpon), 0, 0);
+  integer_list_set((import lpon), 0, 0);
   lw_term("br", 0 - 1, [lv_jn]);
 } return void;
 given lv_loop ((import while_node), 0, 0, 1):() then calls lw_while:((import while_node))

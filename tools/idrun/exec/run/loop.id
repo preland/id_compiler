@@ -189,4 +189,4 @@ vm_rg_text() {
   string vm_rg_s = "regs " + len((import ex_rg)) + ":" + vm_rg_t;
 } return string vm_rg_s;
 given vb_boot ():("regs 3:0,0,0")
-given vb_boot given lset((import ex_rg), 1, 4) ():("regs 3:0,4,0")
+given vb_boot given integer_list_set((import ex_rg), 1, 4) ():("regs 3:0,4,0")

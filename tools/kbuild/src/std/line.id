@@ -14,7 +14,7 @@ kb_line_words(string line, string[] found) {
 // kb_line_words, except that a line whose first non-blank characters are // says
 // nothing and is skipped.
 kb_text_line(string line, string[] found) {
-  if (str_starts(str_trim(line), "//") == 0) {
+  if (string_starts_with(string_trim(line), "//") == 0) {
     kb_line_words(line, found);
   }
 } return void;
@@ -24,7 +24,7 @@ kb_text_line(string line, string[] found) {
 
 // The identifiers of every line of text that is not a comment, in order.
 kb_words(string text) {
-  string[] rows = str_lines(text);
+  string[] rows = string_lines(text);
   string[] found = [];
   int i = 0;
 } chain (string text) {

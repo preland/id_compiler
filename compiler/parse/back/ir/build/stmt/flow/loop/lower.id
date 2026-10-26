@@ -10,7 +10,7 @@ lw_loop(int lv_n) {
   }
 } return void;
 given lv_loop ((import while_node)):() then calls lw_while:((import while_node))
-given lv_loop given lset((import fsc), 0, 1) ((import while_node)):() then calls lv_plan:((import while_node))
+given lv_loop given integer_list_set((import fsc), 0, 1) ((import while_node)):() then calls lv_plan:((import while_node))
 
 lw_versioned(int lv_n) {
   int lv_g = gd_guard();

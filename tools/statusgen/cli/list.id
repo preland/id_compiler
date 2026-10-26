@@ -2,7 +2,7 @@
 // otherwise the label is that tree or under it.
 sg_want(string sgwn_label, string sgwn_tree) {
   string sgwn_sub = sgwn_tree + "/";
-  int sgwn_r = sgwn_tree == "" || sgwn_label == sgwn_tree || str_starts(sgwn_label, sgwn_sub) == 1;
+  int sgwn_r = sgwn_tree == "" || sgwn_label == sgwn_tree || string_starts_with(sgwn_label, sgwn_sub) == 1;
 } return int sgwn_r;
 ("idc/tools", ""):(1)
 ("idc/tools", "idc"):(1)

@@ -17,7 +17,7 @@ wsc_given(string wgv_name) {
   int wgv_i = 0;
   int wgv_r = 0;
   while(wgv_i < len((import casegiven))) {
-    string[] wgv_set = str_split((import casegiven)[wgv_i], " ");
+    string[] wgv_set = string_split((import casegiven)[wgv_i], " ");
     if(find_str(wgv_set, wgv_name) >= 0) {
       wgv_r = 1;
     }

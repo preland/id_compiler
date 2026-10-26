@@ -1,9 +1,9 @@
 rt_fixture() {
   init_rtc();
-  lset((import rtc), 0, 1);
+  integer_list_set((import rtc), 0, 1);
 } return void;
 ():() then (import rtc)[0]:(1)
-():() then calls lset:([1], 0, 1)
+():() then calls integer_list_set:([1], 0, 1)
 ():() then calls init_rtc:[1]
 
 declfix() {

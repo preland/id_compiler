@@ -28,7 +28,7 @@ seg_step(int[] body, string fname, int ln, int[] acc, int i) {
     seg_close(fname, ln, acc, 1, nxt);
   } else {
     int a = stmt_actions(body[i]);
-    lset(acc, 0, acc[0] + a);
+    integer_list_set(acc, 0, acc[0] + a);
     blank_tally(acc, body[i]);
   }
 } return void;
@@ -54,8 +54,8 @@ seg_close(string fname, int ln, int[] acc, int at_seam, int nxt) {
   }
   check_blank_use(fname, ln, acc, at_seam, nxt);
 } chain (string fname, int ln, int[] acc, int at_seam, int nxt) {
-  lset(acc, 0, 0);
-  lset(acc, 1, 0);
+  integer_list_set(acc, 0, 0);
+  integer_list_set(acc, 1, 0);
 } return void;
 given full_env ("f", 1, [0, 0], 0, 0):() then (import chkfail)[0]:(0)
 given full_env ("f", 1, [4, 0], 0, 0):() then (import chkfail)[0]:(1)

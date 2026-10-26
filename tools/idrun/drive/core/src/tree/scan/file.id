@@ -15,7 +15,7 @@ given tf_tree given tf_want ((import tf_root), "build/", 0):((import tf_wbd)) th
 // conf.id is a manifest and backend.id a link recipe; neither is compiled.
 dr_file(string dir, string name) {
   string frag = "";
-  if (str_ends(name, ".id") == 1 && name != "conf.id" && name != "backend.id") {
+  if (string_ends_with(name, ".id") == 1 && name != "conf.id" && name != "backend.id") {
     frag = dr_one(dir + "/" + name);
   }
 } return string frag;

@@ -33,9 +33,9 @@ given full_env ():() then init_units:(0)
 // Consuming a token records its line and its index.
 stamp_tok(int[] pos) {
   int cur_ln_v = cur_ln(pos);
-  lset((import curtl), 0, cur_ln_v);
-  lset((import curtk), 0, pos[0]);
+  integer_list_set((import curtl), 0, cur_ln_v);
+  integer_list_set((import curtk), 0, pos[0]);
 } return void;
-given mk_line9 given push_real("kw", "if") ([0]):() then calls lset:((import curtl), 0, 9)
-given mk_two_toks ([0]):() then calls lset:((import curtl), 0, 1) then calls lset:((import curtk), 0, 0)
-given mk_two_toks ([1]):() then calls lset:((import curtl), 0, 1) then calls lset:((import curtk), 0, 1)
+given mk_line9 given push_real("kw", "if") ([0]):() then calls integer_list_set:((import curtl), 0, 9)
+given mk_two_toks ([0]):() then calls integer_list_set:((import curtl), 0, 1) then calls integer_list_set:((import curtk), 0, 0)
+given mk_two_toks ([1]):() then calls integer_list_set:((import curtl), 0, 1) then calls integer_list_set:((import curtk), 0, 1)

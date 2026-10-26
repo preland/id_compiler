@@ -38,8 +38,8 @@ dg_t_scc() {
 // routine shares (../build/edge/asm.id), the one past prog.
 dg_t_vol() {
   dg_t_rows();
-  sset((import ns1), 16, "ticks");
-  sset((import nkind), 16, "call");
+  string_list_set((import ns1), 16, "ticks");
+  string_list_set((import nkind), 16, "call");
 } return void;
 ():() then (import ns1)[16]:("ticks")
 ():() then len((import dg_comp)):(2)

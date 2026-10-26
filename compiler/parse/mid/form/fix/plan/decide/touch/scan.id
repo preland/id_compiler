@@ -9,8 +9,8 @@ fix_touches(int last) {
     i = i + 1;
   }
 } return int ok;
-given fix_touch_fixture given lset((import fixe_n), 1, (import ft_bcall)) (1):(0)
-given fix_touch_fixture given lset((import fixe_mv), 0, 1) given lset((import fixe_n), 0, (import ft_call)) (0):(1)
+given fix_touch_fixture given integer_list_set((import fixe_n), 1, (import ft_bcall)) (1):(0)
+given fix_touch_fixture given integer_list_set((import fixe_mv), 0, 1) given integer_list_set((import fixe_n), 0, (import ft_call)) (0):(1)
 given fix_touch_fixture (1):(1)
 given fix_touch_fixture (0):(0)
 

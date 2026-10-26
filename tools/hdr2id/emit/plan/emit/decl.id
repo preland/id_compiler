@@ -17,7 +17,7 @@ pl_err(string pl_c) {
 // The C expression for the length in bytes that parameter pl_pj of the signature pl_s gives the buffer it bounds: the value of an integer parameter, or what a pointer to an integer points at, which the shim has already brought in as a<number>.
 pl_lenx(string[] pl_s, int pl_pj) {
   string pl_x = "(long long)a" + pl_pj;
-  if (str_starts(pl_field(pl_s[pl_pj], 0), "P") == 1) {
+  if (string_starts_with(pl_field(pl_s[pl_pj], 0), "P") == 1) {
     pl_x = "(long long)*a" + pl_pj;
   }
 } return string pl_x;
@@ -37,7 +37,7 @@ pl_decl(string[] pl_s, int pl_j) {
   if (pl_c == "s") {
     pl_ln = "const char* " + pl_v + " = " + pl_p + ";";
   }
-  if (str_starts(pl_c, "H:") == 1) {
+  if (string_starts_with(pl_c, "H:") == 1) {
     pl_ln = pl_ct + " " + pl_v + " = (" + pl_ct + ")h_get(&h_" + pl_tag(pl_c) + ", " + pl_p + ");\n    if (!" + pl_v + ") return " + pl_err(pl_field(pl_s[0], 1)) + ";";
   }
   if (pl_k == 2) {

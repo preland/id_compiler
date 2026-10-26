@@ -8,15 +8,15 @@
 // fit_body (../fit/body.id) moves as it goes.
 
 imp_side(int is_s) {
-  lset((import reqc), 2, is_s);
+  integer_list_set((import reqc), 2, is_s);
   if(is_s == 0) {
-    lset((import reqc), 1, 0);
+    integer_list_set((import reqc), 1, 0);
   }
 } return void;
 given reqtests_init (0):() then (import reqc)[2]:(0)
 given reqtests_init (1):() then (import reqc)[2]:(1)
-given reqtests_init given lset((import reqc), 1, 1) (0):() then (import reqc)[1]:(0)
-given reqtests_init given lset((import reqc), 1, 1) (1):() then (import reqc)[1]:(1)
+given reqtests_init given integer_list_set((import reqc), 1, 1) (0):() then (import reqc)[1]:(0)
+given reqtests_init given integer_list_set((import reqc), 1, 1) (1):() then (import reqc)[1]:(1)
 
 // How many cases of the function that case `i` is written under come before it:
 // 0 and 1 are the function's two core cases (docs/TESTS.md).

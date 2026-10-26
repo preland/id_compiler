@@ -37,7 +37,7 @@ sg_sum(string[] sgu_labels, int[][] sgu_ts, string sgu_pre) {
   int[] sgu_s = sg_zeros((import sg_k_len));
   int sgu_i = 0;
   while(sgu_i < len(sgu_labels)) {
-    if(str_starts(sgu_labels[sgu_i], sgu_pre) == 1 && sgu_ts[sgu_i][(import sg_k_files)] > 0) {
+    if(string_starts_with(sgu_labels[sgu_i], sgu_pre) == 1 && sgu_ts[sgu_i][(import sg_k_files)] > 0) {
       sg_acc(sgu_s, sgu_ts[sgu_i]);
     }
     sgu_i = sgu_i + 1;

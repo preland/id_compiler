@@ -5,7 +5,7 @@ edge_is_call_from(int i, string caller) {
   string ek = (import ix_ekind)[i];
   int out_i = 0;
 } chain (int i, string caller) {
-  if(str_cmp(ec, caller) == 0 && str_cmp(ek, "call") == 0) {
+  if(string_compare(ec, caller) == 0 && string_compare(ek, "call") == 0) {
     out_i = 1;
   }
 } return int out_i;

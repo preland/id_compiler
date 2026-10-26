@@ -3,12 +3,12 @@
 // A string as a JSON string: quote, backslash, newline, tab and carriage return
 // escaped; every other byte, UTF-8 included, written as it is.
 dg_jq(string dg_jq_s) {
-  string dg_jq_a = str_replace(dg_jq_s, "\\", "\\\\");
-  string dg_jq_b = str_replace(dg_jq_a, "\"", "\\\"");
-  string dg_jq_c = str_replace(dg_jq_b, "\n", "\\n");
+  string dg_jq_a = string_replace(dg_jq_s, "\\", "\\\\");
+  string dg_jq_b = string_replace(dg_jq_a, "\"", "\\\"");
+  string dg_jq_c = string_replace(dg_jq_b, "\n", "\\n");
 } chain (string dg_jq_s) {
-  string dg_jq_d = str_replace(dg_jq_c, "\t", "\\t");
-  string dg_jq_e = str_replace(dg_jq_d, "\r", "\\r");
+  string dg_jq_d = string_replace(dg_jq_c, "\t", "\\t");
+  string dg_jq_e = string_replace(dg_jq_d, "\r", "\\r");
   string dg_jq_r = "\"" + dg_jq_e + "\"";
 } return string dg_jq_r;
 ("a\"b"):("\"a\\\"b\"")

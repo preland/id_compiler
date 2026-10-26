@@ -22,7 +22,7 @@ lw_byte_hit(int by_node) {
   }
 } return int by_r;
 given lw_env_fixture (0):(0)
-given lw_env_fixture given lset((import lpon), 0, 1) given list_extend((import lpset), [0]) (0):(0)
+given lw_env_fixture given integer_list_set((import lpon), 0, 1) given list_extend((import lpset), [0]) (0):(0)
 
 lw_expand_at(int by_node, string by_helper, string by_ret, int[] by_args) {
   int ret_i = 0 - 1;

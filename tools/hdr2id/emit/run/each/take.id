@@ -3,10 +3,10 @@
 // Adds hd_cls to hd_tl as a struct tag when it is a handle class H:tag the list does not hold yet.
 hd_tag1(string hd_cls, string[] hd_tl) {
   string hd_hc = hd_cls;
-  if (str_starts(hd_cls, "PH:") == 1) {
+  if (string_starts_with(hd_cls, "PH:") == 1) {
     hd_hc = str_sub(hd_cls, 1, len(hd_cls) - 1);
   }
-  int hd_h = str_starts(hd_hc, "H:");
+  int hd_h = string_starts_with(hd_hc, "H:");
 } chain (string hd_cls, string[] hd_tl) {
   if (hd_h == 1) {
     string hd_tg = pl_tag(hd_hc);

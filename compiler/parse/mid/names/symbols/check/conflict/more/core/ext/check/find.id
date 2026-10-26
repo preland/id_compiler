@@ -11,7 +11,7 @@ given env_init given ext_line("Z\tb.id") given ext_line("F\tfoo\tf\t3") given ex
 // It decides which of two same-bodied functions is the later, and so which one
 // a diagnostic is about.
 ext_before(int xe_k, string xe_file, int xe_line) {
-  int xe_cmp = str_cmp((import ext_f)[xe_k], xe_file);
+  int xe_cmp = string_compare((import ext_f)[xe_k], xe_file);
   int xe_pre = xe_cmp < 0;
   if(xe_cmp == 0 && (import ext_l)[xe_k] < xe_line) {
     xe_pre = 1;

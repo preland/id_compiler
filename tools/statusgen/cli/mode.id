@@ -6,7 +6,7 @@ sg_modeU(string sgu_mut, string sgu_idc, string sgu_root, string sgu_std, string
   string[] sgu_out = [];
   sg_ulist(sgu_out, sgu_mut, sgu_idc, sgu_root, sgu_std, sgu_tree);
   if(len(sgu_out) > 0) {
-    print(str_join(sgu_out, "\n"));
+    print(string_join(sgu_out, "\n"));
   }
 } return int 0;
 given sg_t_tree ("sh\n-c\nprintf '#h\\ncase\\ta.id\\tf\\t3\\tc\\ncase\\ta.id\\tf\\t4\\tc\\nsummary\\t2\\t1\\t0\\t0\\t0\\n'\nsh", "idc", (import sg_t_root), "/nonexistent_sg_root", ""):(0) then prints:("sub/b.id:1 g (0 cases)\nsub/more/c.id:1 h (0 cases)\n")

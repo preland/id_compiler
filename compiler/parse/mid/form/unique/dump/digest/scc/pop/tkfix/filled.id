@@ -19,7 +19,7 @@ tk_t_asm() {
 
 tk_t_bad2() {
   tk_t_prep();
-  lset((import tkbad), 0, 1);
+  integer_list_set((import tkbad), 0, 1);
 } return void;
 ():() then tk_nbad:("bad 1")
 ():() then tk_nkeys:("keys 2")

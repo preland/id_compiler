@@ -10,7 +10,7 @@
 // set first, to the closing paren's index, rather than backfilled after.
 fix_span_fixture() {
   fix_fixture();
-  lset((import curtk), 0, 2);
+  integer_list_set((import curtk), 0, 2);
   fix_span_fixture1();
 } return void;
 ():() then (import curtk)[0]:(2)

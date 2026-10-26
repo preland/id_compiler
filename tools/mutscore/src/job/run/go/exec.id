@@ -19,7 +19,7 @@ ms_rn_run(string[] ms_cf, int ms_ms) {
 // back as it was. Answers STATUS, the mutated line's number, the mutant's own
 // fields and the line it makes, tab-separated.
 ms_rn_one(string[] ms_cf, string ms_ml, int ms_ms) {
-  string[] ms_fd = str_split(ms_ml, "\t");
+  string[] ms_fd = string_split(ms_ml, "\t");
   string ms_pa = path_join(ms_cf[(import ms_cf_copy)], ms_fd[0]);
   string ms_src = fs_read_text(ms_pa);
 } chain (string[] ms_cf, string ms_ml, int ms_ms) {
@@ -31,12 +31,12 @@ ms_rn_one(string[] ms_cf, string ms_ml, int ms_ms) {
   string ms_out = ms_rn_run(ms_cf, ms_ms);
   exec_file_put(ms_pa, ms_src, 420);
 } chain (string[] ms_cf, string ms_ml, int ms_ms) {
-  int ms_nl = str_find(ms_out, "\n");
+  int ms_nl = string_find(ms_out, "\n");
   string ms_tx = str_sub(ms_out, ms_nl + 1, len(ms_out) - ms_nl - 1);
   int ms_rc = to_int(str_sub(ms_out, 0, ms_nl));
 } chain (string[] ms_cf, string ms_ml, int ms_ms) {
   string ms_st = ms_rn_class(ms_tx, ms_rc);
-  string ms_df = str_replace(ms_df_show(ms_src, ms_a, ms_b, ms_fd[5]), "\t", " ");
+  string ms_df = string_replace(ms_df_show(ms_src, ms_a, ms_b, ms_fd[5]), "\t", " ");
   int ms_lno = ms_df_ln(ms_src, ms_a);
 } chain (string[] ms_cf, string ms_ml, int ms_ms) {
   string ms_res = ms_st + "\t" + ms_lno + "\t" + ms_ml + "\t" + ms_df;

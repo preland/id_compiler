@@ -12,8 +12,8 @@ given ds_test_setup (0, [0, 1], 2):(0, [0, 1, 2], 2) then (import ds_seen)[2]:(1
 given ds_test_setup (0, [0], 3):(0, [0], 3)
 
 take_eq(int[] grp, int j, string a, string b) {
-  if(str_cmp(a, b) == 0) {
-    lset((import ds_seen), j, 1);
+  if(string_compare(a, b) == 0) {
+    integer_list_set((import ds_seen), j, 1);
     take_new(grp, j);
   }
 } return void;

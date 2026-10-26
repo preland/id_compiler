@@ -24,7 +24,7 @@ dg_show_human(string dg_sh_b, int dg_sh_on, string[] dg_sh_seen) {
 // The block without its why and help: the reasoning and the advice that the first
 // diagnostic of the code already gave, in place of which one line says so.
 dg_brief(string dg_br_b, string dg_br_c) {
-  string[] dg_br_l = str_split(dg_br_b, "\n");
+  string[] dg_br_l = string_split(dg_br_b, "\n");
   string[] dg_br_o = [dg_br_l[0]];
   int dg_br_i = 1;
 } chain (string dg_br_b, string dg_br_c) {
@@ -33,7 +33,7 @@ dg_brief(string dg_br_b, string dg_br_c) {
     dg_br_i = dg_br_i + 1;
   }
   push(dg_br_o, "  why: (as for the first [" + dg_br_c + "] above)");
-  string dg_br_r = str_join(dg_br_o, "\n");
+  string dg_br_r = string_join(dg_br_o, "\n");
 } return string dg_br_r;
 ("h\n  why: w\n  help: x\n  at: a", "E0001"):("h\n  at: a\n  why: (as for the first [E0001] above)")
 ("h\n  edit: e", "E0002"):("h\n  edit: e\n  why: (as for the first [E0002] above)")

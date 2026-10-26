@@ -16,7 +16,7 @@ given decl_tokens ([0]):(17) then (import chkfail)[0]:(0)
 // `pure` on a parameter is a promise about the function value passed: the
 // parameter's type has to be a function type, or there is nothing to promise.
 pure_mark_param(int[] pos, int pflag, int node) {
-  if(pflag == 1 && str_starts((import ns1)[node], "func(") == 0) {
+  if(pflag == 1 && string_starts_with((import ns1)[node], "func(") == 0) {
     pure_misplaced(pos, (import ns2)[node], (import ns1)[node]);
   }
   pure_mark_fn(pflag, node);

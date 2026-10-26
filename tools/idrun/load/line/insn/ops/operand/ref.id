@@ -10,7 +10,7 @@ given tf_ld("@id_f") ():(0) then (import ld_fn):(["id_f"])
 
 ld_cid(string nm) {
   int id = 0;
-  if (character_code_at(nm, 0) == 46 || str_starts(nm, "idfrd_") == 1) {
+  if (character_code_at(nm, 0) == 46 || string_starts_with(nm, "idfrd_") == 1) {
     id = ld_get("s", nm);
   } else {
     id = ld_get("f", nm);

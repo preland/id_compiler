@@ -26,7 +26,7 @@ declaring_fns(string[] imports) {
   int i = 0;
   while(i < len(imports)) {
     string d = find_declaring_fn(imports[i]);
-    if(str_cmp(d, "") != 0) {
+    if(string_compare(d, "") != 0) {
       push(out_li, d);
     }
     i = i + 1;

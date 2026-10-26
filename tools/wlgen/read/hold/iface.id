@@ -8,8 +8,8 @@ given wg_init ("wl_a", "3"):() then wg_t_state:("1 0 0")
 given wg_init given wg_iface("x", "1") ("wl_b", "2"):() then wg_t_state:("2 0 0")
 
 wg_zero(int[] vl_ct) {
-  lset(vl_ct, 0, 0);
-  lset(vl_ct, 1, 0);
+  integer_list_set(vl_ct, 0, 0);
+  integer_list_set(vl_ct, 1, 0);
 } return void;
 ([5, 6]):([0, 0])
 ([1, 1]):([0, 0])

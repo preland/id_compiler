@@ -39,7 +39,7 @@ flt_over_at(int flp, string flds) {
 
 flt_ge_max(string flds) {
   string flhead = flt_head(flds, (import flt_inf_pt));
-  int flc = str_cmp(flhead, (import flt_inf_digits));
+  int flc = string_compare(flhead, (import flt_inf_digits));
   int flge = flc >= 0;
 } return int flge;
 ("17976931348623157081"):(0)

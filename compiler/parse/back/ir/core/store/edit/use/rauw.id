@@ -31,10 +31,10 @@ given ir_rows (0, 4, 88):() then chk_b:("b 88")
 
 ir_rauw_at(int i, int old, int fresh) {
   if((import ia)[i] == old) {
-    lset((import ia), i, fresh);
+    integer_list_set((import ia), i, fresh);
   }
   if((import ib)[i] == old) {
-    lset((import ib), i, fresh);
+    integer_list_set((import ib), i, fresh);
   }
   ir_rauw_l(i, old, fresh);
 } return void;

@@ -4,7 +4,7 @@
 // a block of its own, passed through untouched.
 
 dg_blocks(string dg_bt) {
-  string[] dg_bl = str_lines(dg_bt);
+  string[] dg_bl = string_lines(dg_bt);
   string[] dg_bo = [];
   int dg_bi = 0;
 } chain (string dg_bt) {

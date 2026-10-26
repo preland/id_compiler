@@ -29,7 +29,7 @@ wr_tables(string[] wr_tags) {
     wr_i = wr_i + 1;
   }
 } chain (string[] wr_tags) {
-  string wr_r = str_join(wr_ts, "");
+  string wr_r = string_join(wr_ts, "");
 } return string wr_r;
 (["gzFile_s", "other"]):("static HTab h_gzFile_s = { {0}, {0}, 1 };\nstatic HTab h_other = { {0}, {0}, 2 };\n")
 ([]):("")

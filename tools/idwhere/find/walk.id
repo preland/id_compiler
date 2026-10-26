@@ -31,14 +31,14 @@ given iw_tree_make ([], [], (import iw_troot), "sub/", "g", ""):([], ["sub/b.id:
 iw_entry(string[] iw_etodo, string[] iw_erows, string iw_eroot, string iw_edir, string iw_eent, string iw_ename, string iw_efile) {
   string iw_erel = path_join(iw_edir, iw_eent);
   string iw_einfo = "";
-  if(str_ends(iw_eent, ".id") == 1) {
+  if(string_ends_with(iw_eent, ".id") == 1) {
     iw_einfo = iw_scan(path_join(iw_eroot, iw_erel), iw_ename);
   }
 } chain (string[] iw_etodo, string[] iw_erows, string iw_eroot, string iw_edir, string iw_eent, string iw_ename, string iw_efile) {
-  if(iw_einfo != "" && str_ends(iw_erel, iw_efile) == 1) {
+  if(iw_einfo != "" && string_ends_with(iw_erel, iw_efile) == 1) {
     push(iw_erows, iw_erel + ":" + iw_einfo);
   }
-  if(str_ends(iw_eent, "/") == 1 && str_starts(iw_eent, ".") == 0) {
+  if(string_ends_with(iw_eent, "/") == 1 && string_starts_with(iw_eent, ".") == 0) {
     push(iw_etodo, iw_erel);
   }
 } return void;

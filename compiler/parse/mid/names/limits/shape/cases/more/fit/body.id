@@ -27,7 +27,7 @@ fit_items(int i, int fn, int[] items) {
     j = j + 1;
   }
 } return void;
-given calls_node_fixture given lset((import fixture_calls_one), 0, (import fixture_fn)) (0, (import fixture_fn), (import fixture_calls_one)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given calls_node_fixture given integer_list_set((import fixture_calls_one), 0, (import fixture_fn)) (0, (import fixture_fn), (import fixture_calls_one)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
 given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one)):() then calls fit_item:(0, (import fixture_fn), (import fixture_calls_one), 0)
 given case_fixture (0, (import fixture_node), []):() then prints:("")
 
@@ -36,7 +36,7 @@ fit_item(int i, int fn, int[] items, int j) {
   string pt = (import ns1)[(ps[j])];
   fit_value(i, items[j], pt);
 } return void;
-given calls_node_fixture given lset((import fixture_calls_one), 0, (import fixture_fn)) (0, (import fixture_fn), (import fixture_calls_one), 0):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
-given print_fixture given lset((import fixture_print_two), 0, (import fixture_fn)) (0, (import fixture_fn), (import fixture_print_two), 0):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given calls_node_fixture given integer_list_set((import fixture_calls_one), 0, (import fixture_fn)) (0, (import fixture_fn), (import fixture_calls_one), 0):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given print_fixture given integer_list_set((import fixture_print_two), 0, (import fixture_fn)) (0, (import fixture_fn), (import fixture_print_two), 0):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
 given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one), 0):() then calls fit_value:[1]
 given print_fixture (0, (import fixture_fn), (import fixture_print_two), 0):() then calls fit_value:[1]

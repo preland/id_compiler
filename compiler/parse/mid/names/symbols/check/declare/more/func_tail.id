@@ -24,7 +24,7 @@ given regrow_param ((import regrow_plist), 0, "z", 20):() then len((import dvnam
 // Test check: the whole declared-variable name table -- how many names and
 // which, joined by "|" (see vnames_state, ../../../lookup/more/std_unit.id).
 dvname_state() {
-  string dvs_j = str_join((import dvname), "|");
+  string dvs_j = string_join((import dvname), "|");
   string dvs_s = "decls " + len((import dvname)) + ":" + dvs_j;
 } return string dvs_s;
 given regrow_c ():("decls 0:")

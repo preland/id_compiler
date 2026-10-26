@@ -7,9 +7,9 @@
 // Entry i belongs to the function entry i of `cfp` does (`cfpfn`).
 
 ul_fill() {
-  lset((import cloose), 0, 1);
+  integer_list_set((import cloose), 0, 1);
   ul_fill_all();
-  lset((import cloose), 0, 0);
+  integer_list_set((import cloose), 0, 0);
 } return void;
 given lz_o ():() then (import cloose)[0]:(0)
 given lz_o ():() then len((import cfpl)):(4)

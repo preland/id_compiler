@@ -68,7 +68,7 @@ given dce_fx_setup("nope") (0, 0):(0)
 dce_keep(int i, int n) {
   string s1_of_v = (import ns1)[((import prog)[i])];
   if(is_reach(s1_of_v) == 1) {
-    lset((import prog), n, (import prog)[i]);
+    integer_list_set((import prog), n, (import prog)[i]);
     n = n + 1;
   }
 } return int n;

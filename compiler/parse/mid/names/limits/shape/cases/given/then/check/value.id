@@ -13,7 +13,7 @@ then_value_fit(int ci, int chk_node, int cfn) {
   }
 } return void;
 given then_node_fixture ((import fixture_ci), (import fixture_then_node), (import fixture_fn)):() then prints:("fixture.id:4: error: a 'then' check compares exactly one value, not 0\n")
-given chk_fixture given sset((import ns2), (import fixture_chk_fn), "string") ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
+given chk_fixture given string_list_set((import ns2), (import fixture_chk_fn), "string") ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
 given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn)):() then prints:("")
 
 then_lit(int ci, int e, int cfn) {

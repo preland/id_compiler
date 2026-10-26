@@ -45,7 +45,7 @@ given nat_row_setup ():() then prints:("/* ---- natives ---- */\nharness|nat_tar
 // function (init_units) to have run first, the same as any other exported
 // list this program's cases grow.
 exclunit_seed(string raw) {
-  string[] excl_parts = str_split(raw, ",");
+  string[] excl_parts = string_split(raw, ",");
   int i = 0;
   while(i < len(excl_parts)) {
     if(excl_parts[i] != "") {

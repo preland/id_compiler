@@ -9,7 +9,7 @@ given vb_boot (122):(1) then (import ex_strs):(["", "z"])
 vm_b_strcmp(word wa, word wb) {
   int ia = wa;
   int ib = wb;
-  int c = str_cmp((import ex_strs)[ia], (import ex_strs)[ib]);
+  int c = string_compare((import ex_strs)[ia], (import ex_strs)[ib]);
 } return int c;
 given vb_boot given tf_sput("a") given tf_sput("b") (1, 2):(-1)
 given vb_boot given tf_sput("a") given tf_sput("b") (2, 1):(1)

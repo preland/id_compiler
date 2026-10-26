@@ -15,9 +15,9 @@ dg_col(string dg_cs, string dg_cm) {
 ("x", ""):(0)
 
 dg_find_word(string dg_ws, string dg_wm, int dg_wf) {
-  int dg_wp = str_findat(dg_ws, dg_wm, dg_wf);
+  int dg_wp = string_find_from(dg_ws, dg_wm, dg_wf);
   while(dg_wp >= 0 && dg_edge(dg_ws, dg_wm, dg_wp) == 0) {
-    dg_wp = str_findat(dg_ws, dg_wm, dg_wp + 1);
+    dg_wp = string_find_from(dg_ws, dg_wm, dg_wp + 1);
   }
 } return int dg_wp;
 ("a ab a", "a", 0):(0)

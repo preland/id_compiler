@@ -26,4 +26,4 @@ vocab_summary() {
   print(vocab_head + (import vocab_totals)[1] + " not spelled in words");
 } return void;
 given full_env given vocab_words ():() then prints:("word-scan: 0 distinct names, 0 not spelled in words\n")
-given full_env given vocab_words given lset((import vocab_totals), 0, 7) ():() then prints:("word-scan: 7 distinct names, 0 not spelled in words\n")
+given full_env given vocab_words given integer_list_set((import vocab_totals), 0, 7) ():() then prints:("word-scan: 7 distinct names, 0 not spelled in words\n")

@@ -28,7 +28,7 @@ given calls_items_fixture (3, (import fixture_params), (import fixture_calls_one
 given calls_items_fixture (0, (import fixture_params), (import fixture_calls_one), 0):() then calls emit_tc_decl:("int", "idtc_t0a0", "1")
 
 then_label(string chk_nm, int[] targs) {
-  string so = str_replace(call_c(chk_nm, targs), "%", "%%");
+  string so = string_replace(call_c(chk_nm, targs), "%", "%%");
 } return string so;
 ("chk", []):("chk()")
 given fn_fixture ("chk", [(import fixture_zero)]):("chk(0)")

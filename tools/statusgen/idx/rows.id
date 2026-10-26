@@ -5,9 +5,9 @@
 
 // The FILE of a case row, "" for a header, the summary or a blank line.
 sg_rfile(string sgr_row) {
-  string[] sgr_p = str_split(sgr_row, "\t");
+  string[] sgr_p = string_split(sgr_row, "\t");
   string sgr_f = "";
-  if(len(sgr_p) > 3 && str_starts(sgr_row, "#") == 0 && sgr_p[0] != "summary") {
+  if(len(sgr_p) > 3 && string_starts_with(sgr_row, "#") == 0 && sgr_p[0] != "summary") {
     sgr_f = sgr_p[1];
   }
 } return string sgr_f;
@@ -38,7 +38,7 @@ sg_idx(string[] sgi_rows) {
 
 // The row number in an entry of sg_idx.
 sg_from(string sgm_e) {
-  int sgm_t = str_find(sgm_e, "\t");
+  int sgm_t = string_find(sgm_e, "\t");
   string sgm_s = str_sub(sgm_e, sgm_t + 1, len(sgm_e) - sgm_t - 1);
   int sgm_v = to_int(sgm_s);
 } return int sgm_v;

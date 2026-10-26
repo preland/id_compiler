@@ -28,8 +28,8 @@ tcache_set(int id, string t) {
     push((import tcache), "");
     push((import tcache_ok), 0);
   }
-  sset((import tcache), id, t);
-  lset((import tcache_ok), id, 1);
+  string_list_set((import tcache), id, t);
+  integer_list_set((import tcache_ok), id, 1);
 } return void;
 given env_init (0, "int"):() then (import tcache)[0]:("int")
 given env_init (0, "string"):() then (import tcache)[0]:("string")

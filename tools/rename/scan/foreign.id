@@ -46,10 +46,10 @@ rename_foreign_spans(string rename_source, int rename_bare) {
 // The triples for a C header, a C source or a JavaScript module; none for any other file.
 rename_native_file_spans(string rename_file, string rename_source) {
   int[] rename_spans = [];
-  if(str_ends(rename_file, ".mjs") == 1) {
+  if(string_ends_with(rename_file, ".mjs") == 1) {
     rename_spans = rename_foreign_spans(rename_source, 1);
   }
-  if(str_ends(rename_file, ".h") == 1 || str_ends(rename_file, ".c") == 1) {
+  if(string_ends_with(rename_file, ".h") == 1 || string_ends_with(rename_file, ".c") == 1) {
     rename_spans = rename_foreign_spans(rename_source, 0);
   }
 } return int[] rename_spans;

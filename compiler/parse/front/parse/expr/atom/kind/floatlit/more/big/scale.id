@@ -5,7 +5,7 @@
 
 // How many digits stand before the point in the text: all of them when it has none.
 flt_ilen(string text) {
-  int fldot = str_find(text, ".");
+  int fldot = string_find(text, ".");
   int flk = flt_e_at(text);
   if(fldot >= 0) {
     flk = fldot;
@@ -30,7 +30,7 @@ flt_scale(string text, string flraw, string flds) {
 flt_head(string flds, int flw) {
   int fln = len(flds);
   int flmin = fixed_point_minimum(fln, flw);
-  string flz = str_repeat("0", flw - flmin);
+  string flz = string_repeat("0", flw - flmin);
 } chain (string flds, int flw) {
   string flh = str_sub(flds, 0, flmin) + flz;
 } return string flh;

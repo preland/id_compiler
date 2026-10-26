@@ -4,7 +4,7 @@
 // the lookup ignores case like vocab_ok's.
 
 vocab_path_filler(string vocab_name) {
-  string[] vocab_pieces = str_split(vocab_name, "_");
+  string[] vocab_pieces = string_split(vocab_name, "_");
   string vocab_acc = "";
   int vocab_i = 0;
 } chain (string vocab_name) {
@@ -20,7 +20,7 @@ given full_env given vocab_path_words (""):("")
 
 vocab_filler_add(string vocab_acc, string vocab_piece) {
   string vocab_next = vocab_acc;
-  if(hash_map_has((import vocab_keys), (import vocab_used), "!" + str_lower(vocab_piece)) == 1) {
+  if(hash_map_has((import vocab_keys), (import vocab_used), "!" + string_lower(vocab_piece)) == 1) {
     vocab_next = vocab_join(vocab_acc, vocab_piece);
   }
 } return string vocab_next;

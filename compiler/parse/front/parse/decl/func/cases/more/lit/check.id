@@ -10,7 +10,7 @@ check_lit(int e) {
   if(is_lit(e) == 0) {
     string lit_loc = cur_file() + ":" + (import nline)[e];
     diag("E0506", lit_loc, "a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2))", "", "a case is checked before any variable or call exists, so each value in it must be written out in full", "write the value itself, as in (3, \"a\"):(7), or build it in a function named by 'given'");
-    lset((import synfail), 0, 1);
+    integer_list_set((import synfail), 0, 1);
   }
 } return void;
 given lit_fix (0):() then prints:("") then (import synfail)[0]:(0)

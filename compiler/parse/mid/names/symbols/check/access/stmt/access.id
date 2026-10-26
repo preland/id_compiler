@@ -32,7 +32,7 @@ given fnscope_fix ((import regrow_fn_node)):() then (import chkfail)[0]:(0)
 // joined by "|" -- so a case states the full state it expects (see
 // vnames_state, ../../../lookup/more/std_unit.id).
 fnames_state() {
-  string fns_j = str_join((import fnames), "|");
+  string fns_j = string_join((import fnames), "|");
   string fns_s = "funcs " + len((import fnames)) + ":" + fns_j;
 } return string fns_s;
 given call2_setup ():("funcs 0:")

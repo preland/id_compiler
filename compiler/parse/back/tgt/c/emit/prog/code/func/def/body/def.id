@@ -5,7 +5,7 @@
 
 emit_def(int id) {
   string sig_v = sig(id);
-  lset((import sqbase), 0, id);
+  integer_list_set((import sqbase), 0, id);
   string lq_attr = lp_flat(id);
 } chain (int id) {
   print(lq_attr + sig_v + " {");

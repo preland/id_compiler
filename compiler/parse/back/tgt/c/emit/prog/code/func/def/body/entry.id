@@ -25,7 +25,7 @@ given fn_fixture ():() then init_units:(0)
 
 entry_fixture_harn() {
   harn_init();
-  lset((import harn), 0, 1);
+  integer_list_set((import harn), 0, 1);
 } return void;
 given fn_fixture ():() then (import harn)[0]:(1)
 given entry_fixture ():() then (import harn)[0]:(1)

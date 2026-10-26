@@ -8,7 +8,7 @@
 sg_lint(string sgl_mut, string sgl_root) {
   int[] sgl_code = [0];
   string sgl_text = exec_out(sgl_mut + "\nlint\n" + sgl_root + "\n--tsv\n", sgl_code);
-  string[] sgl_rows = str_split(sgl_text, "\n");
+  string[] sgl_rows = string_split(sgl_text, "\n");
 } return string[] sgl_rows;
 ("echo", "/x"):(["lint /x --tsv", ""])
 ("sh\n-c\nprintf 'a\\nb\\n'\nx", "/x"):(["a", "b", ""])
@@ -33,7 +33,7 @@ sg_fsrow(string sgs_label) {
 // The command line that lists the exempt functions of sgv_path: sgv_idc is the
 // compiler command, sgv_flags its flags separated by spaces.
 sg_exargv(string sgv_idc, string sgv_path, string sgv_flags) {
-  string sgv_fl = str_replace(sgv_flags, " ", "\n");
+  string sgv_fl = string_replace(sgv_flags, " ", "\n");
   string sgv_a = sgv_idc + "\n" + sgv_path + "\n" + sgv_fl + "\n--list-untested\n";
 } return string sgv_a;
 ("idc", "/r/k", "--a --b"):("idc\n/r/k\n--a\n--b\n--list-untested\n")

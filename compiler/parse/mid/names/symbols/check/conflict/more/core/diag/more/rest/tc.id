@@ -6,7 +6,7 @@
 tc_diag(int dgn_node, string dgn_code, string dgn_msg, string dgn_at, string dgn_why, string dgn_help) {
   string dgn_tc_where = tc_at(dgn_node);
   diag(dgn_code, dgn_tc_where, dgn_msg, dgn_at, dgn_why, dgn_help);
-  lset((import tcerrs), 0, (import tcerrs)[0] + 1);
+  integer_list_set((import tcerrs), 0, (import tcerrs)[0] + 1);
 } return void;
 given fn_fixture ((import fixture_zero), "E0099", "bad", "x", "because", "do this"):() then prints:("<stdin>:1: error: bad [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import tcerrs)[0]:(1)
 given fn_fixture ((import fixture_zero), "E0098", "worse", "", "", ""):() then prints:("<stdin>:1: error: worse [E0098]\n") then (import chkfail)[0]:(1)
@@ -21,7 +21,7 @@ diag_sig(int dgn_sigfn) {
     dgn_k = dgn_k + 1;
   }
 } chain (int dgn_sigfn) {
-  string dgn_sig = (import ns1)[dgn_sigfn] + "(" + str_join(dgn_parts, ", ") + ")";
+  string dgn_sig = (import ns1)[dgn_sigfn] + "(" + string_join(dgn_parts, ", ") + ")";
 } return string dgn_sig;
 given argfn_d ((import argfn_fn)):("g(int p)")
 given farm_g ((import f_vfwd)):("vfwd(int a)")

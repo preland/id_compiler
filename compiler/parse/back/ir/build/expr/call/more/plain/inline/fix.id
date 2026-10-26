@@ -2,7 +2,7 @@
 // lw_expand_trap that must keep their calls.
 lw_trap_fs1() {
   lw_env_fixture();
-  lset((import fsc), 0, 1);
+  integer_list_set((import fsc), 0, 1);
 } return void;
 ():() then (import fsc)[0]:(1)
 ():() then (import lwcur)[0]:(1)

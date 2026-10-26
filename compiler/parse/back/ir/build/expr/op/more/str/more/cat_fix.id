@@ -13,7 +13,7 @@ cat_fixture() {
 
 cat_fs1() {
   cat_fixture();
-  lset((import fsc), 0, 1);
+  integer_list_set((import fsc), 0, 1);
 } return void;
 ():() then (import fsc)[0]:(1)
 ():() then (import cat_l):(7)

@@ -15,7 +15,7 @@ given esc_ffo (4) (4, (import eff_make), 0, 0):() then (import esc_pe)[4]:(1)
 
 esc_pass(int ix, int fn, int esd, int emk) {
   int ecg = (import esc_fx)[2];
-  lset((import esc_fx), 1, 1000000);
+  integer_list_set((import esc_fx), 1, 1000000);
   esc_join(ix, esc_summary(fn));
 } chain (int ix, int fn, int esd, int emk) {
   int ean = esc_again(esd, emk, ecg);

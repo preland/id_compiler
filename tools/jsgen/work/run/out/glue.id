@@ -11,7 +11,7 @@ given jg_t_proj ((import jg_t_glue), "hello", []):((import jg_t_glue), "hello", 
 ("/nonexistent/jg/out.mjs", "x", []):("/nonexistent/jg/out.mjs", "x", ["cannot write /nonexistent/jg/out.mjs"])
 
 jg_make_glue(string[] jg_cf, string[][] jg_sigs, string[][] jg_ub, string[] jg_errs) {
-  string[] jg_ls = str_split(fs_read_text(jg_cf[(import jg_c_glue)]), "\n");
+  string[] jg_ls = string_split(fs_read_text(jg_cf[(import jg_c_glue)]), "\n");
   string jg_name = path_base(jg_prefix(jg_cf[(import jg_c_wasm)], jg_cf[(import jg_c_out)]));
   string[] jg_tl = jg_glue_texts(jg_name, jg_sigs, jg_ub);
 } chain (string[] jg_cf, string[][] jg_sigs, string[][] jg_ub, string[] jg_errs) {

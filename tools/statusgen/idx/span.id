@@ -19,7 +19,7 @@ sg_range(string[] sgg_e, string sgg_f, int sgg_n) {
   string sgg_p = sgg_f + "\t";
 } chain (string[] sgg_e, string sgg_f, int sgg_n) {
   while(sgg_i < len(sgg_e) && sgg_r[1] == 0) {
-    if(str_starts(sgg_e[sgg_i], sgg_p) == 1) {
+    if(string_starts_with(sgg_e[sgg_i], sgg_p) == 1) {
       sgg_r = sg_span(sgg_e, sgg_i, sgg_n);
     }
     sgg_i = sgg_i + 1;
@@ -38,7 +38,7 @@ sg_count(string[] sgc_rows, int sgc_from, int sgc_to, string sgc_file, string sg
   int sgc_i = sgc_from;
 } chain (string[] sgc_rows, int sgc_from, int sgc_to, string sgc_file, string sgc_fn) {
   while(sgc_i < sgc_to) {
-    int sgc_at = str_find(sgc_rows[sgc_i], sgc_nd);
+    int sgc_at = string_find(sgc_rows[sgc_i], sgc_nd);
     sgc_n = sgc_n + (sgc_at > 0 && sgc_at < 8);
     sgc_i = sgc_i + 1;
   }

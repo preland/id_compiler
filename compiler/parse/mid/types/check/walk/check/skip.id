@@ -23,7 +23,7 @@ tk_check(int i, int tkf) {
   int tkb = (import tcerrs)[0];
   tc_node_at(i);
   if((import tcerrs)[0] != tkb && tkf < len((import tkbad))) {
-    lset((import tkbad), tkf, 1);
+    integer_list_set((import tkbad), tkf, 1);
   }
 } return void;
 given tk_t_prep (0, 0):() then tk_nbad:("bad 0")
@@ -34,7 +34,7 @@ tk_row_at(int i) {
   while(tkc < len((import prog)) && (import prog)[tkc] < i) {
     tkc = tkc + 1;
   }
-  lset((import tkcur), 0, tkc);
+  integer_list_set((import tkcur), 0, tkc);
 } return int tkc;
 given tk_t_prep (3):(0)
 given tk_t_prep (7):(1)

@@ -12,7 +12,7 @@ font_cut(string text, int at, string key) {
 ("k\"ab\"", 0, "k\""):("ab")
 
 font_run(string text, int start) {
-  int end = str_findat(text, "\"", start);
+  int end = string_find_from(text, "\"", start);
   string one = str_sub(text, start, end - start);
 } return string one;
 ("ab\"", 0):("ab")

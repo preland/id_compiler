@@ -17,7 +17,7 @@ rp_count(string[] rp_rows, string rp_p) {
   int rp_i = 0;
   int rp_n = 0;
   while (rp_i < len(rp_rows)) {
-    rp_n = rp_n + str_starts(rp_rows[rp_i], rp_p);
+    rp_n = rp_n + string_starts_with(rp_rows[rp_i], rp_p);
     rp_i = rp_i + 1;
   }
 } return int rp_n;
@@ -30,7 +30,7 @@ rp_hits(string[] rp_rows, string rp_key) {
   int rp_i = 0;
   int rp_n = 0;
   while (rp_i < len(rp_rows)) {
-    rp_n = rp_n + (str_starts(rp_rows[rp_i], "U ") && str_find(rp_rows[rp_i], rp_key) >= 0);
+    rp_n = rp_n + (string_starts_with(rp_rows[rp_i], "U ") && string_find(rp_rows[rp_i], rp_key) >= 0);
     rp_i = rp_i + 1;
   }
 } return int rp_n;

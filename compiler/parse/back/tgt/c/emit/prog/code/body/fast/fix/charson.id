@@ -2,7 +2,7 @@
 
 lpf_lsn() {
   lpf_lsc();
-  lset((import lpon), 0, 1);
+  integer_list_set((import lpon), 0, 1);
   push((import lpset), (import lpf_hx));
 } return void;
 ():() then (import lpon)[0]:(1)

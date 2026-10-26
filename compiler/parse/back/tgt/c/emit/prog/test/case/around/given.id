@@ -13,7 +13,7 @@ given casegiven_fixture (0):() then prints:("    int idtc_a0 = 0;\n")
 given casegiven_fixture (0):() then calls emit_case_args:(0)
 
 emit_case_given(int ci) {
-  string[] setups = str_split((import casegiven)[ci], " ");
+  string[] setups = string_split((import casegiven)[ci], " ");
   int i = 0;
   while(i < len(setups)) {
     if(setups[i] != "") {

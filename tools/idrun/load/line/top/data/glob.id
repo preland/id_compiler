@@ -33,7 +33,7 @@ ld_gstr(string nm) {
     ld_galias(h);
     return;
   }
-  if (str_starts(nm, "idfrd_") == 1) {
+  if (string_starts_with(nm, "idfrd_") == 1) {
     return;
   }
   ts[h] = ld_cstr();

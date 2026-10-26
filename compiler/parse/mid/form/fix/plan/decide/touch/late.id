@@ -32,8 +32,8 @@ given fix_sep_fixture (0, 0):(0)
 // (a moved call to an unregistered name) has a read to leave ahead of it.
 fix_late_fixture() {
   fix_sep_fixture();
-  lset((import fixe_cl), 0, 2);
-  lset((import fixe_mv), 0, 1);
+  integer_list_set((import fixe_cl), 0, 2);
+  integer_list_set((import fixe_mv), 0, 1);
 } return void;
 ():() then calls fix_sep_fixture:[1] then (import fixe_cl)[0]:(2) then (import fixe_mv)[0]:(1)
 ():() then len((import fixe_cl)):(2)

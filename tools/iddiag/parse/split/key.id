@@ -3,13 +3,13 @@
 // key, which is what keeps an ordinary indented line of some other tool's output
 // from being folded into the diagnostic above it.
 dg_key(string dg_kl) {
-  int dg_kp = str_find(dg_kl, ": ");
+  int dg_kp = string_find(dg_kl, ": ");
   string dg_kk = "";
-  if(str_starts(dg_kl, "  ") == 1 && dg_kp > 2) {
+  if(string_starts_with(dg_kl, "  ") == 1 && dg_kp > 2) {
     dg_kk = str_sub(dg_kl, 2, dg_kp - 2);
   }
 } chain (string dg_kl) {
-  int dg_ks = str_find(" why help at edit related follows in ", " " + dg_kk + " ");
+  int dg_ks = string_find(" why help at edit related follows in ", " " + dg_kk + " ");
   if(dg_ks < 0) {
     dg_kk = "";
   }
@@ -22,7 +22,7 @@ dg_key(string dg_kl) {
 
 // The text after a continuation line's `key: `.
 dg_kv(string dg_vl) {
-  int dg_vp = str_find(dg_vl, ": ");
+  int dg_vp = string_find(dg_vl, ": ");
   int dg_vn = len(dg_vl) - dg_vp - 2;
   string dg_vr = str_sub(dg_vl, dg_vp + 2, dg_vn);
 } return string dg_vr;
@@ -32,7 +32,7 @@ dg_kv(string dg_vl) {
 // Every value the block gives for a key, in order. Line 0 is the head, so the
 // scan starts at line 1.
 dg_vals(string dg_ab, string dg_ak) {
-  string[] dg_al = str_split(dg_ab, "\n");
+  string[] dg_al = string_split(dg_ab, "\n");
   string[] dg_ao = [];
   int dg_ai = 1;
 } chain (string dg_ab, string dg_ak) {

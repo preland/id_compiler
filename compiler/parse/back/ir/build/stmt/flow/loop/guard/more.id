@@ -1,7 +1,7 @@
 // The rest of the dispatch on an item.
 
 gd_op_b(string gdi_item) {
-  if(str_starts(gdi_item, "i:") == 1 || str_starts(gdi_item, "k:") == 1) {
+  if(string_starts_with(gdi_item, "i:") == 1 || string_starts_with(gdi_item, "k:") == 1) {
     gd_push_lit(gdi_item);
   } else {
     gd_op_c(gdi_item);

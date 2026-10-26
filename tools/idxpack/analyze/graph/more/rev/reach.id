@@ -53,7 +53,7 @@ given rev_edge_fixture ([], [0, 0, 1], [0], 2):([1, 1])
 rev_flat_step(int[] flat, int[] cursor, int ei) {
   int ci = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
   int cj = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecaller)[ei], -1);
-  if(str_cmp((import ix_ekind)[ei], "call") == 0 && ci >= 0 && cj >= 0) {
+  if(string_compare((import ix_ekind)[ei], "call") == 0 && ci >= 0 && cj >= 0) {
     flat[cursor[ci]] = cj;
     cursor[ci] = cursor[ci] + 1;
   }

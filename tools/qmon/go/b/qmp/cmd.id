@@ -11,7 +11,7 @@ given qmb_qmp_peer("again \"error\" here") ("ping"):() then eprints:("qmon: agai
 given qmb_qmp_peer("hello") ("ping"):() then eprints:("")
 
 check_error(string r) {
-  int idx = str_find(r, "\"error\"");
+  int idx = string_find(r, "\"error\"");
   report_if_error(idx, r);
 } return void;
 ("{\"error\": {\"desc\": \"bad\"}}"):() then eprints:("qmon: {\"error\": {\"desc\": \"bad\"}}\n")

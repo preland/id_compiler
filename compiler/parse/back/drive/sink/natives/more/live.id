@@ -30,13 +30,13 @@ nat_init(int argc, string[] argv) {
 } chain (int argc, string[] argv) {
   string stdunit_arg = arg_flag_val(argc, argv, 1, "--std-unit", "-1");
   int stdunit_val = to_int(stdunit_arg);
-  lset((import stdunit), 0, stdunit_val);
+  integer_list_set((import stdunit), 0, stdunit_val);
 } chain (int argc, string[] argv) {
   string exclunit_arg = arg_flag_val(argc, argv, 1, "--exclude-units", "");
   exclunit_seed(exclunit_arg);
-  lset((import unitc), 0, arg_flag(argc, argv, 1, "--units"));
+  integer_list_set((import unitc), 0, arg_flag(argc, argv, 1, "--units"));
 } chain (int argc, string[] argv) {
-  lset((import tkout), 0, arg_flag(argc, argv, 1, "--tc-keys"));
+  integer_list_set((import tkout), 0, arg_flag(argc, argv, 1, "--tc-keys"));
   ur_seed(arg_flag_val(argc, argv, 1, "--unit-roots", ""));
 } return void export natc;
 given env_init (3, ["prog", "--unit-roots", "/r"]):() then len((import uroots)):(1)

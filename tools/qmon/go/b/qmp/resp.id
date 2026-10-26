@@ -8,7 +8,7 @@ given qmb_qmp_peer("hello") ():("hello")
 given qmb_qmp_empty_ser_empty ():("")
 
 check_event(string line) {
-  int idx = str_find(line, "\"event\"");
+  int idx = string_find(line, "\"event\"");
   string r = event_or_line(idx, line);
 } return string r;
 given qmb_qmp_peer("hello") ("{\"event\": \"X\"}"):("hello")

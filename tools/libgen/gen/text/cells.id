@@ -2,7 +2,7 @@
 
 // A table entry with every mark replaced by a value.
 lg_sub(string lg_text, string lg_mark, string lg_value) {
-  string lg_done = str_join(str_split(lg_text, lg_mark), lg_value);
+  string lg_done = string_join(string_split(lg_text, lg_mark), lg_value);
 } return string lg_done;
 ("int32_t $", "$", "in_x"):("int32_t in_x")
 ("$ and $_len", "$", "k"):("k and k_len")
@@ -36,7 +36,7 @@ lg_cparams(string lg_hd, string lg_rt, string lg_lib) {
   if (len(lg_ps) == 0) {
     push(lg_ps, "void");
   }
-  string lg_pc = str_join(lg_ps, ", ");
+  string lg_pc = string_join(lg_ps, ", ");
 } return string lg_pc;
 ("int 0,string 1", "string", "csv"):("int32_t in_0, const char* in_1, size_t in_1_len, char** out, size_t* out_len")
 ("", "void", "csv"):("void")

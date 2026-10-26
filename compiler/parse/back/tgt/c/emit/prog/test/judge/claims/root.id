@@ -15,7 +15,7 @@ given dg_t_parsed (1):("")
 
 ur_seed(string urs) {
   if(urs != "") {
-    string[] urparts = str_split(urs, chr(31));
+    string[] urparts = string_split(urs, chr(31));
     keep_strs(urparts, (import uroots));
   }
 } return void;

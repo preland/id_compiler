@@ -3,7 +3,7 @@
 // The first two tab-separated fields of ms_qw (the file and the function of a
 // mutant line or of a fingerprint row), tab-separated.
 ms_gt_fn(string ms_qw_d) {
-  string[] ms_qf_d = str_split(ms_qw_d, "\t");
+  string[] ms_qf_d = string_split(ms_qw_d, "\t");
   string ms_qk_d = list_string_get_or(ms_qf_d, 0, "") + "\t" + list_string_get_or(ms_qf_d, 1, "");
 } return string ms_qk_d;
 ("a.id\tf\t1\t2\tcmp\t<"):("a.id\tf")

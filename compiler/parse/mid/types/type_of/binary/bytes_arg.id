@@ -20,10 +20,10 @@ bytes_mark_arg(int i, int bm_k) {
 } chain (int i, int bm_k) {
   bytes_mark_to(bm_a, bm_t);
 } return void;
-given bm_nest ((import bm_push_call), 1):() then calls lset:((import bytesmark), (import bm_push_arr), 1)
-given bm_sized ((import bm_call_fn), 0):() then calls lset:((import bytesmark), (import bm_arr_fn), 1)
-given bm_sized ((import bm_call_ctor), 0):() then calls lset:((import bytesmark), (import bm_arr_ctor), 1)
-given bm_sized ((import bm_call_int), 0):() then calls lset:[0]
+given bm_nest ((import bm_push_call), 1):() then calls integer_list_set:((import bytesmark), (import bm_push_arr), 1)
+given bm_sized ((import bm_call_fn), 0):() then calls integer_list_set:((import bytesmark), (import bm_arr_fn), 1)
+given bm_sized ((import bm_call_ctor), 0):() then calls integer_list_set:((import bytesmark), (import bm_arr_ctor), 1)
+given bm_sized ((import bm_call_int), 0):() then calls integer_list_set:[0]
 
 bytes_param_type(int i, int bm_k) {
   string bm_nm = (import ns1)[i];

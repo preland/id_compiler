@@ -31,15 +31,15 @@ arr_marks() {
   while(i < len((import nkind))) {
     int c = arr_mark_at(i);
     if(c >= 0) {
-      lset((import arrmark), c, 1);
+      integer_list_set((import arrmark), c, 1);
     }
     i = i + 1;
   }
 } return void;
-given decltype_fixture ():() then calls lset:((import arrmark), (import lit_a), 1)
+given decltype_fixture ():() then calls integer_list_set:((import arrmark), (import lit_a), 1)
 given decltype_fixture ():() then len((import arrmark)):(7)
-given decltype_fixture ():() then calls lset:[1]
-given leaves_fixture ():() then calls lset:[0]
+given decltype_fixture ():() then calls integer_list_set:[1]
+given leaves_fixture ():() then calls integer_list_set:[0]
 
 // The child node `i` hands a list type to, or -1 if it is none of the four
 // positions (want/positions/): a declaration's, an assignment's and a return

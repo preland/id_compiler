@@ -4,9 +4,9 @@
 
 // The function's name, or "" for a line that is not a function.
 lg_name(string lg_ln) {
-  string[] lg_fields = str_split(lg_ln, "\t");
+  string[] lg_fields = string_split(lg_ln, "\t");
   string lg_nm = "";
-  if (len(lg_fields) >= 3 && str_find(lg_ln, "|(") >= 0) {
+  if (len(lg_fields) >= 3 && string_find(lg_ln, "|(") >= 0) {
     lg_nm = lg_fields[1];
   }
 } return string lg_nm;
@@ -16,8 +16,8 @@ lg_name(string lg_ln) {
 
 // The parameter types, comma-separated, each followed by its position.
 lg_header(string lg_ln) {
-  int lg_to = str_find(lg_ln, ")->");
-  int lg_from = str_find(lg_ln, "|(") + 2;
+  int lg_to = string_find(lg_ln, ")->");
+  int lg_from = string_find(lg_ln, "|(") + 2;
   string lg_hd = str_sub(lg_ln, lg_from, lg_to - lg_from);
 } return string lg_hd;
 ("|(int[] 0,int 1)->int=>x\tf\tf.id:1"):("int[] 0,int 1")
@@ -26,8 +26,8 @@ lg_header(string lg_ln) {
 
 // The return type: between `)->` and the body.
 lg_ret(string lg_ln) {
-  int lg_from = str_find(lg_ln, ")->") + 3;
-  int lg_to = str_find(lg_ln, "=>");
+  int lg_from = string_find(lg_ln, ")->") + 3;
+  int lg_to = string_find(lg_ln, "=>");
   string lg_rt = str_sub(lg_ln, lg_from, lg_to - lg_from);
 } return string lg_rt;
 ("|(int 0)->string[][]=>x\tf\tf.id:1"):("string[][]")

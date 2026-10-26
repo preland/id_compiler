@@ -9,14 +9,14 @@ tk_t_parsed() {
   build_syms();
   collect_exports();
 } chain () {
-  lset((import tkout), 0, 1);
+  integer_list_set((import tkout), 0, 1);
 } return void;
 ():() then tk_enabled:(1)
 ():() then (import chkfail)[0]:(0)
 
 tk_t_prep0() {
   tk_t_parsed();
-  lset((import tkout), 0, 0);
+  integer_list_set((import tkout), 0, 0);
   tk_prepare();
 } return void;
 ():() then tk_nkeys:("keys 0")

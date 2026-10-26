@@ -22,14 +22,14 @@ std_root_set(string root, int present) {
 path_is_std(string path) {
   int out_i = 0;
   int has_root = 0;
-  if((import ix_stdpresent) == 1 && str_cmp((import ix_stdroot), "") != 0) {
+  if((import ix_stdpresent) == 1 && string_compare((import ix_stdroot), "") != 0) {
     has_root = 1;
   }
 } chain (string path) {
-  if(has_root == 1 && str_starts(path, (import ix_stdroot) + "/") == 1) {
+  if(has_root == 1 && string_starts_with(path, (import ix_stdroot) + "/") == 1) {
     out_i = 1;
   }
-  if(has_root == 0 && (import ix_stdpresent) == 0 && str_find(path, "/idstd/") >= 0) {
+  if(has_root == 0 && (import ix_stdpresent) == 0 && string_find(path, "/idstd/") >= 0) {
     out_i = 1;
   }
 } return int out_i;

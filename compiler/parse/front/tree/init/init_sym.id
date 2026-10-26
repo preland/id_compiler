@@ -55,6 +55,6 @@ init_sym_b() {
   export int[] kept_lists = [0 - 1];
 } return void;
 given full_env given add_export("g", "int", "o") ():() then len((import eowners)):(0)
-given full_env given lset((import kept_lists), 0, 3) ():() then (import kept_lists)[0]:(-1)
+given full_env given integer_list_set((import kept_lists), 0, 3) ():() then (import kept_lists)[0]:(-1)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

@@ -4,7 +4,7 @@
 
 dg_edit_text(string dg_et_e, string dg_et_p, int dg_et_on) {
   string dg_et_o = dg_ef(dg_et_e, 1);
-  string dg_et_w = str_tab3(dg_ef(dg_et_e, 0), "machine", "machine-applicable", "maybe", "check it before applying", "placeholder", "fill in the placeholders", "unspecified");
+  string dg_et_w = string_lookup_table(dg_ef(dg_et_e, 0), "machine", "machine-applicable", "maybe", "check it before applying", "placeholder", "fill in the placeholders", "unspecified");
   string dg_et_n = dg_ef(dg_et_e, 2);
 } chain (string dg_et_e, string dg_et_p, int dg_et_on) {
   string dg_et_d = dg_need(dg_et_e);
@@ -24,8 +24,8 @@ dg_edit_text(string dg_et_e, string dg_et_p, int dg_et_on) {
 
 // Added text, one line to a line, each behind the gutter and a `+`.
 dg_plus(string dg_pl_t, string dg_pl_p) {
-  string[] dg_pl_l = str_lines(dg_pl_t);
-  string dg_pl_j = str_join(dg_pl_l, "\n" + dg_pl_p + " + ");
+  string[] dg_pl_l = string_lines(dg_pl_t);
+  string dg_pl_j = string_join(dg_pl_l, "\n" + dg_pl_p + " + ");
   string dg_pl_r = dg_pl_p + " + " + dg_pl_j;
 } return string dg_pl_r;
 ("a\nb\n", " "):("  + a\n  + b")

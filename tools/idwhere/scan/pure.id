@@ -3,8 +3,8 @@
 // with (docs/SPEC.md, section 1.3). -1 when the file defines none.
 
 iw_find(string iw_pt, string iw_pn) {
-  int iw_pat = str_find("\n" + iw_pt, "\n" + iw_pn + "(");
-  int iw_ppure = str_find("\n" + iw_pt, "\npure " + iw_pn + "(");
+  int iw_pat = string_find("\n" + iw_pt, "\n" + iw_pn + "(");
+  int iw_ppure = string_find("\n" + iw_pt, "\npure " + iw_pn + "(");
   if(iw_pat < 0 && iw_ppure >= 0) {
     iw_pat = iw_ppure + 5;
   }

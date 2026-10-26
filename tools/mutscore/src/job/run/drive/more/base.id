@@ -3,7 +3,7 @@
 // What the output ms_ot of ms_rn_run (exit status, newline, text) says:
 // the class of ms_rn_class.
 ms_dr_cls(string ms_ot) {
-  int ms_nl = str_find(ms_ot, "\n");
+  int ms_nl = string_find(ms_ot, "\n");
   string ms_tx = str_sub(ms_ot, ms_nl + 1, len(ms_ot) - ms_nl - 1);
   int ms_rc = to_int(str_sub(ms_ot, 0, ms_nl));
 } chain (string ms_ot) {

@@ -40,4 +40,4 @@ lh_pick(int lh_a) {
 } return int lh_r;
 given lv_fix given lv_hit ((import lpf_na)):(-1)
 given lv_fix given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) ((import lpf_na)):(9)
-given lv_fix given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) given lset((import lpon), 0, 0) ((import lpf_na)):(-1)
+given lv_fix given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) given integer_list_set((import lpon), 0, 0) ((import lpf_na)):(-1)

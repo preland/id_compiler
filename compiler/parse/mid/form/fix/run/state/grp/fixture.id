@@ -21,7 +21,7 @@ fix_fixture2() {
   init_idx();
 } return void;
 given fix_push4_fixture ():() then len((import fixe_nm)):(0)
-given fix_fixture given sset((import bnames), 0, "zz") ():() then (import bnames)[0]:("print")
+given fix_fixture given string_list_set((import bnames), 0, "zz") ():() then (import bnames)[0]:("print")
 given fix_fixture ():() then (import chkfail)[0]:(0)
 given fix_fixture ():() then init_units:(0)
 

@@ -4,7 +4,7 @@
 
 dg_loc(string dg_lo_b, string dg_lo_h, int dg_lo_on) {
   int dg_lo_n = dg_ln(dg_lo_h);
-  string dg_lo_p = str_repeat(" ", len("" + dg_lo_n) + 1);
+  string dg_lo_p = string_repeat(" ", len("" + dg_lo_n) + 1);
   string dg_lo_c = dg_colpart(dg_file(dg_lo_h), dg_lo_n, dg_val(dg_lo_b, "at"));
 } chain (string dg_lo_b, string dg_lo_h, int dg_lo_on) {
   string dg_lo_a = dg_paint("-->", "1;34", dg_lo_on);

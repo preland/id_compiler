@@ -27,7 +27,7 @@ given kb_t_std(0) ("/no/such/file", (import kb_t_dst)):("") then kb_t_done:("don
 // Copies name, a path under home/core, to the same place under dir/core when it is
 // a source file, and adds its text to texts. Other files are not part of the library.
 kb_stage_one(string dir, string home, string name, string[] texts) {
-  if (str_ends(name, ".id") == 1) {
+  if (string_ends_with(name, ".id") == 1) {
     push(texts, kb_copy(home + "/core/" + name, dir + "/core/" + name));
   }
 } return void;

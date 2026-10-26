@@ -5,7 +5,7 @@
 // assertions are all `then F:(value)` for a name F in the set ms_kx, and the
 // case has no expected value of its own (or one that is only its arguments).
 ms_lt_mark_row(string ms_rw, string ms_kx) {
-  string[] ms_mfd = str_split(ms_rw, "\t");
+  string[] ms_mfd = string_split(ms_rw, "\t");
   string ms_mre = ms_rw;
   string[] ms_mpc = [];
 } chain (string ms_rw, string ms_kx) {

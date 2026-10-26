@@ -25,7 +25,7 @@ given fix_late_fixture (0, 1, 0):(0)
 // sits inside a moved read.
 fix_inner_fixture() {
   fix_late_fixture();
-  lset((import fixe_cl), 1, 2);
+  integer_list_set((import fixe_cl), 1, 2);
 } return void;
 ():() then calls fix_late_fixture:[1] then (import fixe_mv)[0]:(1)
 ():() then (import fixe_cl)[1]:(2)

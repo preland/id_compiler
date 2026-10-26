@@ -4,7 +4,7 @@
 flt_lit_mant(string text) {
   int flk = flt_e_at(text);
   string flm = slice(text, 0, flk);
-  string flraw = str_replace(flm, ".", "");
+  string flraw = string_replace(flm, ".", "");
 } return string flraw;
 ("0.0125e3"):("00125")
 ("6.02e23"):("602")
@@ -33,7 +33,7 @@ flt_norm(string text) {
   int fln = len(text);
   string flout = text;
 } chain (string text) {
-  if(flk < fln && str_find(text, ".") < 0) {
+  if(flk < fln && string_find(text, ".") < 0) {
     flout = slice(text, 0, flk) + ".0" + slice(text, flk, fln);
   }
 } return string flout;

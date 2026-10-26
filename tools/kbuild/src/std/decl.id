@@ -4,7 +4,7 @@
 // The name a line of conf.id declares ("int a = 1;" declares a), or "" for any
 // other line: a comment, a blank line.
 kb_decl_name(string line) {
-  string[] parts = str_split(line, " ");
+  string[] parts = string_split(line, " ");
   string name = "";
   if (len(parts) >= 3) {
     name = kb_decl_pick(parts);
@@ -17,7 +17,7 @@ kb_decl_name(string line) {
 
 // parts[1] when parts is a type, a name and an equals sign, otherwise "".
 kb_decl_pick(string[] parts) {
-  string base = str_replace(parts[0], "[]", "");
+  string base = string_replace(parts[0], "[]", "");
   string name = "";
   if (parts[2] == "=" && (base == "int" || base == "string" || base == "word" || base == "float")) {
     name = parts[1];

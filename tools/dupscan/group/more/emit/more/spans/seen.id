@@ -20,7 +20,7 @@ given ds_test_setup ([0, 2], "fileC.id:30", 2):(0)
 
 where_at(int[] grp, string where, int k) {
   string here = ds_col(grp[k], 3);
-  int r = str_cmp(where, here) == 0;
+  int r = string_compare(where, here) == 0;
 } return int r;
 given ds_test_setup ([0], "fileA.id:10", 0):(1)
 given ds_test_setup ([0], "fileZ.id:99", 0):(0)

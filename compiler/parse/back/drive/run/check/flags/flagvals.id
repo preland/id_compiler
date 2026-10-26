@@ -3,7 +3,7 @@
 
 arg_flags2(int argc, string[] argv) {
   int arg_reqtests_v = arg_reqtests(argc, argv, 1, 0);
-  lset((import reqc), 0, arg_reqtests_v);
+  integer_list_set((import reqc), 0, arg_reqtests_v);
   arg_flags3(argc, argv);
 } return void;
 given flags_setup (1, ["prog"]):() then (import reqc)[0]:(0)
@@ -11,7 +11,7 @@ given flags_setup (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
 
 arg_flags3(int argc, string[] argv) {
   int arg_flag_v = arg_flag(argc, argv, 1, "--runtime");
-  lset((import rtc), 0, arg_flag_v);
+  integer_list_set((import rtc), 0, arg_flag_v);
   arg_flags4(argc, argv);
 } return void;
 given flags_setup (1, ["prog"]):() then (import rtc)[0]:(0)
@@ -19,7 +19,7 @@ given flags_setup (2, ["prog", "--runtime"]):() then (import rtc)[0]:(1)
 
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
-  lset((import fsc), 0, arg_flag_v2);
+  integer_list_set((import fsc), 0, arg_flag_v2);
   string host_t = arg_flag_val(argc, argv, 1, "--host-triple", "");
 } chain (int argc, string[] argv) {
   if(host_t == "") {

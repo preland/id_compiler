@@ -22,7 +22,7 @@ dg_code(string dg_ch) {
   int dg_cn = len(dg_cr);
   string dg_cc = "";
 } chain (string dg_ch) {
-  if(dg_cn >= 8 && str_eqat(dg_cr, dg_cn - 8, " [") == 1 && character_code_at(dg_cr, dg_cn - 1) == 93 && character_in(character_code_at(dg_cr, dg_cn - 6), 65, 90) == 1) {
+  if(dg_cn >= 8 && string_equals_at(dg_cr, dg_cn - 8, " [") == 1 && character_code_at(dg_cr, dg_cn - 1) == 93 && character_in(character_code_at(dg_cr, dg_cn - 6), 65, 90) == 1) {
     dg_cc = str_sub(dg_cr, dg_cn - 6, 5);
   }
 } return string dg_cc;

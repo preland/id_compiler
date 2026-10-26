@@ -22,7 +22,7 @@ m2r_ldfx() {
   export int ldfx_id = ir_insn("load", "int", (import pra)[0], 42, "", none, none);
 } chain () {
   export int ldfx_id2 = ir_insn("store", "int", (import pra)[0], 42, "", none, none);
-  lset((import chk_id), 0, ldfx_id);
+  integer_list_set((import chk_id), 0, ldfx_id);
 } return void;
 ():() then (import ldfx_id2):(4)
 ():() then chk_op:("op load")

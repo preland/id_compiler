@@ -12,7 +12,7 @@ ix_fill_edges(string[] ecaller, string[] ecallee, string[] ekind, string[] lines
 ([], [], [], ["a|b|call"], 0):(["a"], ["b"], ["call"], ["a|b|call"])
 
 ix_row_edge(string[] ecaller, string[] ecallee, string[] ekind, string edge_line) {
-  string[] parts = str_split(edge_line, "|");
+  string[] parts = string_split(edge_line, "|");
   push(ecaller, parts[0]);
   push(ecallee, parts[1]);
 } chain (string[] ecaller, string[] ecallee, string[] ekind, string edge_line) {

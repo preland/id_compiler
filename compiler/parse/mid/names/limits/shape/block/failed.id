@@ -9,7 +9,7 @@
 // which this compiler's own diagnostic already names as the fix, so keeping a
 // second copy was exactly the duplication the uniqueness rule exists to catch.
 note_failure() {
-  lset((import chkfail), 0, 1);
+  integer_list_set((import chkfail), 0, 1);
 } return void;
 given env_init ():() then (import chkfail)[0]:(1)
 given full_env ():() then (import chkfail)[0]:(1)

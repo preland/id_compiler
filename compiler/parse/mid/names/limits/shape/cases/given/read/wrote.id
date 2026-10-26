@@ -6,7 +6,7 @@
 // (import NAME)` check after such a setup is still the function under test's
 // own read (then_imp_value, ../../report/host/cases/then.id).
 given_writes(int ci, string imp_nm) {
-  string[] setups = str_split((import casegiven)[ci], " ");
+  string[] setups = string_split((import casegiven)[ci], " ");
   int ek = find_str((import enames), imp_nm);
   int hit = 0;
 } chain (int ci, string imp_nm) {
@@ -16,12 +16,12 @@ given_writes(int ci, string imp_nm) {
     si = si + 1;
   }
 } return int hit;
-given then_imp_fixture ("int[]", 1, 0) given sset((import eowners), 0, "fx_target") given sset((import casegiven), 0, "fx_target") (0, "gx"):(1)
-given then_imp_fixture ("int[]", 1, 0) given sset((import eowners), 0, "fx_target") (0, "gx"):(0)
-given then_imp_fixture ("int[]", 1, 0) given sset((import eowners), 0, "fx_target") given sset((import casegiven), 0, "fx_target") (0, "gy"):(0)
-given wrote_fixture () given sset((import casegiven), 0, "wr") (0, "gx"):(1)
-given wrote_fixture () given sset((import casegiven), 0, "wc") (0, "gx"):(0)
-given wrote_fixture () given sset((import casegiven), 0, "wc wr") (0, "gx"):(1)
+given then_imp_fixture ("int[]", 1, 0) given string_list_set((import eowners), 0, "fx_target") given string_list_set((import casegiven), 0, "fx_target") (0, "gx"):(1)
+given then_imp_fixture ("int[]", 1, 0) given string_list_set((import eowners), 0, "fx_target") (0, "gx"):(0)
+given then_imp_fixture ("int[]", 1, 0) given string_list_set((import eowners), 0, "fx_target") given string_list_set((import casegiven), 0, "fx_target") (0, "gy"):(0)
+given wrote_fixture () given string_list_set((import casegiven), 0, "wr") (0, "gx"):(1)
+given wrote_fixture () given string_list_set((import casegiven), 0, "wc") (0, "gx"):(0)
+given wrote_fixture () given string_list_set((import casegiven), 0, "wc wr") (0, "gx"):(1)
 
 // One setup of a multi-setup `given`: raises `hit` when this name is a
 // function in the build that exports NAME or writes it through an import.

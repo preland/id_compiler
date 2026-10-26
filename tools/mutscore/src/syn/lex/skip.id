@@ -6,7 +6,7 @@ ms_lx_gap(string ms_s, int ms_i) {
   int ms_c = character_code_at(ms_s, ms_i);
   int ms_j = ms_i + character_is_space(ms_c);
   if(ms_c == 47 && character_code_at(ms_s, ms_i + 1) == 47) {
-    ms_j = str_eol(ms_s, ms_i);
+    ms_j = string_end_of_line(ms_s, ms_i);
   }
 } return int ms_j;
 (" x", 0):(1)

@@ -9,8 +9,8 @@ m2r_shift(int[] l, int i) {
 
 m2r_swap(int[] l, int i) {
   int v = l[i];
-  lset(l, i, l[i - 1]);
-  lset(l, i - 1, v);
+  integer_list_set(l, i, l[i - 1]);
+  integer_list_set(l, i - 1, v);
 } return void;
 ([1, 2], 1):([2, 1])
 ([5, 9, 3], 1):([9, 5, 3])

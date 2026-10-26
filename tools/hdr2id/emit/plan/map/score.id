@@ -2,13 +2,13 @@
 
 // 1 when the parameter name pl_nm is named like a length: it has one of len_words in it, lower-cased, or is n.
 pl_lenish(string pl_nm) {
-  string pl_lw = str_lower(pl_nm);
+  string pl_lw = string_lower(pl_nm);
   int pl_i = 0;
   int pl_l = pl_lw == "n";
 } chain (string pl_nm) {
   string[] pl_ws = (import len_words);
   while (pl_i < len(pl_ws)) {
-    pl_l = pl_l || str_find(pl_lw, pl_ws[pl_i]) >= 0;
+    pl_l = pl_l || string_find(pl_lw, pl_ws[pl_i]) >= 0;
     pl_i = pl_i + 1;
   }
 } return int pl_l;
@@ -20,8 +20,8 @@ pl_lenish(string pl_nm) {
 
 // How many leading characters, ignoring case, the names pl_x and pl_y share.
 pl_prefix(string pl_x, string pl_y) {
-  string pl_lx = str_lower(pl_x);
-  string pl_ly = str_lower(pl_y);
+  string pl_lx = string_lower(pl_x);
+  string pl_ly = string_lower(pl_y);
   int pl_i = 0;
 } chain (string pl_x, string pl_y) {
   while (pl_i < len(pl_lx) && pl_i < len(pl_ly) && character_code_at(pl_lx, pl_i) == character_code_at(pl_ly, pl_i)) {

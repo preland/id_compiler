@@ -1,7 +1,7 @@
 // Writing into, and reading back from, the files of jg_t_proj.
 
 jg_t_nlines() {
-  string[] jg_ls = str_split(fs_read_text((import jg_t_glue)), "\n");
+  string[] jg_ls = string_split(fs_read_text((import jg_t_glue)), "\n");
   int jg_nl2 = len(jg_ls);
 } return int jg_nl2;
 given jg_t_proj ():(7)

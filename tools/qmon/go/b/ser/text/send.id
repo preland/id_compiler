@@ -10,7 +10,7 @@ given qmb_keys_empty_seed ():() then calls send_text_lines:[0]
 given qmb_init_seed_a given qmb_qmp_empty_ser_empty ():() then calls send_text_lines:("ls;pwd")
 
 send_text_lines(string text) {
-  string[] lines = str_split(text, ";");
+  string[] lines = string_split(text, ";");
   send_lines_loop(lines, 0);
 } return void;
 given qmb_qmp_empty_ser_empty ("hi"):() then calls send_lines_loop:(["hi"], 0)

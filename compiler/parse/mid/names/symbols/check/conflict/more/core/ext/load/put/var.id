@@ -5,7 +5,7 @@
 
 ext_route4(string xe_tag, string[] xe_f) {
   if(xe_tag == "M") {
-    lset((import ext_mode), 0, 1);
+    integer_list_set((import ext_mode), 0, 1);
   } else if(xe_tag == "V") {
     ext_put_var(xe_f);
   }

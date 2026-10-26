@@ -9,7 +9,7 @@ wg_bases(int[] vl_rows) {
 } chain (int[] vl_rows) {
   int vi_i = 1;
   while (vi_i < len(vl_b)) {
-    lset(vl_b, vi_i, vl_b[vi_i] + vl_b[vi_i - 1]);
+    integer_list_set(vl_b, vi_i, vl_b[vi_i] + vl_b[vi_i - 1]);
     vi_i = vi_i + 1;
   }
 } return int[] vl_b;
@@ -17,7 +17,7 @@ given wg_t_load ([0]):([0, 1, 1])
 given wg_t_load ([1, 2]):([0, 1, 2])
 
 wg_count(int[] vl_b, int vi_at) {
-  lset(vl_b, vi_at, vl_b[vi_at] + 1);
+  integer_list_set(vl_b, vi_at, vl_b[vi_at] + 1);
 } return void;
 ([0, 0], 1):([0, 1])
 ([5, 6, 7], 2):([5, 6, 8])

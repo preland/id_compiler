@@ -1316,16 +1316,16 @@ ID_CLO IdFn* id_fn_plain(void* fn, void* raw) {
 #endif
 static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "%s\n", s); }
 /* forward declarations */
-void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
+void id_integer_list_set(IdList* idstd_xs, int idstd_i, int idstd_v);
 int id_character_in(int idstd_range_code, int idstd_lo, int idstd_hi);
 int id_character_is_alpha(int idstd_alpha_code);
 int id_character_is_space(int idstd_space_code);
 int id_character_is_name_start(int idstd_name_start_code);
 int id_character_is_name_part(int idstd_name_part_code);
 int id_character_is_digit(int idstd_digit_code);
-int id_str_eol(char* idstd_s, int idstd_i);
-int id_idstd_chr_is_digit_at(char* idstd_s, int idstd_i);
-int id_idstd_chr_is_space_at(char* idstd_s, int idstd_i);
+int id_string_end_of_line(char* idstd_s, int idstd_i);
+int id_idstd_character_is_digit_at(char* idstd_s, int idstd_i);
+int id_idstd_character_is_space_at(char* idstd_s, int idstd_i);
 int id_is_name_start_at(char* src, int i);
 int id_is_name_part_at(char* src, int i);
 int id_is_hex_at(char* src, int i);
@@ -1500,7 +1500,7 @@ static void idfs_GuiTbHist(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L)
 static void idfr_GuiTbHist(IdList* p) { id_frs_run(p, idfs_GuiTbHist); }
 static void idfs_GuiTip(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_str_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
 static void idfr_GuiTip(IdList* p) { id_frs_run(p, idfs_GuiTip); }
-void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
+void id_integer_list_set(IdList* idstd_xs, int idstd_i, int idstd_v) {
     id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
     return;
 }
@@ -1541,14 +1541,14 @@ int id_character_is_digit(int idstd_digit_code) {
     return idstd_ret_i;
 }
 
-int id_str_eol(char* idstd_s, int idstd_i) {
+int id_string_end_of_line(char* idstd_s, int idstd_i) {
     while (((id_character_code_at(idstd_s, idstd_i) != 10) && (id_character_code_at(idstd_s, idstd_i) != (-1)))) {
         idstd_i = (idstd_i + 1);
     }
     return idstd_i;
 }
 
-int id_idstd_chr_is_digit_at(char* idstd_s, int idstd_i) {
+int id_idstd_character_is_digit_at(char* idstd_s, int idstd_i) {
     int idstd_charat_v;
     int idstd_ret_i;
     idstd_charat_v = id_character_code_at(idstd_s, idstd_i);
@@ -1556,7 +1556,7 @@ int id_idstd_chr_is_digit_at(char* idstd_s, int idstd_i) {
     return idstd_ret_i;
 }
 
-int id_idstd_chr_is_space_at(char* idstd_s, int idstd_i) {
+int id_idstd_character_is_space_at(char* idstd_s, int idstd_i) {
     int idstd_charat_v;
     int idstd_ret_i;
     idstd_charat_v = id_character_code_at(idstd_s, idstd_i);
@@ -1617,7 +1617,7 @@ char* id_kindof(char* w) {
 int id_scan_one(char* src, int i) {
     int ni;
     ni = 0;
-    if (id_idstd_chr_is_space_at(src, i)) {
+    if (id_idstd_character_is_space_at(src, i)) {
         ni = id_eat_space(src, i);
     } else {
         ni = id_scan_tok_span(src, i);
@@ -1629,7 +1629,7 @@ int id_scan_word(char* src, int i) {
     int ni;
     ni = 0;
     if (((id_character_code_at(src, i) == 47) && (id_character_code_at(src, (i + 1)) == 47))) {
-        ni = id_str_eol(src, i);
+        ni = id_string_end_of_line(src, i);
     } else {
         ni = id_scan_block(src, i);
     }
@@ -1698,7 +1698,7 @@ int id_skip_block(char* src, int i) {
 
 void id_bump_line(void) {
 IdList* idsq_17;
-    (idsq_17 = lexline, id_lset(idsq_17, 0, ((int)(id_list_get(lexline, 0)) + 1)));
+    (idsq_17 = lexline, id_integer_list_set(idsq_17, 0, ((int)(id_list_get(lexline, 0)) + 1)));
     id_print(id_concat_f(ID_S("line "), id_str_of_int((int)(id_list_get(lexline, 0))), 2));
     return;
 }
@@ -1722,7 +1722,7 @@ void id_span_out(char* src, int i, int ni) {
 int id_scan_decop(char* src, int i) {
     int ni;
     ni = 0;
-    if (id_idstd_chr_is_digit_at(src, i)) {
+    if (id_idstd_character_is_digit_at(src, i)) {
         ni = id_scan_number(src, i);
     } else {
         ni = id_scan_strop(src, i);
@@ -1743,9 +1743,9 @@ int id_scan_hashop(char* src, int i) {
 
 int id_scan_hash(char* src, int i) {
     int e;
-    e = id_str_eol(src, i);
+    e = id_string_end_of_line(src, i);
     id_scan_hash_out(src, i, e);
-    id_lset(lexline, 0, 0);
+    id_integer_list_set(lexline, 0, 0);
     return e;
 }
 
@@ -1831,7 +1831,7 @@ char* id_numkind(int e, int fe) {
 }
 
 int id_digit_run_end(char* src, int i) {
-    while (id_idstd_chr_is_digit_at(src, i)) {
+    while (id_idstd_character_is_digit_at(src, i)) {
         i = (i + 1);
     }
     return i;
@@ -1840,7 +1840,7 @@ int id_digit_run_end(char* src, int i) {
 int id_has_frac(char* src, int e) {
     int ok;
     ok = 0;
-    if (((id_character_code_at(src, e) == 46) && id_idstd_chr_is_digit_at(src, (e + 1)))) {
+    if (((id_character_code_at(src, e) == 46) && id_idstd_character_is_digit_at(src, (e + 1)))) {
         ok = 1;
     }
     return ok;
@@ -2012,7 +2012,7 @@ int id_eat_space(char* src, int i) {
     int ret_i;
     if ((id_character_code_at(src, i) == 10)) {
         id_bump_line();
-        id_lset(lexbol, 0, (i + 1));
+        id_integer_list_set(lexbol, 0, (i + 1));
     }
     ret_i = (i + 1);
     return ret_i;
@@ -2142,7 +2142,7 @@ int id_scan_bang(char* src, int i) {
 
 int id_scan_shebang(char* src, int i) {
     int e;
-    e = id_str_eol(src, i);
+    e = id_string_end_of_line(src, i);
     if ((id_is_shebang(src, i) == 0)) {
         id_print(ID_S("op #!"));
     }

@@ -15,7 +15,7 @@ given stmt_fix (3):("5")
 // hoist_loop.id is at its three-function cap).
 sq_based() {
   env_init();
-  lset((import sqbase), 0, 20);
+  integer_list_set((import sqbase), 0, 20);
 } return void;
 ():() then calls env_init:[1] then (import sqbase)[0]:(20)
 ():() then len((import tyname)):(6)

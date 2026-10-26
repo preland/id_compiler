@@ -2,7 +2,7 @@
 // chk_* case can read fn 1's row with the same wrapper that reads fn 0's.
 ir_rows_chk1() {
   ir_rows();
-  lset((import chk_id), 0, 1);
+  integer_list_set((import chk_id), 0, 1);
 } return void;
 ():() then (import chk_id)[0]:(1)
 ():() then chk_op:("op const") then chk_s:("hi")

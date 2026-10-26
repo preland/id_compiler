@@ -29,7 +29,7 @@ rename_splice(string rename_source, int[] rename_spans, string[] rename_picked) 
   int rename_rest = len(rename_source) - rename_cursor[0];
   push(rename_parts, str_sub(rename_source, rename_cursor[0], rename_rest));
 } chain (string rename_source, int[] rename_spans, string[] rename_picked) {
-  string rename_text = str_join(rename_parts, "");
+  string rename_text = string_join(rename_parts, "");
 } return string rename_text;
 ("ab = cd;", [0, 2, 1, 5, 7, 1], ["x", "yz"]):("x = yz;")
 ("ab = cd;", [0, 2, 1, 5, 7, 1], ["", "yz"]):("ab = yz;")

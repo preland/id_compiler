@@ -24,7 +24,7 @@ sg_stem(string sgs_n) {
 // entry when it is the same stem, a new entry otherwise.
 sg_gadd(string[] sgad_out, string sgad_stem) {
   string sgad_last = list_string_get_or(sgad_out, len(sgad_out) - 1, "");
-  string[] sgad_p = str_split(sgad_last, "\t");
+  string[] sgad_p = string_split(sgad_last, "\t");
   int sgad_same = sgad_p[0] == sgad_stem;
 } chain (string[] sgad_out, string sgad_stem) {
   if(sgad_same == 1) {

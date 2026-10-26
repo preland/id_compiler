@@ -13,7 +13,7 @@ jg_chain_open(string jg_t, int jg_cl) {
 ("chain (a)\n  {}", 9):(14)
 
 jg_chain_end(string jg_t, int jg_r) {
-  int jg_po = str_findat(jg_t, "(", jg_r);
+  int jg_po = string_find_from(jg_t, "(", jg_r);
   int jg_pc = -1;
   int jg_e = -1;
 } chain (string jg_t, int jg_r) {
@@ -33,7 +33,7 @@ jg_tail_pos(string jg_t, int jg_e) {
   int jg_r = -1;
   while (jg_e > 0) {
     int jg_at = jg_skip_ws(jg_t, jg_e);
-    if (str_eqat(jg_t, jg_at, "chain") == 1) {
+    if (string_equals_at(jg_t, jg_at, "chain") == 1) {
       jg_e = jg_chain_end(jg_t, jg_at);
     } else {
       jg_r = jg_at;

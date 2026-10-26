@@ -37,8 +37,8 @@ fix_decl_fixture() {
   push((import fixe_nt), "int");
   push((import fixe_an), "");
 } chain () {
-  lset((import nst), 0, 0);
-  lset((import curtk), 0, 1);
+  integer_list_set((import nst), 0, 0);
+  integer_list_set((import curtk), 0, 1);
   int e2 = newleaf("ident", 0, 0, "n", "");
 } chain () {
   push((import fixd_gcl), 0 - 1);
@@ -50,7 +50,7 @@ fix_decl_fixture() {
   push((import fixe_ru), 1);
 } chain () {
   push((import fixe_nt), "string");
-  lset((import nst), 1, 1);
+  integer_list_set((import nst), 1, 1);
   push((import fixe_an), "");
 } return void;
 ():() then calls newleaf:("ident", 0, 0, "n", "")

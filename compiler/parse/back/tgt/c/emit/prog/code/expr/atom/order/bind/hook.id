@@ -26,7 +26,7 @@ seq_mark(int id, int v) {
   while(len((import seqt)) <= id) {
     push((import seqt), 0);
   }
-  lset((import seqt), id, v);
+  integer_list_set((import seqt), id, v);
 } return void;
 given sq_fixture (7, 1):() then sq_foo_seqd:(1)
 given sq_marked (7, 0):() then sq_foo_seqd:(0)

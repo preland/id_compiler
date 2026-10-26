@@ -24,7 +24,7 @@ given fs_temp_text("alpha\n") ((import fs_temp_path)):("alpha\n")
 
 // Line N (counting from 1) of a text.
 dg_nth(string dg_ht, int dg_hn) {
-  string[] dg_hl = str_lines(dg_ht);
+  string[] dg_hl = string_lines(dg_ht);
   string dg_hr = "";
   if(dg_hn >= 1 && dg_hn <= len(dg_hl)) {
     dg_hr = dg_hl[dg_hn - 1];

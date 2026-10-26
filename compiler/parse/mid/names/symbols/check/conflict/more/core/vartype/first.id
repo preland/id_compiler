@@ -33,4 +33,4 @@ first_type_at(int i, string name, string t, int unit) {
 given regrow_d (0, "x", "", 0):("int")
 given regrow_d (0, "y", "", 0):("")
 given regrow_d (0, "x", "", 3):("int")
-given regrow_d given lset((import stdunit), 0, 2) (0, "x", "", 2):("")
+given regrow_d given integer_list_set((import stdunit), 0, 2) (0, "x", "", 2):("")

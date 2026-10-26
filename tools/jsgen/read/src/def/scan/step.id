@@ -8,7 +8,7 @@ jg_scan_step(string jg_t, string jg_path, int[] jg_st, string[][] jg_defs) {
   int jg_nx = jg_i + 1;
 } chain (string jg_t, string jg_path, int[] jg_st, string[][] jg_defs) {
   if (jg_c == (import jg_slash) && character_code_at(jg_t, jg_i + 1) == (import jg_slash)) {
-    jg_nx = str_eol(jg_t, jg_i);
+    jg_nx = string_end_of_line(jg_t, jg_i);
   } else if (jg_c == (import jg_quote)) {
     jg_nx = jg_str_end(jg_t, jg_i + 1) + 1;
   }

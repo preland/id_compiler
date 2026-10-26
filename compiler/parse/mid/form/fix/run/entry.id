@@ -42,7 +42,7 @@ fix_all(int argc, string[] argv) {
   }
 } return void;
 given fix_std_fixture (2, ["prog", "--fix-std"]):() then calls fix_init:(2, ["prog", "--fix-std"])
-given fix_std_fixture given lset((import synfail), 0, 1) (1, ["prog"]):() then prints:("@N|||the source has syntax errors; nothing was rewritten\n")
+given fix_std_fixture given integer_list_set((import synfail), 0, 1) (1, ["prog"]):() then prints:("@N|||the source has syntax errors; nothing was rewritten\n")
 given fix_std_fixture (1, ["prog"]):() then calls fix_funcs:[1]
 
 fix_init(int argc, string[] argv) {
@@ -53,7 +53,7 @@ fix_init(int argc, string[] argv) {
   if(on == 0) {
     on = fix_std_scan();
   }
-  lset((import fixd_std), 0, on);
+  integer_list_set((import fixd_std), 0, on);
 } return void;
 given fix_std_fixture (2, ["prog", "--fix-std"]):() then (import fixd_std)[0]:(1)
 given fix_std_fixture (1, ["prog"]):() then (import fixd_std)[0]:(0)

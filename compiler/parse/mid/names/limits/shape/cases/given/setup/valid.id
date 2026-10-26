@@ -7,7 +7,7 @@
 // than C that does not compile.
 
 fit_given(int i) {
-  string[] setups = str_split((import casegiven)[i], " ");
+  string[] setups = string_split((import casegiven)[i], " ");
   int si = 0;
   while(si < len(setups)) {
     if(setups[si] != "") {

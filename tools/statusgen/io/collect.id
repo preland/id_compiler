@@ -3,7 +3,7 @@
 // The sg_frow rows of the file sgo_ent under sgo_root, appended to sgo_fr; a
 // directory entry adds none.
 sg_cone(string[] sgo_fr, string sgo_root, string sgo_ent, string[] sgo_rows, string[] sgo_idx) {
-  if(str_ends(sgo_ent, ".id") == 1) {
+  if(string_ends_with(sgo_ent, ".id") == 1) {
     string sgo_text = fs_read_text(path_join(sgo_root, sgo_ent));
     list_string_extend(sgo_fr, sg_funcs(sgo_ent, sgo_text, sgo_rows, sgo_idx));
   }

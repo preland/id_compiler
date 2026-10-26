@@ -16,7 +16,7 @@ given sg_t_tree ((import sg_t_root)):(["sub"])
 ("/nonexistent_sg_root"):([])
 
 sg_sub1(string[] sgb_r, string sgb_e) {
-  if(str_ends(sgb_e, "/") == 1 && str_starts(sgb_e, ".") == 0 && sgb_e != "build/") {
+  if(string_ends_with(sgb_e, "/") == 1 && string_starts_with(sgb_e, ".") == 0 && sgb_e != "build/") {
     string sgb_nm = str_sub(sgb_e, 0, len(sgb_e) - 1);
     push(sgb_r, sgb_nm);
   }

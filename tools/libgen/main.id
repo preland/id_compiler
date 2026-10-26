@@ -26,7 +26,7 @@ lg_after(string[] lg_xs, int lg_k) {
 lg_go(int lg_argc, string[] lg_argv) {
   int lg_rc = 2;
   string[] lg_fns = lg_after(lg_argv, 3);
-  string[] lg_lines = str_split(read_all(), "\n");
+  string[] lg_lines = string_split(read_all(), "\n");
 } chain (int lg_argc, string[] lg_argv) {
   if (lg_argc >= 3 && (lg_argv[1] == "header" || lg_argv[1] == "wrap")) {
     lg_rc = lg_all(lg_argv[1], lg_argv[2], lg_fns, lg_lines);

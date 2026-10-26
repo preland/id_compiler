@@ -23,7 +23,7 @@ given environment_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_stem (["idru
 // newline eprint would double; nothing when the file is empty or missing.
 dr_diag(string path) {
   string raw = fs_read_text(path);
-  string text = str_trim(raw);
+  string text = string_trim(raw);
   if (len(text) > 0) {
     eprint(text);
   }

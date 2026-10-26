@@ -9,16 +9,16 @@
 
 esc_scx(int sx_i, int sx_s, int sx_d) {
   esc_fix();
-  lset((import esc_st), sx_i, sx_s);
-  lset((import esc_dp), sx_i, sx_d);
+  integer_list_set((import esc_st), sx_i, sx_s);
+  integer_list_set((import esc_dp), sx_i, sx_d);
 } return void;
 (1, 2, 3):() then (import esc_st)[1]:(2)
 (1, 2, 3):() then (import esc_dp)[1]:(3)
 
 esc_scy(int sy_lo, int sy_ch, int sy_mn) {
   esc_fix();
-  lset((import esc_fx), 1, sy_lo);
-  lset((import esc_fx), 2, sy_ch);
+  integer_list_set((import esc_fx), 1, sy_lo);
+  integer_list_set((import esc_fx), 2, sy_ch);
 } chain (int sy_lo, int sy_ch, int sy_mn) {
   int sy_i = 0;
   while(sy_i < sy_mn) {

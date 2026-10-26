@@ -11,7 +11,7 @@ rename_function_region(string rename_source, string rename_function) {
   string rename_padded = "\n" + rename_source;
   int rename_hit = rename_function_header(rename_padded, rename_function);
 } chain (string rename_source, string rename_function) {
-  int rename_stop = str_findat(rename_padded, "\n\n", rename_hit + 1);
+  int rename_stop = string_find_from(rename_padded, "\n\n", rename_hit + 1);
   if(rename_hit >= 0 && rename_stop < 0) {
     rename_stop = len(rename_padded);
   }
@@ -31,7 +31,7 @@ rename_function_region(string rename_source, string rename_function) {
 // The same for a file: only a source file has functions, so a registry has none.
 rename_file_region(string rename_file, string rename_source, string rename_function) {
   int[] rename_region = [];
-  if(str_ends(rename_file, ".id") == 1) {
+  if(string_ends_with(rename_file, ".id") == 1) {
     rename_region = rename_function_region(rename_source, rename_function);
   }
 } return int[] rename_region;

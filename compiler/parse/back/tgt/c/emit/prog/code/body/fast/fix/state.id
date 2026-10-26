@@ -17,7 +17,7 @@ given lpf_env ():() then len((import lpset)):(1)
 
 lpf_on() {
   lpf_more();
-  lset((import lpon), 0, 1);
+  integer_list_set((import lpon), 0, 1);
   push((import lpset), (import lpf_xa));
 } return void;
 ():() then (import lpon)[0]:(1)

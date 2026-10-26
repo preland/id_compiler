@@ -22,7 +22,7 @@ given esc_ffix ((import eff_pt), "p"):(1)
 given esc_ffix ((import eff_glob), "r"):(0)
 
 is_list_ty(string t) {
-  int ok = str_ends(t, "[]") == 1 && str_starts(t, "func") == 0;
+  int ok = string_ends_with(t, "[]") == 1 && string_starts_with(t, "func") == 0;
 } return int ok;
 ("int[]"):(1)
 ("int"):(0)

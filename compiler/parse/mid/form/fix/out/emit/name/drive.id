@@ -32,7 +32,7 @@ given fix_nameat_fixture (0):() then calls fix_rcache_taint:(0)
 fix_name_at(int i) {
   if((import fixe_sep)[i] == 1) {
     string name = fix_name_pick(i);
-    sset((import fixe_nm), i, name);
+    string_list_set((import fixe_nm), i, name);
   }
 } return void;
 given fix_nameat_fixture (0):() then fixe_nm_named:(1)

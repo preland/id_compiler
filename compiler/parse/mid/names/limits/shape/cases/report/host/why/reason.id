@@ -27,7 +27,7 @@ wr_build() {
     wr_fn(wr_i);
     wr_i = wr_i + 1;
   }
-  lset((import wrdone), 0, 1);
+  integer_list_set((import wrdone), 0, 1);
 } return void;
 given then_imp_fixture ("int[]", 2, 0) ():() then (import wrx):(["i:gx"])
 given then_imp_fixture ("int", 1, 0) ():() then len((import wrf)):(0)

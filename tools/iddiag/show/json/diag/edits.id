@@ -12,7 +12,7 @@ dg_jedits(string dg_ed_g, string dg_ed_f) {
     }
     dg_ed_i = dg_ed_i + 1;
   }
-  string dg_ed_r = "[" + str_join(dg_ed_o, ",") + "]";
+  string dg_ed_r = "[" + string_join(dg_ed_o, ",") + "]";
 } return string dg_ed_r;
 ("  help: h\n  edit: machine\treplace\t2\tcount\tx\n  edit: machine\treplace\t2\tnothere\ty", "sample.txt"):("[{\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_line\":2,\"end_column\":12,\"text\":\"x\"}]")
 ("  help: h", "sample.txt"):("[]")
@@ -41,7 +41,7 @@ dg_japp(string dg_ap_g, string dg_ap_f) {
 } chain (string dg_ap_g, string dg_ap_f) {
   string dg_ap_r = "none";
   if(dg_ap_n > 0) {
-    dg_ap_r = str_tab3(dg_ef(dg_ap_v[0], 0), "machine", "machine-applicable", "maybe", "maybe-incorrect", "placeholder", "has-placeholders", "unspecified");
+    dg_ap_r = string_lookup_table(dg_ef(dg_ap_v[0], 0), "machine", "machine-applicable", "maybe", "maybe-incorrect", "placeholder", "has-placeholders", "unspecified");
   }
   if(dg_ap_k < dg_ap_n) {
     dg_ap_r = "unresolved";

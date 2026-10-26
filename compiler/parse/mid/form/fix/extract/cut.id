@@ -14,7 +14,7 @@ given fix_xplanned ():("")
 given fix_xcrooked ():("the block's statements cannot be split into segments of exactly 3 actions for a chained helper")
 
 fix_xcutscan() {
-  lset((import fixx_acc), 0, 0);
+  integer_list_set((import fixx_acc), 0, 0);
   fix_xcutloop();
 } return void;
 given fix_xplanned ():() then (import fixx_cuts):(["7|7"])

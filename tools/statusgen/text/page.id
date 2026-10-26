@@ -12,7 +12,7 @@ sg_or(string sgo_a, string sgo_b) {
 // the test sections, the benchmark table and the mutation score.
 sg_assemble(string[] sgp_p, string sgp_t1, string sgp_t2, string sgp_t3, string sgp_sec, string sgp_b, string sgp_m) {
   string[] sgp_parts = [sgp_p[0], "\n\n", sgp_p[1], sgp_t1, sgp_p[2], sgp_p[3], sgp_t2, sgp_p[4], sgp_p[5], sgp_t3, sgp_p[6], sgp_p[7], sgp_sec, sgp_p[8], sgp_b, sgp_p[9], sgp_p[10], sgp_m, sgp_p[11]];
-  string sgp_page = str_join(sgp_parts, "");
+  string sgp_page = string_join(sgp_parts, "");
 } return string sgp_page;
 (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b"], "T1", "T2", "T3", "S", "B", "M"):("0\n\n1T123T245T367S8B9aMb")
 (["", "", "", "", "", "", "", "", "", "", "", ""], "", "", "", "", "", ""):("\n\n")

@@ -4,8 +4,8 @@
 // ms_ar: a .id file, other than conf.id, below the path ms_ar, with no
 // directory or file whose name starts with a dot.
 ms_en_ok(string ms_rel, string ms_ar) {
-  int ms_ok = str_ends(ms_rel, ".id") == 1 && str_starts(ms_rel, ms_ar) == 1 && character_code_at(ms_rel, 0) != 46;
-  int ms_hid = str_find(ms_rel, "/.") >= 0 || ms_rel == "conf.id" || str_ends(ms_rel, "/conf.id") == 1;
+  int ms_ok = string_ends_with(ms_rel, ".id") == 1 && string_starts_with(ms_rel, ms_ar) == 1 && character_code_at(ms_rel, 0) != 46;
+  int ms_hid = string_find(ms_rel, "/.") >= 0 || ms_rel == "conf.id" || string_ends_with(ms_rel, "/conf.id") == 1;
   int ms_yes = ms_ok == 1 && ms_hid == 0;
 } return int ms_yes;
 ("src/a.id", ""):(1)

@@ -21,7 +21,7 @@ jg_skip_list(string[][] jg_skips) {
     jg_i = jg_i + 1;
   }
 } chain (string[][] jg_skips) {
-  string jg_all = str_join(jg_ps, "; ");
+  string jg_all = string_join(jg_ps, "; ");
 } return string jg_all;
 ([["a", "why a"], ["b", "why b"]]):("'a' (why a); 'b' (why b)")
 ([]):("")

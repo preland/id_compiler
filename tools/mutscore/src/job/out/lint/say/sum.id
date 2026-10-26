@@ -2,7 +2,7 @@
 
 // The non-empty lines of ms_tx.
 ms_lt_split(string ms_tx) {
-  string[] ms_ab = str_split(ms_tx, "\n");
+  string[] ms_ab = string_split(ms_tx, "\n");
   string[] ms_lr = [];
   int ms_i = 0;
 } chain (string ms_tx) {

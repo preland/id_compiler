@@ -14,7 +14,7 @@ then_sig(int ci, int chk_node, int cfn, string chk_nm) {
     then_args_fit(ci, chk_node, cfn);
   }
 } return void;
-given chk_fixture given sset((import ns2), (import fixture_chk_fn), "void") ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn), "chk"):() then prints:("fixture.id:4: error: 'then' names 'chk', which returns void; a check returns the value it compares\n")
+given chk_fixture given string_list_set((import ns2), (import fixture_chk_fn), "void") ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn), "chk"):() then prints:("fixture.id:4: error: 'then' names 'chk', which returns void; a check returns the value it compares\n")
 given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_fn), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s), but this 'then' passes 0; a check is called with one literal per parameter, as in 'then fx_target(1, 2):(value)', and with none as 'then fx_target:(value)'\n")
 given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn), "chk"):() then prints:("")
 given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), (import fixture_fn), "fx_target"):() then prints:("")
@@ -47,5 +47,5 @@ then_imp_field(int ci, int chk_node, string want) {
     then_imp_value(ci, chk_node, ft);
   }
 } return void;
-given then_imp_fixture ("int", 0, 0) given sset((import ns2), (import then_imp_node), ".z") ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx).z: (import gx) is a int, not a struct, so it has no fields; drop '.z', or name an export that is a struct\n")
+given then_imp_fixture ("int", 0, 0) given string_list_set((import ns2), (import then_imp_node), ".z") ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx).z: (import gx) is a int, not a struct, so it has no fields; drop '.z', or name an export that is a struct\n")
 given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_node), "int"):() then calls then_imp_value:((import fixture_ci), (import then_imp_node), "int")

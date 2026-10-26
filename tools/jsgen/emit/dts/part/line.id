@@ -9,7 +9,7 @@ jg_sig_params(string[] jg_sr) {
     jg_i = jg_i + 2;
   }
 } chain (string[] jg_sr) {
-  string jg_all = str_join(jg_ps, ", ");
+  string jg_all = string_join(jg_ps, ", ");
 } return string jg_all;
 (["f", "int", "x:1", "a", "int", "s", "string[]"]):("a: number, s: string[]")
 (["f", "int", "x:1", "new", "word"]):("new_: bigint")

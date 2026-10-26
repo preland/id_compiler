@@ -17,7 +17,7 @@ rec_target_loop(int ti) {
     rec_target_step(ti);
     ti = ti + 1;
   }
-  lset((import rectseen), 0, ti);
+  integer_list_set((import rectseen), 0, ti);
 } return void;
 given calls_node_fixture (0):() then len((import rectarget)):(1)
 given calls_node_fixture (1):() then (import rectseen)[0]:(1)

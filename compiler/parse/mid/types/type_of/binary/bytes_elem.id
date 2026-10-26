@@ -6,14 +6,14 @@
 
 bytes_mark_to(int bm_val, string bm_want) {
   if(bm_want == "bytes" && (import nkind)[bm_val] == "arr") {
-    lset((import bytesmark), bm_val, 1);
+    integer_list_set((import bytesmark), bm_val, 1);
   } else if(ty_is_list(bm_want) == 1 && (import nkind)[bm_val] == "arr") {
     bytes_mark_each(bm_val, elem_type(bm_want));
   }
 } return void;
-given bm_nest ((import bm_in_a), "bytes"):() then calls lset:((import bytesmark), (import bm_in_a), 1)
-given bm_nest ((import bm_outer), "bytes[]"):() then calls lset:((import bytesmark), (import bm_in_b), 1)
-given bm_nest ((import bm_outer), "int[]"):() then calls lset:[0]
+given bm_nest ((import bm_in_a), "bytes"):() then calls integer_list_set:((import bytesmark), (import bm_in_a), 1)
+given bm_nest ((import bm_outer), "bytes[]"):() then calls integer_list_set:((import bytesmark), (import bm_in_b), 1)
+given bm_nest ((import bm_outer), "int[]"):() then calls integer_list_set:[0]
 
 bytes_mark_each(int bm_val, string bm_et) {
   int bm_j = 0;
@@ -23,8 +23,8 @@ bytes_mark_each(int bm_val, string bm_et) {
     bm_j = bm_j + 1;
   }
 } return void;
-given bm_nest ((import bm_outer), "bytes"):() then calls lset:[2]
-given bm_nest ((import bm_outer), "int"):() then calls lset:[0]
+given bm_nest ((import bm_outer), "bytes"):() then calls integer_list_set:[2]
+given bm_nest ((import bm_outer), "int"):() then calls integer_list_set:[0]
 
 bytes_push_elem(int i) {
   int[] bm_pl = (import nl1)[i];

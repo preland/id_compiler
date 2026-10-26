@@ -30,7 +30,7 @@ given kb_t_seen("a") ([]):("")
 // of sources, and those named in the value of one of those, however long a chain.
 kb_slice(string conf, string[] sources) {
   kb_tables();
-  string[] rows = str_lines(conf);
+  string[] rows = string_lines(conf);
   int i = 0;
 } chain (string conf, string[] sources) {
   while (i < len(sources)) {

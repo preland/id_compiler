@@ -5,13 +5,13 @@
 // not pay for a reader and the fixture it would need (../build/fill.id).
 fix_wseed(int ow) {
   if(ow >= 0 && (import fixd_wm)[ow] == 0) {
-    lset((import fixd_wm), ow, 1);
+    integer_list_set((import fixd_wm), ow, 1);
     push((import fixd_wq), ow);
   }
 } return void;
-given fix_wseed_fixture (0):() then calls lset:((import fixd_wm), 0, 1)
+given fix_wseed_fixture (0):() then calls integer_list_set:((import fixd_wm), 0, 1)
 given fix_wseed_fixture (-1):() then (import fixd_wm)[0]:(0)
-given fix_wseed_fixture (-1):() then calls lset:[0]
+given fix_wseed_fixture (-1):() then calls integer_list_set:[0]
 
 // fixd_wm seeded with one unmarked entry directly, bypassing fix_wfill's
 // fnames-length loop entirely (fill.id's own comment: every fix fixture

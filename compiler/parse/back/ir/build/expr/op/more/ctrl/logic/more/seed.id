@@ -23,7 +23,7 @@ given logic_fixture ((import or_node), 2, "1"):(15)
 // other branch of lw_strcmp.
 strcmp_fs1() {
   strcmp_fs0();
-  lset((import fsc), 0, 1);
+  integer_list_set((import fsc), 0, 1);
 } return void;
 ():() then (import fsc)[0]:(1)
 ():() then (import lvc)[0]:(1)

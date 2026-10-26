@@ -5,7 +5,7 @@ ms_lt_count(string[] ms_lr, string ms_kd) {
   int ms_n = 0;
   int ms_i = 0;
   while(ms_i < len(ms_lr)) {
-    ms_n = ms_n + str_starts(ms_lr[ms_i], ms_kd + "\t");
+    ms_n = ms_n + string_starts_with(ms_lr[ms_i], ms_kd + "\t");
     ms_i = ms_i + 1;
   }
 } return int ms_n;
@@ -16,7 +16,7 @@ ms_lt_count(string[] ms_lr, string ms_kd) {
 // Adds the function of the row ms_rw (its second and third columns) to ms_ks
 // unless it is there already.
 ms_lt_seen(string[] ms_ks, string ms_rw) {
-  string[] ms_fd = str_split(ms_rw, "\t");
+  string[] ms_fd = string_split(ms_rw, "\t");
   string ms_ky = ms_fd[1] + "\t" + ms_fd[2];
   if(list_string_index(ms_ks, ms_ky) < 0) {
     push(ms_ks, ms_ky);

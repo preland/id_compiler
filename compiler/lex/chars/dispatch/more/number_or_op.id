@@ -1,7 +1,7 @@
 // decimal number, or hand off
 scan_decop(string src, int i) {
   int ni = 0;
-  if(idstd_chr_is_digit_at(src, i)) {
+  if(idstd_character_is_digit_at(src, i)) {
     ni = scan_number(src, i);
   } else {
     ni = scan_strop(src, i);
@@ -41,9 +41,9 @@ given lex_fix_setup ("#!x", 0):(3) then prints:("")
 // character what slicing past a hard-coded "#file " used to produce, which is
 // what keeps this change invisible to byte-parity.
 scan_hash(string src, int i) {
-  int e = str_eol(src, i);
+  int e = string_end_of_line(src, i);
   scan_hash_out(src, i, e);
-  lset((import lexline), 0, 0);
+  integer_list_set((import lexline), 0, 0);
 } return int e;
 given lex_fix_setup ("#abc", 0):(4) then prints:("abc\n")
 given lex_fix_setup ("#xy", 0):(3) then prints:("xy\n")

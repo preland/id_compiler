@@ -39,7 +39,7 @@ rename_string_end(string rename_source, int rename_index) {
 rename_other_end(string rename_source, int rename_index) {
   int rename_end = rename_index + 1;
   if(character_code_at(rename_source, rename_index) == 47 && character_code_at(rename_source, rename_index + 1) == 47) {
-    rename_end = str_eol(rename_source, rename_index);
+    rename_end = string_end_of_line(rename_source, rename_index);
   }
   if(character_code_at(rename_source, rename_index) == 34) {
     rename_end = rename_string_end(rename_source, rename_index);

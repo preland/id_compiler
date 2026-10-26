@@ -2,13 +2,13 @@
 // body.
 
 fh_sig(string fh_hl) {
-  string fh_r = str_trim(fh_hl);
+  string fh_r = string_trim(fh_hl);
   int fh_n = len(fh_r) - 1;
-  int fh_e = str_ends(fh_r, "{");
+  int fh_e = string_ends_with(fh_r, "{");
 } chain (string fh_hl) {
   if(fh_e == 1) {
     string fh_cut = str_sub(fh_r, 0, fh_n);
-    fh_r = str_trim(fh_cut);
+    fh_r = string_trim(fh_cut);
   }
 } return string fh_r;
 ("add(int a, int b) {"):("add(int a, int b)")

@@ -6,7 +6,7 @@
 font_hex(string text) {
   string[] strs = [];
   font_parts(strs, "\n" + text);
-  string hex = str_join(strs, "");
+  string hex = string_join(strs, "");
 } return string hex;
 ("string font_rom0 = \"0a\";\nstring font_rom1 = \"0b\";\n"):("0a0b")
 ("x"):("")
@@ -28,7 +28,7 @@ font_parts(string[] strs, string text) {
 // The digits of font_rom<k>, or "" when conf.id declares no such constant.
 font_part(string text, int k) {
   string key = "\nstring font_rom" + k + " = \"";
-  int at = str_find(text, key);
+  int at = string_find(text, key);
   string one = font_cut(text, at, key);
 } return string one;
 ("\nstring font_rom1 = \"cd\";", 1):("cd")

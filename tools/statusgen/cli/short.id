@@ -6,7 +6,7 @@
 // appended to sgu_out when it is short and not exempt (sgu_ex: the compiler's
 // rows).
 sg_u1(string[] sgu_out, string sgu_row, string[] sgu_ex, string sgu_dir, string sgu_label) {
-  string[] sgu_p = str_split(sgu_row, "\t");
+  string[] sgu_p = string_split(sgu_row, "\t");
   int sgu_n = to_int(sgu_p[3]);
   string sgu_key = "exempt|" + path_join(sgu_dir, sgu_p[0]) + ":" + sgu_p[1] + "|" + sgu_p[2];
 } chain (string[] sgu_out, string sgu_row, string[] sgu_ex, string sgu_dir, string sgu_label) {

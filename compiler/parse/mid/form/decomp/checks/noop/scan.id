@@ -27,7 +27,7 @@ noop_scan() {
 given noop_world ():() then calls noop_at:(74)
 given noop_world ():() then calls noop_op:((import nfx_plus_zero))
 given env_init ():() then calls noop_loop:[1]
-given env_init given lset((import chkfail), 0, 1) ():() then calls noop_loop:[0]
+given env_init given integer_list_set((import chkfail), 0, 1) ():() then calls noop_loop:[0]
 
 noop_loop() {
   int nzl_i = 0;

@@ -25,10 +25,10 @@ given stmt_tokens ([28]):([])
 parse_while(int[] pos) {
   advance(pos);
   int cond = parse_paren(pos);
-  lset((import loopd), 0, (import loopd)[0] + 1);
+  integer_list_set((import loopd), 0, (import loopd)[0] + 1);
 } chain (int[] pos) {
   int[] parse_block_v = parse_block(pos);
-  lset((import loopd), 0, (import loopd)[0] - 1);
+  integer_list_set((import loopd), 0, (import loopd)[0] - 1);
   int ret_i = node_while(cond, parse_block_v);
 } return int ret_i;
 given stmt_tokens ([28]):(7)

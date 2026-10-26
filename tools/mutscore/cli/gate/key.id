@@ -2,7 +2,7 @@
 
 // The text of the file the mutant line ms_qm is in, under the tree ms_root.
 ms_gt_src(string ms_root, string ms_qm_g) {
-  string[] ms_qf_g = str_split(ms_qm_g, "\t");
+  string[] ms_qf_g = string_split(ms_qm_g, "\t");
   string ms_qa_g = path_join(ms_root, list_string_get_or(ms_qf_g, 0, ""));
   string ms_qt_g = fs_read_text(ms_qa_g);
 } return string ms_qt_g;
@@ -19,10 +19,10 @@ ms_gt_key(string ms_root, string[] ms_al) {
   int ms_qn_h = len(ms_al);
 } chain (string ms_root, string[] ms_al) {
   while(ms_qp_h < ms_qn_h) {
-    ms_qt_h = ms_qt_h + str_hash(ms_gt_src(ms_root, ms_al[ms_qp_h]));
+    ms_qt_h = ms_qt_h + string_hash(ms_gt_src(ms_root, ms_al[ms_qp_h]));
     ms_qp_h = ms_qp_h + 1;
   }
-  string ms_qk_h = "g-" + str_hash(ms_qt_h);
+  string ms_qk_h = "g-" + string_hash(ms_qt_h);
 } return string ms_qk_h;
 given ms_t_tree ((import ms_t_root), ["src/a.id\tadd\t32\t33\tarith\t-"]):("g-85339336")
 given ms_t_tree ((import ms_t_root), []):("g-1838287151")

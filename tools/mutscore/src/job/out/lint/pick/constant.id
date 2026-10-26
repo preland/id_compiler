@@ -28,15 +28,15 @@ given ms_t_lex("f() {} return int -1;") ("f() {} return int -1;", (import ms_t_t
 // `F:(value)` for a name F in the set, 1000 for anything else, call counts
 // included.
 ms_lt_cpart(string ms_cq, string ms_kx) {
-  string ms_cqq = str_trim(ms_cq);
+  string ms_cqq = string_trim(ms_cq);
   int ms_cqz = ms_lt_part(ms_cqq) == 0;
-  int ms_cqi = str_find(ms_cqq, ":(");
+  int ms_cqi = string_find(ms_cqq, ":(");
 } chain (string ms_cq, string ms_kx) {
   int ms_cqw = 1000;
   if(ms_cqz == 1) {
     ms_cqw = 0;
   }
-  if(ms_cqz == 0 && ms_cqi > 0 && str_ends(ms_cqq, ")") == 1 && str_find(ms_kx, "\n" + str_sub(ms_cqq, 0, ms_cqi) + "\n") >= 0) {
+  if(ms_cqz == 0 && ms_cqi > 0 && string_ends_with(ms_cqq, ")") == 1 && string_find(ms_kx, "\n" + str_sub(ms_cqq, 0, ms_cqi) + "\n") >= 0) {
     ms_cqw = 1;
   }
 } return int ms_cqw;
@@ -51,7 +51,7 @@ ms_lt_cpart(string ms_cq, string ms_kx) {
 // 1 when the clauses ms_rs of a case are at least one `then F:(value)` for a
 // constant function F of the set ms_kx and nothing else but the silent prints.
 ms_lt_constant(string ms_rs, string ms_kx) {
-  string[] ms_czl = str_split(ms_rs, "then ");
+  string[] ms_czl = string_split(ms_rs, "then ");
   int ms_czn = 0;
   int ms_czj = 0;
 } chain (string ms_rs, string ms_kx) {

@@ -1,6 +1,6 @@
 
 lw_go(int b) {
-  lset((import lwcur), 0, b);
+  integer_list_set((import lwcur), 0, b);
 } return int b;
 given lw_fixture(0) (99):(99) then (import lwcur)[0]:(99)
 given lw_fixture(1) (7):(7) then (import lwcur)[0]:(7)
@@ -9,7 +9,7 @@ given lw_fixture(1) (7):(7) then (import lwcur)[0]:(7)
 // branch into the body, so an alloca can be appended to it at any point in the
 // lowering without landing after a terminator. simplifycfg merges the pair.
 lw_open2(int f) {
-  lset((import lwfn), 0, f);
+  integer_list_set((import lwfn), 0, f);
   int ir_block_v = ir_block(f, "entry");
   lw_open2_tail(f, ir_block_v);
 } return void;

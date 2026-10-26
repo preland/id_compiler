@@ -6,7 +6,7 @@ jg_tag_at(string[] jg_ls, string jg_tag) {
   int jg_at = -1;
   int jg_i = 0;
   while (jg_i < len(jg_ls) && jg_at < 0) {
-    if (str_ends(jg_ls[jg_i], "//@gen " + jg_tag) == 1) {
+    if (string_ends_with(jg_ls[jg_i], "//@gen " + jg_tag) == 1) {
       jg_at = jg_i;
     }
     jg_i = jg_i + 1;

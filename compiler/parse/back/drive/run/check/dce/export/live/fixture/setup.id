@@ -31,7 +31,7 @@ cvl_setup() {
 ():() then init_units:(0)
 
 clive_str() {
-  string cvf_s_t = "live " + (str_join((import clive), ","));
+  string cvf_s_t = "live " + (string_join((import clive), ","));
 } return string cvf_s_t;
 given cvl_setup ():("live ")
 given cvl_setup given const_mark(0) ():("live cb,cd,ca")

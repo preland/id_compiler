@@ -4,7 +4,7 @@
 fn_sigtop(string[] fn_t, int fn_p, string[] fn_tn, string[] fn_tc) {
   string[] fn_rw = fn_retw(fn_t, fn_p);
   string fn_rcl = ty_class(fn_rw, fn_tn, fn_tc);
-  string fn_top = fn_t[fn_p - 1] + "|" + fn_rcl + "|" + str_join(fn_rw, " ");
+  string fn_top = fn_t[fn_p - 1] + "|" + fn_rcl + "|" + string_join(fn_rw, " ");
 } return string fn_top;
 (["extern", "const", "char", "*", "f", "(", ")", ";"], 5, [], []):("f|s|const char *")
 (["int", "g", "(", ")", ";"], 2, [], []):("g|i4|int")
@@ -24,7 +24,7 @@ fn_sigtail(string[] fn_t, int fn_p, string[] fn_tn, string[] fn_tc, string[] fn_
 
 // The signature of the statement fn_st, its tokens joined by single spaces, read against the type table: a list whose first element is name|return class|return type and whose others are the parameters' cls|name|type records; an empty list when fn_st does not declare a function.
 fn_sig(string fn_st, string[] fn_tn, string[] fn_tc) {
-  string[] fn_t = str_split(fn_st, " ");
+  string[] fn_t = string_split(fn_st, " ");
   int fn_p = fn_open(fn_t);
   string[] fn_o = [];
 } chain (string fn_st, string[] fn_tn, string[] fn_tc) {

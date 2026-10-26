@@ -5,14 +5,14 @@
 // with it and tools/idwhere finds a function by name with it.
 
 fh_name(string fh_line) {
-  int fh_p = str_find(fh_line, "(");
+  int fh_p = string_find(fh_line, "(");
   string fh_head = "";
   string fh_r = "";
 } chain (string fh_line) {
   if(fh_p > 0) {
     fh_head = str_sub(fh_line, 0, fh_p);
   }
-  if(str_starts(fh_head, "pure ") == 1) {
+  if(string_starts_with(fh_head, "pure ") == 1) {
     fh_head = str_sub(fh_head, 5, len(fh_head) - 5);
   }
   if(fh_head != "" && fh_is_name(fh_head) == 1) {

@@ -19,7 +19,7 @@ find_next_file_marker(string[] lines, int from) {
 
 find_next_file_marker_step(string[] lines, int i, int out_i) {
   int ret_i = out_i;
-  if(out_i < 0 && str_starts(lines[i], "===F:") == 1) {
+  if(out_i < 0 && string_starts_with(lines[i], "===F:") == 1) {
     ret_i = i;
   }
 } return int ret_i;

@@ -9,7 +9,7 @@ dg_jfixes(string dg_fx_b, string dg_fx_f) {
     push(dg_fx_o, dg_jfix(dg_fx_g[dg_fx_i], dg_fx_f));
     dg_fx_i = dg_fx_i + 1;
   }
-  string dg_fx_r = "[" + str_join(dg_fx_o, ",") + "]";
+  string dg_fx_r = "[" + string_join(dg_fx_o, ",") + "]";
 } return string dg_fx_r;
 ("h\n  help: a\n  help: b", "sample.txt"):("[{\"description\":\"a\",\"applicability\":\"none\",\"edits\":[]},{\"description\":\"b\",\"applicability\":\"none\",\"edits\":[]}]")
 ("h\n  why: w", "sample.txt"):("[]")
@@ -23,7 +23,7 @@ dg_jrels(string dg_rl_b) {
     push(dg_rl_o, dg_jrel(dg_rl_v[dg_rl_i]));
     dg_rl_i = dg_rl_i + 1;
   }
-  string dg_rl_r = "[" + str_join(dg_rl_o, ",") + "]";
+  string dg_rl_r = "[" + string_join(dg_rl_o, ",") + "]";
 } return string dg_rl_r;
 ("h\n  related: a.id:3: note: first here\n  related: b.id:9: note: and here"):("[{\"file\":\"a.id\",\"line\":3,\"message\":\"first here\"},{\"file\":\"b.id\",\"line\":9,\"message\":\"and here\"}]")
 ("h"):("[]")

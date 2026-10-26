@@ -5,7 +5,7 @@
 // counted exempt when the compiler exempts it (sgf_ex holds its rows as
 // exempt|FILE:LINE|NAME, FILE absolute) and it has fewer than two cases.
 sg_tfn(int[] sgf_t, string sgf_r, string[] sgf_ex, string sgf_root) {
-  string[] sgf_p = str_split(sgf_r, "\t");
+  string[] sgf_p = string_split(sgf_r, "\t");
   int sgf_n = to_int(sgf_p[3]);
   string sgf_key = "exempt|" + path_join(sgf_root, sgf_p[0]) + ":" + sgf_p[1] + "|" + sgf_p[2];
 } chain (int[] sgf_t, string sgf_r, string[] sgf_ex, string sgf_root) {

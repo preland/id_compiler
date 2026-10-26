@@ -5,16 +5,16 @@
 
 dg_t_stk2() {
   dg_t_graph();
-  lset((import dg_comp), 2, 0);
+  integer_list_set((import dg_comp), 2, 0);
   push((import dg_deep), 9);
 } chain () {
   push((import dg_dirty), 0);
-  lset((import dg_ctr), 1, 1);
+  integer_list_set((import dg_ctr), 1, 1);
   push((import dg_stk), 0);
 } chain () {
   push((import dg_stk), 1);
-  lset((import dg_on), 0, 1);
-  lset((import dg_on), 1, 1);
+  integer_list_set((import dg_on), 0, 1);
+  integer_list_set((import dg_on), 1, 1);
 } return void;
 ():() then len((import dg_stk)):(2)
 ():() then (import dg_ctr)[1]:(1)

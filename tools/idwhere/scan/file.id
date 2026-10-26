@@ -17,11 +17,11 @@ given fs_temp_text("// c\npure f(int a) {\n} return int a;\n") ((import fs_temp_
 ("/nonexistent/iw_scan.id", "f"):("")
 
 iw_row(string iw_rt, int iw_rat) {
-  int iw_reol = str_findat(iw_rt, "\n", iw_rat);
+  int iw_reol = string_find_from(iw_rt, "\n", iw_rat);
   string iw_rhead = str_sub(iw_rt, iw_rat, iw_reol - iw_rat);
   string iw_rbefore = str_sub(iw_rt, 0, iw_rat);
 } chain (string iw_rt, int iw_rat) {
-  string[] iw_rls = str_split(iw_rbefore, "\n");
+  string[] iw_rls = string_split(iw_rbefore, "\n");
   string iw_rsig = fh_sig(iw_rhead);
   string iw_rtype = iw_ret(iw_rt, iw_rat);
 } chain (string iw_rt, int iw_rat) {
@@ -32,13 +32,13 @@ iw_row(string iw_rt, int iw_rat) {
 ("k\n\nb() {\n} return void;\n", 3):("3: b() -> void")
 
 iw_ret(string iw_tt, int iw_tat) {
-  int iw_tr = str_findat(iw_tt, "\n} return ", iw_tat);
+  int iw_tr = string_find_from(iw_tt, "\n} return ", iw_tat);
   string iw_tw = "?";
-  int iw_tsemi = str_findat(iw_tt, ";", iw_tr + 1);
+  int iw_tsemi = string_find_from(iw_tt, ";", iw_tr + 1);
 } chain (string iw_tt, int iw_tat) {
   if(iw_tr >= 0) {
     string iw_tclause = str_sub(iw_tt, iw_tr + 10, iw_tsemi - iw_tr - 10);
-    string[] iw_twl = str_words(iw_tclause);
+    string[] iw_twl = string_words(iw_tclause);
     iw_tw = iw_twl[0];
   }
 } return string iw_tw;

@@ -19,7 +19,7 @@ ms_st_swap(string ms_s, int[] ms_tk, int ms_t) {
 // The decimal float spelled ms_q with its last digit, or its exponent, one
 // higher.
 ms_mu_flt(string ms_q) {
-  int ms_p = str_find(ms_q, "e") + str_find(ms_q, "E") + 1;
+  int ms_p = string_find(ms_q, "e") + string_find(ms_q, "E") + 1;
   int ms_n = len(ms_q);
   string ms_y = str_sub(ms_q, 0, ms_n - 1) + (character_code_at(ms_q, ms_n - 1) - 47) % 10;
 } chain (string ms_q) {

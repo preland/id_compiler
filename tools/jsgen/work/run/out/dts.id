@@ -4,7 +4,7 @@
 jg_emit_dts(string[] jg_cf, string[][] jg_sigs, string[][] jg_skips, string[] jg_errs) {
   string jg_pre = jg_prefix(jg_cf[(import jg_c_wasm)], jg_cf[(import jg_c_out)]);
   string jg_top = jg_dts_top(path_base(jg_cf[(import jg_c_wasm)]), path_base(jg_pre));
-  string jg_dt = jg_dts_join(jg_top, str_join((import jg_dts_tail), "\n"), jg_sigs, jg_skips);
+  string jg_dt = jg_dts_join(jg_top, string_join((import jg_dts_tail), "\n"), jg_sigs, jg_skips);
 } chain (string[] jg_cf, string[][] jg_sigs, string[][] jg_skips, string[] jg_errs) {
   if (len(jg_errs) == 0) {
     jg_write(jg_pre + ".d.mts", jg_dt, jg_errs);
@@ -30,7 +30,7 @@ jg_report(string jg_base, int jg_nsig, string[] jg_bks, int jg_nskip) {
   string jg_be = "";
   string jg_skn = "";
   if (len(jg_bks) > 0) {
-    jg_be = ", backends " + str_join(jg_bks, "+");
+    jg_be = ", backends " + string_join(jg_bks, "+");
   }
 } chain (string jg_base, int jg_nsig, string[] jg_bks, int jg_nskip) {
   if (jg_nskip > 0) {

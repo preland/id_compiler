@@ -5,7 +5,7 @@
 ms_cm_wi(string[] ms_cf) {
   string[] ms_wi = [];
   if(len(ms_cf[(import ms_cf_with)]) > 0) {
-    ms_wi = str_split(ms_cf[(import ms_cf_with)], ",");
+    ms_wi = string_split(ms_cf[(import ms_cf_with)], ",");
   }
 } return string[] ms_wi;
 (["", "", "", "", "", "", "", "", "", "", ""]):([])
@@ -15,8 +15,8 @@ ms_cm_wi(string[] ms_cf) {
 // hash of all of them. The baseline marker holds it, so a changed source is
 // built again.
 ms_cm_key(string[] ms_al) {
-  string ms_jn = str_join(ms_al, "\n");
-  string ms_ky = "" + len(ms_al) + ":" + str_hash(ms_jn);
+  string ms_jn = string_join(ms_al, "\n");
+  string ms_ky = "" + len(ms_al) + ":" + string_hash(ms_jn);
 } return string ms_ky;
 (["a\tf\t1\t2\tcmp\t<"]):("1:2090518854")
 (["a\tf\t1\t2\tcmp\t<", "a\tf\t3\t4\tcmp\t<="]):("2:1016490036")

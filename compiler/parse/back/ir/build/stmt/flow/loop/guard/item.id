@@ -19,7 +19,7 @@ given gd_fix given gd_stk_new ("i:7"):() then gd_last:("int const 7")
 given gd_fix given gd_stk_new ("i:12"):() then (import gdstk)[0]:(3)
 
 gd_op(string gdi_item) {
-  if(str_starts(gdi_item, "v:") == 1) {
+  if(string_starts_with(gdi_item, "v:") == 1) {
     gd_push_name(gdi_item);
   } else {
     gd_op_b(gdi_item);

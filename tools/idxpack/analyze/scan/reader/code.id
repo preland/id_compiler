@@ -24,7 +24,7 @@ given ix_test_setup ("nope"):([])
 func_code_lines_step(string[] body, string[] out_li, int i) {
   push(out_li, body[i]);
   int ret_i = 0;
-  if(str_starts(body[i], "} return") == 1) {
+  if(string_starts_with(body[i], "} return") == 1) {
     ret_i = 1;
   }
 } return int ret_i;

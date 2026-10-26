@@ -39,7 +39,7 @@ fix_ret_fixture() {
   string[] rtexts = ["{", "return", "(", "x"];
 } chain () {
   toks_push(rkinds, rtexts);
-  lset((import curtk), 0, 3);
+  integer_list_set((import curtk), 0, 3);
   int tlk = 0;
 } chain () {
   while(tlk < 4) {
@@ -54,7 +54,7 @@ fix_ret_fixture() {
 } chain () {
   int e = newleaf("ident", 0, 0, "x", "");
   push((import fixd_gcl), 0 - 1);
-  lset((import curtl), 0, 5);
+  integer_list_set((import curtl), 0, 5);
 } chain () {
   int stmt = newleaf("ident", 0, 0, "s", "");
   push((import fixd_gcl), 0 - 1);
@@ -70,14 +70,14 @@ fix_ret_fixture() {
 } chain () {
   int f3 = node_func("h", "void", none2, none2, 0 - 1);
   push((import fixd_gcl), 0 - 1);
-  lset((import curtk), 0, 1);
+  integer_list_set((import curtk), 0, 1);
 } chain () {
   int e2 = newleaf("ident", 0, 0, "y", "");
   push((import fixd_gcl), 0 - 1);
   push((import pfile), "a.id");
 } chain () {
   push((import pfile), "b.id");
-  lset((import curtk), 0, 10);
+  integer_list_set((import curtk), 0, 10);
   int e3 = newleaf("ident", 0, 0, "z", "");
 } chain () {
   push((import fixd_gcl), 0 - 1);

@@ -6,7 +6,7 @@
 // in ms_rel; "" when the text is not a case. ms_vd is 1 for a void function
 // and ms_ef 1 when it has a statement that does something.
 ms_lt_row(string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
-  int ms_ix = str_find(ms_lc, "\t");
+  int ms_ix = string_find(ms_lc, "\t");
   string ms_tt = str_sub(ms_lc, ms_ix + 1, len(ms_lc) - ms_ix - 1);
   string[] ms_pcs = ms_lt_parts(ms_tt);
 } chain (string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {

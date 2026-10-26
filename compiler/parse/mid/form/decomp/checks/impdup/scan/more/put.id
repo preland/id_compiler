@@ -10,14 +10,14 @@ imd_set(string[] imd_out, int imd_slot, string imd_fp) {
 (["p", "q", "", ""], 2, "|YY"):(["p", "q", "2:YY", ""])
 
 imd_head(string imd_fp) {
-  int imd_bar = str_find(imd_fp, "|");
+  int imd_bar = string_find(imd_fp, "|");
   string ret_s = str_sub(imd_fp, 0, imd_bar);
 } return string ret_s;
 ("a,b|x{}"):("a,b")
 ("|y"):("")
 
 imd_text(string imd_fp) {
-  int imd_bar = str_find(imd_fp, "|");
+  int imd_bar = string_find(imd_fp, "|");
   int imd_rest = len(imd_fp) - imd_bar - 1;
   string ret_s = str_sub(imd_fp, imd_bar + 1, imd_rest);
 } return string ret_s;

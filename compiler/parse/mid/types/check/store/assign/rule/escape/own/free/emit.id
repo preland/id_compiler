@@ -5,7 +5,7 @@
 esc_free_decl(int fn, int sn, string out) {
   string nm = (import ns2)[sn];
   string line = esc_free_fn(fn, nm) + "(" + nm + "); ";
-  if(esc_exit(fn, nm) == 1 && str_find(out, line) < 0) {
+  if(esc_exit(fn, nm) == 1 && string_find(out, line) < 0) {
     out = out + line;
   }
 } return string out;

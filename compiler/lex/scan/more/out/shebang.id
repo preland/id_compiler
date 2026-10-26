@@ -33,7 +33,7 @@ given lex_fix_setup ("#abc", 0):(4) then prints:("abc\n")
 // nothing; a `#!` anywhere else prints a token the parser rejects, and takes
 // the rest of its line with it so that one mistake is one error.
 scan_shebang(string src, int i) {
-  int e = str_eol(src, i);
+  int e = string_end_of_line(src, i);
   if(is_shebang(src, i) == 0) {
     print("op #!");
   }

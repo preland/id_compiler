@@ -4,7 +4,7 @@ sg_unknown(string[] sgk_argv) {
   string sgk_r = "";
   int sgk_i = 1;
   while(sgk_i < len(sgk_argv) && sgk_r == "") {
-    if(str_starts(sgk_argv[sgk_i], "-") == 1 && list_string_index((import sg_flags), sgk_argv[sgk_i]) < 0) {
+    if(string_starts_with(sgk_argv[sgk_i], "-") == 1 && list_string_index((import sg_flags), sgk_argv[sgk_i]) < 0) {
       sgk_r = sgk_argv[sgk_i];
     }
     sgk_i = sgk_i + 1;

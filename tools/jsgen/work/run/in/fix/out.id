@@ -2,7 +2,7 @@
 // the .d.mts is the same file.
 
 jg_t_dts_n() {
-  string[] jg_ls = str_split(fs_read_text((import jg_t_pre) + ".d.ts"), "\n");
+  string[] jg_ls = string_split(fs_read_text((import jg_t_pre) + ".d.ts"), "\n");
   int jg_nd = len(jg_ls);
 } return int jg_nd;
 given jg_t_proj ():(1)

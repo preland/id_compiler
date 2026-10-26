@@ -31,7 +31,7 @@ ixw_field_types(int ixw_k) {
     push(ixw_ts, ixw_base(ixw_row_types[ixw_j]));
     ixw_j = ixw_j + 1;
   }
-  string ixw_joined = str_join(ixw_ts, " ");
+  string ixw_joined = string_join(ixw_ts, " ");
 } return string ixw_joined;
 given sd_pair (0):("int int")
 given sd_pair given sd_note("R", ["a"], ["Pt[]"], "r.id", 9) (2):("Pt")

@@ -12,7 +12,7 @@ hx_end(string lx_line, int lx_i) {
   if (lx_k == 2) {
     lx_j = hx_quote(lx_line, lx_i + 1, lx_c);
   }
-  if (lx_k == 3 && str_eqat(lx_line, lx_i, "...") == 1) {
+  if (lx_k == 3 && string_equals_at(lx_line, lx_i, "...") == 1) {
     lx_j = lx_i + 3;
   }
 } return int lx_j;
@@ -40,7 +40,7 @@ hx_line(string lx_line, string[] lx_toks) {
 
 // Tokenizes the whole preprocessed text lx_text into lx_toks, with an @in or @out token wherever the file the lines come from changes, @in being the header that ends with lx_suffix.
 hx_all(string lx_text, string lx_suffix, string[] lx_toks) {
-  string[] lx_lines = str_split(lx_text, "\n");
+  string[] lx_lines = string_split(lx_text, "\n");
   int lx_i = 0;
   while (lx_i < len(lx_lines)) {
     hx_feed(lx_lines[lx_i], lx_suffix, lx_toks);

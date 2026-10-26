@@ -46,7 +46,7 @@ ll_piece(string s, int i) {
 // past the four characters of a `\xHH`, which is one byte whatever follows it,
 // or past a backslash and its one to three octal digits.
 ll_step(string s, int i) {
-  int next = str_adv(s, i, 92, 2);
+  int next = string_advance_past_escape(s, i, 92, 2);
   if(hex_escape_at(s, i) == 1) {
     next = i + 4;
   }

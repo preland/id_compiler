@@ -18,7 +18,7 @@ given env_init ("F", "1.5"):("F1.5")
 // it while the loose table is built.
 lit_loose_fixture() {
   env_init();
-  lset((import cloose), 0, 1);
+  integer_list_set((import cloose), 0, 1);
 } return void;
 ():() then len((import tyname)):(6)
 ():() then (import cloose)[0]:(1)

@@ -27,17 +27,17 @@ scan_imports_in(string[] body, string[] out_li) {
 (["x"], []):(["x"], [])
 
 scan_imports_in_line(string text_line, string[] out_li) {
-  int p = str_find(text_line, "(import ");
+  int p = string_find(text_line, "(import ");
   string name = "";
   if(p >= 0) {
-    int q = str_findat(text_line, ")", p + 8);
+    int q = string_find_from(text_line, ")", p + 8);
     if(q >= 0) {
       int len_n = q - p - 8;
       name = str_sub(text_line, p + 8, len_n);
     }
   }
 } chain (string text_line, string[] out_li) {
-  if(str_cmp(name, "") != 0 && idx_find_str(out_li, name) < 0) {
+  if(string_compare(name, "") != 0 && idx_find_str(out_li, name) < 0) {
     push(out_li, name);
   }
   if(p >= 0) {

@@ -3,7 +3,7 @@
 // out (./pathtext.id). It is placed at its path, a directory with a trailing `/`.
 
 vocab_path_report(string vocab_entry, string vocab_name, string vocab_failed, string vocab_filler) {
-  lset((import vocab_totals), 1, (import vocab_totals)[1] + 1);
+  integer_list_set((import vocab_totals), 1, (import vocab_totals)[1] + 1);
   string vocab_label = vocab_path_label(vocab_entry);
   string vocab_msg = vocab_label + " name '" + vocab_name + "' " + vocab_path_reason(vocab_failed, vocab_filler);
 } chain (string vocab_entry, string vocab_name, string vocab_failed, string vocab_filler) {

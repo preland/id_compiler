@@ -4,7 +4,7 @@
 // two that follow do not read it.
 
 esc_close(int ix, int esd, int esv, int emk) {
-  lset((import esc_fx), 0, esd);
+  integer_list_set((import esc_fx), 0, esd);
   if((import esc_fx)[1] < esd) {
     esc_defer(ix, (import esc_fx)[1], esv);
   } else {
@@ -16,15 +16,15 @@ given esc_scy (0, 0, 0) (1, 1, 1000000, 0):() then (import esc_st)[1]:(2)
 given esc_scy (0, 0, 0) (1, 4, 1000000, 0):() then (import esc_fx)[0]:(4)
 
 esc_defer(int ix, int elo, int esv) {
-  lset((import esc_st), ix, 2);
-  lset((import esc_dp), ix, elo);
+  integer_list_set((import esc_st), ix, 2);
+  integer_list_set((import esc_dp), ix, elo);
   push((import esc_mem), ix);
 } chain (int ix, int elo, int esv) {
   int edl = esv;
   if(elo < esv) {
     edl = elo;
   }
-  lset((import esc_fx), 1, edl);
+  integer_list_set((import esc_fx), 1, edl);
 } return void;
 given esc_fix (1, 0, 1000000):() then (import esc_st)[1]:(2)
 given esc_fix (1, 3, 1000000):() then (import esc_dp)[1]:(3)
@@ -33,9 +33,9 @@ given esc_fix (1, 3, 5):() then (import esc_fx)[1]:(3)
 given esc_fix (1, 3, 5):() then (import esc_mem)[0]:(1)
 
 esc_seal(int ix, int emk, int esv) {
-  lset((import esc_st), ix, 3);
+  integer_list_set((import esc_st), ix, 3);
   esc_drain(emk, 3);
-  lset((import esc_fx), 1, esv);
+  integer_list_set((import esc_fx), 1, esv);
 } return void;
 given esc_fix (1, 0, 7):() then (import esc_st)[1]:(3)
 given esc_fix (1, 0, 7):() then (import esc_fx)[1]:(7)

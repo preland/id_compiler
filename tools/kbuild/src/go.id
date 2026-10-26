@@ -29,7 +29,7 @@ kb_out_arg(int argc, string[] argv) {
 // and reports the image. Answers the first failing step's status, 0 if none.
 kb_build(string root, string out) {
   string full = out;
-  if (str_starts(out, "/") == 0) {
+  if (string_starts_with(out, "/") == 0) {
     full = root + "/" + out;
   }
   int made = fs_mkdir_p(root + "/build");

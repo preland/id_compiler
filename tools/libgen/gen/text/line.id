@@ -16,7 +16,7 @@ lg_line(string lg_s) {
 lg_call(string lg_hd, string lg_nm, int lg_rk) {
   string[] lg_conv = lg_cells(lg_cols(lg_hd, 0), lg_cols(lg_hd, 1), (import lg_targ));
   string lg_ct = (import lg_tctype)[lg_rk];
-  string lg_ex = "id_" + lg_nm + "(" + str_join(lg_conv, ", ") + ");";
+  string lg_ex = "id_" + lg_nm + "(" + string_join(lg_conv, ", ") + ");";
 } chain (string lg_hd, string lg_nm, int lg_rk) {
   if (lg_ct != "") {
     lg_ex = lg_ct + " r = " + lg_ex;
@@ -30,7 +30,7 @@ lg_call(string lg_hd, string lg_nm, int lg_rk) {
 // prefix: `csv_rows` in the library `csv` is csv_rows, not csv_csv_rows.
 lg_short(string lg_lib, string lg_nm) {
   string lg_sh = lg_nm;
-  if (str_starts(lg_nm, lg_lib + "_")) {
+  if (string_starts_with(lg_nm, lg_lib + "_")) {
     lg_sh = str_sub(lg_nm, len(lg_lib) + 1, len(lg_nm) - len(lg_lib) - 1);
   }
 } return string lg_sh;

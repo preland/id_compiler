@@ -30,7 +30,7 @@ ms_tk_is(string ms_s, int[] ms_tk, int ms_t, string ms_wd) {
   int ms_a = ms_tk_get(ms_tk, ms_t, 1);
   int ms_ok = 0;
   if(ms_a >= 0) {
-    ms_ok = str_eqat(ms_s, ms_a, ms_wd) && ms_tk[3 * ms_t + 2] - ms_a == len(ms_wd);
+    ms_ok = string_equals_at(ms_s, ms_a, ms_wd) && ms_tk[3 * ms_t + 2] - ms_a == len(ms_wd);
   }
 } return int ms_ok;
 ("ab cd", [0, 0, 2, 0, 3, 5], 1, "cd"):(1)

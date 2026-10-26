@@ -26,7 +26,7 @@ esc_xmemo(int export_slot, string nm) {
     push((import esc_xm), 0 - 1);
   }
   if((import esc_xm)[export_slot] < 0) {
-    lset((import esc_xm), export_slot, esc_xcheck(export_slot, nm));
+    integer_list_set((import esc_xm), export_slot, esc_xcheck(export_slot, nm));
   }
   int ok = (import esc_xm)[export_slot];
 } return int ok;

@@ -1,7 +1,7 @@
 fix_type_ok(int i) {
   string t = fix_evtype(i);
   int ok = 0;
-  if(t != "" && t != "void" && str_find(t, "?") < 0 && ty_is_func(t) == 0) {
+  if(t != "" && t != "void" && string_find(t, "?") < 0 && ty_is_func(t) == 0) {
     ok = fix_spanok((import fixe_n)[i]);
   }
 } return int ok;

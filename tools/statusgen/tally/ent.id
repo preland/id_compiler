@@ -3,7 +3,7 @@
 // (more, rest, tail, cont, partN).
 
 sg_depth(string sgq_e) {
-  string[] sgq_p = str_split(sgq_e, "/");
+  string[] sgq_p = string_split(sgq_e, "/");
   int sgq_d = len(sgq_p) - 1;
   if(sgq_d > (import sg_k_ndep) - 1) {
     sgq_d = (import sg_k_ndep) - 1;
@@ -28,7 +28,7 @@ sg_digits(string sgg_s) {
 
 sg_fillname(string sgn_n) {
   int sgn_r = list_string_index((import sg_fills), sgn_n) >= 0;
-  if(str_starts(sgn_n, "part") == 1) {
+  if(string_starts_with(sgn_n, "part") == 1) {
     string sgn_rest = str_sub(sgn_n, 4, len(sgn_n) - 4);
     sgn_r = sg_digits(sgn_rest);
   }

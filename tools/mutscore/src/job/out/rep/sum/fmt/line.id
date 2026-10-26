@@ -5,7 +5,7 @@
 // tree's key has no function part; its column is left empty.
 ms_rg_tsv(string[] ms_ks, int[] ms_cn, int ms_ix, int ms_lv) {
   string ms_kk = ms_ks[ms_ix];
-  if(str_find(ms_kk, "\t") < 0) {
+  if(string_find(ms_kk, "\t") < 0) {
     ms_kk = ms_kk + "\t";
   }
   string ms_ln = (import ms_lv_names)[ms_lv] + "\t" + ms_kk + "\t" + ms_rp_fig(ms_cn, ms_ix);
@@ -16,7 +16,7 @@ ms_rg_tsv(string[] ms_ks, int[] ms_cn, int ms_ix, int ms_lv) {
 
 // The line for group ms_ix in the form to read: the figures, then the key.
 ms_rg_txt(string[] ms_ks, int[] ms_cn, int ms_ix) {
-  string ms_kk = str_replace(ms_ks[ms_ix], "\t", " ");
+  string ms_kk = string_replace(ms_ks[ms_ix], "\t", " ");
   if(len(ms_kk) == 0) {
     ms_kk = "(whole tree)";
   }

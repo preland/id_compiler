@@ -4,7 +4,7 @@
 // not given a code yet is not seen as one, so what follows from it is not tagged.
 dg_is_syntax(string dg_sy_h) {
   string dg_sy_c = dg_code(dg_sy_h);
-  int dg_sy_r = str_starts(dg_sy_c, "E01");
+  int dg_sy_r = string_starts_with(dg_sy_c, "E01");
 } return int dg_sy_r;
 ("a.id:1: error: expected '=' [E0101]"):(1)
 ("a.id:1: error: undefined variable 'x' [E0301]"):(0)
@@ -15,7 +15,7 @@ dg_is_syntax(string dg_sy_h) {
 // type. `undefined variable ';'` is one; `undefined variable 'count'` is not.
 dg_artefact(string dg_ar_h) {
   string dg_ar_m = dg_msg(dg_ar_h);
-  int dg_ar_q = str_find(dg_ar_m, "'");
+  int dg_ar_q = string_find(dg_ar_m, "'");
   int dg_ar_r = 0;
 } chain (string dg_ar_h) {
   if(dg_ar_q >= 0 && dg_ar_q + 1 < len(dg_ar_m)) {

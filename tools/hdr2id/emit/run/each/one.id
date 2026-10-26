@@ -2,7 +2,7 @@
 
 // Maps the signature whose lines are joined by newlines in hd_line when pl_verdict allows it, and otherwise adds a row to the report saying why not.
 hd_one(string hd_pre, string hd_line, string[][] hd_o) {
-  string[] hd_s = str_split(hd_line, "\n");
+  string[] hd_s = string_split(hd_line, "\n");
   string hd_why = pl_verdict(hd_s);
   if (hd_why == "") {
     hd_take(hd_pre, hd_s, hd_o);

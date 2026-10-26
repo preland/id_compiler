@@ -27,14 +27,14 @@ ms_rn_argv(string[] ms_cf) {
 // "invalid" (it did not compile), or "error" (it failed some other way).
 ms_rn_class(string ms_tx, int ms_rc) {
   string ms_st = "error";
-  if(str_find(ms_tx, ": error:") >= 0) {
+  if(string_find(ms_tx, ": error:") >= 0) {
     ms_st = "invalid";
   }
   if(ms_rc == 0) {
     ms_st = "survived";
   }
 } chain (string ms_tx, int ms_rc) {
-  if(str_find(ms_tx, ": test failed") >= 0) {
+  if(string_find(ms_tx, ": test failed") >= 0) {
     ms_st = "killed";
   }
   if(ms_rc == -2) {

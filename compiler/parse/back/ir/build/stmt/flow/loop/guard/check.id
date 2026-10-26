@@ -10,7 +10,7 @@ gd_known(string gdk_tok) {
   if(gt_isar(gdk_tok) == 1) {
     gdk_ok = gt_arity(gdk_tok) >= 1;
   }
-  if(str_starts(gdk_tok, "v:") == 1) {
+  if(string_starts_with(gdk_tok, "v:") == 1) {
     gdk_ok = gd_okname(gt_tail(gdk_tok));
   }
 } return int gdk_ok;

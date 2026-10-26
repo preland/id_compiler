@@ -27,12 +27,12 @@ given dg_t_graph (0):() then (import dg_ctr)[1]:(2)
 given dg_t_scc (0):() then (import dg_ctr)[1]:(4)
 
 dg_visit(int dgv) {
-  lset((import dg_ix), dgv, (import dg_ctr)[0]);
-  lset((import dg_low), dgv, (import dg_ctr)[0]);
-  lset((import dg_ctr), 0, (import dg_ctr)[0] + 1);
+  integer_list_set((import dg_ix), dgv, (import dg_ctr)[0]);
+  integer_list_set((import dg_low), dgv, (import dg_ctr)[0]);
+  integer_list_set((import dg_ctr), 0, (import dg_ctr)[0] + 1);
 } chain (int dgv) {
   push((import dg_stk), dgv);
-  lset((import dg_on), dgv, 1);
+  integer_list_set((import dg_on), dgv, 1);
   dg_succ(dgv, 0);
 } chain (int dgv) {
   if((import dg_low)[dgv] == (import dg_ix)[dgv]) {

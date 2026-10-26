@@ -19,7 +19,7 @@ pl_pass(string[] pl_s, int pl_bf, string[] pl_acc) {
 pl_lead(string[] pl_ls, string pl_ld) {
   string pl_r = "";
   if (len(pl_ls) > 0) {
-    pl_r = pl_ld + str_join(pl_ls, "\n" + pl_ld) + "\n";
+    pl_r = pl_ld + string_join(pl_ls, "\n" + pl_ld) + "\n";
   }
 } return string pl_r;
 (["int a;", "int b;"], "    "):("    int a;\n    int b;\n")

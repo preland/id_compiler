@@ -47,7 +47,7 @@ esc_fix() {
 } chain () {
   esc_fx_e();
   esc_seed();
-  lset((import sqbase), 0, (import efc_fn));
+  integer_list_set((import sqbase), 0, (import efc_fn));
 } return void;
 given esc_fix ():() then calls add_func:("fa_loc", "int[]", (import efb_fn))
 given esc_fix ():() then calls add_func:("fa_nest", "int[]", (import efc_fn))

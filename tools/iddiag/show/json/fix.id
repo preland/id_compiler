@@ -3,7 +3,7 @@
 // applied as a `help:` followed by its edits.
 
 dg_groups(string dg_gr_b) {
-  string[] dg_gr_l = str_split(dg_gr_b, "\n");
+  string[] dg_gr_l = string_split(dg_gr_b, "\n");
   string[] dg_gr_o = [];
   int dg_gr_i = 1;
 } chain (string dg_gr_b) {
@@ -33,7 +33,7 @@ dg_gfold(string[] dg_gf_o, string dg_gf_l) {
 // One fix as a JSON object: its text, whether and how far it can be applied, and
 // the edits that were placed in the file.
 dg_jfix(string dg_jf_g, string dg_jf_f) {
-  string[] dg_jf_l = str_split(dg_jf_g, "\n");
+  string[] dg_jf_l = string_split(dg_jf_g, "\n");
   string dg_jf_d = dg_kv(dg_jf_l[0]);
   string dg_jf_e = dg_jedits(dg_jf_g, dg_jf_f);
 } chain (string dg_jf_g, string dg_jf_f) {

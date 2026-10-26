@@ -9,13 +9,13 @@ pl_tag(string pl_c) {
 
 // The line that forgets the handle after the call, for a function whose name has one of release_words in it and whose first parameter is a handle; "" for any other.
 pl_drop(string[] pl_s) {
-  string pl_lw = str_lower(pl_field(pl_s[0], 0));
+  string pl_lw = string_lower(pl_field(pl_s[0], 0));
   int pl_i = 0;
   string pl_r = "";
 } chain (string[] pl_s) {
   string[] pl_ws = (import release_words);
-  while (pl_i < len(pl_ws) && len(pl_s) > 1 && str_starts(pl_field(pl_s[1], 0), "H:") == 1) {
-    if (str_find(pl_lw, pl_ws[pl_i]) >= 0) {
+  while (pl_i < len(pl_ws) && len(pl_s) > 1 && string_starts_with(pl_field(pl_s[1], 0), "H:") == 1) {
+    if (string_find(pl_lw, pl_ws[pl_i]) >= 0) {
       pl_r = "    h_drop(&h_" + pl_tag(pl_field(pl_s[1], 0)) + ", p1);\n";
     }
     pl_i = pl_i + 1;
@@ -42,7 +42,7 @@ pl_ret(string[] pl_s) {
   if (pl_rc == "s") {
     pl_ex = "id_str_of_cstr(r ? r : \"\")";
   }
-  if (str_starts(pl_rc, "H:") == 1) {
+  if (string_starts_with(pl_rc, "H:") == 1) {
     pl_ex = "r ? h_put(&h_" + pl_tag(pl_rc) + ", r) : -1";
   }
   if (pl_rc == "v") {

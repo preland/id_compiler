@@ -12,7 +12,7 @@ dg_t_claim() {
 
 dg_t_std() {
   dg_t_built();
-  lset((import stdunit), 0, 0);
+  integer_list_set((import stdunit), 0, 0);
 } return void;
 ():() then dg_nfn:(2)
 ():() then len((import dg_comp)):(3)

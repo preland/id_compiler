@@ -5,7 +5,7 @@
 
 ty_is_end(string t) {
   int ok = 0;
-  if(str_find(t, "sender(") == 0 || str_find(t, "receiver(") == 0) {
+  if(string_find(t, "sender(") == 0 || string_find(t, "receiver(") == 0) {
     ok = 1;
   }
 } return int ok;

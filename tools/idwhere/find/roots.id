@@ -16,7 +16,7 @@ iw_roots(string iw_xarg, string[] iw_xroots) {
   int iw_xcode = iw_xn == 0;
 } chain (string iw_xarg, string[] iw_xroots) {
   if(iw_xn == 0) {
-    eprint("idwhere: no function '" + iw_xarg + "' under " + str_join(iw_xroots, ", ") + "; NAME is the exact function name (or FILE::NAME, FILE being the end of its path), so check the spelling, and pass the project and the standard library as roots");
+    eprint("idwhere: no function '" + iw_xarg + "' under " + string_join(iw_xroots, ", ") + "; NAME is the exact function name (or FILE::NAME, FILE being the end of its path), so check the spelling, and pass the project and the standard library as roots");
   }
 } return int iw_xcode;
 ("iw_usage", ["."]):(0) then prints:("main.id:11: iw_usage() -> void\n")
@@ -36,7 +36,7 @@ iw_show(string iw_hroot, string[] iw_hrows) {
 
 iw_shown(string iw_nroot, string iw_nrow) {
   string iw_npath = path_join(iw_nroot, iw_nrow);
-  if(str_starts(iw_npath, "./") == 1) {
+  if(string_starts_with(iw_npath, "./") == 1) {
     iw_npath = str_sub(iw_npath, 2, len(iw_npath) - 2);
   }
 } return string iw_npath;

@@ -25,10 +25,10 @@ ms_cl_has(string[] ms_av, string ms_nm) {
 // working directory ms_wd), without a trailing slash.
 ms_cl_abs(string ms_pt, string ms_wd) {
   string ms_ap = ms_pt;
-  if(str_starts(ms_pt, "/") == 0) {
+  if(string_starts_with(ms_pt, "/") == 0) {
     ms_ap = path_join(ms_wd, ms_pt);
   }
-  if(len(ms_ap) > 1 && str_ends(ms_ap, "/") == 1) {
+  if(len(ms_ap) > 1 && string_ends_with(ms_ap, "/") == 1) {
     ms_ap = str_sub(ms_ap, 0, len(ms_ap) - 1);
   }
 } return string ms_ap;

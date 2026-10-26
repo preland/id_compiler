@@ -35,7 +35,7 @@ lx_inv(int lg_e, int lg_lo, int lg_hi) {
 } return int lg_r;
 given lpq_cs(0) ((import lpq_gi), (import lpq_loi), (import lpq_hii)):(1)
 given lpq_cs(0) ((import lpq_gj), (import lpq_loi), (import lpq_hii)):(0)
-given lpq_cs(0) given lset((import harn), 0, 1) ((import lpq_gi), (import lpq_loi), (import lpq_hii)):(0)
+given lpq_cs(0) given integer_list_set((import harn), 0, 1) ((import lpq_gi), (import lpq_loi), (import lpq_hii)):(0)
 given lpq_cs(0) ((import lpq_gi), (import lpf_log), (import lpf_hig)):(0)
 
 lx_var(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {

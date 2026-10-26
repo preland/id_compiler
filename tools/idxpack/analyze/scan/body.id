@@ -22,7 +22,7 @@ func_end_line(string file, int line, string[] all_lines) {
     gi = gi + 1;
   }
   while(j < best) {
-    if(str_find(all_lines[j], "} return") == 0) {
+    if(string_find(all_lines[j], "} return") == 0) {
       best = j + 1;
     }
     j = j + 1;

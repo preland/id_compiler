@@ -1,6 +1,6 @@
 // Is this conf.id line a constant declaration: a type, a name, and an `=`.
 dr_isconst(string line) {
-  string tn = ld_sub(line, 0, str_find(line, " "));
+  string tn = ld_sub(line, 0, string_find(line, " "));
   int ok = tn == "int" || tn == "int[]" || tn == "word" || tn == "word[]" || tn == "float" || tn == "float[]" || tn == "string" || tn == "string[]";
 } return int ok;
 ("int a = 1;"):(1)

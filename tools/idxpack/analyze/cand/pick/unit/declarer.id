@@ -24,7 +24,7 @@ pick_declarer(string reader_path, string name) {
   }
 } chain (string reader_path, string name) {
   string chosen = same_fn;
-  if(str_cmp(chosen, "") == 0) {
+  if(string_compare(chosen, "") == 0) {
     int any_i = idx_find_str((import ix_ename), name);
     if(any_i >= 0) {
       chosen = (import ix_fn)[(import ix_efn)[any_i]];
@@ -41,7 +41,7 @@ given unit_fixture ("/repo/idstd/y.id", "gv"):("b")
 pick_declarer_step(string name, int reader_std, int i, string acc) {
   string ret_s = acc;
   int matches = 0;
-  if(str_cmp(acc, "") == 0 && str_cmp((import ix_ename)[i], name) == 0) {
+  if(string_compare(acc, "") == 0 && string_compare((import ix_ename)[i], name) == 0) {
     int d_std = path_is_std((import ix_file)[(import ix_efn)[i]]);
     if(d_std == reader_std) {
       matches = 1;

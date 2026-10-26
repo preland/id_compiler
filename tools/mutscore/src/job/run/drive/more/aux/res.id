@@ -11,7 +11,7 @@ given ms_t_tree ("killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id
 
 // What the log file holds.
 ms_t_logtxt() {
-  string ms_q = str_replace(fs_read_text((import ms_t_log)), "\t", "|");
+  string ms_q = string_replace(fs_read_text((import ms_t_log)), "\t", "|");
 } return string ms_q;
 given ms_t_tree ():("")
 given ms_t_tree given ms_t_wlog("killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id\tf\t3\t9\tdel\t\tx;  =>  \nstray\n") ():("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\n")

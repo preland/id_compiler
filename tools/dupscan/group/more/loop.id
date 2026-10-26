@@ -24,7 +24,7 @@ given ds_test_setup (4):() then prints:("")
 
 group_head(int i, int[] grp) {
   push(grp, i);
-  lset((import ds_seen), i, 1);
+  integer_list_set((import ds_seen), i, 1);
   group_rest(i, grp);
 } return void;
 given ds_test_setup (0, []):(0, [0, 1, 2])

@@ -71,7 +71,7 @@ fit_then_ix(int ci, int ix_node) {
   }
 } return void;
 given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_cix)):() then prints:("fixture.id:4: error: (import gx) is an exported variable, and only a conf.id constant may stand in a then check's index: a variable's value is what the check is testing; name a constant, or write the index as a number\n")
-given then_imp_fixture ("string", 0, 0) given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import then_imp_cix)):() then prints:("fixture.id:4: error: this case gives (import gx), a string, where a int is required\n")
-given then_imp_fixture ("int", 0, 0) given sset((import enames), 0, "zz") ((import fixture_ci), (import then_imp_cix)):() then prints:("fixture.id:4: error: (import gx): 'gx' is not an exported variable or a conf.id constant\n")
+given then_imp_fixture ("string", 0, 0) given string_list_set((import eowners), 0, "conf.id") ((import fixture_ci), (import then_imp_cix)):() then prints:("fixture.id:4: error: this case gives (import gx), a string, where a int is required\n")
+given then_imp_fixture ("int", 0, 0) given string_list_set((import enames), 0, "zz") ((import fixture_ci), (import then_imp_cix)):() then prints:("fixture.id:4: error: (import gx): 'gx' is not an exported variable or a conf.id constant\n")
 given then_imp_fixture ("int[]", 0, 0) ((import fixture_ci), (import fixture_zero)):() then prints:("")
-given then_imp_fixture ("int", 0, 0) given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import then_imp_cix)):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given string_list_set((import eowners), 0, "conf.id") ((import fixture_ci), (import then_imp_cix)):() then prints:("")

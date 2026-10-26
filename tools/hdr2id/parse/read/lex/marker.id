@@ -2,9 +2,9 @@
 
 // The path a linemarker line names, or "" for any line that is not one. A linemarker is # then a space then a line number.
 hx_marker(string lx_line) {
-  int lx_ok = str_starts(lx_line, "# ") && character_is_digit(character_code_at(lx_line, 2));
-  int lx_a = str_find(lx_line, "\"");
-  int lx_b = str_findat(lx_line, "\"", lx_a + 1);
+  int lx_ok = string_starts_with(lx_line, "# ") && character_is_digit(character_code_at(lx_line, 2));
+  int lx_a = string_find(lx_line, "\"");
+  int lx_b = string_find_from(lx_line, "\"", lx_a + 1);
 } chain (string lx_line) {
   string lx_path = "";
   if (lx_ok == 1 && lx_a >= 0 && lx_b > lx_a) {
@@ -19,7 +19,7 @@ hx_marker(string lx_line) {
 // "@in" when the file at lx_path is the header being read, which ends with lx_suffix, and "@out" when it is any other file: the marker tokens that tell the statement reader whose declarations it is looking at.
 hx_side(string lx_path, string lx_suffix) {
   string lx_side = "@out";
-  if (str_ends(lx_path, lx_suffix) == 1) {
+  if (string_ends_with(lx_path, lx_suffix) == 1) {
     lx_side = "@in";
   }
 } return string lx_side;
@@ -32,7 +32,7 @@ hx_feed(string lx_line, string lx_suffix, string[] lx_toks) {
   if (lx_path != "") {
     push(lx_toks, hx_side(lx_path, lx_suffix));
   }
-  if (lx_path == "" && str_starts(lx_line, "#") == 0) {
+  if (lx_path == "" && string_starts_with(lx_line, "#") == 0) {
     hx_line(lx_line, lx_toks);
   }
 } return void;

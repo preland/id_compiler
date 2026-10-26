@@ -19,9 +19,9 @@ emit_loop_fast(int id, string ind) {
   print(ind + "if (" + lq_pre + ") {");
   lp_hoist(id, ind + "    ");
 } chain (int id, string ind) {
-  lset((import lpon), 0, 1);
+  integer_list_set((import lpon), 0, 1);
   emit_while(id, ind + "    ");
-  lset((import lpon), 0, 0);
+  integer_list_set((import lpon), 0, 0);
 } chain (int id, string ind) {
   print(ind + "} else {");
   emit_while(id, ind + "    ");

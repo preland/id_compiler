@@ -22,7 +22,7 @@
 chk_dead() {
   init_reach();
   reach_mark();
-  lset((import dphase), 0, 1);
+  integer_list_set((import dphase), 0, 1);
 } chain () {
   reach_funcs(0, 0);
   const_mark(0);

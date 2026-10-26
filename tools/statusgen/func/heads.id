@@ -3,7 +3,7 @@
 // `LINE TAB NAME` for each function header in the text of a file (lib/fnhead
 // says what a header is).
 sg_heads(string sgh_t) {
-  string[] sgh_ls = str_split(sgh_t, "\n");
+  string[] sgh_ls = string_split(sgh_t, "\n");
   string[] sgh_r = [];
   int sgh_i = 0;
 } chain (string sgh_t) {
@@ -21,7 +21,7 @@ sg_heads(string sgh_t) {
 // `FILE TAB LINE TAB NAME TAB CASES` for the header sgw_head (an sg_heads row)
 // of the file sgw_rel, whose case rows are sgw_rows[sgw_rg[0]] up to sgw_rg[1].
 sg_frow(string sgw_rel, string sgw_head, string[] sgw_rows, int[] sgw_rg) {
-  string[] sgw_p = str_split(sgw_head, "\t");
+  string[] sgw_p = string_split(sgw_head, "\t");
   int sgw_n = sg_count(sgw_rows, sgw_rg[0], sgw_rg[1], sgw_rel, sgw_p[1]);
   string sgw_r = sgw_rel + "\t" + sgw_p[0] + "\t" + sgw_p[1] + "\t" + sgw_n;
 } return string sgw_r;

@@ -17,7 +17,7 @@ given ms_t_tree given ms_t_wlog("killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsu
 
 // The mutants a results file already has an answer for, as keys.
 ms_dr_done(string ms_pa) {
-  string[] ms_lns = str_lines(fs_read_text(ms_pa));
+  string[] ms_lns = string_lines(fs_read_text(ms_pa));
   string[] ms_ks = [];
   int ms_i = 0;
 } chain (string ms_pa) {

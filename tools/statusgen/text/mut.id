@@ -3,7 +3,7 @@ sg_hasres(string[] sgrh_ls) {
   int sgrh_n = 0;
   int sgrh_i = 0;
   while(sgrh_i < len(sgrh_ls)) {
-    sgrh_n = sgrh_n + (str_starts(sgrh_ls[sgrh_i], "r-") == 1 && str_ends(sgrh_ls[sgrh_i], ".tsv") == 1);
+    sgrh_n = sgrh_n + (string_starts_with(sgrh_ls[sgrh_i], "r-") == 1 && string_ends_with(sgrh_ls[sgrh_i], ".tsv") == 1);
     sgrh_i = sgrh_i + 1;
   }
 } return int sgrh_n;
@@ -13,7 +13,7 @@ sg_hasres(string[] sgrh_ls) {
 // The tree row of `mutscore report DIR --tsv` as a sentence: its columns are
 // level, file, function, killed, survived, invalid, other and the score.
 sg_mutline(string[] sgrl_rows) {
-  string[] sgrl_p = str_split(sg_pick(sgrl_rows, "tree\t"), "\t");
+  string[] sgrl_p = string_split(sg_pick(sgrl_rows, "tree\t"), "\t");
   string sgrl_r = "";
   if(len(sgrl_p) > 7) {
     sgrl_r = sgrl_p[7] + "% (" + sgrl_p[3] + " killed, " + sgrl_p[4] + " survived; " + sgrl_p[5] + " invalid, " + sgrl_p[6] + " other)";
@@ -32,7 +32,7 @@ sg_mut(string sgrm_mut, string sgrm_dir) {
 } chain (string sgrm_mut, string sgrm_dir) {
   if(sg_hasres(sgrm_ls) > 0) {
     string sgrm_text = exec_out(sgrm_mut + "\nreport\n" + sgrm_dir + "\n--tsv\n", sgrm_code);
-    sgrm_r = sg_mutline(str_split(sgrm_text, "\n"));
+    sgrm_r = sg_mutline(string_split(sgrm_text, "\n"));
   }
   if(sgrm_r == "" && len(sgrm_ls) > 1 && sg_hasres(sgrm_ls) > 0) {
     sgrm_r = "unreadable";

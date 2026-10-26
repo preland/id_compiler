@@ -13,8 +13,8 @@ harn_init() {
 // init/more/call.id): the answer holds while one unit's functions are emitted,
 // and the harness narrows the program between units and restores it after.
 kept_lists_reset() {
-  lset((import kept_lists), 0, 0 - 1);
+  integer_list_set((import kept_lists), 0, 0 - 1);
 } return void;
-given lc_dce_setup given lset((import kept_lists), 0, 5) ():() then (import kept_lists)[0]:(-1)
-given lc_dce_setup2 given lset((import kept_lists), 0, 7) ():() then (import kept_lists)[0]:(-1)
+given lc_dce_setup given integer_list_set((import kept_lists), 0, 5) ():() then (import kept_lists)[0]:(-1)
+given lc_dce_setup2 given integer_list_set((import kept_lists), 0, 7) ():() then (import kept_lists)[0]:(-1)
 

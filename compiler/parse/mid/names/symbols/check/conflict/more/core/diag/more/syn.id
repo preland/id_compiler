@@ -9,7 +9,7 @@ syn_diag(int[] pos, string dgn_code, string dgn_msg, string dgn_at, string dgn_w
   string dgn_sloc = dgn_sfile + ":" + dgn_sline;
 } chain (int[] pos, string dgn_code, string dgn_msg, string dgn_at, string dgn_why, string dgn_help) {
   diag(dgn_code, dgn_sloc, dgn_msg, dgn_at, dgn_why, dgn_help);
-  lset((import synfail), 0, 1);
+  integer_list_set((import synfail), 0, 1);
 } return void;
 given mk_two_toks ([0], "E0099", "bad", "x", "because", "do this"):() then prints:("<stdin>:1: error: bad [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import synfail)[0]:(1)
 given mk_two_toks ([1], "E0098", "worse", "", "", ""):() then prints:("<stdin>:1: error: worse [E0098]\n") then (import chkfail)[0]:(1)

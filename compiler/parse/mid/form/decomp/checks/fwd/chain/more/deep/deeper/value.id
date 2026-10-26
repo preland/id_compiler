@@ -28,7 +28,7 @@ given farm_k ("fv(target)", 0):(1)
 given farm_k ("fv(nope)", 0):(0)
 
 fwd_used_step(string needle, int idx) {
-  int hitpos = str_find((import cfp)[idx], needle);
+  int hitpos = string_find((import cfp)[idx], needle);
   int ok = 0;
   if(hitpos >= 0) {
     ok = 1;

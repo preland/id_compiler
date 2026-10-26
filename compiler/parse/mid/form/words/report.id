@@ -3,7 +3,7 @@
 // not words, then the two ways out. The why is conf.id's vocab_why.
 
 vocab_report(string vocab_name, int vocab_kind, int vocab_row, string vocab_failed) {
-  lset((import vocab_totals), 1, (import vocab_totals)[1] + 1);
+  integer_list_set((import vocab_totals), 1, (import vocab_totals)[1] + 1);
   string vocab_where = vocab_loc(vocab_kind, vocab_row, vocab_name);
   string vocab_msg = (import vocab_labels)[vocab_kind] + " '" + vocab_name + "' is not spelled in words: " + vocab_failed;
 } chain (string vocab_name, int vocab_kind, int vocab_row, string vocab_failed) {
@@ -16,7 +16,7 @@ given vocab_world ("fb_w", 0, 0, "fb, w"):() then (import vocab_totals)[1]:(1)
 given sd_pair given vocab_words ("y", 4, 0, "y"):() then prints:("p.id:1: error: struct field 'y' is not spelled in words: y [E0311]\n  at: y\n  why: a name is read by people who did not write it, so each part of it has to be a word they already know; an abbreviation means one thing to its author and another to everyone else\n  help: spell out 'y' as a word, or add it to idc/data/words/allowed.txt if it is a real term\n")
 
 vocab_first(string vocab_list) {
-  int vocab_cut = str_find(vocab_list, ", ");
+  int vocab_cut = string_find(vocab_list, ", ");
   string vocab_head = vocab_list;
   if(vocab_cut >= 0) {
     vocab_head = str_sub(vocab_list, 0, vocab_cut);

@@ -7,8 +7,8 @@
 seal_rets(string name, string rt) {
   while(len((import pend_rets)) > 0) {
     int seal_r = pop((import pend_rets));
-    sset((import ns1), seal_r, name);
-    sset((import ns2), seal_r, rt);
+    string_list_set((import ns1), seal_r, name);
+    string_list_set((import ns2), seal_r, rt);
   }
 } return void;
 given seal_fixture ("f", "int"):() then last_s1:("s1 f")
@@ -31,7 +31,7 @@ retexp_bind(int fnode) {
   if(len((import retexp_pend)) > 0) {
     string rb_nm = pop((import retexp_pend));
     push((import retexp), rb_nm);
-    lset((import ni2), fnode, len((import retexp)) + 1);
+    integer_list_set((import ni2), fnode, len((import retexp)) + 1);
   }
 } return void;
 given fn_fixture given list_string_extend((import retexp_pend), ["gx"]) ((import fixture_fn)):() then len((import retexp)):(1) then len((import retexp_pend)):(0)

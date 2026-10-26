@@ -4,9 +4,9 @@
 qa_check_paths() {
   string qa_q = (import qm_qmp_path);
   string qa_s = (import qm_ser_path);
-  int qa_qok = (str_find(qa_q, "/tmp/qmon.") == 0) * (str_find(qa_q, ".qmp") == len(qa_q) - 4);
+  int qa_qok = (string_find(qa_q, "/tmp/qmon.") == 0) * (string_find(qa_q, ".qmp") == len(qa_q) - 4);
 } chain () {
-  int qa_sok = (str_find(qa_s, "/tmp/qmon.") == 0) * (str_find(qa_s, ".ser") == len(qa_s) - 4);
+  int qa_sok = (string_find(qa_s, "/tmp/qmon.") == 0) * (string_find(qa_s, ".ser") == len(qa_s) - 4);
   int qa_ok = qa_qok * qa_sok;
 } return int qa_ok;
 given mk_paths ():(1)

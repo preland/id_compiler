@@ -32,9 +32,9 @@ fit_then_imp(int chk_node) {
   }
 } return void;
 given then_imp_fixture ("string", 0, 0) ((import then_imp_node)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
-given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") ((import then_imp_node)):() then prints:("fixture.id:4: error: (import gx) needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it\n")
-given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") given sset((import eowners), 0, "fx_target") given list_string_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import then_imp_node)):() then prints:("")
-given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") given sset((import eowners), 0, "fx_target") ((import then_imp_node)):() then calls chk_own_import:[1]
+given then_imp_fixture ("int", 0, 0) given string_list_set((import casegiven), (import fixture_ci), "") ((import then_imp_node)):() then prints:("fixture.id:4: error: (import gx) needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it\n")
+given then_imp_fixture ("int", 0, 0) given string_list_set((import casegiven), (import fixture_ci), "") given string_list_set((import eowners), 0, "fx_target") given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import then_imp_node)):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given string_list_set((import casegiven), (import fixture_ci), "") given string_list_set((import eowners), 0, "fx_target") ((import then_imp_node)):() then calls chk_own_import:[1]
 given then_imp_fixture ("int", 1, 0) ((import then_imp_node)):() then calls then_imp_field:[1]
 given then_imp_fixture ("int", 0, 0) ((import then_imp_node)):() then calls then_imp_field:[1]
 

@@ -31,7 +31,7 @@ given unmet_req_fixture ("b"):(["d"])
 // is already there.
 reader_own_required_step(string path, string imp_name, string[] out_li) {
   string d = pick_declarer(path, imp_name);
-  if(str_cmp(d, "") != 0 && idx_find_str(out_li, d) < 0) {
+  if(string_compare(d, "") != 0 && idx_find_str(out_li, d) < 0) {
     push(out_li, d);
   }
 } return void;

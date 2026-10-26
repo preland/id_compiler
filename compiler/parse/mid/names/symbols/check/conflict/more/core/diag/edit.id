@@ -25,9 +25,9 @@ diag_edit(string dgn_appl, string dgn_op, int dgn_at_line, string dgn_needle, st
 ("placeholder", "after-function", 7, "", "(0):(0)\n"):() then prints:("  edit: placeholder\tafter-function\t7\t\t(0):(0)\\n\n")
 
 diag_esc(string dgn_raw) {
-  string dgn_esc_bs = str_replace(dgn_raw, "\\", "\\\\");
-  string dgn_esc_nl = str_replace(dgn_esc_bs, "\n", "\\n");
-  string dgn_esc_tab = str_replace(dgn_esc_nl, "\t", "\\t");
+  string dgn_esc_bs = string_replace(dgn_raw, "\\", "\\\\");
+  string dgn_esc_nl = string_replace(dgn_esc_bs, "\n", "\\n");
+  string dgn_esc_tab = string_replace(dgn_esc_nl, "\t", "\\t");
 } return string dgn_esc_tab;
 ("a\\b"):("a\\\\b")
 ("a\nb\tc"):("a\\nb\\tc")

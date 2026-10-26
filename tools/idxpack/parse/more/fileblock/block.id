@@ -28,16 +28,16 @@ fx_fill_block(string[] paths, string[][] blocks, string[] lines, int i, string c
 // hmap and appended to ix_ename/ix_efn -- a line that does not declare an
 // export contributes nothing to either.
 ix_scan_export_line(string export_src_line, int fn_idx) {
-  int p = str_find(export_src_line, "export ");
+  int p = string_find(export_src_line, "export ");
   int rest_n = len(export_src_line) - p - 7;
   string name = "";
 } chain (string export_src_line, int fn_idx) {
   if(p >= 0) {
     string rest = str_sub(export_src_line, p + 7, rest_n);
-    string[] parts = str_split(rest, " ");
+    string[] parts = string_split(rest, " ");
     name = parts[1];
   }
-  if(str_cmp(name, "") != 0) {
+  if(string_compare(name, "") != 0) {
     hash_map_put((import ix_ekeys), (import ix_evals), (import ix_eused), (import ix_ecnt), name, fn_idx);
     push((import ix_ename), name);
     push((import ix_efn), fn_idx);

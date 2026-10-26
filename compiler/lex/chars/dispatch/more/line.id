@@ -4,7 +4,7 @@
 // to carry a private copy of it.
 
 bump_line() {
-  lset((import lexline), 0, (import lexline)[0] + 1);
+  integer_list_set((import lexline), 0, (import lexline)[0] + 1);
   print("line " + (import lexline)[0]);
 } return void;
 given lex_fix_setup ():() then prints:("line 2\n")

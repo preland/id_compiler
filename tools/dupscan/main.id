@@ -23,7 +23,7 @@ stdin "projA\tFPX\tfoo\tfileA.id:10\n" (1, ["prog"]):(0) then prints:("")
 
 scan_text(string text, string tab) {
   string nl = chr(10);
-  string[] lines = str_split(text, nl);
+  string[] lines = string_split(text, nl);
   scan_lines(lines, tab);
 } return void;
 ("projA\tFPX\tfoo\tfileA.id:10\nprojB\tFPX\tfoo\tfileB.id:20", "\t"):() then prints:("2 copies of foo:\n    fileA.id:10\n    fileB.id:20\n")

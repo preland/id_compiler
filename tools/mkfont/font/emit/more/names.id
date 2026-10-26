@@ -4,7 +4,7 @@
 mf_imports(int n) {
   string[] strs = [];
   mf_names(strs, n);
-  string sum = str_join(strs, " + ");
+  string sum = string_join(strs, " + ");
 } return string sum;
 (2):("(import font_rom0) + (import font_rom1)")
 (1):("(import font_rom0)")

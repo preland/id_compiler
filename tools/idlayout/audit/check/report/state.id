@@ -20,7 +20,7 @@ given lay_fixture_two_hits ():() then lay_report:(0)
 // A violation with the record's extra lines (docs/DIAGNOSTICS.md): the head line
 // carries the code, and the why and help follow it, indented, for tools/iddiag.
 lay_diag(string path, string lay_code, string text, string why, string help) {
-  string head = str_cat3(path, ":1: error: ", text + " [" + lay_code + "]");
+  string head = string_join_around_middle(path, ":1: error: ", text + " [" + lay_code + "]");
   string full = head + "\n  why: " + why + "\n  help: " + help;
 } return string full;
 ("a/b.id", "E0090", "bad", "because", "do this"):("a/b.id:1: error: bad [E0090]\n  why: because\n  help: do this")

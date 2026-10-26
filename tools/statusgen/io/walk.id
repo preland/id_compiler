@@ -27,8 +27,8 @@ given sg_t_tree ([], [], (import sg_t_root), "sub/"):(["sub/more/"], ["sub/b.id"
 
 sg_entry(string[] sge_todo, string[] sge_ents, string sge_dir, string sge_e) {
   string sge_rel = path_join(sge_dir, sge_e);
-  int sge_src = str_ends(sge_e, ".id");
-  int sge_sub = str_ends(sge_e, "/") && str_starts(sge_e, ".") == 0 && sge_e != "build/";
+  int sge_src = string_ends_with(sge_e, ".id");
+  int sge_sub = string_ends_with(sge_e, "/") && string_starts_with(sge_e, ".") == 0 && sge_e != "build/";
 } chain (string[] sge_todo, string[] sge_ents, string sge_dir, string sge_e) {
   if(sge_src == 1 || sge_sub == 1) {
     push(sge_ents, sge_rel);

@@ -21,7 +21,7 @@ given m2r_outv_fixture (0, 0):() then outv_sum:("outv -1") then chk_op:("op add"
 
 m2r_kept(int id, int i, int j) {
   int ir_b_v = (import ib)[id];
-  lset((import outv)[i], j, ir_b_v);
+  integer_list_set((import outv)[i], j, ir_b_v);
   ir_kill(id);
 } return void;
 given m2r_outv_fixture (0, 0, 0):() then outv_sum:("outv 4")

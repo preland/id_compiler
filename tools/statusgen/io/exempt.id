@@ -7,7 +7,7 @@
 sg_exrun(string sgr_idc, string sgr_path, string sgr_flags) {
   int[] sgr_code = [0];
   string sgr_text = exec_out(sg_exargv(sgr_idc, sgr_path, sgr_flags), sgr_code);
-  string[] sgr_rows = str_split(sgr_text, "\n");
+  string[] sgr_rows = string_split(sgr_text, "\n");
 } return string[] sgr_rows;
 ("sh\n-c\nprintf 'exempt|/a.id:3|f\\n'\nsh", "/p", "--a"):(["exempt|/a.id:3|f", ""])
 ("sh\n-c\nprintf 'short|/a.id:3|f|0\\n'\nsh", "/p", ""):(["short|/a.id:3|f|0", ""])
@@ -16,7 +16,7 @@ sg_exrun(string sgr_idc, string sgr_path, string sgr_flags) {
 // tree built for the host.
 sg_exempt(string sge_idc, string sge_root, string sge_label) {
   string sge_row = sg_fsrow(sge_label);
-  string[] sge_p = str_split(sge_row, "\t");
+  string[] sge_p = string_split(sge_row, "\t");
   string[] sge_out = [];
 } chain (string sge_idc, string sge_root, string sge_label) {
   if(sge_row != "") {
