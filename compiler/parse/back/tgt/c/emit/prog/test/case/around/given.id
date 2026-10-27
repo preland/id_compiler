@@ -41,7 +41,7 @@ emit_setup(int ci, int si, string nm) {
 } chain (int ci, int si, string nm) {
   string an = names_upto(len(items));
   emit_arg_lines(ps, items);
-  print("    id_" + nm + "(" + an + ");");
+  print("    " + fn_sym(nm) + "(" + an + ");");
 } chain (int ci, int si, string nm) {
   if(len(items) > 0) {
     print("    }");

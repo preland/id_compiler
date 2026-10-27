@@ -6,6 +6,8 @@ lit_int_fixture() {
   env_init();
   export int lit_e = node_txt2("int", "5", 5, 0);
   export int lit_e2 = node_txt2("int", "4", 4, 0);
+} chain () {
+  init_rtc();
 } return void;
 ():() then calls node_txt2:("int", "5", 5, 0)
 ():() then calls node_txt2:("int", "4", 4, 0)

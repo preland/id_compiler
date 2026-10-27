@@ -9,8 +9,8 @@ given sd_note_fixture ("int", "int"):() then prints:("static int idtc_eq_int(IdL
 given sd_note_fixture ("str", "string"):() then prints:("static int idtc_eq_str(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!(strcmp((char*)(intptr_t)(a->data[i]), (char*)(intptr_t)(b->data[i])) == 0)) return 0;\n    return 1;\n}\nstatic void idtc_show_str(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
 
 eq_cond(string et) {
-  string ga = unbox("a->data[i]", et);
-  string gb = unbox("b->data[i]", et);
+  string ga = unbox(lcell_at("a", "i"), et);
+  string gb = unbox(lcell_at("b", "i"), et);
   string so = tc_compare(ga, gb, et);
 } return string so;
 given sd_note_fixture ("int"):("((int)(a->data[i]) == (int)(b->data[i]))")
@@ -18,7 +18,7 @@ given sd_note_fixture ("string"):("(strcmp((char*)(intptr_t)(a->data[i]), (char*
 
 emit_eq_body(string key, string et) {
   string cmp = eq_cond(et);
-  print("static int idtc_eq_" + key + "(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!" + cmp + ") return 0;\n    return 1;\n}");
+  print("static int idtc_eq_" + key + "(IdList* a, IdList* b) {\n    if (" + lcell_len("a") + " != " + lcell_len("b") + ") return 0;\n    for (int i = 0; i < " + lcell_len("a") + "; i++)\n        if (!" + cmp + ") return 0;\n    return 1;\n}");
 } return void;
 given sd_note_fixture ("int", "int"):() then prints:("static int idtc_eq_int(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!((int)(a->data[i]) == (int)(b->data[i]))) return 0;\n    return 1;\n}\n")
 given sd_note_fixture ("str", "string"):() then prints:("static int idtc_eq_str(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!(strcmp((char*)(intptr_t)(a->data[i]), (char*)(intptr_t)(b->data[i])) == 0)) return 0;\n    return 1;\n}\n")

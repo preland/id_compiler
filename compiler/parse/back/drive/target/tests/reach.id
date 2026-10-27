@@ -33,6 +33,8 @@ seed_tested() {
     }
     ni = ni + 1;
   }
+} chain () {
+  seed_lists();
 } return void;
 given rfnfx_setup ():() then (import rfn)[0]:("conf.id")
 given seed_given_fixture ():() then len((import rfn)):(2)

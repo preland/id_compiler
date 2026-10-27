@@ -18,6 +18,8 @@ tctys_note_one_setup() {
   env_init();
   tc_types_init();
   note_one("int[]");
+} chain () {
+  init_rtc();
 } return void;
 ():() then calls note_one:("int[]")
 ():() then (import tctys)[0]:("int[]") then len((import tcsts)):(0)

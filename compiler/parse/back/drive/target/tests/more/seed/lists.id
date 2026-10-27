@@ -1,0 +1,23 @@
+// A --runtime harness builds a case's list literals with the tree's own
+// list_new and list_push and compares them with its list_len and list_get
+// (back/tgt/c/out/case/lit/rt.id), none of which a case names, so reachability
+// would drop them and the harness would call an undeclared function.
+
+seed_lists() {
+  if((import rtc)[0] == 1) {
+    seed_list_names();
+  }
+} return void;
+given seed_given_fixture given init_rtc ():() then len((import rfn)):(2)
+given seed_given_fixture given lcell_rt_fixture ():() then len((import rfn)):(4)
+
+seed_list_names() {
+  string[] wanted = ["list_new", "list_push", "list_len", "list_get"];
+  int wi = 0;
+  while(wi < len(wanted)) {
+    reach_add(wanted[wi]);
+    wi = wi + 1;
+  }
+} return void;
+given seed_given_fixture given lcell_rt_fixture ():() then len((import rfn)):(4)
+given seed_given_fixture given lcell_rt_fixture ():() then (import rfn)[0]:("main")

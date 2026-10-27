@@ -1,0 +1,31 @@
+// How the harness's list helpers read a list's length and its i-th cell. The
+// host runtime's lists are walked in place; a --runtime tree's lists have a
+// layout of their own, so there the tree's list_len and list_get read them.
+
+lcell_len(string listname) {
+  string so = listname + "->len";
+  if((import rtc)[0] == 1) {
+    so = fn_sym("list_len") + "(" + listname + ")";
+  }
+} return string so;
+given init_rtc ("a"):("a->len")
+given lcell_rt_fixture ("a"):("idr_list_len(a)")
+
+lcell_at(string listname, string cellindex) {
+  string so = listname + "->data[" + cellindex + "]";
+  if((import rtc)[0] == 1) {
+    so = fn_sym("list_get") + "(" + listname + ", " + cellindex + ")";
+  }
+} return string so;
+given init_rtc ("a", "i"):("a->data[i]")
+given lcell_rt_fixture ("a", "i"):("idr_list_get(a, i)")
+
+lcell_rt_fixture() {
+  lit_int_fixture();
+  rt_fixture();
+  push((import fnames), "list_len");
+} chain () {
+  push((import fnames), "list_get");
+} return void;
+():() then (import rtc)[0]:(1)
+():() then calls rt_fixture:[1]

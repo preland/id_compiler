@@ -1,0 +1,35 @@
+// A list literal built by the runtime tree's own list_new and list_push. In a
+// --runtime harness the host runtime's id_list_lit lays a list out differently
+// from the tree's lists, so a tree function handed one would read garbage;
+// the tree's constructors build the layout its own accessors read. A statement
+// expression keeps the literal usable wherever a value goes.
+
+tc_list_rt(int[] xs, string et) {
+  string pushes = tc_rt_pushes(xs, et);
+  string so = "({ IdList* idtc_l = " + fn_sym("list_new") + "();" + pushes + " idtc_l; })";
+} return string so;
+given lit_rt_fixture ([], "int"):("({ IdList* idtc_l = idr_list_new(); idtc_l; })")
+given lit_rt_fixture ((import lit_cells_xs), "int"):("({ IdList* idtc_l = idr_list_new(); idr_list_push(idtc_l, (long long)(5)); idr_list_push(idtc_l, (long long)(4)); idtc_l; })")
+
+tc_rt_pushes(int[] xs, string et) {
+  string out = "";
+  int i = 0;
+  while(i < len(xs)) {
+    string cv = tc_value(xs[i], et);
+    out = out + " " + fn_sym("list_push") + "(idtc_l, " + box(cv, et) + ");";
+    i = i + 1;
+  }
+} return string out;
+given lit_rt_fixture ([], "int"):("")
+given lit_rt_fixture ((import lit_cells_xs), "int"):(" idr_list_push(idtc_l, (long long)(5)); idr_list_push(idtc_l, (long long)(4));")
+
+lit_rt_fixture() {
+  lit_cells_fixture();
+  rt_fixture();
+  push((import fnames), "list_new");
+} chain () {
+  push((import fnames), "list_push");
+} return void;
+():() then (import rtc)[0]:(1)
+():() then len((import lit_cells_xs)):(2)
+():() then calls rt_fixture:[1]

@@ -8,6 +8,7 @@ sd_note_fixture() {
   init_struct_rows();
 } chain () {
   tc_types_init();
+  init_rtc();
 } return void;
 ():() then calls sd_note:("W", ["p", "n"], ["P", "int"], "w.id", 9)
 ():() then len((import sdname)):(3)
