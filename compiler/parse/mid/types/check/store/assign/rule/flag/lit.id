@@ -1,0 +1,23 @@
+// The two small questions the flag test asks of a node: is it the literal 0 or
+// 1 (and which), and is the variable the function returns.
+
+bfl_lit(int bfl_e) {
+  int bfl_v = 0 - 1;
+  if((import nkind)[bfl_e] == "int" && (import ni2)[bfl_e] == 0 && (import ni1)[bfl_e] >= 0 && (import ni1)[bfl_e] <= 1) {
+    bfl_v = (import ni1)[bfl_e];
+  }
+} return int bfl_v;
+given bfl_fixture ((import fixture_zero)):(0)
+given bfl_fixture ((import bfl_one)):(1)
+given leaves_fixture ((import lit_a)):(-1)
+given leaves_fixture ((import lit_word)):(-1)
+
+bfl_tail(int bfl_f, string bfl_nm) {
+  string bfl_text = "";
+  int bfl_ret_node = (import ni1)[(import prog)[bfl_f]];
+  if(bfl_ret_node >= 0 && (import nkind)[bfl_ret_node] == "var" && (import ns1)[bfl_ret_node] == bfl_nm) {
+    bfl_text = ", and return bool";
+  }
+} return string bfl_text;
+given bfl_fixture (1, "fx_flag"):(", and return bool")
+given bfl_fixture (1, "other"):("")

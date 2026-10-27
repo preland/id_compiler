@@ -1,0 +1,32 @@
+// Two functions on fn_fixture's leaves for the flag test: "fx_flagfn" declares
+// fx_flag = 0, assigns it 1 and returns it; "fx_cntfn" declares fx_cnt = 0,
+// assigns it fx_cnt + 1 and returns it. Each function's node is pushed to prog,
+// which is how bfl_row finds the function a node is in.
+
+bfl_fixture() {
+  fn_fixture();
+  bfl_build();
+  bfl_build2();
+} chain () {
+  bfl_build3();
+  bfl_build4();
+} return void;
+():() then calls fn_fixture:()
+():() then calls fn_fixture:[1]
+():() then len((import prog)):(3)
+
+bfl_build() {
+  export int bfl_one = node_txt2("int", "1", 1, 0);
+  export int bfl_d0 = node_decl("int", "fx_flag", (import fixture_zero), 0);
+  export int bfl_a1 = node_txt1("assign", "fx_flag", (import bfl_one));
+} return void;
+given fn_fixture ():() then calls node_txt2:("int", "1", 1, 0)
+given fn_fixture ():() then calls node_decl:("int", "fx_flag", (import fixture_zero), 0)
+
+bfl_build2() {
+  export int bfl_ret = node_txt("var", "fx_flag");
+  export int bfl_fn = bfl_func("fx_flagfn", (import bfl_ret));
+} return void;
+given fn_fixture ():() then calls node_txt:("var", "fx_flag")
+given fn_fixture ():() then len((import prog)):(2)
+

@@ -11,6 +11,7 @@ chk_decl(int id) {
 } chain (int id) {
   chk_literal_fit(id, s1_of_v, i1_of_v);
   decl_bool(id, s1_of_v, i1_of_v);
+  decl_flag(id, s1_of_v, i1_of_v);
 } return void;
 given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
 given decltype_fixture ((import decl_scalar)):() then (import chkfail)[0]:(0)

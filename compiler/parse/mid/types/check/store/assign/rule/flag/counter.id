@@ -1,0 +1,25 @@
+// The counter half of fixture.id: fx_cnt is declared 0 and assigned
+// fx_cnt + 1, so the flag test must leave it alone. bfl_fixture builds both.
+
+bfl_build3() {
+  export int bfl_c0 = node_decl("int", "fx_cnt", (import fixture_zero), 0);
+  export int bfl_cv = node_txt("var", "fx_cnt");
+  export int bfl_plus = node_txt2("bin", "+", (import bfl_cv), (import bfl_one));
+} return void;
+given bfl_fixture ():() then len((import nkind)):(17)
+given bfl_fixture ():() then len((import prog)):(3)
+
+bfl_build4() {
+  export int bfl_cas = node_txt1("assign", "fx_cnt", (import bfl_plus));
+  export int bfl_cfn = bfl_func("fx_cntfn", (import bfl_cv));
+} return void;
+given bfl_fixture ():() then len((import ns1)):(16)
+given bfl_fixture ():() then len((import prog)):(4)
+
+bfl_func(string bfl_name, int bfl_body) {
+  int[] bfl_none = [];
+  int bfl_node = node_func(bfl_name, "int", bfl_none, bfl_none, bfl_body);
+  push((import prog), bfl_node);
+} return int bfl_node;
+given fn_fixture ("f", 0):(4)
+given fn_fixture ("g", 0):(4)

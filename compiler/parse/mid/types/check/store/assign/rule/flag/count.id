@@ -1,0 +1,37 @@
+// The function a declaration is in, and how many of its nodes are stores of a
+// given class (node.id): the node ids from `lo` to `hi` are walked once per
+// class, because a count is the one thing a loop here can return without a flag.
+
+bfl_count(string bfl_nm, int bfl_lo, int bfl_hi, int bfl_kind) {
+  int bfl_n = 0;
+  int bfl_i = bfl_lo;
+  while(bfl_i <= bfl_hi) {
+    if(bfl_class(bfl_i, bfl_nm) == bfl_kind) {
+      bfl_n = bfl_n + 1;
+    }
+    bfl_i = bfl_i + 1;
+  }
+} return int bfl_n;
+given bfl_fixture ("fx_flag", (import bfl_d0), (import bfl_fn), 1):(1)
+given bfl_fixture ("fx_flag", (import bfl_d0), (import bfl_fn), 2):(1)
+given bfl_fixture ("fx_flag", (import bfl_d0), (import bfl_fn), 3):(0)
+given bfl_fixture ("fx_cnt", (import bfl_c0), (import bfl_cfn), 3):(2)
+given bfl_fixture ("fx_cnt", (import bfl_c0), (import bfl_c0), 3):(0)
+
+bfl_row(int bfl_id) {
+  int bfl_f = 0;
+  while(bfl_f < len((import prog)) && (import prog)[bfl_f] < bfl_id) {
+    bfl_f = bfl_f + 1;
+  }
+} return int bfl_f;
+given bfl_fixture ((import bfl_d0)):(1)
+given bfl_fixture ((import fixture_zero)):(0)
+
+bfl_first(int bfl_f) {
+  int bfl_start = 0;
+  if(bfl_f > 0) {
+    bfl_start = (import prog)[bfl_f - 1] + 1;
+  }
+} return int bfl_start;
+given bfl_fixture (0):(0)
+given bfl_fixture (1):(4)

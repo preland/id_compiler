@@ -1,0 +1,31 @@
+// Arithmetic on a named variable: `n + x` makes x a quantity, not a flag. Only
+// the operator and the two operand names are read, so the names come back as
+// text and are compared, rather than as a yes-or-no answer.
+
+bfl_arith(int bfl_i, string bfl_nm) {
+  int bfl_c = 0;
+  string bfl_op = (import ns1)[bfl_i];
+  if(bfl_op == "+" || bfl_op == "-" || bfl_op == "*" || bfl_op == "/" || bfl_op == "%") {
+    bfl_c = bfl_operand(bfl_i, bfl_nm);
+  }
+} return int bfl_c;
+given bfl_fixture ((import bfl_plus), "fx_cnt"):(3)
+given bfl_fixture ((import bfl_plus), "other"):(0)
+
+bfl_operand(int bfl_i, string bfl_nm) {
+  int bfl_c = 0;
+  if(bfl_var_name((import ni1)[bfl_i]) == bfl_nm || bfl_var_name((import ni2)[bfl_i]) == bfl_nm) {
+    bfl_c = 3;
+  }
+} return int bfl_c;
+given bfl_fixture ((import bfl_plus), "fx_cnt"):(3)
+given bfl_fixture ((import bfl_plus), "other"):(0)
+
+bfl_var_name(int bfl_e) {
+  string bfl_text = "";
+  if((import nkind)[bfl_e] == "var") {
+    bfl_text = (import ns1)[bfl_e];
+  }
+} return string bfl_text;
+given bfl_fixture ((import bfl_cv)):("fx_cnt")
+given bfl_fixture ((import bfl_one)):("")
