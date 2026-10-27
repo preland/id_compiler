@@ -2988,7 +2988,7 @@ if [ "$LIST_UNTESTED" -eq 1 ]; then
         compiler_bug "idlex or idparse failed on this input"
     fi
     SHORT_RE="^(.*):([0-9]+): error: function '([^']*)' has ([0-9]+) test case\(s\); --require-tests needs at least 2 .*"
-    EXEMPT_RE="^(.*):([0-9]+): note: function '([^']*)' cannot be tested on the build host .*"
+    EXEMPT_RE="^([^ ].*):([0-9]+): note: function '([^']*)' cannot be tested on the build host .*"
     sed -E -n -e "s/$SHORT_RE/short|\1:\2|\3|\4/p" -e "s/$EXEMPT_RE/exempt|\1:\2|\3/p" "$RAW_OUT"
     OTHER=$(awk '
         /^  (at|why|help|edit|related): / { if (keep) print; next }

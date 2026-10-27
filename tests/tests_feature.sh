@@ -1910,6 +1910,9 @@ grep -qxF "short|$TMP/fs/io.id:12|kbd_scan|0" "$TMP/list" \
    && grep -qxF "short|$TMP/fs/add.id:7|mul|0" "$TMP/list" \
     && ok "bin/idc: --list-untested lists the host-less and the pure functions as short" \
     || bad "bin/idc: --list-untested lists the host-less and the pure functions as short ($(tr '\n' '|' < "$TMP/list") $(head -1 "$TMP/log"))"
+! grep -q "^exempt|" "$TMP/list" \
+    && ok "bin/idc: --list-untested turns no related note into an exempt row" \
+    || bad "bin/idc: --list-untested turns no related note into an exempt row ($(grep "^exempt|" "$TMP/list" | tr '\n' '|'))"
 
 cat > "$TMP/fs/io.id" <<'EOF'
 asm "x86_64-unknown-none" in8(word p) {
