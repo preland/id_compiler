@@ -4587,6 +4587,20 @@ int id_minus_operand(int e);
 int id_int_too_wide(int e);
 char* id_literal_spelling(int e);
 void id_chk_literal_fit(int id, char* want, int e);
+int id_bfl_arith(int bfl_i, char* bfl_nm);
+int id_bfl_operand(int bfl_i, char* bfl_nm);
+char* id_bfl_var_name(int bfl_e);
+int id_bfl_count(char* bfl_nm, int bfl_lo, int bfl_hi, int bfl_kind);
+int id_bfl_row(int bfl_id);
+int id_bfl_first(int bfl_f);
+void id_decl_flag(int bfl_id, char* bfl_want, int bfl_e);
+void id_decl_flag_scan(int bfl_id);
+void id_decl_flag_say(int bfl_id, char* bfl_tail_text);
+int id_bfl_lit(int bfl_e);
+char* id_bfl_tail(int bfl_f, char* bfl_nm);
+int id_bfl_class(int bfl_i, char* bfl_nm);
+int id_bfl_store_at(int bfl_i, char* bfl_nm);
+int id_bfl_store(int bfl_i);
 int id_bad_init(char* want, char* got);
 int id_ty_known(char* t);
 int id_ty_pair_known(char* lt, char* rt);
@@ -36839,6 +36853,7 @@ void id_chk_decl(int id) {
     }
     id_chk_literal_fit(id, s1_of_v, i1_of_v);
     id_decl_bool(id, s1_of_v, i1_of_v);
+    id_decl_flag(id, s1_of_v, i1_of_v);
     return;
 }
 
@@ -39700,6 +39715,161 @@ void id_chk_literal_fit(int id, char* want, int e) {
         ({ char* idft2 = id_concat_f(id_concat(ID_S("the integer literal "), spelling), ID_S(" does not fit an int"), 1); id_tc_diag(id, ID_S("E0608"), idft2, spelling, ID_S("an int is 32 bits, from -2147483648 to 2147483647, and a literal outside that range is a word; storing it in an int would silently keep only its low 32 bits"), ID_S("declare the variable as a word if the value is meant, or write a value inside the int range")); id_str_free(idft2); });
     }
     return;
+}
+
+int id_bfl_arith(int bfl_i, char* bfl_nm) {
+    int bfl_c;
+    char* bfl_op;
+    bfl_c = 0;
+    bfl_op = (char*)(intptr_t)(id_list_get(ns1, bfl_i));
+    if ((((((strcmp(bfl_op, ID_S("+")) == 0) || (strcmp(bfl_op, ID_S("-")) == 0)) || (strcmp(bfl_op, ID_S("*")) == 0)) || (strcmp(bfl_op, ID_S("/")) == 0)) || (strcmp(bfl_op, ID_S("%")) == 0))) {
+        bfl_c = id_bfl_operand(bfl_i, bfl_nm);
+    }
+    return bfl_c;
+}
+
+int id_bfl_operand(int bfl_i, char* bfl_nm) {
+    int bfl_c;
+    bfl_c = 0;
+    if (((strcmp(id_bfl_var_name((int)(id_list_get(ni1, bfl_i))), bfl_nm) == 0) || (strcmp(id_bfl_var_name((int)(id_list_get(ni2, bfl_i))), bfl_nm) == 0))) {
+        bfl_c = 3;
+    }
+    return bfl_c;
+}
+
+char* id_bfl_var_name(int bfl_e) {
+    char* bfl_text;
+    bfl_text = ID_S("");
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, bfl_e)), ID_S("var")) == 0)) {
+        bfl_text = (char*)(intptr_t)(id_list_get(ns1, bfl_e));
+    }
+    return bfl_text;
+}
+
+int id_bfl_count(char* bfl_nm, int bfl_lo, int bfl_hi, int bfl_kind) {
+    int bfl_n;
+    int bfl_i;
+    bfl_n = 0;
+    bfl_i = bfl_lo;
+    while ((bfl_i <= bfl_hi)) {
+        if ((id_bfl_class(bfl_i, bfl_nm) == bfl_kind)) {
+            bfl_n = (bfl_n + 1);
+        }
+        bfl_i = (bfl_i + 1);
+    }
+    return bfl_n;
+}
+
+int id_bfl_row(int bfl_id) {
+    int bfl_f;
+    bfl_f = 0;
+    while (((bfl_f < id_list_len(prog)) && ((int)(id_list_get(prog, bfl_f)) < bfl_id))) {
+        bfl_f = (bfl_f + 1);
+    }
+    return bfl_f;
+}
+
+int id_bfl_first(int bfl_f) {
+    int bfl_start;
+    bfl_start = 0;
+    if ((bfl_f > 0)) {
+        bfl_start = ((int)(id_list_get(prog, (bfl_f - 1))) + 1);
+    }
+    return bfl_start;
+}
+
+void id_decl_flag(int bfl_id, char* bfl_want, int bfl_e) {
+    if (((((strcmp(bfl_want, ID_S("int")) == 0) && ((int)(id_list_get(ni2, bfl_id)) == 0)) && (id_bfl_lit(bfl_e) >= 0)) && ((int)(id_list_get(bsc, 0)) == 1))) {
+        id_decl_flag_scan(bfl_id);
+    }
+    return;
+}
+
+void id_decl_flag_scan(int bfl_id) {
+    char* bfl_nm;
+    int bfl_f;
+    int bfl_hi;
+    int bfl_zero;
+    int bfl_one_n;
+    bfl_nm = (char*)(intptr_t)(id_list_get(ns2, bfl_id));
+    bfl_f = id_bfl_row(bfl_id);
+    bfl_hi = (int)(id_list_get(prog, bfl_f));
+    bfl_zero = id_bfl_count(bfl_nm, id_bfl_first(bfl_f), bfl_hi, 1);
+    bfl_one_n = id_bfl_count(bfl_nm, id_bfl_first(bfl_f), bfl_hi, 2);
+    if ((((bfl_zero > 0) && (bfl_one_n > 0)) && (id_bfl_count(bfl_nm, id_bfl_first(bfl_f), bfl_hi, 3) == 0))) {
+        id_decl_flag_say(bfl_id, id_bfl_tail(bfl_f, bfl_nm));
+    }
+    return;
+}
+
+void id_decl_flag_say(int bfl_id, char* bfl_tail_text) {
+    char* bfl_nm;
+    int bfl_ln;
+    char* bfl_help = NULL;
+    bfl_nm = (char*)(intptr_t)(id_list_get(ns2, bfl_id));
+    bfl_ln = id_tc_line(bfl_id);
+    { char* idfe_o = bfl_help; bfl_help = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("declare it 'bool "), bfl_nm), ID_S("', store true and false instead of 1 and 0"), 1), bfl_tail_text, 1), ID_S(" (--fix rewrites only the declaration for now; the stores and the return are a later rule)"), 1); id_str_free(idfe_o); }
+    ({ char* idft2 = id_concat_f(id_concat(ID_S("'"), bfl_nm), ID_S("' only ever holds 0 or 1 but is declared int"), 1); id_tc_diag(bfl_id, ID_S("E0650"), idft2, bfl_nm, ID_S("an int that behaves like a boolean is not allowed under --bool-strict: a variable stored only 0 and 1 is a flag, and a flag is a bool"), bfl_help); id_str_free(idft2); });
+    ({ char* idft3 = id_concat(ID_S("int "), bfl_nm); char* idft4 = id_concat(ID_S("bool "), bfl_nm); id_diag_edit(ID_S("machine"), ID_S("replace"), bfl_ln, idft3, idft4); id_str_free(idft3); id_str_free(idft4); });
+    { id_str_free(bfl_help); return; }
+}
+
+int id_bfl_lit(int bfl_e) {
+    int bfl_v;
+    bfl_v = (0 - 1);
+    if (((((strcmp((char*)(intptr_t)(id_list_get(nkind, bfl_e)), ID_S("int")) == 0) && ((int)(id_list_get(ni2, bfl_e)) == 0)) && ((int)(id_list_get(ni1, bfl_e)) >= 0)) && ((int)(id_list_get(ni1, bfl_e)) <= 1))) {
+        bfl_v = (int)(id_list_get(ni1, bfl_e));
+    }
+    return bfl_v;
+}
+
+char* id_bfl_tail(int bfl_f, char* bfl_nm) {
+    char* bfl_text;
+    int bfl_ret_node;
+    bfl_text = ID_S("");
+IdList* idsq_25;
+    bfl_ret_node = (idsq_25 = ni1, (int)(id_list_get(idsq_25, (int)(id_list_get(prog, bfl_f)))));
+    if ((((bfl_ret_node >= 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, bfl_ret_node)), ID_S("var")) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(ns1, bfl_ret_node)), bfl_nm) == 0))) {
+        bfl_text = ID_S(", and return bool");
+    }
+    return bfl_text;
+}
+
+int id_bfl_class(int bfl_i, char* bfl_nm) {
+    int bfl_c;
+    bfl_c = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, bfl_i)), ID_S("bin")) == 0)) {
+        bfl_c = id_bfl_arith(bfl_i, bfl_nm);
+    } else {
+        bfl_c = id_bfl_store_at(bfl_i, bfl_nm);
+    }
+    return bfl_c;
+}
+
+int id_bfl_store_at(int bfl_i, char* bfl_nm) {
+    int bfl_c;
+    bfl_c = 0;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, bfl_i)), ID_S("decl")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns2, bfl_i)), bfl_nm) == 0))) {
+        bfl_c = id_bfl_store(bfl_i);
+    }
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, bfl_i)), ID_S("assign")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, bfl_i)), bfl_nm) == 0))) {
+        bfl_c = id_bfl_store(bfl_i);
+    }
+    return bfl_c;
+}
+
+int id_bfl_store(int bfl_i) {
+    int bfl_v;
+    int bfl_c;
+    bfl_v = id_bfl_lit((int)(id_list_get(ni1, bfl_i)));
+    bfl_c = 3;
+    if ((bfl_v == 0)) {
+        bfl_c = 1;
+    }
+    if ((bfl_v == 1)) {
+        bfl_c = 2;
+    }
+    return bfl_c;
 }
 
 int id_bad_init(char* want, char* got) {
