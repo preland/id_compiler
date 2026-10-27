@@ -1,0 +1,35 @@
+// Making a bytes: zeroed, from a string, and the way back to a string.
+vm_b_bytes_new(word wa) {
+  int h = 0;
+  int n = wa;
+  if (n < 0) {
+    vm_trap("bytes_new: length out of range");
+    n = 0;
+  }
+} chain (word wa) {
+  h = vm_lnew();
+  word[] l = (import ex_lists)[h];
+  while (n > 0) {
+    push(l, 0);
+    n = n - 1;
+  }
+} return int h;
+given vb_boot (3):(1) then (import ex_lists):([[], [0, 0, 0]])
+given vb_boot (0):(1) then (import ex_lists):([[], []])
+given vb_boot (-1):(1) then (import ex_lists):([[], []]) then eprints:("id: bytes_new: length out of range\n")
+
+vm_b_bytes_of_string(word wa) {
+  int ia = wa;
+  string s = (import ex_strs)[ia];
+  int h = vm_lnew();
+} chain (word wa) {
+  word[] l = (import ex_lists)[h];
+  int i = 0;
+  while (i < len(s)) {
+    push(l, character_code_at(s, i));
+    i = i + 1;
+  }
+} return int h;
+given vb_boot given tf_sput("AB") (1):(1) then (import ex_lists):([[], [65, 66]])
+given vb_boot given tf_sput("") (1):(1) then (import ex_lists):([[], []])
+

@@ -56,6 +56,9 @@ vm_bw(int id, word wa, word wb, word wc) {
   if (id == (import b_mul_checked32)) {
     wr = vm_b_mul32(wa, wb);
   }
+  if (id >= (import b_bytes0)) {
+    wr = vm_bb(id, wa, wb, wc);
+  }
 } return word wr;
 (70, 4294967296, 4294967296, 0):(1)
 (71, 1, 65, 0):(2)

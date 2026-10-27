@@ -1,0 +1,38 @@
+// A bytes back to a string. A NUL byte cannot be in a string, so it is the trap
+// the hosted runtime gives; a byte becomes a one-byte string through chr.
+vm_bnz(word wv) {
+  int ok = 1;
+  if (wv == 0) {
+    vm_trap("a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes");
+    ok = 0;
+  }
+} return int ok;
+given vb_boot (65):(1)
+given vb_boot (0):(0) then eprints:("id: a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes\n")
+
+vm_bchr(word wv) {
+  int c = wv;
+  string onebyte = chr(c);
+} return string onebyte;
+(65):("A")
+(122):("z")
+
+vm_b_string_of_bytes(word wa) {
+  int hl = wa;
+  int ok = vm_live(hl);
+  string s = "";
+} chain (word wa) {
+  word[] l = (import ex_lists)[hl];
+  int i = 0;
+  while (ok == 1 && i < len(l)) {
+    ok = vm_bnz(l[i]);
+    if (ok == 1) {
+      s = s + vm_bchr(l[i]);
+    }
+    i = i + 1;
+  }
+} chain (word wa) {
+  int h = vm_sput(s);
+} return int h;
+given vb_boot given tf_lnew given vm_b_list_push(1, 72) given vm_b_list_push(1, 105) (1):(1) then (import ex_strs):(["", "Hi"])
+given vb_boot given tf_lnew given vm_b_list_push(1, 72) given vm_b_list_push(1, 0) (1):(1) then eprints:("id: a NUL byte reached a string (string_of_bytes): look for it first with idstd bytes_find(b, 0), or keep the data in bytes\n")

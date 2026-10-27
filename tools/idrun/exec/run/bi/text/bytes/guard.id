@@ -1,0 +1,35 @@
+// The checks the bytes helpers share. A bytes here is a list in ex_lists whose
+// cells are the bytes, so list 0 is the null bytes and a store outside 0..255
+// is the trap the hosted runtime gives. A trap ends the run but not the helper,
+// so each check answers 1 when the write or read may go ahead.
+vm_bfit(word wv) {
+  int ok = 1;
+  if (wv < 0 || wv > 255) {
+    vm_trap("byte value " + wv + " out of range 0..255");
+    ok = 0;
+  }
+} return int ok;
+given vb_boot (7):(1)
+given vb_boot (256):(0) then eprints:("id: byte value 256 out of range 0..255\n")
+given vb_boot (0):(1)
+given vb_boot (-1):(0) then eprints:("id: byte value -1 out of range 0..255\n")
+
+vm_bidx(int hl, word wi) {
+  int ok = vm_live(hl);
+  int n = len((import ex_lists)[hl]);
+  if (ok == 1 && (wi < 0 || wi >= n)) {
+    vm_trap("index " + wi + " out of bounds (len " + n + ")");
+    ok = 0;
+  }
+} return int ok;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 0):(1)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 1):(0) then eprints:("id: index 1 out of bounds (len 1)\n")
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, -1):(0) then eprints:("id: index -1 out of bounds (len 1)\n")
+
+vm_bspan(word wi, word wc, int bl) {
+  string msg = "bytes span out of bounds: i=" + wi;
+  msg = msg + " n=" + wc;
+  vm_trap(msg + " in a bytes of length " + bl);
+} return void;
+given vb_boot (2, 5, 4):() then eprints:("id: bytes span out of bounds: i=2 n=5 in a bytes of length 4\n")
+given vb_boot (-1, 0, 0):() then eprints:("id: bytes span out of bounds: i=-1 n=0 in a bytes of length 0\n")

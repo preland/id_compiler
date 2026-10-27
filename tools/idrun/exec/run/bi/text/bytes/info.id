@@ -1,0 +1,40 @@
+// What a bytes is, beyond its length (id_bytes_len is vm_b_list_len), and the
+// way to and from the flat store. The raw forms answer -1 for the null bytes
+// instead of trapping; the capacity is the hosted runtime's floor of 8, since a
+// list here has no spare room to report.
+vm_b_bytes_len_raw(word wa) {
+  int hl = wa;
+  int n = 0 - 1;
+  if (hl != 0) {
+    n = len((import ex_lists)[hl]);
+  }
+} return int n;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1):(1)
+given vb_boot (0):(-1)
+
+vm_b_bytes_cap_raw(word wa) {
+  int n = vm_b_bytes_len_raw(wa);
+  if (n >= 0 && n < 8) {
+    n = 8;
+  }
+} return int n;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1):(8)
+given vb_boot (0):(-1)
+
+vm_b_bytes_of_memory(word wa, word wb) {
+  int n = wb;
+  int h = vm_lnew();
+  if (n < 0) {
+    vm_trap("bytes_of_memory: length out of range");
+    n = 0;
+  }
+} chain (word wa, word wb) {
+  word[] l = (import ex_lists)[h];
+  int i = 0;
+  while (i < n) {
+    push(l, peek8u(wa + i));
+    i = i + 1;
+  }
+} return int h;
+given vb_boot given tf_mem("hey") ((import tf_sa), 2):(1) then (import ex_lists):([[], [104, 101]])
+given vb_boot (0, -1):(1) then (import ex_lists):([[], []]) then eprints:("id: bytes_of_memory: length out of range\n")

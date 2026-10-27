@@ -1,0 +1,41 @@
+// A bytes copied into freshly allocated store, and the address; 0 for the null
+// bytes after its trap. And id_list_lit, a call with n then n cells, which is
+// the one helper that reads more than three argument slots, so it takes the
+// frame and the argument position and not three words.
+vm_b_memory_of_bytes(word wa) {
+  int hl = wa;
+  word ad = 0;
+  int i = 0;
+} chain (word wa) {
+  word[] l = (import ex_lists)[hl];
+  if (vm_live(hl) == 1) {
+    ad = alloc(len(l));
+  }
+  while (i < len(l)) {
+    poke8(ad + i, l[i]);
+    i = i + 1;
+  }
+} return word ad;
+given vb_boot given tf_lnew given vm_b_list_push(1, 104) given vm_b_list_push(1, 105) (1):(8) then tf_peekat(1):(105)
+given vb_boot (0):(0) then eprints:("id: read of an uninitialised export (its declaring function has not run)\n")
+
+tf_peekat(word wo) {
+  word wv = peek8(8 + wo);
+} return word wv;
+given vb_boot given tf_mem("AB") (0):(65)
+given vb_boot given tf_mem("AB") (1):(66)
+
+vm_b_list_lit(int fp, int apos) {
+  word[] vals = (import ex_vals);
+  int n = vals[fp + (import ex_argp)[apos]];
+  int h = vm_lnew();
+} chain (int fp, int apos) {
+  word[] l = (import ex_lists)[h];
+  int i = 0;
+  while (i < n) {
+    push(l, vals[fp + (import ex_argp)[apos + 1 + i]]);
+    i = i + 1;
+  }
+} return int h;
+given vb_boot given tf_set(1, 2) given tf_set(2, 7) given tf_set(3, 8) given list_extend((import ex_argp), [1]) given list_extend((import ex_argp), [2]) given list_extend((import ex_argp), [3]) (0, 0):(1) then (import ex_lists):([[], [7, 8]])
+given vb_boot given tf_set(1, 0) given list_extend((import ex_argp), [1]) given list_extend((import ex_argp), [0]) given list_extend((import ex_argp), [0]) (0, 0):(1) then (import ex_lists):([[], []])

@@ -120,7 +120,7 @@ int p_ret = 25;
 // grouped by what they touch: strings, lists, console and clock, arithmetic
 // helpers, the flat store. The three that take or give a double are VM
 // opcodes of their own.
-string bi_names = "id_concat id_str_of_int id_character_code_at id_len id_str_of_word id_chr strcmp id_to_int id_str_of_mem id_mem_of_str id_list_get id_list_push id_list_new id_list_set id_list_len id_list_pop id_list_lock id_print id_eprint id_put id_flush id_input id_read_all id_getkey id_sleep_ms id_ticks id_idiv id_imod id_sdiv id_smod id_shl id_sar id_ushr id_udiv id_umod id_ult id_mem_alloc id_mem_size id_peek8 id_peek16 id_peek32 id_peek64 id_poke8 id_poke16 id_poke32 id_poke64 id_peek8s id_peek16s id_peek32s id_peek8u id_peek16u id_peek32u id_fail id_list_free id_list_free_deep id_fn_plain id_clo_make id_clo_set id_clo_copy id_fn_raw id_clo_fn id_clo_cell id_str_sub id_concat_f id_str_free id_str_dup id_list_free_strs id_free_walk id_clo_setl id_clo_free id_umul_hi id_rotl id_rotl32 id_uword_of_int id_add_checked id_add_checked32 id_sub_checked id_sub_checked32 id_mul_checked id_mul_checked32";
+string bi_names = "id_concat id_str_of_int id_character_code_at id_len id_str_of_word id_chr strcmp id_to_int id_str_of_mem id_mem_of_str id_list_get id_list_push id_list_new id_list_set id_list_len id_list_pop id_list_lock id_print id_eprint id_put id_flush id_input id_read_all id_getkey id_sleep_ms id_ticks id_idiv id_imod id_sdiv id_smod id_shl id_sar id_ushr id_udiv id_umod id_ult id_mem_alloc id_mem_size id_peek8 id_peek16 id_peek32 id_peek64 id_poke8 id_poke16 id_poke32 id_poke64 id_peek8s id_peek16s id_peek32s id_peek8u id_peek16u id_peek32u id_fail id_list_free id_list_free_deep id_fn_plain id_clo_make id_clo_set id_clo_copy id_fn_raw id_clo_fn id_clo_cell id_str_sub id_concat_f id_str_free id_str_dup id_list_free_strs id_free_walk id_clo_setl id_clo_free id_umul_hi id_rotl id_rotl32 id_uword_of_int id_add_checked id_add_checked32 id_sub_checked id_sub_checked32 id_mul_checked id_mul_checked32 id_bytes_append id_bytes_cap_raw id_bytes_cell id_bytes_cell_set id_bytes_cmp id_bytes_free id_bytes_get id_bytes_len id_bytes_len_raw id_bytes_new id_bytes_of_memory id_bytes_of_string id_bytes_pop id_bytes_push id_bytes_set id_bytes_sub id_list_free_bytes id_list_lit id_memory_of_bytes id_string_of_bytes";
 string fbi_names = "id_box_f id_unbox_f id_str_of_float id_bits_of_float id_float_of_bits id_bits32_of_float id_float_of_bits32";
 int b_concat = 0;
 int b_str_of_int = 1;
@@ -223,6 +223,30 @@ int b_sub_checked = 76;
 int b_sub_checked32 = 77;
 int b_mul_checked = 78;
 int b_mul_checked32 = 79;
+// Ids from here are the bytes helpers (docs/SPEC.md bytes), in bi_names order. A
+// bytes is a list in ex_lists with one byte per cell, so the interpreter keeps no
+// capacity and the frees answer nothing. id_list_lit builds a list from n cells.
+int b_bytes0 = 80;
+int b_bytes_append = 80;
+int b_bytes_cap_raw = 81;
+int b_bytes_cell = 82;
+int b_bytes_cell_set = 83;
+int b_bytes_cmp = 84;
+int b_bytes_free = 85;
+int b_bytes_get = 86;
+int b_bytes_len = 87;
+int b_bytes_len_raw = 88;
+int b_bytes_new = 89;
+int b_bytes_of_memory = 90;
+int b_bytes_of_string = 91;
+int b_bytes_pop = 92;
+int b_bytes_push = 93;
+int b_bytes_set = 94;
+int b_bytes_sub = 95;
+int b_list_free_bytes = 96;
+int b_list_lit = 97;
+int b_memory_of_bytes = 98;
+int b_string_of_bytes = 99;
 // The VM ops for add sub mul and or xor, at 32 and at 64 bits, indexed by the
 // instruction's offset from p_add. They are the o_ numbers above, written out
 // because a list constant holds literals only; a case in ld_binop holds the

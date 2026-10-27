@@ -11,6 +11,9 @@ vm_bcall(int fp, int d, int bid, int apos, int nx) {
   word wc = vals[fp + ap[apos + 2]];
   word wr = vm_bi(bid, wa, wb, wc);
 } chain (int fp, int d, int bid, int apos, int nx) {
+  if (bid == (import b_list_lit)) {
+    wr = vm_b_list_lit(fp, apos);
+  }
   if (d >= 0) {
     vals[fp + d] = wr;
   }

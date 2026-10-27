@@ -1,0 +1,40 @@
+// Reading and writing one byte. get and set check the index and the value; the
+// cell pair is the unchecked access the compiler uses after its own bounds
+// test, so only the value is checked there. id_bytes_cell is vm_b_list_get.
+vm_b_bytes_get(word wa, word wb) {
+  int hl = wa;
+  int i = wb;
+  word wr = 0;
+} chain (word wa, word wb) {
+  if (vm_bidx(hl, wb) == 1) {
+    wr = (import ex_lists)[hl][i];
+  }
+} return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1, 1):(6)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 1):(0) then eprints:("id: index 1 out of bounds (len 1)\n")
+
+vm_b_bytes_set(word wa, word wb, word wc) {
+  int hl = wa;
+  int i = wb;
+  int ok = vm_bidx(hl, wb);
+} chain (word wa, word wb, word wc) {
+  if (ok == 1 && vm_bfit(wc) == 1) {
+    word[] l = (import ex_lists)[hl];
+    l[i] = wc;
+  }
+} return void;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 0, 9):() then (import ex_lists):([[], [9]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 0, 256):() then (import ex_lists):([[], [5]]) then eprints:("id: byte value 256 out of range 0..255\n")
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 1, 9):() then (import ex_lists):([[], [5]]) then eprints:("id: index 1 out of bounds (len 1)\n")
+
+vm_b_bytes_cell_set(word wa, word wb, word wc) {
+  int hl = wa;
+  int i = wb;
+  word[] l = (import ex_lists)[hl];
+} chain (word wa, word wb, word wc) {
+  if (vm_bfit(wc) == 1) {
+    l[i] = wc;
+  }
+} return void;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 0, 200):() then (import ex_lists):([[], [200]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (1, 0, -1):() then (import ex_lists):([[], [5]]) then eprints:("id: byte value -1 out of range 0..255\n")

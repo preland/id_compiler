@@ -1,0 +1,38 @@
+// Joining and cutting bytes. append copies the source's cells to the end of the
+// destination (a bytes appended to itself doubles); sub is a new bytes of n
+// cells from i, and a span past either end is a trap.
+vm_b_bytes_append(word wa, word wb) {
+  int hd = wa;
+  int hs = wb;
+  int ok = vm_live(hd);
+} chain (word wa, word wb) {
+  if (ok == 1) {
+    ok = vm_live(hs);
+  }
+  if (ok == 1) {
+    vm_bcopy(hd, hs, 0, len((import ex_lists)[hs]));
+  }
+} return void;
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(1, 1) given vm_b_list_push(2, 2) (1, 2):() then (import ex_lists):([[], [1, 2], [2]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 1) given vm_b_list_push(1, 2) (1, 1):() then (import ex_lists):([[], [1, 2, 1, 2]])
+
+vm_b_bytes_sub(word wa, word wb, word wc) {
+  int hl = wa;
+  int ok = vm_live(hl);
+  int bl = len((import ex_lists)[hl]);
+} chain (word wa, word wb, word wc) {
+  int i = wb;
+  int n = wc;
+  int h = vm_lnew();
+} chain (word wa, word wb, word wc) {
+  if (ok == 1 && (wb < 0 || wc < 0 || (wc > 0 && wb + wc > bl))) {
+    vm_bspan(wb, wc, bl);
+    ok = 0;
+  }
+  if (ok == 1) {
+    vm_bcopy(h, hl, i, n);
+  }
+} return int h;
+given vb_boot given tf_lnew given vm_b_list_push(1, 1) given vm_b_list_push(1, 2) given vm_b_list_push(1, 3) (1, 1, 2):(2) then (import ex_lists):([[], [1, 2, 3], [2, 3]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 1) (1, 0, 2):(2) then (import ex_lists):([[], [1], []]) then eprints:("id: bytes span out of bounds: i=0 n=2 in a bytes of length 1\n")
+given vb_boot given tf_lnew given vm_b_list_push(1, 1) (1, 1, 0):(2) then (import ex_lists):([[], [1], []])

@@ -1,0 +1,41 @@
+// Growing a bytes: push and pop one byte, and vm_bcopy, which appends n cells
+// of list hs from i to the end of list hd (append and sub both use it).
+vm_bcopy(int hd, int hs, int i, int n) {
+  word[] cdst = (import ex_lists)[hd];
+  word[] csrc = (import ex_lists)[hs];
+  int e = i + n;
+} chain (int hd, int hs, int i, int n) {
+  while (i < e) {
+    push(cdst, csrc[i]);
+    i = i + 1;
+  }
+} return void;
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(2, 7) given vm_b_list_push(2, 8) given vm_b_list_push(2, 9) (1, 2, 1, 2):() then (import ex_lists):([[], [8, 9], [7, 8, 9]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 7) (1, 1, 0, 1):() then (import ex_lists):([[], [7, 7]])
+
+vm_b_bytes_push(word wa, word wb) {
+  int hl = wa;
+  int ok = vm_live(hl);
+  if (ok == 1 && vm_bfit(wb) == 1) {
+    push((import ex_lists)[hl], wb);
+  }
+} return void;
+given vb_boot given tf_lnew (1, 9):() then (import ex_lists):([[], [9]])
+given vb_boot given tf_lnew (1, 300):() then (import ex_lists):([[], []]) then eprints:("id: byte value 300 out of range 0..255\n")
+
+vm_b_bytes_pop(word wa) {
+  int hl = wa;
+  int ok = vm_live(hl);
+  word wr = 0;
+} chain (word wa) {
+  if (ok == 1 && len((import ex_lists)[hl]) == 0) {
+    vm_trap("pop from empty bytes");
+    ok = 0;
+  }
+  if (ok == 1) {
+    word[] l = (import ex_lists)[hl];
+    wr = pop(l);
+  }
+} return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1):(6) then (import ex_lists):([[], [5]])
+given vb_boot given tf_lnew (1):(0) then eprints:("id: pop from empty bytes\n")

@@ -1,0 +1,97 @@
+// The bytes helpers (conf.id, b_bytes0 and after), by id. A bytes is a list, so
+// id_bytes_len and id_bytes_cell are the list forms; the frees answer nothing,
+// as every free here does; id_list_lit is read by vm_bcall, which has the frame.
+vm_bb(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_bytes_append)) {
+    vm_b_bytes_append(wa, wb);
+    return wr;
+  }
+  if (id == (import b_bytes_cap_raw)) {
+    wr = vm_b_bytes_cap_raw(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_bytes_cell)) {
+    wr = vm_b_list_get(wa, wb);
+    return wr;
+  }
+  if (id == (import b_bytes_cell_set)) {
+    vm_b_bytes_cell_set(wa, wb, wc);
+    return wr;
+  }
+  if (id == (import b_bytes_cmp)) {
+    wr = vm_b_bytes_cmp(wa, wb);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_bytes_get)) {
+    wr = vm_b_bytes_get(wa, wb);
+    return wr;
+  }
+  if (id == (import b_bytes_len)) {
+    wr = vm_b_list_len(wa);
+    return wr;
+  }
+  if (id == (import b_bytes_len_raw)) {
+    wr = vm_b_bytes_len_raw(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_bytes_new)) {
+    wr = vm_b_bytes_new(wa);
+    return wr;
+  }
+  if (id == (import b_bytes_of_memory)) {
+    wr = vm_b_bytes_of_memory(wa, wb);
+    return wr;
+  }
+  if (id == (import b_bytes_of_string)) {
+    wr = vm_b_bytes_of_string(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_bytes_pop)) {
+    wr = vm_b_bytes_pop(wa);
+    return wr;
+  }
+  if (id == (import b_bytes_push)) {
+    vm_b_bytes_push(wa, wb);
+    return wr;
+  }
+  if (id == (import b_bytes_set)) {
+    vm_b_bytes_set(wa, wb, wc);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_bytes_sub)) {
+    wr = vm_b_bytes_sub(wa, wb, wc);
+    return wr;
+  }
+  if (id == (import b_memory_of_bytes)) {
+    wr = vm_b_memory_of_bytes(wa);
+    return wr;
+  }
+  if (id == (import b_string_of_bytes)) {
+    wr = vm_b_string_of_bytes(wa);
+    return wr;
+  }
+} return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (86, 1, 0, 0):(5)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (87, 1, 0, 0):(1)
+given vb_boot (89, 2, 0, 0):(1) then (import ex_lists):([[], [0, 0]])
+given vb_boot given tf_lnew (93, 1, 7, 0):(0) then (import ex_lists):([[], [7]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (92, 1, 0, 0):(5) then (import ex_lists):([[], []])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (88, 1, 0, 0):(1)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (81, 1, 0, 0):(8)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (95, 1, 1, 1):(2) then (import ex_lists):([[], [5, 6], [6]])
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(1, 4) given vm_b_list_push(2, 4) (84, 1, 2, 0):(0)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (94, 1, 0, 9):(0) then (import ex_lists):([[], [9]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (82, 1, 0, 0):(5)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (83, 1, 0, 9):(0) then (import ex_lists):([[], [9]])
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(2, 3) (80, 1, 2, 0):(0) then (import ex_lists):([[], [3], [3]])
+given vb_boot given tf_sput("A") (91, 1, 0, 0):(1) then (import ex_lists):([[], [65]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 72) (99, 1, 0, 0):(1) then (import ex_strs):(["", "H"])
+given vb_boot (90, 0, 0, 0):(1) then (import ex_lists):([[], []])
+given vb_boot given tf_lnew (98, 1, 0, 0):(8)
+given vb_boot (85, 1, 0, 0):(0)

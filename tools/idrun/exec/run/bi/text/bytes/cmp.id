@@ -1,0 +1,49 @@
+// Comparing two bytes: 0 when equal, 1 when the lengths differ, else the sign of
+// the first differing byte as -1 or 1.
+vm_bsign(word wx, word wy) {
+  int r = 0;
+  if (wx < wy) {
+    r = 0 - 1;
+  }
+  if (wx > wy) {
+    r = 1;
+  }
+} return int r;
+(1, 2):(-1)
+(2, 1):(1)
+(3, 3):(0)
+
+vm_bcmp(int ha, int hb) {
+  word[] ca = (import ex_lists)[ha];
+  word[] cb = (import ex_lists)[hb];
+  int r = 0;
+} chain (int ha, int hb) {
+  int i = 0;
+  if (len(ca) != len(cb)) {
+    r = 1;
+    i = len(ca);
+  }
+  while (r == 0 && i < len(ca)) {
+    r = vm_bsign(ca[i], cb[i]);
+    i = i + 1;
+  }
+} return int r;
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(1, 4) given vm_b_list_push(2, 4) (1, 2):(0)
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(1, 4) given vm_b_list_push(2, 5) (1, 2):(-1)
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(1, 4) (1, 2):(1)
+
+vm_b_bytes_cmp(word wa, word wb) {
+  int ha = wa;
+  int hb = wb;
+  int ok = vm_live(ha);
+} chain (word wa, word wb) {
+  int r = 0;
+  if (ok == 1) {
+    ok = vm_live(hb);
+  }
+  if (ok == 1) {
+    r = vm_bcmp(ha, hb);
+  }
+} return int r;
+given vb_boot given tf_lnew given tf_lnew given vm_b_list_push(1, 4) given vm_b_list_push(2, 4) (1, 2):(0)
+given vb_boot given tf_lnew (1, 0):(0) then eprints:("id: read of an uninitialised export (its declaring function has not run)\n")
