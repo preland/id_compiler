@@ -21,11 +21,12 @@ given calls_node_fixture ("thencalls", (import fixture_ci), 0, (import fixture_c
 given chk_fixture ("then", 0, 0, (import fixture_chk_node)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_then_check(int ci, int ti, int node) {
-  string chk_nm = (import ns1)[node];
   if((import nkind)[node] == "thenimp" || (import nkind)[node] == "thenlen") {
     emit_then_imp(ci, ti, node);
+  } else if(func_node((import ns1)[node]) < 0) {
+    emit_then_reader(ci, ti, node);
   } else {
-    emit_then_got(ci, ti, chk_nm, func_node(chk_nm));
+    emit_then_got(ci, ti, (import ns1)[node], func_node((import ns1)[node]));
   }
 } return void;
 given chk_fixture {

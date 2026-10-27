@@ -1,0 +1,18 @@
+cells() {
+  word b = alloc(16);
+  export word cz = b;
+  export word cz8 = b + 8;
+} return void export cz;
+given cells ():() then peek64((import cz)):(0)
+given cells ():() then peek8((import cz8)):(0)
+
+cell_pair(word p, word v) {
+  poke64(p, v);
+  poke64(p + 8, v + 1);
+} return void;
+given cells ((import cz), 5):() then peek64((import cz)):(5) then peek64((import cz8)):(6)
+given cells ((import cz), 250):() then peek8((import cz8)):(251)
+
+main(int argc, string[] argv) {
+  print("peeked");
+} return int 0;

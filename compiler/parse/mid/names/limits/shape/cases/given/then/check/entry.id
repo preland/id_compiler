@@ -44,7 +44,7 @@ then_fn(int chk_node, string chk_nm) {
   string chk_nm2 = (import ns1)[chk_node];
 } chain (int chk_node, string chk_nm) {
   if(cfn < 0) {
-    case_err(ci, "'then' names '" + chk_nm2 + "', which is not a function in this build");
+    then_unknown(ci, chk_node, chk_nm2);
   } else {
     then_sig(ci, chk_node, cfn, chk_nm2);
   }

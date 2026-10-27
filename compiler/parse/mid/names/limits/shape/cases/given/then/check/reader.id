@@ -1,0 +1,47 @@
+// A `then` may name a builtin that only reads memory and returns a word:
+// peek8, peek16, peek32, peek64 and their signed (s) and unsigned (u)
+// spellings. E0405 turns an (import NAME) in a call into a parameter, and a
+// one-operation reader function is then refused by E0408 (the call site should
+// write the operation itself), so without this a test has no legal way to look
+// at memory. Builtins with effects (poke*, print, alloc) stay refused: a check
+// must not change what it observes.
+
+read_builtin(string rd_nm) {
+  int ok = 0;
+  if(rd_nm == "peek8" || rd_nm == "peek16" || rd_nm == "peek32" || rd_nm == "peek64" || rd_nm == "peek8s" || rd_nm == "peek16s" || rd_nm == "peek32s" || rd_nm == "peek8u" || rd_nm == "peek16u" || rd_nm == "peek32u") {
+    ok = 1;
+  }
+} return int ok;
+("peek64"):(1)
+("peek16s"):(1)
+("poke64"):(0)
+("alloc"):(0)
+
+then_unknown(int ci, int chk_node, string un_nm) {
+  if(read_builtin(un_nm) == 1) {
+    then_reader(ci, chk_node, un_nm);
+  } else {
+    case_err(ci, "'then' names '" + un_nm + "', which is not a function in this build");
+  }
+} return void;
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), "nope"):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), "peek64"):() then calls then_reader:[1]
+
+then_reader(int ci, int chk_node, string rd_nm) {
+  int[] targs = (import nl2)[chk_node];
+  if(len(targs) != 1) {
+    case_err(ci, "'then' names '" + rd_nm + "', a read builtin, which takes one address; write it as 'then " + rd_nm + "(ADDRESS):(value)'");
+  } else {
+    then_arg_value(ci, targs[0], "word");
+  }
+} chain (int ci, int chk_node, string rd_nm) {
+  int[] items = (import nl1)[chk_node];
+  if(len(items) != 1) {
+    int ne = len(items);
+    case_err(ci, "a 'then' check compares exactly one value, not " + ne);
+  } else {
+    fit_value(ci, items[0], "word");
+  }
+} return void;
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), "peek64"):() then prints:("fixture.id:4: error: 'then' names 'peek64', a read builtin, which takes one address; write it as 'then peek64(ADDRESS):(value)'\n")
+given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), "peek64"):() then calls then_arg_value:[1]

@@ -1,0 +1,24 @@
+// A `then` that names a read builtin (peek8 .. peek64, see mid/names/limits/
+// shape/cases/given/then/check/reader.id) has no function of the program to
+// call, so there is no signature to take the argument's type from: the address
+// is a word and so is the result. From the local on it is the same judge a
+// check function gets (got.id).
+
+emit_then_reader(int ci, int ti, int node) {
+  string rd_nm = (import ns1)[node];
+  int[] targs = (import nl2)[node];
+  string an = "idtc_t" + ti + "a0";
+} chain (int ci, int ti, int node) {
+  emit_tc_decl("word", an, tc_value(targs[0], "word"));
+  print("    " + c_type("word") + " idtc_chk" + ti + " = " + sys_helper(rd_nm) + "((long long)(" + an + "));");
+  emit_then_judge(ci, ti, then_label(rd_nm, targs), "word", (import nl1)[node]);
+} return void;
+given peek_node_fixture (0, 0, (import fixture_peek_node)):() then calls emit_then_judge:[1]
+given peek_node_fixture (0, 0, (import fixture_peek_node)):() then calls emit_tc_decl:[2]
+
+peek_node_fixture() {
+  chk_fixture();
+  export int fixture_peek_node = newnode("then", (import fixture_ci), 0, "peek64", "", (import fixture_chk_one), (import fixture_chk_zero));
+} return void;
+():() then calls chk_fixture:[1]
+given chk_fixture ():() then calls newnode:("then", (import fixture_ci), 0, "peek64", "", [(import fixture_one)], [(import fixture_zero)])

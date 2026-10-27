@@ -10,3 +10,4 @@ Each case pins down one semantic question about `id`'s WORD/FLAT-STORE system.
 - `08-unsigned-vs-signed` — on a word whose top bit is set, `udiv`/`ult`/`ushr` disagree with the plain signed `/`, `<`, `>>` operators on the identical bit pattern.
 - `09-mem-str-roundtrip` — `mem_of_str` followed by `str_of_mem` recovers the original string's bytes.
 - `10-word-wraparound` — `word` arithmetic wraps at 64 bits (two's complement) rather than trapping or promoting.
+- `17-then-peek` — a `then` check may name `peek64` (a pure read builtin) to read memory a `given` setup wrote.
