@@ -8,6 +8,8 @@ fit_scalar(int i, int e, string want) {
   } else if(ty_fits(want, lt) == 0) {
     case_err(i, "this case gives a " + lt + " where a " + want + " is required");
   }
+} chain (int i, int e, string want) {
+  case_bool_strict(i, e, want);
 } return void;
 given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
 given fn_fixture ((import fixture_ci), (import fixture_zero), "string"):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")

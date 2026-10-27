@@ -38,6 +38,8 @@ chk_index2(int id) {
   if(ty_known(it) == 1 && it != "int" && it != "bool") {
     tc_diag(id, "E0614", "list index must be int, got " + it, it, "an index counts elements, so only an int can say which one", "use an int index, or convert it first, as in to_int(x)");
   }
+} chain (int id) {
+  index_strict(id, it);
 } return void;
 given idxfix ((import rgidx_node)):() then (import chkfail)[0]:(0)
 given idxquiet ((import idx_node3)):() then (import chkfail)[0]:(0)

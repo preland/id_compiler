@@ -1,0 +1,12 @@
+// `--bool-strict`: a bool is not an index. The comparison that produced it
+// says which element is meant, so the fix is to write that choice out; there
+// is no mechanical edit because the index value depends on what was meant.
+
+index_strict(int id, string it) {
+  if(it == "bool" && (import bsc)[0] == 1) {
+    tc_diag(id, "E0648", "list index must be int, got bool", it, "an index counts elements, and under --bool-strict a bool does not convert to the 0 or 1 it stood for", "index with an int, or choose the element explicitly: if(b) { i = 1; } else { i = 0; }");
+  }
+} return void;
+given idxfix given init_rtc given integer_list_set((import bsc), 0, 1) ((import rgidx_node), "bool"):() then (import chkfail)[0]:(1)
+given idxfix given init_rtc given integer_list_set((import bsc), 0, 1) ((import rgidx_node), "int"):() then (import chkfail)[0]:(0)
+given idxfix given init_rtc ((import rgidx_node), "bool"):() then (import chkfail)[0]:(0)

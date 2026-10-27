@@ -1,0 +1,29 @@
+// `--bool-strict`: a case for a bool result is written `true` or `false`; a
+// bare number there is the implicit int-to-bool conversion the flag refuses.
+// The literals true and false are int leaves marked "bool" in ns2
+// (front/tree/make/expr/bool.id), which is what tells them from a 1 or a 0.
+
+case_bool_strict(int i, int e, string want) {
+  if(want == "bool" && (import nkind)[e] == "int" && (import ns2)[e] != "bool" && (import bsc)[0] == 1) {
+    case_bool_say(i, e);
+  }
+} return void;
+given fn_fixture given init_rtc given integer_list_set((import bsc), 0, 1) ((import fixture_ci), (import fixture_zero), "bool"):() then (import chkfail)[0]:(1)
+given fn_fixture given init_rtc given integer_list_set((import bsc), 0, 1) ((import fixture_ci), (import fixture_zero), "int"):() then (import chkfail)[0]:(0)
+given fn_fixture given init_rtc ((import fixture_ci), (import fixture_zero), "bool"):() then (import chkfail)[0]:(0)
+
+case_bool_say(int i, int e) {
+  string cb_v = (import ns1)[e];
+  int cb_ln = (import tline)[(import casestart)[i]];
+  case_diag(i, "E0649", "this case gives " + cb_v + " where a bool is required", "a bool result is written true or false, and under --bool-strict a number does not convert", "write :(true) or :(false)");
+} chain (int i, int e) {
+  string cb_to = "false";
+  if(cb_v == "1") {
+    cb_to = "true";
+  }
+  if(cb_v == "0" || cb_v == "1") {
+    diag_edit("machine", "replace", cb_ln, ":(" + cb_v + ")", ":(" + cb_to + ")");
+  }
+} return void;
+given fn_fixture ((import fixture_ci), (import fixture_zero)):() then (import chkfail)[0]:(1)
+given fn_fixture ((import fixture_ci), (import fixture_zero)):() then prints:("fixture.id:4: error: this case gives 0 where a bool is required [E0649]\n  why: a bool result is written true or false, and under --bool-strict a number does not convert\n  help: write :(true) or :(false)\n  edit: machine\treplace\t4\t:(0)\t:(false)\n")

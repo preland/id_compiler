@@ -1,0 +1,22 @@
+// `--bool-strict`: a name declared `int` and given a bool expression
+// (`int n = a < b;`) is an error whose fix is to declare it `bool`. The flag is
+// read last in the test so that a build without a bool never touches it.
+
+decl_bool(int id, string want, int e) {
+  if(want == "int" && type_of(e) == "bool" && (import bsc)[0] == 1) {
+    decl_bool_say(id);
+  }
+} return void;
+given cmp_fixture given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int", (import bin_eq)):() then (import chkfail)[0]:(1)
+given cmp_fixture given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int", (import lit_a)):() then (import chkfail)[0]:(0)
+given cmp_fixture given integer_list_set((import bsc), 0, 0) ((import bin_eq), "int", (import bin_eq)):() then (import chkfail)[0]:(0)
+
+decl_bool_say(int id) {
+  string dbool_nm = (import ns2)[id];
+  int dbool_ln = tc_line(id);
+  tc_diag(id, "E0647", "'" + dbool_nm + "' is declared int but is given a bool", dbool_nm, "a comparison or logical operator yields a bool, and under --bool-strict a bool does not convert to an int", "declare it 'bool " + dbool_nm + "'");
+} chain (int id) {
+  diag_edit("machine", "replace", dbool_ln, "int " + dbool_nm, "bool " + dbool_nm);
+} return void;
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(1)
+given cmp_fixture ((import bin_lt)):() then (import tcerrs)[0]:(1)
