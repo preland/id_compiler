@@ -6,6 +6,9 @@ fw_ref(word fr_b, word fr_o) {
     fr_o = fw_num(fr_b, fr_o + 1);
   }
 } return word fr_o;
+given desc_fix ((import tdb), 11):(0)
+given desc_fix ((import tdb), 14):(12)
+given desc_fix ((import tdb), 5):(5)
 
 fw_num(word fq_b, word fq_o) {
   word fq_n = 0;
@@ -14,3 +17,6 @@ fw_num(word fq_b, word fq_o) {
     fq_o = fq_o + 1;
   }
 } return word fq_n;
+given desc_fix ((import tdb), 15):(12)
+given desc_fix ((import tdb), 12):(8)
+given desc_fix ((import tdb), 9):(0)

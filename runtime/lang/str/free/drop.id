@@ -10,15 +10,21 @@ str_free(string sf_s) {
     str_give(sf_w - 8);
   }
 } return void;
+given strs_fix ((import twsa)):() then str_head((import twsa)):(1)
+given strs_fix ((import twsc)):() then str_head((import twsc)):(1) then str_head((import twsa)):(0)
 
 str_give(word sg_b) {
   word sg_n = ld64(sg_b);
   word sg_c = pool_cls(16, 36, sg_n + 9);
   pool_give(sg_c, sg_b);
 } return void;
+given strs_fix given strs_w ((import twq)):() then str_head((import twsa)):(1)
+given strs_fix given strs_w ((import twk)):() then str_head((import twsc)):(1) then str_head((import twsa)):(0)
 
 str_dup(string sd_s) {
   word sd_w = s2w(sd_s);
   word sd_n = len(sd_s);
   string ret_s = str_of_mem(sd_w, sd_n);
 } return string ret_s;
+given store_setup(64) given store_near given store_strs given poke64((import tsb), 2) given poke16((import tsp), 25185) ((import tss)):("ab")
+given store_setup(64) given store_near given store_strs given poke64((import tsb), 1) given poke16((import tsp), 25185) ((import tss)):("a")

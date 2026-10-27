@@ -19,6 +19,10 @@ fw_skip(word fk_b, word fk_o) {
     fk_r = fw_semi(fk_b, fk_o) + 1;
   }
 } return word fk_r;
+given desc_fix ((import tdb), 0):(5)
+given desc_fix ((import tdb), 8):(11)
+given desc_fix ((import tdb), 5):(8)
+given desc_fix ((import tdb), 18):(22)
 
 fw_skip_n(word fn_b, word fn_o, word fn_n) {
   while(fn_n > 0) {
@@ -26,9 +30,14 @@ fw_skip_n(word fn_b, word fn_o, word fn_n) {
     fn_n = fn_n - 1;
   }
 } return word fn_o;
+given desc_fix ((import tdb), 2, 2):(5)
+given desc_fix ((import tdb), 5, 0):(5)
+given desc_fix ((import tdb), 2, 1):(3)
 
 fw_semi(word fm_b, word fm_o) {
   while(ld8(fm_b + fm_o) != 59) {
     fm_o = fm_o + 1;
   }
 } return word fm_o;
+given desc_fix ((import tdb), 8):(10)
+given desc_fix ((import tdb), 15):(17)

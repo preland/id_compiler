@@ -1,0 +1,29 @@
+// Checks for the cases under lang/: the capacity a list header holds, and what
+// a size class's free list starts with, so a case can see a block go back.
+
+list_cap_of(int[] lc_xs) {
+  word lc_p = l2w(lc_xs);
+  int ret_i = ld64(lc_p + 8);
+} return int ret_i;
+given rlist_fix ((import tlx)):(4)
+given rlist_fix given list_push((import tlx), 7) given list_push((import tlx), 8) ((import tlx)):(8)
+
+head_is(word hi_c, word hi_w) {
+  word hi_h = ld64(pool_head(hi_c));
+  int ret_i = 0;
+  if(hi_h == hi_w) {
+    ret_i = 1;
+  }
+} return int ret_i;
+given store_setup(64) given pool_give(3, (import tsb)) (3, (import tsb)):(1)
+given store_setup(64) given pool_give(3, (import tsb)) (3, 0):(0)
+
+head_cells(word hc_c, word hc_p) {
+  word hc_h = ld64(pool_head(hc_c));
+  int ret_i = 0;
+  if(hc_h == ld64(hc_p + 16)) {
+    ret_i = 1;
+  }
+} return int ret_i;
+given rlist_fix given list_free((import tlx)) (1, (import tlp)):(1)
+given rlist_fix given list_free((import tlx)) (0, (import tlp)):(0)

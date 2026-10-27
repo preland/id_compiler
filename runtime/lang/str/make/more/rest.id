@@ -5,9 +5,13 @@ concat_copy2(string r, word p, word a) {
   st8(a + copy_bytes_v, 0);
   string ret_s = w2s(p + 8);
 } return string ret_s;
+given strs_fix given strs_w given strs_m ("y", (import twk), (import twm)):((import twsc)) then character_code_at((import twsc), 1):(121) then character_code_at((import twsc), 2):(0)
+given strs_fix given strs_w given strs_m ("", (import twk), (import twm)):((import twsc)) then character_code_at((import twsc), 0):(99) then character_code_at((import twsc), 1):(0)
 
 concat_copy2_write(string r, word a) {
   word s2w_v2 = s2w(r);
   int len_v4 = len(r);
   word copy_bytes_v = copy_bytes(s2w_v2, a, len_v4);
 } return word copy_bytes_v;
+given strs_fix given strs_m ("ab", (import twm)):(2) then character_code_at((import twsc), 1):(97) then character_code_at((import twsc), 2):(98)
+given strs_fix given strs_m ("", (import twm)):(0) then character_code_at((import twsc), 1):(100)

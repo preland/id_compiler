@@ -1,0 +1,24 @@
+// Fixtures for the cases under lang/str/make: the arena-top address three bytes
+// on, a 32-byte string block the decimal writer can use as scratch, and the
+// addresses one and two bytes into the second heap string of strs_fix.
+
+num_far() {
+  export word tnf = (import tnx) + 3;
+} return void;
+given store_setup(64) given num_far ():() then addr_gap((import tnf), (import tnx)):(3)
+given store_setup(64) given num_fix given num_far ():() then addr_gap((import tnf), (import tng)):(1)
+
+big_fix() {
+  export word tbp = mem_alloc(32);
+  st64((import tbp), 23);
+  export string tbs = w2s((import tbp) + 8);
+} return void;
+given big_fix ():() then len((import tbs)):(23) then cell_is((import tbp), 23):(1)
+given big_fix ():() then cell_is((import tbp), 24):(0)
+
+strs_m() {
+  export word twm = s2w((import twsc)) + 1;
+  export word twn = s2w((import twsc)) + 2;
+} return void;
+given strs_fix given strs_m ():() then addr_gap((import twn), (import twm)):(1) then character_code_at((import twsc), 0):(99)
+given strs_fix given strs_m ():() then addr_gap((import twm), (import twn)):(-1) then len((import twsc)):(3)

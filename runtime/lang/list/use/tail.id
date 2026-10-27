@@ -5,6 +5,8 @@ list_wide(word p, word a, word z) {
   st64(p + 8, z);
   st64(p + 16, a);
 } return void;
+given list_pair given rlist_fix given list_far ((import tlp), (import tlw), 16):() then list_cap_of((import tlx)):(16) then cells_at((import tlp), (import tlw)):(1)
+given list_pair given rlist_fix given list_far ((import tlp), (import tlw), 5):() then list_cap_of((import tlx)):(5) then cells_at((import tlp), (import tlc)):(0)
 
 // The length is decremented first so that the cell read back is the one just
 // dropped. docs/SPEC.md 5 traps on an empty list; here it walks off the front
@@ -14,6 +16,8 @@ list_pop(int[] xs) {
   word p = l2w(xs);
   word ret_w = list_pop_at(p);
 } return word ret_w;
+given rlist_fix ((import tlx)):(6) then (import tlx):([4, 5])
+given rlist_fix given list_pop1 ((import tlx)):(5) then len((import tlx)):(1)
 
 // A conf.id list constant is locked once built on the hosted targets
 // (docs/SPEC.md 8's "cannot mutate a constant list" trap) -- but there is
@@ -24,3 +28,5 @@ list_pop(int[] xs) {
 // the same as an out-of-range index here.
 list_lock(int[] xs) {
 } return void;
+given rlist_fix ((import tlx)):() then (import tlx):([4, 5, 6])
+given rlist_fix ((import tlx)):() then list_cap_of((import tlx)):(4) then cells_at((import tlp), (import tlc)):(1)

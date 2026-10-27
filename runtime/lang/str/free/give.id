@@ -22,3 +22,5 @@ str_blk(word sb_n) {
   word sb_z = str_csz(sb_c);
   word sb_p = pool_take(sb_c, sb_z);
 } return word sb_p;
+given strs_fix given strs_w given str_free((import twsa)) (1):((import twq)) then str_head((import twsa)):(0)
+given strs_fix given strs_w given str_free((import twsa)) given str_free((import twsc)) (1):((import twk)) then str_head((import twsa)):(1)

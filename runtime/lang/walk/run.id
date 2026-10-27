@@ -16,6 +16,8 @@ free_walk(int[] fw_root, string fw_base) {
   }
   list_free(fw_st);
 } return void;
+given strs_fix given strs_fill ((import twr), "ls"):() then list_cap_of((import twr)):(-1) then str_head((import twsa)):(1) then str_head((import twsc)):(0)
+given strs_fix given strs_fill ((import twr), "l."):() then list_cap_of((import twr)):(-1) then str_head((import twsa)):(0)
 
 fw_kids_l(int[] fx_st, word fx_b, word fx_p, word fx_o) {
   word fx_k = ld64(fx_p);
@@ -29,3 +31,5 @@ fw_kids_l(int[] fx_st, word fx_b, word fx_p, word fx_o) {
     fx_i = fx_i + 1;
   }
 } return void;
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 5):() then (import tly):([4, 6, 5, 6, 6, 6])
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 3):() then len((import tly)):(0)

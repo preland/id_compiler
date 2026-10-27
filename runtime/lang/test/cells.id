@@ -1,0 +1,32 @@
+// More checks for the cases under lang/: where a list header says its cells
+// are, whether one list sits in another's cell, and whether a string's block is
+// the one the string size class gave back last.
+
+cells_at(word ca_p, word ca_w) {
+  int ret_i = 0;
+  if(ld64(ca_p + 16) == ca_w) {
+    ret_i = 1;
+  }
+} return int ret_i;
+given rlist_fix ((import tlp), (import tlc)):(1)
+given rlist_fix ((import tlp), 0):(0)
+
+list_has(int[] lh_xs, int lh_i, int[] lh_ys) {
+  word lh_w = list_get(lh_xs, lh_i);
+  int ret_i = 0;
+  if(lh_w == l2w(lh_ys)) {
+    ret_i = 1;
+  }
+} return int ret_i;
+given list_pair given list_nest ((import tly), 0, (import tlm)):(1)
+given list_pair given list_nest ((import tly), 0, (import tln)):(0)
+
+str_head(string sh_s) {
+  word sh_h = ld64(pool_head(36));
+  int ret_i = 0;
+  if(sh_h == s2w(sh_s) - 8) {
+    ret_i = 1;
+  }
+} return int ret_i;
+given strs_fix ((import twsa)):(0)
+given strs_fix given str_free((import twsa)) ((import twsa)):(1)

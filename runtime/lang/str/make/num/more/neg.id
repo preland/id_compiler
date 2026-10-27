@@ -4,3 +4,5 @@ num_neg(word a, word e) {
   word q = num_mag(0 - a, e) - 1;
   st8(q, 45);
 } return word q;
+given store_setup(64) given num_fix given num_far (-5, (import tng)):((import tnx)) then peek8((import tnx)):(45) then peek8((import tne)):(53)
+given store_setup(64) given num_fix given num_far (-40, (import tnf)):((import tnx)) then peek8((import tnx)):(45) then peek8((import tne)):(52) then peek8((import tng)):(48)

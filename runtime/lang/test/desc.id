@@ -1,0 +1,24 @@
+// Fixtures for the cases under lang/walk and lang/list: a descriptor string
+// with every node kind in it at known offsets, the address of the second cell
+// of rlist_fix's list, and two heap strings (a literal must never be freed).
+
+desc_fix() {
+  export string tds = "S2sl.ll.@0;@8;@12;S2.s";
+  export word tdb = mem_of_str(tds);
+} return void;
+given desc_fix ():() then len((import tds)):(22)
+given desc_fix ():() then character_code_at((import tds), 21):(115)
+
+list_c2() {
+  export word tle = (import tlc) + 16;
+} return void;
+given rlist_fix given list_c2 ():() then addr_gap((import tle), (import tlc)):(16)
+given rlist_fix given list_c2 ():() then peek64((import tle)):(6)
+
+strs_fix() {
+  export string twsa = concat("a", "b");
+  export string twsc = concat("cd", "e");
+  export int[] twr = list_new();
+} return void;
+given strs_fix ():() then len((import twsc)):(3) then str_head((import twsa)):(0)
+given strs_fix ():() then len((import twsa)):(2) then len((import twr)):(0)

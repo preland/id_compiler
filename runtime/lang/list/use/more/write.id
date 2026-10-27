@@ -5,12 +5,16 @@ list_push_at(word p, word v) {
   word count = ld64(p);
   list_push_write(p, v, addr, count);
 } return void;
+given rlist_fix ((import tlp), 9):() then (import tlx):([4, 5, 6, 9])
+given rlist_fix given list_pop1 ((import tlp), 8):() then (import tlx):([4, 5, 8])
 
 list_push_write(word p, word v, word addr, word count) {
   st64(addr + count * 8, v);
   word ld64_v3 = ld64(p);
   st64(p, ld64_v3 + 1);
 } return void;
+given rlist_fix ((import tlp), 9, (import tlc), 3):() then (import tlx):([4, 5, 6, 9])
+given rlist_fix given list_pop1 ((import tlp), 7, (import tlc), 1):() then (import tlx):([4, 7, 6])
 
 // The tail of `list_grow`: copying the old cells into the freshly allocated,
 // wider array before the header is updated to point at it.
@@ -19,3 +23,5 @@ list_grow_copy(word p, word a, word z, word src) {
   copy_bytes(src, a, count * 8);
   list_wide(p, a, z);
 } return void;
+given list_pair given rlist_fix given list_far ((import tlp), (import tlw), 16, (import tlc)):() then (import tlx):([4, 5, 6]) then cells_at((import tlp), (import tlw)):(1) then list_cap_of((import tlx)):(16)
+given list_pair given rlist_fix given list_far given list_pop1 ((import tlp), (import tlw), 8, (import tlc)):() then (import tlx):([4, 5]) then list_cap_of((import tlx)):(8)

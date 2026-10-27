@@ -13,6 +13,7 @@ list_new() {
   list_init(p);
   int[] ret_li = w2l(p);
 } return int[] ret_li;
+given rlist_fix ():([])
 ():([])
 
 // Arena memory arrives with whatever the bootloader left in it, so every field
@@ -22,6 +23,8 @@ list_init(word p) {
   st64(p + 8, 4);
   list_init_cells(p);
 } return void;
+given rlist_fix ((import tlp)):() then len((import tlx)):(0)
+given rlist_fix given list_push((import tlx), 7) given list_push((import tlx), 8) ((import tlp)):() then list_cap_of((import tlx)):(4)
 
 list_len(int[] xs) {
   word l2w_v = l2w(xs);

@@ -1,0 +1,30 @@
+// The C symbol a systems builtin call is emitted under.
+//
+// A systems builtin (peek8, str_of_mem, ...) is normally the host runtime's
+// `id_<name>` helper. A --runtime tree that defines one of these names itself
+// has its own definition emitted as `idr_<name>` (fn_sym), and a call from the
+// tree must reach that one: the host helper checks addresses against the host's
+// store, while the tree's functions work on the tree's own arena. So when
+// fn_sym renames the name, the call follows it; any other name keeps the helper
+// sys_helper_at picked (including the width-suffixed and renamed ones).
+
+sys_sym(int id) {
+  string sym_n = (import ns1)[id];
+  string sym_h = sys_helper_at(id);
+  if(fn_sym(sym_n) != "id_" + sym_n) {
+    sym_h = fn_sym(sym_n);
+  }
+} return string sym_h;
+given call_sys_fixture ((import call_e_sys)):("id_peek8")
+given sys_rt_fixture {
+  ((import call_e_sys)):("idr_peek8")
+  ((import call_e_sys2)):("id_mem_alloc")
+}
+
+sys_rt_fixture() {
+  call_sys_fixture();
+  rt_fixture();
+  push((import fnames), "peek8");
+} return void;
+():() then (import rtc)[0]:(1)
+():() then calls rt_fixture:[1]

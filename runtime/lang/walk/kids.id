@@ -10,6 +10,9 @@ fw_kids(int[] fd_st, word fd_b, word fd_p, word fd_o) {
     fw_kids_l(fd_st, fd_b, fd_p, fd_o);
   }
 } return void;
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 0):() then (import tly):([4, 2, 5, 3])
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 5):() then (import tly):([4, 6, 5, 6, 6, 6])
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 3):() then len((import tly)):(0)
 
 fw_kids_s(int[] fz_st, word fz_b, word fz_p, word fz_o) {
   word fz_k = ld8(fz_b + fz_o + 1) - 48;
@@ -21,6 +24,8 @@ fw_kids_s(int[] fz_st, word fz_b, word fz_p, word fz_o) {
     fz_i = fz_i + 1;
   }
 } return void;
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 0):() then (import tly):([4, 2, 5, 3])
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 18):() then (import tly):([5, 21])
 
 fw_field(int[] fg_st, word fg_b, word fg_p, word fg_i, word fg_f) {
   if(ld8(fg_b + fg_f) != 46) {
@@ -28,3 +33,6 @@ fw_field(int[] fg_st, word fg_b, word fg_p, word fg_i, word fg_f) {
   }
   word fg_n = fw_skip(fg_b, fg_f);
 } return word fg_n;
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 0, 2):(3) then (import tly):([4, 2])
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 1, 20):(21) then len((import tly)):(0)
+given list_pair given rlist_fix given desc_fix ((import tly), (import tdb), (import tlp), 2, 3):(5) then (import tly):([6, 3])

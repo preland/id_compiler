@@ -1,0 +1,27 @@
+// Lists the cases under lang/list need: one of three cells and its header
+// address, and a list holding the headers of two others, which is what
+// free_deep and free_cells walk.
+
+rlist_fix() {
+  export int[] tlx = list_tri3(4);
+  export word tlp = l2w(tlx);
+  export word tlc = ld64(tlp + 16);
+} return void;
+given rlist_fix ():() then (import tlx):([4, 5, 6])
+given rlist_fix ():() then cells_at((import tlp), (import tlc)):(1) then cell_is((import tlp), 3):(1)
+
+list_pair() {
+  export int[] tlm = list_solo(7);
+  export int[] tln = list_tri(8);
+  export int[] tly = list_new();
+} return void;
+given list_pair ():() then (import tlm):([7]) then (import tln):([8, 9])
+given list_pair ():() then len((import tly)):(0) then list_cap_of((import tly)):(4)
+
+list_nest() {
+  list_push((import tly), l2w((import tlm)));
+  list_push((import tly), l2w((import tln)));
+  export word tlz = l2w((import tly));
+} return void;
+given list_pair ():() then len((import tly)):(2) then list_has((import tly), 0, (import tlm)):(1)
+given list_pair ():() then list_has((import tly), 1, (import tln)):(1)

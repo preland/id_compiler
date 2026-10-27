@@ -4,3 +4,5 @@ num_mag_write(word q, word a) {
   word umod_v = umod(a, 10);
   st8(q, 48 + umod_v);
 } return void;
+given store_setup(64) given num_fix ((import tnx), 123):() then peek8((import tnx)):(51)
+given store_setup(64) given num_fix ((import tne), 70):() then peek8((import tne)):(48)

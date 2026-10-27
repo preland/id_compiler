@@ -1,0 +1,26 @@
+// More fixtures for the cases under lang/: the list of two heap strings and the
+// addresses of their bytes and blocks, and the addresses just past the first
+// bytes of the arena top, where the digit writers of lang/str/make/num end.
+
+strs_fill() {
+  list_push((import twr), s2w((import twsa)));
+  list_push((import twr), s2w((import twsc)));
+  export word twp = l2w((import twr));
+} return void;
+given strs_fix ():() then len((import twr)):(2)
+given strs_fix ():() then len((import twr)):(2) then list_cap_of((import twr)):(4)
+
+strs_w() {
+  export word twa = s2w((import twsa));
+  export word twq = twa - 8;
+  export word twk = s2w((import twsc)) - 8;
+} return void;
+given strs_fix given strs_w ():() then addr_gap((import twa), (import twq)):(8) then cell_is((import twq), 2):(1)
+given strs_fix given strs_w ():() then cell_is((import twk), 3):(1)
+
+num_fix() {
+  export word tne = (import tnx) + 1;
+  export word tng = (import tnx) + 2;
+} return void;
+given store_setup(64) given num_fix ():() then addr_gap((import tne), (import tnx)):(1)
+given store_setup(64) given num_fix ():() then addr_gap((import tng), (import tn8)):(-6)

@@ -28,3 +28,5 @@ chr_term(word p, int n) {
   st8(p + 9, 0);
   string ret_s = w2s(p + 8);
 } return string ret_s;
+given strs_fix given strs_w ((import twq), 66):((import twsa)) then character_code_at((import twsa), 0):(66) then character_code_at((import twsa), 1):(0)
+given strs_fix given strs_w ((import twk), 90):((import twsc)) then character_code_at((import twsc), 0):(90) then character_code_at((import twsc), 2):(101)

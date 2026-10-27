@@ -11,6 +11,8 @@ list_push(int[] xs, word v) {
   word p = list_room(l2w_v);
   list_push_at(p, v);
 } return void;
+given rlist_fix ((import tlx), 9):() then (import tlx):([4, 5, 6, 9])
+given rlist_fix given list_push((import tlx), 7) ((import tlx), 8):() then (import tlx):([4, 5, 6, 7, 8]) then list_cap_of((import tlx)):(8)
 
 list_room(word p) {
   if(ld64(p) >= ld64(p + 8)) {
@@ -18,6 +20,8 @@ list_room(word p) {
     list_grow(p, ld64_v * 2);
   }
 } return word p;
+given rlist_fix ((import tlp)):((import tlp)) then list_cap_of((import tlx)):(4)
+given rlist_fix given list_push((import tlx), 7) ((import tlp)):((import tlp)) then list_cap_of((import tlx)):(8)
 
 list_grow(word p, word z) {
   word cls = pool_cls(4, 1, z);
@@ -27,3 +31,5 @@ list_grow(word p, word z) {
   list_grow_copy(p, a, z, ld64_v);
   pool_give(cls - 1, ld64_v);
 } return void;
+given rlist_fix ((import tlp), 16):() then list_cap_of((import tlx)):(16) then (import tlx):([4, 5, 6])
+given rlist_fix ((import tlp), 8):() then cells_at((import tlp), (import tlc)):(0) then (import tlx):([4, 5, 6])

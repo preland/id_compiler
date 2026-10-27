@@ -13,6 +13,8 @@ num_mag(word a, word e) {
     a = udiv(a, 10);
   }
 } return word q;
+given store_setup(64) given num_fix (7, (import tne)):((import tnx)) then peek8((import tnx)):(55)
+given store_setup(64) given num_fix (42, (import tng)):((import tnx)) then peek8((import tnx)):(52) then peek8((import tne)):(50)
 
 // Zero has no digits by that rule, so it is the one value written rather than
 // derived.
@@ -22,8 +24,12 @@ num_pos(word a, word e) {
     q = num_zero(e);
   }
 } return word q;
+given store_setup(64) given num_fix (0, (import tne)):((import tnx)) then peek8((import tnx)):(48)
+given store_setup(64) given num_fix (35, (import tng)):((import tnx)) then peek8((import tnx)):(51) then peek8((import tne)):(53)
 
 num_zero(word e) {
   st8(e - 1, 48);
   word ret_w = e - 1;
 } return word ret_w;
+given store_setup(64) given num_fix ((import tne)):((import tnx)) then peek8((import tnx)):(48)
+given store_setup(64) given num_fix ((import tng)):((import tne)) then peek8((import tne)):(48)

@@ -7,3 +7,5 @@ str_of_word_at(word a, word p) {
   string ret_s = str_of_mem(num_str_v, p + 31 - num_str_v);
   pool_give(pool_cls(16, 36, 32), p);
 } return string ret_s;
+given big_fix (1234, (import tbp)):("1234") then head_is(37, (import tbp)):(1)
+given big_fix (-5, (import tbp)):("-5") then head_is(37, (import tbp)):(1)

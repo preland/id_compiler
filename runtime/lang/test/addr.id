@@ -1,0 +1,16 @@
+// Fixtures for the cases under lang/list/use: the header and cell array of an
+// empty list, which a case can hand to the cell-array writers as somewhere
+// else for the cells to go.
+
+list_far() {
+  export word tlh = l2w((import tly));
+  export word tlw = ld64((import tlh) + 16);
+} return void;
+given list_pair given list_far ():() then cells_at((import tlh), (import tlw)):(1) then cell_is((import tlh), 0):(1)
+given list_pair given rlist_fix given list_far ():() then cells_at((import tlh), (import tlc)):(0) then list_cap_of((import tly)):(4)
+
+list_pop1() {
+  word lp_v = list_pop((import tlx));
+} return void;
+given rlist_fix ():() then (import tlx):([4, 5])
+given rlist_fix given list_pop1 ():() then len((import tlx)):(1) then cell_is((import tlp), 1):(1)

@@ -6,14 +6,20 @@ concat_alloc(string s, string r) {
   word p = str_blk(len_v);
   st64(p, len_v);
 } return word p;
+given strs_fix given strs_w given str_free((import twsa)) ("ab", "cd"):((import twq)) then cell_is((import twq), 4):(1)
+given strs_fix given strs_w given str_free((import twsa)) ("x", ""):((import twq)) then cell_is((import twq), 1):(1)
 
 concat_at(string s, string r, word p) {
   word a = concat_copy1(s, p);
   string ret_s = concat_copy2(r, p, a);
 } return string ret_s;
+given strs_fix given strs_w given poke64((import twq), 4) ("ab", "cd", (import twq)):("abcd")
+given strs_fix given strs_w given poke64((import twq), 1) ("x", "", (import twq)):("x")
 
 concat_copy1(string s, word p) {
   word s2w_v = s2w(s);
   int len_v3 = len(s);
   word a = p + 8 + copy_bytes(s2w_v, p + 8, len_v3);
 } return word a;
+given strs_fix given strs_w given strs_m ("xy", (import twk)):((import twn)) then character_code_at((import twsc), 1):(121) then character_code_at((import twsc), 2):(101)
+given strs_fix given strs_w given strs_m ("z", (import twk)):((import twm)) then character_code_at((import twsc), 0):(122) then character_code_at((import twsc), 1):(100)

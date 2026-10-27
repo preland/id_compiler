@@ -10,6 +10,8 @@ cell_at(int[] xs, int i) {
   word l2w_v = l2w(xs);
   word ret_w = ld64(l2w_v + 16) + i * 8;
 } return word ret_w;
+given rlist_fix given list_c2 ((import tlx), 2):((import tle))
+given rlist_fix ((import tlx), 0):((import tlc))
 
 list_get(int[] xs, int i) {
   word cell_at_v = cell_at(xs, i);
@@ -22,3 +24,5 @@ list_set(int[] xs, int i, word v) {
   word cell_at_v = cell_at(xs, i);
   st64(cell_at_v, v);
 } return void;
+given rlist_fix ((import tlx), 1, 9):() then (import tlx):([4, 9, 6])
+given rlist_fix ((import tlx), 2, 0):() then (import tlx):([4, 5, 0])

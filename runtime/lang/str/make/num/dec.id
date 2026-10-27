@@ -14,10 +14,14 @@ str_of_word(word a) {
   st8(p + 31, 0);
   string ret_s = str_of_word_at(a, p);
 } return string ret_s;
+(0):("0")
+(-1234):("-1234")
 
 str_of_int(int n) {
   string ret_s = str_of_word(n);
 } return string ret_s;
+(42):("42")
+(-7):("-7")
 
 num_str(word a, word e) {
   word q = 0;
@@ -27,3 +31,5 @@ num_str(word a, word e) {
     q = num_pos(a, e);
   }
 } return word q;
+given store_setup(64) given num_fix (-5, (import tng)):((import tnx)) then peek8((import tnx)):(45) then peek8((import tne)):(53)
+given store_setup(64) given num_fix (30, (import tng)):((import tnx)) then peek8((import tnx)):(51) then peek8((import tne)):(48)

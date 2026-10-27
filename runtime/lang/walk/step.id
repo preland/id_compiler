@@ -14,6 +14,10 @@ fw_step(int[] fs_st, word fs_b, word fs_p, word fs_o) {
     fw_list(fs_st, fs_b, fs_p, fs_n);
   }
 } return void;
+given list_pair given desc_fix given strs_fix given strs_w ((import tly), (import tdb), (import twa), 2):() then str_head((import twsa)):(1) then len((import tly)):(0)
+given list_pair given desc_fix given strs_fix given strs_w ((import tly), (import tdb), 0, 2):() then str_head((import twsa)):(0) then len((import tly)):(0)
+given list_pair given desc_fix given strs_fix given strs_fill ((import tly), (import tdb), (import twp), 5):() then len((import tly)):(4) then list_cap_of((import twr)):(-1)
+given list_pair given desc_fix given strs_fix given strs_fill ((import tly), (import tdb), (import twp), 8):() then len((import tly)):(4) then list_cap_of((import twr)):(-1)
 
 fw_list(int[] fl_st, word fl_b, word fl_p, word fl_o) {
   if(ld64(fl_p + 8) > 0) {
@@ -21,6 +25,8 @@ fw_list(int[] fl_st, word fl_b, word fl_p, word fl_o) {
     list_free(w2l(fl_p));
   }
 } return void;
+given list_pair given desc_fix given strs_fix given strs_fill ((import tly), (import tdb), (import twp), 5):() then len((import tly)):(4) then list_cap_of((import twr)):(-1)
+given list_pair given desc_fix given strs_fix given strs_fill given list_free((import twr)) ((import tly), (import tdb), (import twp), 5):() then len((import tly)):(0)
 
 fw_push(int[] fh_st, word fh_p, word fh_i, word fh_o) {
   word fh_cells = ld64(fh_p + 16);
@@ -29,3 +35,5 @@ fw_push(int[] fh_st, word fh_p, word fh_i, word fh_o) {
 } chain (int[] fh_st, word fh_p, word fh_i, word fh_o) {
   list_push(fh_st, fh_o);
 } return void;
+given list_pair given rlist_fix ((import tly), (import tlp), 1, 99):() then (import tly):([5, 99])
+given list_pair given rlist_fix ((import tly), (import tlp), 0, 7):() then (import tly):([4, 7])

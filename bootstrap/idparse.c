@@ -2488,6 +2488,7 @@ char* id_sys_helper2(char* name);
 char* id_arg_cast(char* name, int arg);
 char* id_sys_helper_at(int id);
 char* id_sys_narrow(int id, char* text);
+char* id_sys_sym(int id);
 char* id_tc_cells(IdList* xs, char* et);
 char* id_tc_scalar(int e);
 char* id_tc_neg(int e);
@@ -17327,7 +17328,7 @@ char* id_emit_syscall(int id) {
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
 char* idsq_13;
-    ret_s = (idsq_13 = id_sys_helper_at(id), id_sys_narrow(id, id_concat_f(id_concat_f(id_concat_f(idsq_13, ID_S("("), 1), id_cast_args(s1_of_v, l1_of_v), 3), ID_S(")"), 1)));
+    ret_s = (idsq_13 = id_sys_sym(id), id_sys_narrow(id, id_concat_f(id_concat_f(id_concat_f(idsq_13, ID_S("("), 1), id_cast_args(s1_of_v, l1_of_v), 3), ID_S(")"), 1)));
     return ret_s;
 }
 
@@ -17405,6 +17406,17 @@ char* id_sys_narrow(int id, char* text) {
         sha_r = id_concat_f(id_concat(ID_S("(int)("), text), ID_S(")"), 1);
     }
     { id_str_free(sha_n); return sha_r; }
+}
+
+char* id_sys_sym(int id) {
+    char* sym_n;
+    char* sym_h = NULL;
+    sym_n = (char*)(intptr_t)(id_list_get(ns1, id));
+    { char* idfe_o = sym_h; sym_h = id_sys_helper_at(id); id_str_free(idfe_o); }
+    if ((strcmp(id_fn_sym(sym_n), id_concat(ID_S("id_"), sym_n)) != 0)) {
+        { char* idfe_o = sym_h; sym_h = id_fn_sym(sym_n); id_str_free(idfe_o); }
+    }
+    return sym_h;
 }
 
 char* id_tc_cells(IdList* xs, char* et) {

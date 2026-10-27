@@ -8,6 +8,8 @@ list_free_strs(int[] ls_xs) {
   list_free_each(ls_p);
   list_free(ls_xs);
 } return void;
+given strs_fix given strs_fill ((import twr)):() then str_head((import twsc)):(1) then list_cap_of((import twr)):(-1)
+given strs_fix given strs_fill given list_free((import twr)) ((import twr)):() then str_head((import twsc)):(0)
 
 list_free_each(word le_p) {
   word le_k = 0;
@@ -16,9 +18,13 @@ list_free_each(word le_p) {
     le_k = le_k + 1;
   }
 } return void;
+given strs_fix given strs_fill ((import twp)):() then str_head((import twsc)):(1) then str_head((import twsa)):(0) then list_cap_of((import twr)):(4)
+given strs_fix given strs_fill given list_free((import twr)) ((import twp)):() then str_head((import twsc)):(0)
 
 str_free_at(word sa_p, word sa_k) {
   word sa_cells = ld64(sa_p + 16);
   word sa_e = ld64(sa_cells + 8 * sa_k);
   str_free(w2s(sa_e));
 } return void;
+given strs_fix given strs_fill ((import twp), 1):() then str_head((import twsc)):(1) then str_head((import twsa)):(0)
+given strs_fix given strs_fill ((import twp), 0):() then str_head((import twsa)):(1) then str_head((import twsc)):(0)

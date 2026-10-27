@@ -4,6 +4,8 @@ list_init_cells(word p) {
   word mem_alloc_v = pool_take(1, 32);
   st64(p + 16, mem_alloc_v);
 } return void;
+given store_setup(64) ((import tsb)):() then cells_at((import tsb), (import tnx)):(1)
+given store_setup(64) given store_near given pool_give(1, (import tsq)) ((import tsb)):() then cells_at((import tsb), (import tsq)):(1)
 
 // Giving back a list and the lists it holds (drop.id's list_free for the
 // elements as well). The compiler calls this (as id_list_free_deep) for a local
@@ -17,6 +19,8 @@ list_free_deep(int[] xs) {
   list_free_cells(fd_p);
   list_free(xs);
 } return void;
+given list_pair given list_nest ((import tly)):() then list_cap_of((import tlm)):(-1) then list_cap_of((import tln)):(-1) then list_cap_of((import tly)):(-1)
+given list_pair given list_nest given list_free((import tly)) ((import tly)):() then list_cap_of((import tln)):(4)
 
 list_free_cells(word fc_p) {
   word fc_k = 0;
@@ -25,3 +29,6 @@ list_free_cells(word fc_p) {
     fc_k = fc_k + 1;
   }
 } return void;
+given list_pair given list_nest ((import tlz)):() then list_cap_of((import tlm)):(-1) then list_cap_of((import tln)):(-1) then list_cap_of((import tly)):(4)
+given list_pair given list_nest given list_free((import tly)) ((import tlz)):() then list_cap_of((import tlm)):(4)
+(0):()

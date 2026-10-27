@@ -14,6 +14,8 @@ list_free(int[] xs) {
     list_give(p);
   }
 } return void;
+given rlist_fix ((import tlx)):() then list_cap_of((import tlx)):(-1) then head_cells(1, (import tlp)):(1)
+given rlist_fix given list_free((import tlx)) ((import tlx)):() then cell_is((import tlp), 0):(1) then head_is(0, (import tlp)):(1)
 
 list_give(word p) {
   word cap = ld64(p + 8);
@@ -24,3 +26,5 @@ list_give(word p) {
   st64(p + 8, 0 - 1);
   pool_give(0, p);
 } return void;
+given rlist_fix ((import tlp)):() then list_cap_of((import tlx)):(-1) then head_is(0, (import tlp)):(1) then head_cells(1, (import tlp)):(1)
+given rlist_fix given list_push((import tlx), 7) given list_push((import tlx), 8) ((import tlp)):() then list_cap_of((import tlx)):(-1) then head_cells(2, (import tlp)):(1)

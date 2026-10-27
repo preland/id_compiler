@@ -10,6 +10,8 @@ str_sub(string s, int i, int n) {
   word s2w_v = s2w(s);
   string ret_s = str_of_mem(s2w_v + i, sub_n);
 } return string ret_s;
+given store_setup(64) given store_near given store_strs given poke64((import tsb), 2) given poke16((import tsp), 25185) ((import tss), 1, 1):("b")
+given store_setup(64) given store_near given store_strs given poke64((import tsb), 2) given poke16((import tsp), 25185) ((import tss), 0, 2):("ab")
 
 sub_span(string s, int i, int n) {
   int sub_ok = i >= 0 && n >= 0 && (n == 0 || i + n <= len(s));

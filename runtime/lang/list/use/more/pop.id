@@ -5,12 +5,16 @@ list_pop_at(word p) {
   st64(p, ld64_v - 1);
   word ret_w = list_pop_read(p);
 } return word ret_w;
+given rlist_fix ((import tlp)):(6) then (import tlx):([4, 5])
+given rlist_fix given list_pop1 ((import tlp)):(5) then (import tlx):([4])
 
 list_pop_read(word p) {
   word addr = ld64(p + 16);
   word count = ld64(p);
   word ret_w = ld64(addr + count * 8);
 } return word ret_w;
+given rlist_fix given list_pop1 ((import tlp)):(6)
+given rlist_fix given list_pop1 given list_pop1 ((import tlp)):(5)
 
 // One cell of a list being freed with its elements (more/init.id,
 // list_free_deep): the cell is a list, and goes back as one. Filed here beside
@@ -20,3 +24,5 @@ list_free_at(word fa_p, word fa_k) {
   word fa_e = ld64(fa_cells + 8 * fa_k);
   list_free(w2l(fa_e));
 } return void;
+given list_pair given list_nest ((import tlz), 0):() then list_cap_of((import tlm)):(-1) then list_cap_of((import tln)):(4)
+given list_pair given list_nest ((import tlz), 1):() then list_cap_of((import tln)):(-1) then list_cap_of((import tlm)):(4)

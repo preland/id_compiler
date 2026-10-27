@@ -1,0 +1,26 @@
+// Runtime-built lists for the fixtures of lang/test: the list literals the
+// hosted test binary makes live outside the arena, so the load and store
+// primitives under test cannot reach their headers. These are made by
+// list_new and list_push, which put header and cells in the arena.
+
+list_tri(int lt_a) {
+  int[] lt_xs = list_new();
+  list_push(lt_xs, lt_a);
+  list_push(lt_xs, lt_a + 1);
+} return int[] lt_xs;
+(4):([4, 5])
+(9):([9, 10])
+
+list_tri3(int lt_b) {
+  int[] lt_ys = list_tri(lt_b);
+  list_push(lt_ys, lt_b + 2);
+} return int[] lt_ys;
+(4):([4, 5, 6])
+(1):([1, 2, 3])
+
+list_solo(int lo_a) {
+  int[] lo_xs = list_new();
+  list_push(lo_xs, lo_a);
+} return int[] lo_xs;
+(7):([7])
+(0):([0])
