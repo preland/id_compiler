@@ -2941,6 +2941,8 @@ int id_parse_primary(IdList* pos);
 int id_parse_paren(IdList* pos);
 void id_no_case_word(IdList* pos);
 void id_no_func_word(IdList* pos);
+char* id_rel_op(IdList* pos);
+void id_bare_eq_diag(IdList* pos);
 int id_parse_expr(IdList* pos);
 int id_parse_rel(IdList* pos);
 int id_fold_rel(IdList* pos, int left);
@@ -3435,6 +3437,9 @@ void id_fix_state1(void);
 void id_fix_state2(void);
 void id_fix_gcl_at(int i);
 void id_fix_ev_reset(void);
+void id_fix_beq(int lo, int f);
+void id_fix_beq_scan(int from, int to);
+void id_fix_beq_one(int t0, int from, int to);
 void id_fix_enter(int i, int f, int lo);
 void id_fix_setfile(int i);
 void id_fix_funcs(void);
@@ -3845,6 +3850,8 @@ void id_case_void_err(int i, int fn, int ne);
 void id_case_ret_err(int i, int fn, int ne);
 void id_fit_void(int i, int fn, IdList* expd);
 void id_fit_ret(int i, int fn, IdList* expd);
+void id_case_bool_strict(int i, int e, char* want);
+void id_case_bool_say(int i, int e);
 char* id_list_elem(char* t);
 char* id_then_imp_type(int chk_node);
 char* id_bool_spell(int e);
@@ -4222,6 +4229,7 @@ void id_chk_site_at(int id, int fn);
 void id_tc_g4(int id);
 void id_chk_index(int id);
 void id_chk_index2(int id);
+void id_index_strict(int id, char* it);
 void id_ix_err(int id, char* msg);
 int id_is_ia_target(int id);
 int id_ia_hit(int i, int id, int ok);
@@ -4308,6 +4316,8 @@ void id_chk_un2(int id, char* t);
 void id_chk_decl(int id);
 void id_chk_assign(int id);
 int id_bad_store(char* want, int e);
+void id_decl_bool(int id, char* want, int e);
+void id_decl_bool_say(int id);
 void id_decl_err(int id, char* t, int e);
 void id_assign_err(int id, char* vt, int e);
 int id_bad_store2(char* want, int e);
@@ -5005,6 +5015,7 @@ IdList* ngrp;  /* exported by init_pos2() */
 IdList* ngrpc;  /* exported by init_pos3() */
 IdList* nst;  /* exported by init_pos3() */
 IdList* synfail;  /* exported by init_pos3() */
+IdList* beqtok;  /* exported by init_pos3() */
 IdList* ns2;  /* exported by init_c() */
 IdList* nl1;  /* exported by init_c() */
 IdList* nl2;  /* exported by init_c() */
@@ -22018,6 +22029,39 @@ void id_no_func_word(IdList* pos) {
     return;
 }
 
+char* id_rel_op(IdList* pos) {
+    char* beq_op;
+    beq_op = id_cur_text(pos);
+    if ((strcmp(beq_op, ID_S("=")) == 0)) {
+        id_bare_eq_diag(pos);
+IdList* idsq_10;
+        (idsq_10 = beqtok, id_list_push(idsq_10, (long long)((int)(id_list_get(pos, 0)))));
+        beq_op = ID_S("==");
+    }
+    return beq_op;
+}
+
+void id_bare_eq_diag(IdList* pos) {
+    char* beq_left;
+    char* beq_right;
+    char* beq_why;
+    char* beq_from = NULL;
+    char* beq_to = NULL;
+    char* beq_loc = NULL;
+    beq_left = id_fix_xtext(((int)(id_list_get(pos, 0)) - 1));
+    beq_right = id_fix_xtext(((int)(id_list_get(pos, 0)) + 1));
+    beq_why = ID_S("in id a statement `x = y;` stores, and an expression compares with `==`; the single `=` between two operands is accepted by the grammar as a comparison but reads as a store to anyone who knows either form");
+    { char* idfe_o = beq_from; beq_from = id_concat_f(id_concat(beq_left, ID_S(" = ")), beq_right, 1); id_str_free(idfe_o); }
+    { char* idfe_o = beq_to; beq_to = id_concat_f(id_concat(beq_left, ID_S(" == ")), beq_right, 1); id_str_free(idfe_o); }
+char* idsq_38;
+    { char* idfe_o = beq_loc; beq_loc = (idsq_38 = id_cur_file(), id_concat_f(id_concat(idsq_38, ID_S(":")), id_str_of_int(id_cur_ln(pos)), 3)); id_str_free(idfe_o); }
+    id_diag(ID_S("E0313"), beq_loc, ID_S("'=' compares nothing here: equality in an expression is written '=='"), ID_S("="), beq_why, ID_S("write '==' where the comparison is meant"));
+    if (((strcmp(beq_left, ID_S("")) != 0) && (strcmp(beq_right, ID_S("")) != 0))) {
+        id_diag_edit(ID_S("machine"), ID_S("replace"), id_cur_ln(pos), beq_from, beq_to);
+    }
+    { id_str_free(beq_from); id_str_free(beq_to); id_str_free(beq_loc); return; }
+}
+
 int id_parse_expr(IdList* pos) {
     int left;
     left = id_parse_and(pos);
@@ -22039,7 +22083,7 @@ int id_parse_rel(IdList* pos) {
 int id_fold_rel(IdList* pos, int left) {
     char* op;
     int ret_i;
-    op = id_cur_text(pos);
+    op = id_rel_op(pos);
     id_advance(pos);
     ret_i = id_fold_rel_tail(pos, left, op);
     return ret_i;
@@ -22782,6 +22826,7 @@ void id_init_pos3(void) {
     ngrpc = id_list_lit(0);
     nst = id_list_lit(0);
     synfail = id_list_lit(1, (long long)(0));
+    beqtok = id_list_lit(0);
     return;
 }
 
@@ -27045,6 +27090,38 @@ void id_fix_ev_reset(void) {
     return;
 }
 
+void id_fix_beq(int lo, int f) {
+    int from;
+    from = 0;
+    if ((lo > 0)) {
+        from = ((int)(id_list_get(ntok, (lo - 1))) + 1);
+    }
+    id_fix_beq_scan(from, (int)(id_list_get(ntok, f)));
+    return;
+}
+
+void id_fix_beq_scan(int from, int to) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(beqtok))) {
+        id_fix_beq_one((int)(id_list_get(beqtok, i)), from, to);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_beq_one(int t0, int from, int to) {
+    int sq;
+    if ((((t0 >= from) && (t0 <= to)) && (id_fix_packed(t0) >= 0))) {
+        sq = id_fix_seq();
+IdList* idsq_25;
+char* idsq_23;
+char* idsq_17;
+        (idsq_25 = fixd_file, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, 0)), idsq_17 = id_fix_at(t0), id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("@R|"), idsq_23), ID_S("|"), 1), idsq_17, 3), ID_S("|"), 1), id_fix_after(t0), 3), ID_S("|"), 1), id_str_of_int(sq), 3), ID_S("|=="), 1)));
+    }
+    return;
+}
+
 void id_fix_enter(int i, int f, int lo) {
     id_fix_state3();
     id_fix_setfile(i);
@@ -27092,6 +27169,7 @@ void id_fix_func(int i, int f, int lo) {
     id_fix_ret(f);
     id_fix_parens(lo, f);
     id_fix_extract(f, lo);
+    id_fix_beq(lo, f);
     return;
 }
 
@@ -31691,6 +31769,31 @@ void id_fit_ret(int i, int fn, IdList* expd) {
     return;
 }
 
+void id_case_bool_strict(int i, int e, char* want) {
+    if (((((strcmp(want, ID_S("bool")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("int")) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(ns2, e)), ID_S("bool")) != 0)) && ((int)(id_list_get(bsc, 0)) == 1))) {
+        id_case_bool_say(i, e);
+    }
+    return;
+}
+
+void id_case_bool_say(int i, int e) {
+    char* cb_v;
+    int cb_ln;
+    char* cb_to;
+    cb_v = (char*)(intptr_t)(id_list_get(ns1, e));
+IdList* idsq_53;
+    cb_ln = (idsq_53 = tline, (int)(id_list_get(idsq_53, (int)(id_list_get(casestart, i)))));
+    ({ char* idft2 = id_concat_f(id_concat(ID_S("this case gives "), cb_v), ID_S(" where a bool is required"), 1); id_case_diag(i, ID_S("E0649"), idft2, ID_S("a bool result is written true or false, and under --bool-strict a number does not convert"), ID_S("write :(true) or :(false)")); id_str_free(idft2); });
+    cb_to = ID_S("false");
+    if ((strcmp(cb_v, ID_S("1")) == 0)) {
+        cb_to = ID_S("true");
+    }
+    if (((strcmp(cb_v, ID_S("0")) == 0) || (strcmp(cb_v, ID_S("1")) == 0))) {
+        ({ char* idft3 = id_concat_f(id_concat(ID_S(":("), cb_v), ID_S(")"), 1); char* idft4 = id_concat_f(id_concat(ID_S(":("), cb_to), ID_S(")"), 1); id_diag_edit(ID_S("machine"), ID_S("replace"), cb_ln, idft3, idft4); id_str_free(idft3); id_str_free(idft4); });
+    }
+    return;
+}
+
 char* id_list_elem(char* t) {
     int n;
     char* et = NULL;
@@ -31840,6 +31943,7 @@ void id_fit_scalar(int i, int e, char* want) {
     } else if ((id_ty_fits(want, lt) == 0)) {
         ({ char* idft1 = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives a "), lt), ID_S(" where a "), 1), want, 1), ID_S(" is required"), 1); id_case_err(i, idft1); id_str_free(idft1); });
     }
+    id_case_bool_strict(i, e, want);
     return;
 }
 
@@ -35806,6 +35910,14 @@ void id_chk_index2(int id) {
     if ((((id_ty_known(it) == 1) && (strcmp(it, ID_S("int")) != 0)) && (strcmp(it, ID_S("bool")) != 0))) {
         ({ char* idft2 = id_concat(ID_S("list index must be int, got "), it); id_tc_diag(id, ID_S("E0614"), idft2, it, ID_S("an index counts elements, so only an int can say which one"), ID_S("use an int index, or convert it first, as in to_int(x)")); id_str_free(idft2); });
     }
+    id_index_strict(id, it);
+    return;
+}
+
+void id_index_strict(int id, char* it) {
+    if (((strcmp(it, ID_S("bool")) == 0) && ((int)(id_list_get(bsc, 0)) == 1))) {
+        id_tc_diag(id, ID_S("E0648"), ID_S("list index must be int, got bool"), it, ID_S("an index counts elements, and under --bool-strict a bool does not convert to the 0 or 1 it stood for"), ID_S("index with an int, or choose the element explicitly: if(b) { i = 1; } else { i = 0; }"));
+    }
     return;
 }
 
@@ -36726,6 +36838,7 @@ void id_chk_decl(int id) {
         id_decl_err(id, s1_of_v, i1_of_v);
     }
     id_chk_literal_fit(id, s1_of_v, i1_of_v);
+    id_decl_bool(id, s1_of_v, i1_of_v);
     return;
 }
 
@@ -36750,6 +36863,23 @@ int id_bad_store(char* want, int e) {
         ok = id_bad_store2(want, e);
     }
     return ok;
+}
+
+void id_decl_bool(int id, char* want, int e) {
+    if ((((strcmp(want, ID_S("int")) == 0) && (strcmp(id_type_of(e), ID_S("bool")) == 0)) && ((int)(id_list_get(bsc, 0)) == 1))) {
+        id_decl_bool_say(id);
+    }
+    return;
+}
+
+void id_decl_bool_say(int id) {
+    char* dbool_nm;
+    int dbool_ln;
+    dbool_nm = (char*)(intptr_t)(id_list_get(ns2, id));
+    dbool_ln = id_tc_line(id);
+    ({ char* idft2 = id_concat_f(id_concat(ID_S("'"), dbool_nm), ID_S("' is declared int but is given a bool"), 1); char* idft5 = id_concat_f(id_concat(ID_S("declare it 'bool "), dbool_nm), ID_S("'"), 1); id_tc_diag(id, ID_S("E0647"), idft2, dbool_nm, ID_S("a comparison or logical operator yields a bool, and under --bool-strict a bool does not convert to an int"), idft5); id_str_free(idft2); id_str_free(idft5); });
+    ({ char* idft3 = id_concat(ID_S("int "), dbool_nm); char* idft4 = id_concat(ID_S("bool "), dbool_nm); id_diag_edit(ID_S("machine"), ID_S("replace"), dbool_ln, idft3, idft4); id_str_free(idft3); id_str_free(idft4); });
+    return;
 }
 
 void id_decl_err(int id, char* t, int e) {
