@@ -13,7 +13,7 @@
 // printed on stderr, so stdout is only ever the output, and exits 1.
 main(int argc, string[] argv) {
   int[] d = file_bytes(argv[1]);
-  int[] hd = pcsf_head(d);
+  int[] hd = screen_font_header(d);
   int rc = mf_run(argv, d, hd);
 } return int rc;
 (4, ["mkfont", "/nonexistent/psf", "x.psf", "conf"]):(1)
