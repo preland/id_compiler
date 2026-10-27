@@ -1,10 +1,11 @@
 // The pieces of a name that are not words, in the order they occur, as the text
 // the diagnostic prints ("fb, w"); "" when every piece is one. The scan splits
-// on `_` exactly as the rule says, so `__` makes an empty piece and a name with
-// no `_` is its own single piece.
+// on `_` and on PascalCase/camelCase boundaries (string_snake), so `__` makes an
+// empty piece, `GlyphRun` is glyph and run, and a name with neither is its own
+// single piece.
 
 vocab_bad(string vocab_name) {
-  string[] vocab_pieces = string_split(vocab_name, "_");
+  string[] vocab_pieces = string_split(string_snake(vocab_name), "_");
   string vocab_acc = "";
   int vocab_i = 0;
 } chain (string vocab_name) {
@@ -22,3 +23,6 @@ given full_env given vocab_words ("fb"):("fb")
 given full_env given vocab_words ("buffer_x"):("")
 given full_env given vocab_words ("BUFFER_Y"):("")
 given full_env given vocab_words ("z"):("z")
+given full_env given vocab_words ("BufferWidth"):("")
+given full_env given vocab_words ("FbWidth"):("Fb")
+given full_env given vocab_words ("BufferFbW"):("Fb, W")

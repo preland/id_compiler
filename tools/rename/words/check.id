@@ -23,7 +23,7 @@ given rename_test_words_filled ([], "q", 2, (import rename_test_word_keys), (imp
 
 // The pieces of a name that are not words, as `a, b`; "" when every piece is.
 rename_bad_pieces(string rename_name, string[] rename_word_keys, int[] rename_word_used) {
-  string[] rename_pieces = string_split(rename_name, "_");
+  string[] rename_pieces = string_split(string_snake(rename_name), "_");
   string[] rename_bad = [];
   int rename_at = 0;
 } chain (string rename_name, string[] rename_word_keys, int[] rename_word_used) {
@@ -36,6 +36,8 @@ rename_bad_pieces(string rename_name, string[] rename_word_keys, int[] rename_wo
 given rename_test_words_filled ("alpha_beta", (import rename_test_word_keys), (import rename_test_word_used)):("")
 given rename_test_words_filled ("alpha_q_gamma_beta", (import rename_test_word_keys), (import rename_test_word_used)):("q, gamma")
 given rename_test_words_filled ("alpha_x", (import rename_test_word_keys), (import rename_test_word_used)):("")
+given rename_test_words_filled ("AlphaBeta", (import rename_test_word_keys), (import rename_test_word_used)):("")
+given rename_test_words_filled ("AlphaQBeta", (import rename_test_word_keys), (import rename_test_word_used)):("Q")
 given rename_test_words_filled ("y", (import rename_test_word_keys), (import rename_test_word_used)):("y")
 given rename_test_words_filled ("_alpha", (import rename_test_word_keys), (import rename_test_word_used)):("(empty)")
 given rename_test_words_filled ("idstd_v2", (import rename_test_word_keys), (import rename_test_word_used)):("v2")
