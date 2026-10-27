@@ -1846,7 +1846,8 @@ self_refuse "bin/idc: a failing case fails a --freestanding build, naming the ca
     || bad "bin/idc: a --freestanding build whose case fails writes no object"
 
 # A function that reaches an asm body the build host has no row for cannot be
-# tested there: it is exempt from the two-case minimum, and says so.
+# tested there: it is still short of the two-case minimum, and the error names
+# the asm overload that would make it testable.
 mkdir -p "$TMP/fs"
 cat > "$TMP/fs/io.id" <<'EOF'
 asm "x86_64-unknown-none" in8(word p) {
@@ -1873,17 +1874,18 @@ add(int a, int b) {
 EOF
 ../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs3.o" >"$TMP/log" 2>&1
 fs_rc=$?
-[ "$fs_rc" -eq 0 ] && [ -s "$TMP/fs3.o" ] \
-    && ok "bin/idc: a --freestanding function reaching a target-only asm builds without cases" \
-    || bad "bin/idc: a --freestanding function reaching a target-only asm builds without cases ($(head -1 "$TMP/log"))"
-grep -qF "fs/io.id:12: note: function 'kbd_scan' cannot be tested on the build host (" "$TMP/log" \
-   && grep -qF "): it calls 'port_byte', which reaches asm 'in8', which has no body for that triple (defined for: x86_64-unknown-none); it is exempt from the two-case minimum" "$TMP/log" \
-    && ok "bin/idc: the exemption is a note naming the function and what it reaches" \
-    || bad "bin/idc: the exemption is a note naming the function and what it reaches ($(tr '\n' '|' < "$TMP/log"))"
-grep -qF "fs/io.id:8: note: function 'port_byte' cannot be tested on the build host (" "$TMP/log" \
-   && grep -qF "): it reaches asm 'in8', which has no body for that triple" "$TMP/log" \
-    && ok "bin/idc: a direct caller of the asm is exempt too, and says so" \
-    || bad "bin/idc: a direct caller of the asm is exempt too, and says so"
+[ "$fs_rc" -ne 0 ] && [ ! -e "$TMP/fs3.o" ] && grep -qF "function 'kbd_scan' has 0 test case(s)" "$TMP/log" \
+    && ok "bin/idc: a --freestanding function reaching a target-only asm fails the build without cases" \
+    || bad "bin/idc: a --freestanding function reaching a target-only asm fails the build without cases ($(tr '\n' '|' < "$TMP/log"))"
+grep -qF "function 'kbd_scan' cannot be tested on the build host (" "$TMP/log" \
+   && grep -qF "): it calls 'port_byte', which reaches asm 'in8', which has no body for that triple (defined for: x86_64-unknown-none); adding asm \"x86_64-unknown-linux-gnu\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)" "$TMP/log" \
+    && ok "bin/idc: the error's note names the function and the asm overload to add" \
+    || bad "bin/idc: the error's note names the function and the asm overload to add ($(tr '\n' '|' < "$TMP/log"))"
+grep -qF "function 'port_byte' has 0 test case(s)" "$TMP/log" \
+   && grep -qF "function 'port_byte' cannot be tested on the build host (" "$TMP/log" \
+   && grep -qF "): it reaches asm 'in8', which has no body for that triple (defined for: x86_64-unknown-none); adding asm \"x86_64-unknown-linux-gnu\"" "$TMP/log" \
+    && ok "bin/idc: a direct caller of the asm is short too, and names the overload" \
+    || bad "bin/idc: a direct caller of the asm is short too, and names the overload ($(tr '\n' '|' < "$TMP/log"))"
 
 cat >> "$TMP/fs/add.id" <<'EOF'
 
@@ -1896,19 +1898,18 @@ fs_rc=$?
 [ "$fs_rc" -ne 0 ] && grep -qF "function 'mul' has 0 test case(s); --require-tests needs at least 2" "$TMP/log" \
     && ok "bin/idc: a pure function without cases fails the minimum in a --freestanding build" \
     || bad "bin/idc: a pure function without cases fails the minimum in a --freestanding build ($(head -1 "$TMP/log"))"
-! grep -qF "function 'kbd_scan' has 0 test case(s)" "$TMP/log" \
-   && grep -qF "note: function 'kbd_scan' cannot be tested on the build host" "$TMP/log" \
-    && ok "bin/idc: beside it, the exempt function is a note and not a minimum error" \
-    || bad "bin/idc: beside it, the exempt function is a note and not a minimum error ($(tr '\n' '|' < "$TMP/log"))"
-
-# The adoption count asks the compiler which functions are exempt rather than
-# guessing from the text, so they are not counted short.
+grep -qF "function 'kbd_scan' has 0 test case(s); --require-tests needs at least 2" "$TMP/log" \
+   && grep -qF "function 'port_byte' has 0 test case(s); --require-tests needs at least 2" "$TMP/log" \
+    && ok "bin/idc: beside it, the host-less function is a minimum error like the pure one" \
+    || bad "bin/idc: beside it, the host-less function is a minimum error like the pure one ($(tr '\n' '|' < "$TMP/log"))"
+# The adoption count lists every such function as short.
+# The adoption count lists every such function as short, none as exempt.
 ../bin/idc "$TMP/fs" --freestanding --list-untested >"$TMP/list" 2>"$TMP/log"
-grep -qxF "exempt|$TMP/fs/io.id:12|kbd_scan" "$TMP/list" \
+grep -qxF "short|$TMP/fs/io.id:12|kbd_scan|0" "$TMP/list" \
+   && grep -qxF "short|$TMP/fs/io.id:8|port_byte|0" "$TMP/list" \
    && grep -qxF "short|$TMP/fs/add.id:7|mul|0" "$TMP/list" \
-   && [ "$(wc -l < "$TMP/list")" -eq 3 ] \
-    && ok "bin/idc: --list-untested lists the exempt and the short functions" \
-    || bad "bin/idc: --list-untested lists the exempt and the short functions ($(tr '\n' '|' < "$TMP/list") $(head -1 "$TMP/log"))"
+    && ok "bin/idc: --list-untested lists the host-less and the pure functions as short" \
+    || bad "bin/idc: --list-untested lists the host-less and the pure functions as short ($(tr '\n' '|' < "$TMP/list") $(head -1 "$TMP/log"))"
 
 cat > "$TMP/fs/io.id" <<'EOF'
 asm "x86_64-unknown-none" in8(word p) {
@@ -1928,9 +1929,9 @@ rm -f "$TMP/fs/add.id"
 ../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs5.o" >"$TMP/log" 2>&1
 fs_rc=$?
 [ "$fs_rc" -ne 0 ] && grep -qF "fs/io.id:11: error: 'kbd_scan' cannot be tested on the build host (" "$TMP/log" \
-   && grep -qF "this case would never run, and a function that cannot be tested needs none" "$TMP/log" \
-    && ok "bin/idc: cases under a function that cannot be tested on the build host are an error" \
-    || bad "bin/idc: cases under a function that cannot be tested on the build host are an error ($(head -1 "$TMP/log"))"
+   && grep -qF "this case would never run until the asm function has a body for the host: adding asm \"x86_64-unknown-linux-gnu\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)" "$TMP/log" \
+    && ok "bin/idc: cases under a function that cannot be tested on the build host are an error naming the overload to add" \
+    || bad "bin/idc: cases under a function that cannot be tested on the build host are an error naming the overload to add ($(tr '\n' '|' < "$TMP/log"))"
 
 # An asm function with a row for the build host's own triple runs there: the
 # harness selects that row, exactly as a hosted build would.
