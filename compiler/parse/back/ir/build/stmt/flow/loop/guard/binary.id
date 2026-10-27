@@ -11,7 +11,7 @@ gd_bin_of(string gdb_op, int gdb_a, int gdb_b) {
     gdb_out = gd_wise(gdb_op, gdb_a, gdb_b);
   }
 } return int gdb_out;
-given gd_vals ("!=", 4, -1):(8) then gd_last:("bool icmp >=")
+given gd_vals ("!=", 4, -1):(8) then gd_last:("i1 icmp >=")
 given gd_vals ("+", 3, 3):(7) then gd_last:("word add ")
 
 gd_wise(string gdb_op, int gdb_a, int gdb_b) {
@@ -19,7 +19,7 @@ gd_wise(string gdb_op, int gdb_a, int gdb_b) {
   int gdb_y = gd_wide(gdb_b);
   int gdb_out = gd_arith(gdb_op, gdb_x, gdb_y);
 } return int gdb_out;
-given gd_vals ("<", 3, 3):(7) then calls lw_op:("icmp", "bool", 5, 6, "<")
+given gd_vals ("<", 3, 3):(7) then calls lw_op:("icmp", "i1", 5, 6, "<")
 given gd_vals ("-", 3, 4):(6) then calls lw_op:("sub", "word", 5, 4, "")
 
 gd_bin(string gdb_tok) {

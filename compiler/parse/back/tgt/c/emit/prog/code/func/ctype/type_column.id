@@ -1,7 +1,7 @@
 // The C target's spelling column.
 //
 // One row per scalar type, IN THE SAME ORDER as mid/types/registry/ registers
-// them -- int, word, float, string, void, bytes -- because c_scalar indexes this
+// them -- int, word, float, string, void, bytes, bool -- because c_scalar indexes this
 // list with the row number ty_find returns. Adding a type to id is one
 // ty_row call there and one push here; getting the order wrong here spells
 // every type as its neighbour, which tests/conform.sh's first case would
@@ -12,7 +12,7 @@ init_tyc() {
   init_tyc_rows();
 } return void;
 given nz_env ():() then (import tyc)[1]:("long long") then (import tyc)[4]:("void")
-given lc_env2 ():() then len((import tyc)):(6)
+given lc_env2 ():() then len((import tyc)):(7)
 given nz_env ():() then (import chkfail)[0]:(0)
 given nz_env ():() then init_units:(0)
 
@@ -21,8 +21,8 @@ init_tyc_rows() {
   push((import tyc), "long long");
   init_tyc_rows2();
 } return void;
-given lc_env2 ():() then (import tyc)[6]:("int") then (import tyc)[7]:("long long")
-given lc_env2 ():() then len((import tyc)):(12) then (import tyc)[11]:("IdBytes*")
+given lc_env2 ():() then (import tyc)[7]:("int") then (import tyc)[8]:("long long")
+given lc_env2 ():() then len((import tyc)):(14) then (import tyc)[12]:("IdBytes*") then (import tyc)[13]:("int")
 given lc_env2 ():() then (import chkfail)[0]:(0)
 given lc_env2 ():() then init_units:(0)
 
@@ -33,8 +33,8 @@ init_tyc_rows2() {
   push((import tyc), "char*");
   init_tyc_rows3();
 } return void;
-given lc_env2 ():() then (import tyc)[6]:("double") then (import tyc)[7]:("char*")
-given lc_env2 ():() then len((import tyc)):(10) then (import tyc)[9]:("IdBytes*")
-given lc_env2 ():() then (import tyc)[8]:("void")
+given lc_env2 ():() then (import tyc)[7]:("double") then (import tyc)[8]:("char*")
+given lc_env2 ():() then len((import tyc)):(12) then (import tyc)[10]:("IdBytes*") then (import tyc)[11]:("int")
+given lc_env2 ():() then (import tyc)[9]:("void")
 given lc_env2 ():() then (import chkfail)[0]:(0)
 given lc_env2 ():() then init_units:(0)

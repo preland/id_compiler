@@ -2,7 +2,7 @@
 // because dispatch/type_of.id is already full, now storing its answer before
 // returning it so the next ask for the same node is a cache hit.
 type_of_miss(int id) {
-  string t = ni2_pick(id, "int", "word");
+  string t = lit_type(id);
   if((import nkind)[id] != "int") {
     t = type_of2(id);
   }
@@ -10,3 +10,14 @@ type_of_miss(int id) {
 } return string t;
 given leaves_fixture ((import lit_a)):("int")
 given leaves_fixture ((import lit_str)):("string")
+
+// An int leaf is int, word when too wide, and bool when the parser marked it
+// as a `true` or `false` literal (node_bool).
+lit_type(int id) {
+  string t = ni2_pick(id, "int", "word");
+  if((import ns2)[id] == "bool") {
+    t = "bool";
+  }
+} return string t;
+given leaves_fixture ((import lit_a)):("int")
+given leaves_fixture ((import lit_str)):("int")

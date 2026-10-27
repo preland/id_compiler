@@ -6,11 +6,11 @@
 gd_and(int gde_acc, int gde_clause) {
   int gde_out = gde_clause;
   if(gde_acc >= 0) {
-    gde_out = lw_op("and", "bool", gde_acc, gde_clause, "");
+    gde_out = lw_op("and", "i1", gde_acc, gde_clause, "");
   }
 } return int gde_out;
 given gd_words (-1, 6):(6)
-given gd_words (5, 6):(7) then gd_last:("bool and ")
+given gd_words (5, 6):(7) then gd_last:("i1 and ")
 
 gd_close(int gde_acc) {
   int gde_clause = pop((import gdstk));

@@ -2,5 +2,5 @@
 tf_nod0() {
   string gone_t = "tf_nod0 " + (fs_exists((import tf_d0)) == 0);
 } return string gone_t;
-given tf_stem ():("tf_nod0 1") then tf_rmstem:(0)
-given tf_stem given tf_mk0 ():("tf_nod0 0") then tf_rmstem:(0)
+given tf_stem ():("tf_nod0 true") then tf_rmstem:(0)
+given tf_stem given tf_mk0 ():("tf_nod0 false") then tf_rmstem:(0)

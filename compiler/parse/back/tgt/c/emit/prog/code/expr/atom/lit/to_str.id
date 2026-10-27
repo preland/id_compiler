@@ -39,6 +39,10 @@ to_str3(string code, string type) {
   if(type == "word") {
     s = "id_str_of_word(" + code + ")";
   }
+  if(type == "bool") {
+    s = "((" + code + ") ? ID_S(\"true\") : ID_S(\"false\"))";
+  }
 } return string s;
+("x", "bool"):("((x) ? ID_S(\"true\") : ID_S(\"false\"))")
 ("x", "word"):("id_str_of_word(x)")
 ("x", "string"):("x")

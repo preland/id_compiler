@@ -11,8 +11,8 @@ init_struct_rows() {
     sd_i = sd_i + 1;
   }
 } return void;
-given env_init ():() then len((import tyname)):(6)
-given sd_pair ():() then len((import tyname)):(8)
+given env_init ():() then len((import tyname)):(7)
+given sd_pair ():() then len((import tyname)):(9)
 
 // The registry as a program with structs P and Q has it: the scalar rows, then
 // the struct table's, which is the order tc_all gives a real build.
@@ -20,5 +20,5 @@ sd_reg() {
   sd_pair();
   init_struct_rows();
 } return void;
-():() then len((import tyname)):(8)
+():() then len((import tyname)):(9)
 ():() then reg_last_width:(8)

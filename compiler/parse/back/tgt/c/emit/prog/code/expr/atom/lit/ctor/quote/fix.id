@@ -4,7 +4,7 @@ lit_buf() {
   env_init();
   export word lit_ad = alloc(64);
 } return void;
-():() then len((import tyname)):(6)
+():() then len((import tyname)):(7)
 ():() then len((import vidx)):(251)
 ():() then calls env_init:()
 ():() then init_units:(0)

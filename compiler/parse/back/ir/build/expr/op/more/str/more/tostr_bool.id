@@ -1,0 +1,24 @@
+// A bool in string context. The runtime has no bool-to-string call, so the
+// word is cut out of "falsetrue" with id_str_sub: a false (0) starts at 0 and
+// is 5 long, a true (1) starts at 5 and is 4 long.
+lw_tostr_bool(int v) {
+  int start = lw_bool_start(v);
+  int len = lw_bool_len(v);
+  int ret_i = lw_callf("id_str_sub", "string", [lw_const("string", "\"falsetrue\""), start, len]);
+} return int ret_i;
+given bound_fixture (3):(8)
+given bound_fixture (4):(8)
+
+lw_bool_start(int v) {
+  int five = lw_const("int", "5");
+  int ret_i = lw_op("mul", "int", v, five, "");
+} return int ret_i;
+given bound_fixture (3):(4)
+given bound_fixture (4):(4)
+
+lw_bool_len(int v) {
+  int five = lw_const("int", "5");
+  int ret_i = lw_op("sub", "int", five, v, "");
+} return int ret_i;
+given bound_fixture (3):(4)
+given bound_fixture (4):(4)

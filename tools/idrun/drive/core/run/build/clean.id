@@ -5,5 +5,5 @@ dr_clean(string dir) {
 } chain (string dir) {
   int d = fs_remove(dir);
 } return void;
-given tf_cdir(1) ((import tf_cdp)):((import tf_cdp)) then tf_gone:("tf_gone 1")
-given tf_cdir(0) ((import tf_cdp)):((import tf_cdp)) then tf_gone:("tf_gone 1")
+given tf_cdir(1) ((import tf_cdp)):((import tf_cdp)) then tf_gone:("tf_gone true")
+given tf_cdir(0) ((import tf_cdp)):((import tf_cdp)) then tf_gone:("tf_gone true")

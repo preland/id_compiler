@@ -10,7 +10,7 @@ given logic_fixture ((import or_node), 2, 0, 1):(1)
 // Continues lw_rhs: the right-hand side's value, once its block is current.
 lw_rhs_val(int node, int slot, int e2, int jn) {
   int lw_cond_v = lw_cond(e2);
-  int lw_conv_v = lw_conv(lw_cond_v, "bool", "int");
+  int lw_conv_v = lw_conv(lw_cond_v, "i1", "int");
   int ret_i = lw_rhs_store(slot, lw_conv_v, jn);
 } return int ret_i;
 given logic_fixture (0, 2, (import ev_node), 1):(1)

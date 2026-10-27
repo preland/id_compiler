@@ -15,16 +15,16 @@ type_of7(int id) {
 given composite_fixture ((import un_float)):("float")
 given composite_fixture ((import bin_concat)):("string")
 
-// `-x` and `~x` keep the operand's type; `!x` is a truth value, so int.
+// `-x` and `~x` keep the operand's type; `!x` is a truth value, so bool.
 type_un(int id) {
   int i1_of_v = (import ni1)[id];
   string t = type_of(i1_of_v);
   if((import ns1)[id] == "!") {
-    t = "int";
+    t = "bool";
   }
 } return string t;
 given composite_fixture ((import un_float)):("float")
-given composite_fixture ((import un_not)):("int")
+given composite_fixture ((import un_not)):("bool")
 
 h_call_match() {
   fcall_reg_b();

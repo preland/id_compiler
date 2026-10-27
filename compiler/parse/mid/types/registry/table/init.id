@@ -31,8 +31,8 @@ init_tyreg() {
   init_ty_cols();
   init_ty_rows();
 } return void;
-():() then len((import tyname)):(6)
-():() then reg_last_width:(8)
+():() then len((import tyname)):(7)
+():() then reg_last_width:(4)
 
 // The four columns. An `export` is a statement, so the columns come into
 // existence when this runs -- which is why init_tyreg() must be called before
@@ -54,5 +54,5 @@ init_ty_rows() {
   ty_row("int", "int", 4, 1);
   init_ty_rows2();
 } return void;
-given init_ty_cols ():() then len((import tyname)):(6)
-given init_ty_cols ():() then reg_last_width:(8)
+given init_ty_cols ():() then len((import tyname)):(7)
+given init_ty_cols ():() then reg_last_width:(4)

@@ -1,16 +1,16 @@
 // The type of a binary expression that is not a concatenation. Comparisons
-// and the logical operators are int; arithmetic and bitwise operators widen
+// and the logical operators are bool; arithmetic and bitwise operators widen
 // their operands, mirroring idc.py's arith_result.
 
 tb2(int id) {
-  string t = "int";
+  string t = "bool";
   string s1_of_v = (import ns1)[id];
   if(str_in((import arithops), s1_of_v)) {
     t = tb2_arith(id);
   }
 } return string t;
 given composite_fixture ((import bin_plus)):("int")
-given composite_fixture ((import bin_and)):("int")
+given composite_fixture ((import bin_and)):("bool")
 
 // Widening order is int < word < float, so mixing an index with an address
 // gives an address rather than silently truncating it to 32 bits. The order

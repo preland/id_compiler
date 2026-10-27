@@ -2,16 +2,16 @@ reg_last_width() {
   int[] widths = (import tywidth);
   int n = widths[len(widths) - 1];
 } return int n;
-given init_tyreg ():(8)
+given init_tyreg ():(4)
 given tyreg_extra("bool", "int", 1, 1) ():(1)
 
-// The width at row index 6: past the registry's 6 built-in rows, so this
+// The width at row index 7: past the registry's 7 built-in rows, so this
 // reads whatever a test appended right after them -- the interior rows
 // init_ty_rows2 adds (word, float) end up masked at the tail by whatever
 // init_ty_rows3 appends after, so a check on the tail alone cannot see them.
 reg_width_at6() {
   int[] widths = (import tywidth);
-  int n = widths[6];
+  int n = widths[7];
 } return int n;
 given tyreg_extra("bool", "int", 1, 1) ():(1)
 given tyreg_extra("byte", "int", 2, 0) ():(2)

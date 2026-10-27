@@ -28,11 +28,11 @@ given lw_env_fixture (6, "bang"):() then (import istr)[2]:("id_fail")
 // not -- no select, which the IR has no instruction for.
 lw_inline_ushr(int[] ih_args) {
   int ih_zero = lw_const("word", "0");
-  int ih_neg = lw_op("icmp", "bool", ih_args[1], ih_zero, "<");
+  int ih_neg = lw_op("icmp", "i1", ih_args[1], ih_zero, "<");
   lw_guard(ih_neg, "shift by a negative amount");
 } chain (int[] ih_args) {
   int ih_width = lw_const("word", "64");
-  int ih_small = lw_op("icmp", "bool", ih_args[1], ih_width, "u<");
+  int ih_small = lw_op("icmp", "i1", ih_args[1], ih_width, "u<");
   int ih_mask = lw_op("sext", "word", ih_small, 0 - 1, "");
 } chain (int[] ih_args) {
   int ih_six = lw_const("word", "63");

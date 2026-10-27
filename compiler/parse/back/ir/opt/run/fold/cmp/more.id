@@ -5,7 +5,7 @@
 fold_isbool(int v) {
   int a = (import ia)[v];
   string t = (import ity)[a];
-  int r = t == "bool";
+  int r = t == "i1";
 } return int r;
 given irlfx_setup ((import irlfx_id)):(0)
 given fold_true_setup ((import ft_id)):(1)
@@ -26,7 +26,7 @@ given fold_true_setup ((import ft_id)):(1)
 fold_true_setup() {
   env_init();
   int[] none = [];
-  int c0 = ir_insn("const", "bool", 0, 0, "0", none, none);
+  int c0 = ir_insn("const", "i1", 0, 0, "0", none, none);
 } chain () {
   export int ft_id = ir_insn("add", "int", c0, c0, "", none, none);
   export int fz_id = ir_insn("zext", "int", c0, 0, "", none, none);

@@ -10,5 +10,5 @@ gd_guard() {
     gdg_at = gdg_at + 1;
   }
 } return int gdg_acc;
-given gd_fix given gd_solo ():(7) then gd_last:("bool icmp >=")
-given gd_fix given gd_cond(["v:j", "k:0", ">=", "|", "v:v", "null", "!=", "|"]) ():(13) then gd_last:("bool and ")
+given gd_fix given gd_solo ():(7) then gd_last:("i1 icmp >=")
+given gd_fix given gd_cond(["v:j", "k:0", ">=", "|", "v:v", "null", "!=", "|"]) ():(13) then gd_last:("i1 and ")

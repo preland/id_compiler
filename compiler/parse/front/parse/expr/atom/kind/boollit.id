@@ -1,0 +1,24 @@
+// The bool literals `true` and `false`, between the float case and the rest of
+// the atom chain (parse_atom -> parse_atom2 -> parse_atom_float -> here ->
+// parse_atom3). Both are keywords, so they never reach the name path.
+
+parse_atom_bool(int[] pos) {
+  int node = 0;
+  if(cur_kind(pos) == "kw" && (cur_text(pos) == "true" || cur_text(pos) == "false")) {
+    node = parse_bool(pos);
+  } else {
+    node = parse_atom3(pos);
+  }
+} return int node;
+given atom_tokens ([17]):(0)
+given atom_tokens ([0]):(3)
+given toks_env(["kw"], ["true"]) ([0]):(0) then calls node_bool:("true")
+given toks_env(["kw"], ["false"]) ([0]):(0) then calls node_bool:("false")
+
+parse_bool(int[] pos) {
+  string text = cur_text(pos);
+  advance(pos);
+  int ret_i = node_bool(text);
+} return int ret_i;
+given atom_tokens ([17]):(0)
+given atom_tokens ([35]):(0)

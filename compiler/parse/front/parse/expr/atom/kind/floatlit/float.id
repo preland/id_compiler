@@ -9,7 +9,7 @@ parse_atom_float(int[] pos) {
   if(cur_kind(pos) == "float") {
     node = parse_float(pos);
   } else {
-    node = parse_atom3(pos);
+    node = parse_atom_bool(pos);
   }
 } return int node;
 given atom_tokens ([17]):(0)

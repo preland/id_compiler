@@ -13,7 +13,7 @@ given calls_node_fixture ((import fixture_calls_one)):("1")
 // A leaf as written: its own text, or `(import NAME)` for an export a case
 // reads (front/parse/decl/func/cases/case/given/elem.id).
 leaf_text(int e) {
-  string lt = (import ns1)[e];
+  string lt = bool_spell(e);
   if((import nkind)[e] == "cimport") {
     lt = "(import " + lt + ")" + index_text(e);
   }

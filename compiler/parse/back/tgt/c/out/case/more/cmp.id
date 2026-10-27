@@ -45,6 +45,9 @@ tc_show(string code, string type) {
   } else if(type == "bytes") {
     so = "id_bytes_show(" + code + ");";
   }
+  if(type == "bool") {
+    so = "fprintf(stderr, \"%s\", (" + code + ") ? \"true\" : \"false\");";
+  }
 } return string so;
 given sd_note_fixture ("x", "int"):("fprintf(stderr, \"%d\", x);")
 given sd_note_fixture ("x", "int[]"):("idtc_show_int(x);")

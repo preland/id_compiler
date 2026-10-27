@@ -2,8 +2,8 @@
 tf_gone() {
   string gone_t = "tf_gone " + (fs_exists((import tf_cdp)) == 0);
 } return string gone_t;
-given tf_cdir(1) ():("tf_gone 0") then tf_rmcd:(0)
-given tf_cdir(1) ():("tf_gone 0") then tf_rmcd:(0) then tf_gone:("tf_gone 1")
+given tf_cdir(1) ():("tf_gone false") then tf_rmcd:(0)
+given tf_cdir(1) ():("tf_gone false") then tf_rmcd:(0) then tf_gone:("tf_gone true")
 
 // Remove the directory and its three files by hand; 0 when all went.
 tf_rmcd() {

@@ -1,0 +1,10 @@
+// The bool literal leaf. `true` and `false` are int leaves carrying 1 and 0,
+// marked "bool" in ns2 so type_of answers bool and the C target prints the
+// digit; ns2 is otherwise empty on an int leaf.
+node_bool(string text) {
+  int bl_v = text == "true";
+  string bl_d = "" + bl_v;
+  int ret_i = newleaf("int", bl_v, 0, bl_d, "bool");
+} return int ret_i;
+given full_env ("true"):(0) then calls newleaf:("int", 1, 0, "1", "bool")
+given full_env ("false"):(0) then calls newleaf:("int", 0, 0, "0", "bool")

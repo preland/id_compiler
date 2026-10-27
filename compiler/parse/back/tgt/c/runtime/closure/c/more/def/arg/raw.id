@@ -20,7 +20,7 @@ clo_fixture() {
   init_rtc();
 } return void;
 ():() then (import fnames)[0]:("fx_target")
-():() then (import tyc)[1]:("long long") then len((import tyc)):(6)
+():() then (import tyc)[1]:("long long") then len((import tyc)):(7)
 ():() then init_units:(0)
 ():() then calls fn_idx_fixture:[1]
 

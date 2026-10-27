@@ -1,9 +1,10 @@
-// The last two rows of the C spelling column: `void`, and `bytes`, which is
+// The last three rows of the C spelling column: `void`, and `bytes`, which is
 // the runtime's IdBytes buffer -- a pointer, like IdList*. It is split from
 // type_column.id only because that file is at its function limit.
 init_tyc_rows3() {
   push((import tyc), "void");
   push((import tyc), "IdBytes*");
+  push((import tyc), "int");
 } return void;
-given lc_env2 ():() then len((import tyc)):(8) then (import tyc)[7]:("IdBytes*")
-given lc_env2 ():() then (import tyc)[6]:("void")
+given lc_env2 ():() then len((import tyc)):(10) then (import tyc)[8]:("IdBytes*") then (import tyc)[9]:("int")
+given lc_env2 ():() then (import tyc)[7]:("void")

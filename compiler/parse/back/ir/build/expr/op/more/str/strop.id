@@ -13,7 +13,7 @@ given str_fixture2 ((import scmp_node)):(7)
 lw_scmp2(int node, int c) {
   int lw_const_v = lw_const("int", "0");
   string s1_of_v = (import ns1)[node];
-  int ret_i = lw_op("icmp", "bool", c, lw_const_v, s1_of_v);
+  int ret_i = lw_op("icmp", "i1", c, lw_const_v, s1_of_v);
 } return int ret_i;
 given str_fixture ((import scmp_node), 5):(4)
 given str_fixture2 ((import scmp_node), 5):(4)

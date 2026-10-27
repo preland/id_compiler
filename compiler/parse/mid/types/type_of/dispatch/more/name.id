@@ -9,7 +9,7 @@ type_of_float(int id) {
   }
 } return string t;
 given leaves_fixture ((import lit_float)):("float")
-given allfix ((import lit_a)):("int")
+given composite_fixture ((import bin_plus)):("int")
 
 argfn_badtype_call() {
   argfn_d();

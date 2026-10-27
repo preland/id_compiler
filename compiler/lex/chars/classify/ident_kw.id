@@ -8,7 +8,7 @@
 // name, but with no syntax of its own outside a case.
 is_kw(string w) {
   int ok = 0;
-  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain" || w == "blank" || w == "break" || w == "stdin" || w == "traps" || w == "timeout" || w == "struct" || w == "pure" || w == "bytes" || w == "sender" || w == "receiver") {
+  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain" || w == "blank" || w == "break" || w == "stdin" || w == "traps" || w == "timeout" || w == "struct" || w == "pure" || w == "bytes" || w == "sender" || w == "receiver" || w == "bool" || w == "true" || w == "false") {
     ok = 1;
   }
 } return int ok;
@@ -23,6 +23,9 @@ is_kw(string w) {
 ("bytes_total"):(0)
 ("sender"):(1)
 ("receiver"):(1)
+("bool"):(1)
+("true"):(1)
+("false"):(1)
 
 kindof(string w) {
   string kind = "ident";

@@ -12,22 +12,24 @@ given lw_fix_int ((import fix_int_n), "word"):(1)
 
 lw_conv(int v, string t, string want) {
   int r = v;
-  if(t != want) {
+  if(t != want && (t != "bool" || want != "int") && (t != "int" || want != "bool")) {
     r = lw_cast(v, t, want);
   }
 } return int r;
 (5, "string", "string"):(5)
+(5, "bool", "int"):(5)
+(5, "int", "bool"):(5)
 given lw_env_fixture (0, "int", "word"):(0)
 
 // `bool` is the IR's own type -- the i1 a comparison produces. It never
 // appears in `id` source and only ever widens.
 lw_cast(int v, string t, string want) {
   int r = v;
-  if(t == "bool") {
+  if(t == "i1") {
     r = lw_op("zext", want, v, 0 - 1, "");
   } else {
     r = lw_cast2(v, t, want);
   }
 } return int r;
-given lw_env_fixture (42, "bool", "int"):(0) then ir_last_b:(0)
+given lw_env_fixture (42, "i1", "int"):(0) then ir_last_b:(0)
 given lw_env_fixture (42, "string", "int"):(42)

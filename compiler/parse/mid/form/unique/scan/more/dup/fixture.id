@@ -7,7 +7,7 @@ resv_env_setup() {
   env_init();
   init_rtc();
 } return void;
-():() then len((import tyname)):(6)
+():() then len((import tyname)):(7)
 ():() then (import rtc)[0]:(0)
 ():() then calls env_init:[1]
 ():() then init_units:(0)

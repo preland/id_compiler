@@ -3,7 +3,7 @@
 // business and the module never looks.
 ll_ty(string t) {
   string s = ll_ty2(t);
-  if(t == "int") {
+  if(t == "int" || t == "bool") {
     s = "i32";
   } else if(t == "word") {
     s = "i64";
@@ -11,19 +11,20 @@ ll_ty(string t) {
 } return string s;
 ("int"):("i32")
 ("float"):("double")
+("bool"):("i32")
 
 ll_ty2(string t) {
   string s = str_pick(t, "wide", "i128", ll_ty3(t));
   if(t == "float") {
     s = "double";
-  } else if(t == "bool" || t == "" || t == "void") {
-    s = str_pick(t, "bool", "i1", "void");
+  } else if(t == "i1" || t == "" || t == "void") {
+    s = str_pick(t, "i1", "i1", "void");
   }
 } return string s;
 ("string"):("ptr")
 ("wide"):("i128")
 ("float"):("double")
-("bool"):("i1")
+("i1"):("i1")
 (""):("void")
 
 ll_ty3(string t) {

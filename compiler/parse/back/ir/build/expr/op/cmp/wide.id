@@ -11,7 +11,7 @@ given lw_fix_bin ((import fix_bin_n), "word"):(5)
 lw_cmp_wide(int node, string t1, string t2) {
   string t = ty_wider(t1, t2);
   int v = lw_cmp2(node, t);
-  int ret_i = lw_conv(v, "bool", "int");
+  int ret_i = lw_conv(v, "i1", "int");
 } return int ret_i;
 given lw_fix_bin ((import fix_bin_n), "int", "int"):(3)
 given lw_fix_bin ((import fix_bin_n), "word", "int"):(5)

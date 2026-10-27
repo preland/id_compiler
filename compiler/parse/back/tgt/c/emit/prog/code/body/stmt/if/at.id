@@ -18,5 +18,5 @@ sq_based() {
   integer_list_set((import sqbase), 0, 20);
 } return void;
 ():() then calls env_init:[1] then (import sqbase)[0]:(20)
-():() then len((import tyname)):(6)
+():() then len((import tyname)):(7)
 ():() then init_units:(0)

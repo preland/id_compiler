@@ -21,7 +21,7 @@ given un_fixture ((import not_node), "int", "not"):(4)
 lw_not_val(int node, int lhs, string t) {
   int v = lw_expr(lhs);
   int lw_iszero_v = lw_iszero(v, t);
-  int ret_i = lw_conv(lw_iszero_v, "bool", "int");
+  int ret_i = lw_conv(lw_iszero_v, "i1", "int");
 } return int ret_i;
 given un_fixture ((import not_node), (import ev_node), "int"):(6)
 given un_fixture ((import neg_node), (import ev_node), "int"):(6)

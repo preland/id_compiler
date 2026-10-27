@@ -24,14 +24,14 @@ given ir_rows_chk1 (0, 1, 9):() then chk_ty:("ty ")
 // statement env_init did.
 fold_cmp_fixture() {
   cfg_fixture();
-  export int fcx_b1 = ir_leaf("const", "bool", 0 - 1, 0 - 1, "0");
+  export int fcx_b1 = ir_leaf("const", "i1", 0 - 1, 0 - 1, "0");
   export int fzc_id = ir_leaf("zext", "int", (import fcx_b1), 0 - 1, "");
 } chain () {
   export int fcmp_row = ir_leaf("icmp", "int", (import fzc_id), (import fcx_b1), "!=");
   export int fq_id = ir_leaf("const", "int", 0 - 1, 0 - 1, "5");
   export int fmix_id = ir_leaf("icmp", "int", (import fzc_id), (import fzc_id), "!=");
 } return void;
-():() then calls ir_leaf:("const", "bool", -1, -1, "0")
+():() then calls ir_leaf:("const", "i1", -1, -1, "0")
 ():() then fc_op_check:("icmp")
 
 fc_op_check() {

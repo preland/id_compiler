@@ -10,10 +10,13 @@ given bound_fixture ((import ev_node)):(4)
 
 lw_tostr_at(int v, string t) {
   int r = v;
-  if(t != "string") {
+  if(t == "bool") {
+    r = lw_tostr_bool(v);
+  } else if(t != "string") {
     string lw_strfn_v = str_pick2(t, "int", "id_str_of_int", "float", "id_str_of_float", "id_str_of_word");
     r = lw_callf(lw_strfn_v, "string", [v]);
   }
 } return int r;
 given bound_fixture (3, "string"):(3)
 given bound_fixture (3, "int"):(3)
+given bound_fixture (3, "bool"):(8)

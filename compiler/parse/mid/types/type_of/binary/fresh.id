@@ -5,6 +5,7 @@
 // the result in it. A name, a literal, an index and the result of a user
 // function are never claimed: another name may hold them.
 
+// A bool is never fresh: its string is a static literal, so freeing it crashes.
 str_fresh(int id) {
   string t = type_of(id);
   int ok = str_fresh_node(id);
@@ -18,7 +19,7 @@ given fresh_fixture ((import lit_str)):(0)
 
 str_fresh_node(int id) {
   int ok = 0;
-  if((import nkind)[id] == "bin") {
+  if((import nkind)[id] == "bin" && type_of(id) != "bool") {
     ok = 1;
   } else {
     ok = str_fresh_call(id);
@@ -26,6 +27,7 @@ str_fresh_node(int id) {
 } return int ok;
 given fresh_fixture ((import fr_n)):(1)
 given fresh_fixture ((import lit_str)):(0)
+given fresh_fixture ((import bin_and)):(0)
 
 // The mask a concat node's backends pass to the consuming concat: 1 when the
 // left operand is fresh, 2 when the right one is, 0 when neither is.

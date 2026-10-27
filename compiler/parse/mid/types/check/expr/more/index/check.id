@@ -35,7 +35,7 @@ given idxquiet ((import idx_node3)):() then calls chk_index2:((import idx_node3)
 chk_index2(int id) {
   int i2_of_v = (import ni2)[id];
   string it = type_of(i2_of_v);
-  if(ty_known(it) == 1 && it != "int") {
+  if(ty_known(it) == 1 && it != "int" && it != "bool") {
     tc_diag(id, "E0614", "list index must be int, got " + it, it, "an index counts elements, so only an int can say which one", "use an int index, or convert it first, as in to_int(x)");
   }
 } return void;

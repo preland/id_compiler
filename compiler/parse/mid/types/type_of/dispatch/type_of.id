@@ -37,4 +37,4 @@ type_of3(int id) {
   }
 } return string t;
 given varleaf_fixture ((import var_vi)):("int")
-given allfix ((import lit_a)):("int")
+given composite_fixture ((import bin_plus)):("int")

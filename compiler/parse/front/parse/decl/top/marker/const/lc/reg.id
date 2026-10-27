@@ -11,7 +11,7 @@ lc_env2() {
   init_rtc();
   init_tyc();
 } return void;
-():() then len((import tyc)):(6)
+():() then len((import tyc)):(7)
 ():() then (import tyc)[1]:("long long")
 ():() then (import rtc)[0]:(0)
 ():() then init_units:(0)
