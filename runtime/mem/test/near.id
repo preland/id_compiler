@@ -1,0 +1,23 @@
+// Fixed offsets into the block store_setup made (base.id), named so a case can
+// hand one to a function and compare another.
+
+store_near() {
+  export word tsp = (import tsb) + 8;
+  export word tsq = (import tsb) + 24;
+  export word tsr = (import tsb) + 32;
+} return void;
+given store_setup(64) given store_near ():() then addr_gap((import tsp), (import tsb)):(8)
+given store_setup(64) given store_near ():() then addr_gap((import tsr), (import tsq)):(8)
+
+store_far() {
+  export word tsl = (import tsb) + 640;
+  export word tso = (import tsb) + 648;
+} return void;
+given store_setup(704) given store_far ():() then addr_gap((import tsl), (import tsb)):(640)
+given store_setup(704) given store_far ():() then addr_gap((import tso), (import tsl)):(8)
+
+addr_gap(word p, word q) {
+  word ret_w = p - q;
+} return word ret_w;
+given store_setup(64) given store_near ((import tsp), (import tsb)):(8)
+given store_setup(64) given store_near ((import tsr), (import tsb)):(32)

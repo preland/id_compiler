@@ -7,11 +7,17 @@
 clo_word(word ko, int kk) {
   word kw = ld64(ko + kk * 8);
 } return word kw;
+given store_setup(64) given store_near given poke64((import tsp), 55) ((import tsb), 1):(55)
+given store_setup(64) given store_near given poke64((import tsb), 66) given poke64((import tsp), 1) ((import tsb), 0):(66)
 
 clo_fn(word ko) {
   word kf = clo_word(ko, 0);
 } return word kf;
+given store_setup(64) given store_near given poke64((import tsb), 77) given poke64((import tsp), 1) ((import tsb)):(77)
+given store_setup(64) given store_near given poke64((import tsb), 88) given poke64((import tsp), 2) ((import tsb)):(88)
 
 fn_raw(word ko) {
   word kr = ld64(ko + 8);
 } return word kr;
+given store_setup(64) given store_near given poke64((import tsp), 99) given poke64((import tsb), 1) ((import tsb)):(99)
+given store_setup(64) given store_near given poke64((import tsp), 0) given poke64((import tsb), 5) ((import tsb)):(0)

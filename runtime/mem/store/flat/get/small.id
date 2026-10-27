@@ -8,7 +8,11 @@
 peek8(word a) {
   word ret_w = ld8(a);
 } return word ret_w;
+given store_setup(64) given poke64((import tsb), 578437695752307201) ((import tsb)):(1)
+given store_setup(64) given poke64((import tsb), 511) ((import tsb)):(255)
 
 peek16(word a) {
   word ret_w = ld16(a);
 } return word ret_w;
+given store_setup(64) given poke64((import tsb), 578437695752307201) ((import tsb)):(513)
+given store_setup(64) given poke64((import tsb), 131071) ((import tsb)):(65535)

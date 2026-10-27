@@ -3,7 +3,11 @@
 peek32(word a) {
   word ret_w = ld32(a);
 } return word ret_w;
+given store_setup(64) given poke64((import tsb), 578437695752307201) ((import tsb)):(67305985)
+given store_setup(64) given poke64((import tsb), 8589934591) ((import tsb)):(4294967295)
 
 peek64(word a) {
   word ret_w = ld64(a);
 } return word ret_w;
+given store_setup(64) given poke64((import tsb), 578437695752307201) ((import tsb)):(578437695752307201)
+given store_setup(64) given poke64((import tsb), 1234567890123) ((import tsb)):(1234567890123)

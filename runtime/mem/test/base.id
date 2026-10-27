@@ -1,0 +1,27 @@
+// Fixtures for the cases under mem/: a block of the arena to read and write, and
+// the address the next allocation will come back at. The cases need real
+// addresses, which only exist once the arena has handed one out, so a setup
+// makes them and exports them (docs/TESTS.md "Module state").
+
+store_setup(word tz) {
+  export word tsb = mem_alloc(tz);
+  export word tnx = tsb + tz;
+  export word tn8 = tnx + 8;
+} return void;
+given store_setup(64) (64):() then top_gap((import tnx)):(0)
+given store_setup(72) (72):() then top_gap((import tnx)):(0)
+
+top_gap(word p) {
+  word ret_w = mem_size() - p;
+} return word ret_w;
+given store_setup(64) ((import tnx)):(0)
+given store_setup(72) ((import tsb)):(72)
+
+cell_is(word p, word v) {
+  word ret_w = 0;
+  if(ld64(p) == v) {
+    ret_w = 1;
+  }
+} return word ret_w;
+given store_setup(64) given poke64((import tsb), 7) ((import tsb), 7):(1)
+given store_setup(64) given poke64((import tsb), 7) ((import tsb), 8):(0)

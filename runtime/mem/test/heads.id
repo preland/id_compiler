@@ -1,0 +1,17 @@
+// The free-list heads and the strings the cases need, beside the block of
+// base.id: the heads are fixed distances from the arena start, and the strings
+// are the bytes of that block read as the layout of lang/str/core.id.
+
+store_heads() {
+  export word th0 = heap_ptr() + 8;
+  export word th3 = (import th0) + 24;
+} return void;
+given store_setup(64) given store_heads ():() then addr_gap((import th3), (import th0)):(24)
+given store_setup(64) given store_heads ():() then addr_gap((import th0), (import tsb)):(-640)
+
+store_strs() {
+  export string tss = w2s((import tsp));
+  export string tst = w2s((import tsr));
+} return void;
+given store_setup(64) given store_near given poke64((import tsb), 3) ():() then len((import tss)):(3)
+given store_setup(64) given store_near given poke64((import tsq), 4) ():() then len((import tst)):(4)

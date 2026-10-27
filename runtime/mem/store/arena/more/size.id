@@ -5,6 +5,8 @@ mem_size() {
   word heap_ptr_v = heap_ptr();
   word ret_w = arena_top(heap_ptr_v);
 } return word ret_w;
+given store_setup(64) ():((import tnx))
+given store_setup(72) ():((import tnx))
 
 // The free-list heads at the front of the arena, zeroed: 80 words from `a`.
 pool_wipe(word a, int i) {
@@ -13,6 +15,8 @@ pool_wipe(word a, int i) {
     i = i + 1;
   }
 } return void;
+given store_setup(704) given store_near given poke64((import tsp), 6) ((import tsp), 0):() then peek64((import tsp)):(0)
+given store_setup(704) given store_near given store_far given poke64((import tsl), 5) given poke64((import tsp), 6) ((import tsp), 79):() then peek64((import tsl)):(0) then peek64((import tsp)):(6)
 
 // A block returned to its size class (pool.id): the old head of the list goes
 // in its first word and the block becomes the head.
@@ -21,3 +25,5 @@ pool_give(word cls, word b) {
   st64(b, ld64(h));
   st64(h, b);
 } return void;
+given store_setup(64) given store_heads (3, (import tsb)):() then cell_is((import th3), (import tsb)):(1) then cell_is((import tsb), 0):(1)
+given store_setup(64) given store_near given store_heads given pool_give(3, (import tsp)) (3, (import tsb)):() then cell_is((import th3), (import tsb)):(1) then cell_is((import tsb), (import tsp)):(1)

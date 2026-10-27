@@ -13,13 +13,20 @@ copy_bytes(word a, word p, word z) {
     d = d + 1;
   }
 } return word z;
+given store_setup(64) given store_near given poke64((import tsb), 578437695752307201) ((import tsb), (import tsp), 8):(8) then cell_is((import tsp), 578437695752307201):(1)
+given store_setup(64) given store_near given poke64((import tsb), 578437695752307201) ((import tsb), (import tsp), 3):(3) then cell_is((import tsp), 197121):(1)
 
 str_of_mem(word a, word z) {
   word p = str_blk(z);
   word copy_bytes_v = copy_bytes(a, p + 8, z);
   string ret_s = str_of_mem_at(p, copy_bytes_v);
 } return string ret_s;
+given store_setup(64) given poke16((import tsb), 25185) ((import tsb), 2):("ab")
+given store_setup(64) given poke16((import tsb), 25185) ((import tsb), 1):("a")
+given store_setup(64) ((import tsb), 0):("")
 
 mem_of_str(string s) {
   word ret_w = s2w(s);
 } return word ret_w;
+given store_setup(64) given store_near given store_strs ((import tss)):((import tsp))
+given store_setup(64) given store_near given store_strs ((import tst)):((import tsr))

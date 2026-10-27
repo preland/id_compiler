@@ -5,3 +5,5 @@ str_of_mem_at(word p, word copy_len_bytes) {
   st8(p + 8 + copy_len_bytes, 0);
   string ret_s = w2s(p + 8);
 } return string ret_s;
+given store_setup(64) given store_near given poke64((import tsp), 5063812098665374305) ((import tsb), 2):("ab")
+given store_setup(64) given store_near given poke64((import tsp), 5063812098665374305) ((import tsb), 0):("")

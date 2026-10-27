@@ -8,6 +8,8 @@
 clo_cell(word ko, int ki) {
   word kv = clo_word(ko, ki + 3);
 } return word kv;
+given store_setup(64) given store_near given poke64((import tsq), 31) ((import tsb), 0):(31)
+given store_setup(64) given store_near given poke64((import tsr), 32) given poke64((import tsq), 1) ((import tsb), 1):(32)
 
 clo_copy(int[] kxs) {
   int[] kcp = list_new();
@@ -17,3 +19,5 @@ clo_copy(int[] kxs) {
     kj = kj + 1;
   }
 } return int[] kcp;
+([1, 2, 3]):([1, 2, 3])
+([]):([])

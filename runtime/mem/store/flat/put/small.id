@@ -4,7 +4,11 @@
 poke8(word a, word v) {
   st8(a, v);
 } return void;
+given store_setup(64) ((import tsb), 200):() then peek64((import tsb)):(200)
+given store_setup(64) given poke64((import tsb), 578437695752307201) ((import tsb), 9):() then peek64((import tsb)):(578437695752307209)
 
 poke16(word a, word v) {
   st16(a, v);
 } return void;
+given store_setup(64) given poke64((import tsb), 578437695752307201) ((import tsb), 48879):() then peek64((import tsb)):(578437695752355567)
+given store_setup(64) given poke64((import tsb), 578437695752307201) ((import tsb), 65541):() then peek64((import tsb)):(578437695752306693)

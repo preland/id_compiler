@@ -25,6 +25,8 @@ arena_top(word a) {
     p = arena_open(a);
   }
 } return word p;
+given store_setup(64) given poke64((import tsb), 4096) ((import tsb)):(4096)
+given store_setup(704) given store_near given store_far given poke64((import tsp), 99) ((import tsb)):((import tso)) then peek64((import tsp)):(0)
 
 // First use: the free-list heads are zeroed, because whatever the firmware
 // left above the kernel image would otherwise read as a block to reuse.
@@ -32,6 +34,8 @@ arena_open(word a) {
   pool_wipe(a + 8, 0);
   word ret_w = a + 648;
 } return word ret_w;
+given store_setup(704) given store_near given store_far given poke64((import tsp), 99) ((import tsb)):((import tso)) then peek64((import tsp)):(0)
+given store_setup(704) given store_far given poke64((import tsl), 77) ((import tsb)):((import tso)) then peek64((import tsl)):(0)
 
 // Rounded with `&` rather than `%`: a mask is one instruction, while `%` is a
 // call back into this same runtime, and one that would run before the arena it
@@ -41,3 +45,5 @@ mem_alloc(word z) {
   word p = arena_top(a);
   st64(a, p + ((z + 7) & 0xfffffffffffffff8));
 } return word p;
+given store_setup(64) (5):((import tnx)) then top_gap((import tnx)):(8)
+given store_setup(64) (9):((import tnx)) then top_gap((import tnx)):(16)

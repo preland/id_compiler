@@ -12,12 +12,16 @@ pool_head(word cls) {
   word top = arena_top(a);
   word ret_w = a + 8 + cls * 8;
 } return word ret_w;
+given store_setup(64) given store_heads (0):((import th0))
+given store_setup(64) given store_heads (3):((import th3))
 
 pool_take(word cls, word z) {
   word h = pool_head(cls);
   word b = ld64(h);
   word blk = pool_next(h, b, z);
 } return word blk;
+given store_setup(64) (3, 16):((import tnx)) then top_gap((import tnx)):(16)
+given store_setup(64) given pool_give(3, (import tsb)) (3, 16):((import tsb)) then top_gap((import tnx)):(0)
 
 pool_next(word h, word b, word z) {
   if(b == 0) {
@@ -26,3 +30,5 @@ pool_next(word h, word b, word z) {
     st64(h, ld64(b));
   }
 } return word b;
+given store_setup(64) ((import tsb), 0, 16):((import tnx)) then top_gap((import tnx)):(16)
+given store_setup(64) given store_near given poke64((import tsb), 4444) ((import tsp), (import tsb), 16):((import tsb)) then cell_is((import tsp), 4444):(1) then top_gap((import tnx)):(0)
