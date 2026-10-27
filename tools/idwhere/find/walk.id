@@ -17,7 +17,7 @@ given iw_tree_make ((import iw_troot), "h", ""):([])
 given iw_tree_make ((import iw_troot), "g", "other.id"):([])
 
 iw_visit(string[] iw_vtodo, string[] iw_vrows, string iw_vroot, string iw_vdir, string iw_vname, string iw_vfile) {
-  string[] iw_vls = exec_ls(path_join(iw_vroot, iw_vdir));
+  string[] iw_vls = exec_list_directory(path_join(iw_vroot, iw_vdir));
   int iw_vi = 0;
   while(iw_vi < len(iw_vls)) {
     iw_entry(iw_vtodo, iw_vrows, iw_vroot, iw_vdir, iw_vls[iw_vi], iw_vname, iw_vfile);

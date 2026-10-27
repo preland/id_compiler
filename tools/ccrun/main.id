@@ -44,7 +44,7 @@ main(int argc, string[] argv) {
 run_capped(string argv_lines, string input, int mem_kb, int cpu_s) {
   export int cr_out = fs_open("/dev/stdout", "a");
   export int cr_err = fs_open("/dev/stderr", "a");
-  export int cr_h = proc_spawn_limited(argv_lines, mem_kb, cpu_s);
+  export int cr_h = process_spawn_limited(argv_lines, mem_kb, cpu_s);
 } chain (string argv_lines, string input, int mem_kb, int cpu_s) {
   setup_io(input);
   int code = pump_finish(1);

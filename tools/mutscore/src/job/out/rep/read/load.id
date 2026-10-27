@@ -4,7 +4,7 @@
 // The results files of the out directory ms_out (r-I-of-N.tsv), by name, in
 // name order.
 ms_rp_files(string ms_out) {
-  string[] ms_nms = exec_ls(ms_out);
+  string[] ms_nms = exec_list_directory(ms_out);
   string[] ms_fl = [];
   int ms_i = 0;
 } chain (string ms_out) {

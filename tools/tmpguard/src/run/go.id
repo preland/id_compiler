@@ -25,16 +25,16 @@ tg_report(string tg_tree_path, int tg_rc, string[] tg_fresh) {
 // output and TMPDIR live under /tmp with tmpguard's prefix, which the comparison
 // ignores, and are removed again.
 tg_tree(string tg_idc_root, string tg_tree_path, string tg_dir) {
-  string[] tg_before = exec_ls(tg_dir);
+  string[] tg_before = exec_list_directory(tg_dir);
   string tg_out = fs_mktemp((import tg_skip), 1);
   fs_drop_exit(tg_out);
 } chain (string tg_idc_root, string tg_tree_path, string tg_dir) {
   int tg_made = fs_mkdir(tg_out + "/tmp");
   int tg_rc = tg_build(tg_idc_root, tg_tree_path, tg_out);
-  string[] tg_after = exec_ls(tg_dir);
+  string[] tg_after = exec_list_directory(tg_dir);
 } chain (string tg_idc_root, string tg_tree_path, string tg_dir) {
   string[] tg_fresh = tg_new(tg_before, tg_after);
-  string[] tg_priv = exec_ls(tg_out + "/tmp");
+  string[] tg_priv = exec_list_directory(tg_out + "/tmp");
   tg_extend(tg_fresh, tg_priv);
 } chain (string tg_idc_root, string tg_tree_path, string tg_dir) {
   tg_report(tg_tree_path, tg_rc, tg_fresh);

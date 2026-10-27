@@ -1,5 +1,5 @@
 lsn(string lpath) {
-  string[] lnames = exec_ls(lpath);
+  string[] lnames = exec_list_directory(lpath);
   int lcount = len(lnames);
 } return int lcount;
 ("/nonexistent/x"):(1)
@@ -10,13 +10,13 @@ scratch(string sbody) {
   int sdrop = fs_drop_exit(sdir);
   int sput = exec_file_put(sdir + "/f.txt", sbody, 420);
 } chain (string sbody) {
-  string[] sls = exec_ls(sdir);
+  string[] sls = exec_list_directory(sdir);
 } return string[] sls;
 ("a"):(["f.txt", ""])
 ("bb"):(["f.txt", ""])
 
 lsof(string opath) {
-  string[] oe = exec_ls(opath + "/");
+  string[] oe = exec_list_directory(opath + "/");
 } return string[] oe;
 ("/nonexistent/x"):([""])
 ("/nonexistent/y"):([""])

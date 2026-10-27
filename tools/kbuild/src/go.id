@@ -32,7 +32,7 @@ kb_build(string root, string out) {
   if (string_starts_with(out, "/") == 0) {
     full = root + "/" + out;
   }
-  int made = fs_mkdir_p(root + "/build");
+  int made = fs_mkdir_path(root + "/build");
 } chain (string root, string out) {
   int rc = kb_steps(kb_plan_rt(root));
   if (rc == 0) {

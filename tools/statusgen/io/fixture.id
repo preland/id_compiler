@@ -12,7 +12,7 @@
 sg_t_tree() {
   export string sg_t_root = fs_mktemp("statusgen_", 1);
   int sg_t_drop = fs_drop_exit((import sg_t_root));
-  int sg_t_deep = fs_mkdir_p((import sg_t_root) + "/sub/more");
+  int sg_t_deep = fs_mkdir_path((import sg_t_root) + "/sub/more");
 } chain () {
   int sg_t_hid = fs_mkdir((import sg_t_root) + "/.hid");
   int sg_t_bld = fs_mkdir((import sg_t_root) + "/build");

@@ -16,8 +16,8 @@ given rename_test_tree ((import rename_test_text), ""):(0) then fs_read_text((im
 // their expected paths do not depend on where the scratch directory is.
 rename_test_tree() {
   string rename_here = fs_enter(fs_mktemp("rename_t_", 1));
-  int rename_made_sub = fs_mkdir_p("sub");
-  int rename_made_git = fs_mkdir_p(".git");
+  int rename_made_sub = fs_mkdir_path("sub");
+  int rename_made_git = fs_mkdir_path(".git");
 } chain () {
   export string rename_test_text = "x.txt";
   int rename_wrote_source_file = rename_write("a.id", "a");

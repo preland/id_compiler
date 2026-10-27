@@ -2,9 +2,9 @@
 // proc.wait(timeout=10)), and kill it if it has not. This always runs, quit
 // having been sent or not -- see go/a/session/drive.id.
 reap_qemu() {
-  int rc = proc_wait((import qm_qh), 10000);
+  int rc = process_wait((import qm_qh), 10000);
   kill_if_needed(rc);
-  proc_close((import qm_qh));
+  process_close((import qm_qh));
 } return void;
 given qa_init_fast given mk_paths given spawn_qemu ():() then calls kill_if_needed:(1) then qa_check_spawn:(1)
 given qa_init_fast given mk_paths given spawn_qemu ():() then calls kill_if_needed:[1] then qa_check_spawn:(1)
@@ -13,7 +13,7 @@ given qa_init_fast given mk_paths given spawn_qemu ():() then calls kill_if_need
 // deadline; see idstd's host/os/proc/README.md.
 kill_if_needed(int rc) {
   if(rc < 0) {
-    proc_kill((import qm_qh));
+    process_kill((import qm_qh));
   }
 } return void;
 given qa_init_fast given mk_paths given spawn_qemu (0):() then qa_kill_check:(1)

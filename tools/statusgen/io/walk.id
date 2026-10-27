@@ -15,7 +15,7 @@ given sg_t_tree ((import sg_t_root)):(["a.id", "sub/", "sub/b.id", "sub/more/", 
 ("/nonexistent_sg_root"):([])
 
 sg_visit(string[] sgv_todo, string[] sgv_ents, string sgv_root, string sgv_dir) {
-  string[] sgv_ls = exec_ls(path_join(sgv_root, sgv_dir));
+  string[] sgv_ls = exec_list_directory(path_join(sgv_root, sgv_dir));
   int sgv_i = 0;
   while(sgv_i < len(sgv_ls)) {
     sg_entry(sgv_todo, sgv_ents, sgv_dir, sgv_ls[sgv_i]);

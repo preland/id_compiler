@@ -13,7 +13,7 @@
 qmb_qmp_capture_setup() {
   mk_paths();
   export string qmb_cap_path = (import qm_qmp_path) + ".cap";
-  export int qmb_cap_h = proc_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",accept-timeout=30\nOPEN:" + (import qmb_cap_path) + ",creat,trunc\n");
+  export int qmb_cap_h = process_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",accept-timeout=30\nOPEN:" + (import qmb_cap_path) + ",creat,trunc\n");
 } chain () {
   connect_qmp();
 } return void;
@@ -22,7 +22,7 @@ qmb_qmp_capture_setup() {
 
 qmb_cap_read() {
   sock_close((import qm_qmph));
-  proc_wait((import qmb_cap_h), 1000);
+  process_wait((import qmb_cap_h), 1000);
   int h = fs_open((import qmb_cap_path), "r");
 } chain () {
   int[] buf = [];

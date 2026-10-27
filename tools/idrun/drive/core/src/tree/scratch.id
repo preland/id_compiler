@@ -12,7 +12,7 @@ given tf_stem given tf_mk0 ((import tf_stm), 0):((import tf_d1)) then tf_rmstem:
 // The directory this program was started from. Started by path, that is the
 // path's own directory; started by bare name, it is the $PATH entry holding it.
 dr_home(string a0) {
-  string home = fs_dir_of(a0);
+  string home = fs_directory_of(a0);
   if (string_find(a0, "/") < 0) {
     home = dr_which(a0);
   }

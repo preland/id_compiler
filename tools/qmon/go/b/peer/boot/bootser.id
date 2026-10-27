@@ -16,17 +16,17 @@
 qmb_boot_ser(string ser_script) {
   init(2, ["qmon", "/nonexistent/kernel.elf"]);
   mk_paths();
-  int p1 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");
+  int p1 = process_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");
 } chain (string ser_script) {
-  int p2 = proc_spawn("sh\n-c\n" + ser_script + " | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early,accept-timeout=30");
+  int p2 = process_spawn("sh\n-c\n" + ser_script + " | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early,accept-timeout=30");
   spawn_qemu();
   connect_qmp();
 } chain (string ser_script) {
   connect_serial();
-  proc_wait((import qm_qh), 2000);
-  proc_wait(p1, 1000);
+  process_wait((import qm_qh), 2000);
+  process_wait(p1, 1000);
 } chain (string ser_script) {
-  proc_wait(p2, 1000);
+  process_wait(p2, 1000);
   fs_remove((import qm_qmp_path));
   fs_remove((import qm_ser_path));
 } return void;

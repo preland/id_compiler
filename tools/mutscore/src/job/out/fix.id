@@ -15,7 +15,7 @@ given ms_t_tree ():() then ms_t_wn:(3) then ms_t_ns:(3)
 // Test check: how many entries the work directory holds (exec_ls ends its list
 // with an empty name).
 ms_t_wn() {
-  int ms_c = len(exec_ls((import ms_t_work))) - 1;
+  int ms_c = len(exec_list_directory((import ms_t_work))) - 1;
 } return int ms_c;
 given ms_t_tree ():(0)
 given ms_t_tree given ms_t_wrs ():(3)

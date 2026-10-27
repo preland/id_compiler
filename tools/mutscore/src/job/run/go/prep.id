@@ -14,7 +14,7 @@ ms_rn_sh(string ms_ag) {
 // Links the sibling ms_nm of ms_root into ms_work under the same name, so a
 // tree that reads ../ms_nm finds it. Answers the exit status of ln.
 ms_rn_link(string ms_root, string ms_nm, string ms_work) {
-  string ms_tg = path_join(fs_dir_of(ms_root), ms_nm);
+  string ms_tg = path_join(fs_directory_of(ms_root), ms_nm);
   string ms_lk = path_join(ms_work, ms_nm);
   int ms_rc = ms_rn_sh("ln\n-s\n" + ms_tg + "\n" + ms_lk + "\n");
 } return int ms_rc;

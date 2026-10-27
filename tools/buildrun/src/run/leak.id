@@ -9,7 +9,7 @@ br_t_leaked() {
   if (len(tmp_root) == 0) {
     tmp_root = "/tmp";
   }
-  string[] names = exec_ls(tmp_root);
+  string[] names = exec_list_directory(tmp_root);
 } chain () {
   int n = 0;
   int i = 0;

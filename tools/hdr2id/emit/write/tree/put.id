@@ -3,7 +3,7 @@
 // Writes the text wr_tx to the file wr_rp under the directory wr_out, making the directories on the way, and answers the bytes written, or -1.
 wr_put(string wr_out, string wr_rp, string wr_tx) {
   string wr_path = wr_out + "/" + wr_rp;
-  int wr_mk = fs_mkdir_p(fs_dir_of(wr_path));
+  int wr_mk = fs_mkdir_path(fs_directory_of(wr_path));
   int wr_n = exec_file_put(wr_path, wr_tx, 420);
 } return int wr_n;
 given wr_t_dir("a/b.txt") ((import wr_t_out), "a/b.txt", "hi"):(2) then wr_t_text:("hi")

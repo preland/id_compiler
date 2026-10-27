@@ -25,9 +25,9 @@ given ccrun_fx_run_capped_true given ccrun_fx_live_exit("sh\n-c\nexit 0\n") (500
 // there is nothing further to ever wait *for*. This is bounded by however
 // much was left, not by any timeout.
 drain_remaining(int timeout_ms) {
-  int n_out = proc_read((import cr_h), (import cr_chunk), 4096, 0);
+  int n_out = process_read((import cr_h), (import cr_chunk), 4096, 0);
   int wrote_out = fs_write((import cr_out), (import cr_chunk), n_out);
-  int n_err = proc_read_err((import cr_h), (import cr_chunk), 4096, 0);
+  int n_err = process_read_error((import cr_h), (import cr_chunk), 4096, 0);
 } chain (int timeout_ms) {
   int wrote_err = fs_write((import cr_err), (import cr_chunk), n_err);
   int more = n_out > 0 || n_err > 0;
@@ -49,7 +49,7 @@ close_all() {
   int ce = fs_close((import cr_err));
   close_input_if_any();
 } chain () {
-  int cp = proc_close((import cr_h));
+  int cp = process_close((import cr_h));
 } return void;
 given ccrun_fx_run_capped_true ():() then calls close_input_if_any:()
 given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then calls close_input_if_any:()

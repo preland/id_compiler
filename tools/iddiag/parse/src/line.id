@@ -15,7 +15,7 @@ given fs_temp_text("alpha\nbeta\n") ((import fs_temp_path), 9):("")
 // zeros it is made of.
 dg_slurp(string dg_sl_f) {
   string dg_sl_t = "";
-  if(fs_is_dir(dg_sl_f) == 0) {
+  if(fs_is_directory(dg_sl_f) == 0) {
     dg_sl_t = fs_read_text(dg_sl_f);
   }
 } return string dg_sl_t;

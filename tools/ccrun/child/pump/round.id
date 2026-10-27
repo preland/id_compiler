@@ -13,12 +13,12 @@
 // this half of the fix -- idc/README.md's timing).
 pump_round(int timeout_ms) {
   maybe_pump_in(timeout_ms);
-  int n_out = proc_read((import cr_h), (import cr_chunk), 4096, timeout_ms);
+  int n_out = process_read((import cr_h), (import cr_chunk), 4096, timeout_ms);
   int wrote_out = fs_write((import cr_out), (import cr_chunk), n_out);
 } chain (int timeout_ms) {
-  int n_err = proc_read_err((import cr_h), (import cr_chunk), 4096, 0);
+  int n_err = process_read_error((import cr_h), (import cr_chunk), 4096, 0);
   int wrote_err = fs_write((import cr_err), (import cr_chunk), n_err);
-  int code = proc_wait((import cr_h), 0);
+  int code = process_wait((import cr_h), 0);
 } return int code;
 given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main (200):(-1) then (import cr_pending_n)[0]:(2902)
 given ccrun_fx_run_capped_true (150):(-1)

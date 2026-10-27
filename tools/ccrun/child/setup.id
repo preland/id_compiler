@@ -51,7 +51,7 @@ open_input_if_any(string input) {
   if(has) {
     open_input(input);
   } else {
-    int closed = proc_close_in((import cr_h));
+    int closed = process_close_input((import cr_h));
   }
 } return void;
 ("main.id"):("main.id") then calls open_input:("main.id")

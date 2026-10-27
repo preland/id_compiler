@@ -19,7 +19,7 @@ ms_cm_why(string[] ms_cf, int[] ms_sh, string[] ms_al) {
 // ms_el is the milliseconds this run has used so far. Answers 0, or why it
 // could not.
 ms_cm_next(string[] ms_cf, string[] ms_al, int[] ms_sh, int ms_el) {
-  int ms_m = fs_mkdir_p(ms_cf[(import ms_cf_out)]);
+  int ms_m = fs_mkdir_path(ms_cf[(import ms_cf_out)]);
   string ms_pa = ms_cm_pa(ms_cf, ms_sh);
   string[] ms_ks = ms_dr_done(ms_pa);
 } chain (string[] ms_cf, string[] ms_al, int[] ms_sh, int ms_el) {

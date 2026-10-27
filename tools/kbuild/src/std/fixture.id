@@ -9,7 +9,7 @@
 kb_t_std(int rc) {
   kb_t_fake(rc);
   export string kb_t_home = (import kb_t_root) + "/std";
-  int made = fs_mkdir_p(kb_t_home + "/core/d");
+  int made = fs_mkdir_path(kb_t_home + "/core/d");
 } chain (int rc) {
   int put_a = exec_file_put(kb_t_home + "/core/a.id", "f() { x = K1; }\n", 420);
   int put_b = exec_file_put(kb_t_home + "/core/d/b.id", "g() { y = K2; }\n", 420);
@@ -32,7 +32,7 @@ kb_t_run(int stale) {
   int made = 0;
 } chain (int stale) {
   if (stale == 1) {
-    made = fs_mkdir_p(fs_dir_of(old));
+    made = fs_mkdir_path(fs_directory_of(old));
     int put = exec_file_put(old, "stale\n", 420);
   }
   int rc = kb_stage((import kb_t_root), (import kb_t_home));

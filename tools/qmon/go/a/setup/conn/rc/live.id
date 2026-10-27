@@ -16,8 +16,8 @@
 // connects.
 qa_both_ready() {
   mk_paths();
-  int qa_h1 = proc_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",fork,unlink-early,accept-timeout=30\nEXEC:printf ok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\n\n");
-  int qa_h2 = proc_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_ser_path) + ",fork,unlink-early,accept-timeout=30\n/dev/null\n");
+  int qa_h1 = process_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",fork,unlink-early,accept-timeout=30\nEXEC:printf ok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\n\n");
+  int qa_h2 = process_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_ser_path) + ",fork,unlink-early,accept-timeout=30\n/dev/null\n");
 } chain () {
   export int qa_both_nc1 = qa_h1;
   export int qa_both_nc2 = qa_h2;
@@ -31,7 +31,7 @@ qa_both_ready() {
 // failure -- used for conn_bad/set_rc's mixed branch.
 qa_qmp_only_ready() {
   mk_paths();
-  int qa_h1 = proc_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",fork,unlink-early,accept-timeout=30\n/dev/null\n");
+  int qa_h1 = process_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",fork,unlink-early,accept-timeout=30\n/dev/null\n");
   export int qa_qmp_only_nc = qa_h1;
 } return void;
 ():() then qa_check_qmp_only:(1)
@@ -46,9 +46,9 @@ qa_hang_qh() {
   fs_drop_exit(qa_fifo);
   int qa_rm = fs_remove(qa_fifo);
 } chain () {
-  int qa_mk = proc_spawn("mkfifo\n" + qa_fifo + "\n");
-  int qa_mkwait = proc_wait(qa_mk, 2000);
-  int qa_mkclose = proc_close(qa_mk);
+  int qa_mk = process_spawn("mkfifo\n" + qa_fifo + "\n");
+  int qa_mkwait = process_wait(qa_mk, 2000);
+  int qa_mkclose = process_close(qa_mk);
 } chain () {
   export string qa_hang_fifo = qa_fifo;
   init(2, ["qmon", qa_fifo]);

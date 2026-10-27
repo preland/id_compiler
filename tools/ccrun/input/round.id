@@ -13,7 +13,7 @@ pump_in(int timeout_ms) {
   int pending = (import cr_pending_n)[0];
   int eof = (import cr_in_eof)[0];
   if(pending > 0) {
-    int wrote = proc_write((import cr_h), (import cr_pending), pending, timeout_ms);
+    int wrote = process_write((import cr_h), (import cr_pending), pending, timeout_ms);
     if(wrote == pending) {
       pending = 0;
     }

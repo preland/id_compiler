@@ -18,7 +18,7 @@ given environment_put("IDSTD_HOME", "") ("/r"):("/r/../../idstd")
 // Copies the file src to dst, making dst's directory, and answers the text copied.
 kb_copy(string src, string dst) {
   string text = fs_read_text(src);
-  int made = fs_mkdir_p(fs_dir_of(dst));
+  int made = fs_mkdir_path(fs_directory_of(dst));
   int put = exec_file_put(dst, text, 420);
 } return string text;
 given kb_t_std(0) ((import kb_t_src), (import kb_t_dst)):("f() { x = K1; }\n") then kb_t_done:("done 1")

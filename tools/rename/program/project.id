@@ -4,8 +4,8 @@
 // vocabulary of one word, alpha.
 rename_test_project(string rename_second_text) {
   string rename_here = fs_enter(fs_mktemp("rename_t_", 1));
-  int rename_made_source = fs_mkdir_p("src");
-  int rename_made_words = fs_mkdir_p("words");
+  int rename_made_source = fs_mkdir_path("src");
+  int rename_made_words = fs_mkdir_path("words");
 } chain (string rename_second_text) {
   int rename_wrote_source_file = rename_write("src/a.id", "oldname() oldname // oldname \"oldname\"\n");
   int rename_wrote_names = rename_write("src/NAMES.md", "| `oldname` | prose oldname |\nplain `oldname`\n");

@@ -3,9 +3,9 @@
 // there, exactly like the natives it wraps, which is what its own 2 cases
 // exercise: live_check.id's checks call it on the real thing.
 qa_close_nc(int qa_h, string qa_path) {
-  int qa_k = proc_kill(qa_h);
-  int qa_w = proc_wait(qa_h, 500);
-  int qa_c = proc_close(qa_h);
+  int qa_k = process_kill(qa_h);
+  int qa_w = process_wait(qa_h, 500);
+  int qa_c = process_close(qa_h);
 } chain (int qa_h, string qa_path) {
   int qa_r = fs_remove(qa_path);
 } return void;
@@ -26,7 +26,7 @@ qa_sock_full() {
 } chain () {
   fs_drop_exit(qa_path);
   fs_drop_exit(qa_base);
-  int qa_listener = proc_spawn("socat\n-u\nUNIX-LISTEN:" + qa_path + ",fork,unlink-early,accept-timeout=30\n/dev/null\n");
+  int qa_listener = process_spawn("socat\n-u\nUNIX-LISTEN:" + qa_path + ",fork,unlink-early,accept-timeout=30\n/dev/null\n");
 } chain () {
   export string qa_full_path = qa_path;
   export int qa_full_listener = qa_listener;
@@ -59,10 +59,10 @@ qa_free_sock() {
     int qa_c = sock_close(qa_hs[qa_i]);
     qa_i = qa_i + 1;
   }
-  int qa_lk = proc_kill((import qa_full_listener));
+  int qa_lk = process_kill((import qa_full_listener));
 } chain () {
-  int qa_lw = proc_wait((import qa_full_listener), 500);
-  int qa_lc = proc_close((import qa_full_listener));
+  int qa_lw = process_wait((import qa_full_listener), 500);
+  int qa_lc = process_close((import qa_full_listener));
   int qa_rm = fs_remove((import qa_full_path));
 } return int qa_ok;
 given qa_sock_full ():(1)

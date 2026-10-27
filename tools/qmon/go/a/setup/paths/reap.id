@@ -2,8 +2,8 @@
 // every check that leaves a real (if instantly-failing) qemu child behind,
 // so each of those stays about its own state rather than repeating this.
 qa_reap_spawn() {
-  int qa_rc = proc_wait((import qm_qh), 3000);
-  int qa_close = proc_close((import qm_qh));
+  int qa_rc = process_wait((import qm_qh), 3000);
+  int qa_close = process_close((import qm_qh));
   int qa_r1 = fs_remove((import qm_qmp_path));
 } chain () {
   int qa_r2 = fs_remove((import qm_ser_path));

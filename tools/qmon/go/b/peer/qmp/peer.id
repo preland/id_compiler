@@ -15,12 +15,12 @@
 // this fixture is `given` for still sees it.
 qmb_qmp_peer(string qmp_line) {
   mk_paths();
-  int p1 = proc_spawn("sh\n-c\necho '" + qmp_line + "' | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");
-  int p2 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early,accept-timeout=30");
+  int p1 = process_spawn("sh\n-c\necho '" + qmp_line + "' | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");
+  int p2 = process_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early,accept-timeout=30");
 } chain (string qmp_line) {
   connect_both();
-  proc_wait(p1, 1000);
-  proc_wait(p2, 1000);
+  process_wait(p1, 1000);
+  process_wait(p2, 1000);
 } chain (string qmp_line) {
   fs_remove((import qm_qmp_path));
   fs_remove((import qm_ser_path));
@@ -30,12 +30,12 @@ qmb_qmp_peer(string qmp_line) {
 
 qmb_qmp_empty_ser_empty() {
   mk_paths();
-  int p1 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");
-  int p2 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early,accept-timeout=30");
+  int p1 = process_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");
+  int p2 = process_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early,accept-timeout=30");
 } chain () {
   connect_both();
-  proc_wait(p1, 1000);
-  proc_wait(p2, 1000);
+  process_wait(p1, 1000);
+  process_wait(p2, 1000);
 } chain () {
   fs_remove((import qm_qmp_path));
   fs_remove((import qm_ser_path));

@@ -17,7 +17,7 @@ given ccrun_fx_setup_input_main ():() then calls do_close_in:[0] then cr_in_text
 given ccrun_fx_run_capped_true given ccrun_fx_empty_input given ccrun_fx_pump_once ():() then calls do_close_in:[0] then cr_in_text:("input 1:1")
 
 do_close_in() {
-  int closed = proc_close_in((import cr_h));
+  int closed = process_close_input((import cr_h));
   integer_list_set((import cr_in_done), 0, 1);
 } return void;
 given ccrun_fx_run_capped_true ():() then (import cr_in_done)[0]:(1)

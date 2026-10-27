@@ -4,7 +4,7 @@
 // standard library.
 dr_prep(string path) {
   string frag = dr_one(path);
-  if (fs_is_dir(path) == 1) {
+  if (fs_is_directory(path) == 1) {
     frag = dr_consts(path) + dr_walk(path, 1);
   }
 } return string frag;

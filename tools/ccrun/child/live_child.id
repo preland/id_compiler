@@ -4,14 +4,14 @@
 // close just freed (idstd's proc_spawn takes the lowest free slot), leaving cr_h naming a child
 // pump_finish has yet to wait on.
 ccrun_fx_live_exit(string ccrun_fx_le_cmd) {
-  int ccrun_fx_le_h = proc_spawn_limited(ccrun_fx_le_cmd, 0, 0);
+  int ccrun_fx_le_h = process_spawn_limited(ccrun_fx_le_cmd, 0, 0);
 } return void;
 given ccrun_fx_run_capped_true ("sh\n-c\nsleep 0.1; exit 7\n"):() then ccrun_fx_wait_value:(7)
 given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ("sh\n-c\nexit 0\n"):() then ccrun_fx_wait_value:(0)
 
 // What cr_h's child exits with, waited on for up to two seconds.
 ccrun_fx_wait_value() {
-  int ccrun_fx_wv_code = proc_wait((import cr_h), 2000);
+  int ccrun_fx_wv_code = process_wait((import cr_h), 2000);
 } return int ccrun_fx_wv_code;
 given ccrun_fx_run_capped_true given ccrun_fx_live_exit("sh\n-c\nsleep 0.1; exit 7\n") ():(7)
 given ccrun_fx_run_capped_true given ccrun_fx_live_exit("sh\n-c\nexit 0\n") ():(0)

@@ -3,7 +3,7 @@
 // The names of the directories directly under sgd_dir that hold source: not a
 // dot directory and not "build". An unreadable directory has none.
 sg_subdirs(string sgd_dir) {
-  string[] sgd_ls = exec_ls(sgd_dir);
+  string[] sgd_ls = exec_list_directory(sgd_dir);
   string[] sgd_r = [];
   int sgd_i = 0;
 } chain (string sgd_dir) {

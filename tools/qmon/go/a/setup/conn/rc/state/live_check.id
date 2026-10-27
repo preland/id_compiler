@@ -32,10 +32,10 @@ given qa_qmp_only_ready ():(1) then qa_check_qmp_only:(0)
 qa_check_hang() {
   int qa_qh = (import qm_qh);
   int qa_fifo_exists = fs_exists((import qa_hang_fifo));
-  int qa_kill = proc_kill(qa_qh);
+  int qa_kill = process_kill(qa_qh);
 } chain () {
-  int qa_reap = proc_wait(qa_qh, 1000);
-  int qa_close = proc_close(qa_qh);
+  int qa_reap = process_wait(qa_qh, 1000);
+  int qa_close = process_close(qa_qh);
   int qa_rm = fs_remove((import qa_hang_fifo));
 } chain () {
   int qa_rq = fs_remove((import qm_qmp_path));

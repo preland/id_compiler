@@ -13,7 +13,7 @@ qmb_buf_boot() {
   mk_paths();
   spawn_qemu();
 } chain () {
-  proc_wait((import qm_qh), 2000);
+  process_wait((import qm_qh), 2000);
   fs_remove((import qm_qmp_path));
   fs_remove((import qm_ser_path));
 } return void;

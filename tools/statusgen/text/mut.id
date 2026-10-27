@@ -26,7 +26,7 @@ sg_mutline(string[] sgrl_rows) {
 // the directory has none, and "unreadable" when mutscore (the command sgrm_mut)
 // cannot report them.
 sg_mut(string sgrm_mut, string sgrm_dir) {
-  string[] sgrm_ls = exec_ls(sgrm_dir);
+  string[] sgrm_ls = exec_list_directory(sgrm_dir);
   string sgrm_r = "";
   int[] sgrm_code = [0];
 } chain (string sgrm_mut, string sgrm_dir) {

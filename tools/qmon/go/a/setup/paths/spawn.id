@@ -28,10 +28,10 @@ given qmb_init_seed_a given mk_paths given qa_want_argv ():((import qa_want))
 // once: it reads EOF, as it did when proc_spawn gave every child /dev/null.
 spawn_qemu() {
   string a = build_argv();
-  export int qm_qh = proc_spawn(a);
+  export int qm_qh = process_spawn(a);
   export int[] qm_buf = [];
 } chain () {
-  int qm_in_closed = proc_close_in((import qm_qh));
+  int qm_in_closed = process_close_input((import qm_qh));
 } return void;
 given qa_init_fast given mk_paths ():() then qa_check_spawn:(1)
 given qa_init_fast given mk_paths ():() then qa_check_spawn:(1) then qa_check_spawn:(1)
