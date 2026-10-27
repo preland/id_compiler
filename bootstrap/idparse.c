@@ -1353,9 +1353,11 @@ int id_url_hex_value(int idstd_uh_c);
 int id_fixed_point_minimum(int idstd_a, int idstd_b);
 int id_fixed_point_maximum(int idstd_a, int idstd_b);
 int id_fixed_point_sign(int idstd_a);
+int id_character_upper(int idstd_upper_code);
 int id_character_lower(int idstd_lower_code);
 int id_character_in(int idstd_range_code, int idstd_lo, int idstd_hi);
 int id_character_is_space(int idstd_space_code);
+int id_character_is_digit(int idstd_digit_code);
 int id_string_advance_past_escape(char* idstd_adv_s, int idstd_adv_i, int idstd_adv_esc, int idstd_adv_by);
 int id_string_is_axis_piece(char* idstd_axis_piece, int idstd_axis_parts);
 int id_idstd_string_split_bound(char* idstd_s, char* idstd_separator, int idstd_i, int idstd_size);
@@ -1399,6 +1401,9 @@ int id_string_ends_with(char* idstd_s, char* idstd_joined_text);
 int id_idstd_string_join_separator_length(IdList* idstd_strs, char* idstd_separator);
 int id_idstd_string_join_separator_write(char* idstd_separator, long long idstd_address, int idstd_p, int idstd_more);
 int id_idstd_string_skip_until_byte(char* idstd_s, int idstd_i, int idstd_byte);
+int id_idstd_character_case_class(int idstd_class_code);
+int id_idstd_string_snake_cut(char* idstd_cut_s, int idstd_cut_i);
+char* id_string_snake(char* idstd_snake_s);
 void id_print_calls(void);
 void id_print_call_cases(void);
 char* id_call_case_row(int i);
@@ -1476,6 +1481,8 @@ void id_seed_fn_arg(int e);
 void id_seed_givens(void);
 void id_seed_given_list(IdList* setups);
 void id_seed_thens(void);
+void id_seed_lists(void);
+void id_seed_list_names(void);
 void id_test_widen(IdList* pkeep, IdList* rkeep);
 void id_test_widen2(IdList* rkeep);
 void id_seed_tested(void);
@@ -2197,6 +2204,8 @@ void id_tc_collect(void);
 void id_emit_ty_proto(char* ty);
 void id_emit_ty_bodies(void);
 void id_emit_ty_body(char* ty);
+char* id_lcell_len(char* listname);
+char* id_lcell_at(char* listname, char* cellindex);
 void id_emit_ty_body2(char* key, char* et);
 char* id_eq_cond(char* et);
 void id_emit_eq_body(char* key, char* et);
@@ -2479,6 +2488,8 @@ char* id_tc_neg(int e);
 char* id_tc_lit(int e, char* want);
 char* id_tc_cbsets(char* clo0, int fn, IdList* items);
 char* id_tc_cbcell(int fn, int i, int v);
+char* id_tc_list_rt(IdList* xs, char* et);
+char* id_tc_rt_pushes(IdList* xs, char* et);
 char* id_tc_compare(char* ga, char* gb, char* type);
 char* id_tc_show(char* code, char* type);
 char* id_show_scalar(char* code, char* type);
@@ -4278,6 +4289,8 @@ char* id_show_side(int c);
 char* id_fix_side(int id, int c);
 char* id_mixed_words(int id, int c);
 char* id_bit_cmp_words(char* po, char* co);
+void id_cond_strict(int id, char* t);
+void id_cond_strict_say(int id, char* t, char* cond_was);
 int id_cmp_bad(char* lt, char* rt, int okk);
 int id_eq_ok(char* lt, char* rt);
 int id_ord_ok(char* lt, char* rt);
@@ -5095,6 +5108,7 @@ IdList* bnames;  /* exported by init_bnames() */
 IdList* rtc;  /* exported by init_rtc() */
 IdList* fsc;  /* exported by init_rtc() */
 IdList* lvc;  /* exported by init_rtc() */
+IdList* bsc;  /* exported by init_rtc() */
 IdList* rfn;  /* exported by init_reach() */
 IdList* dphase;  /* exported by init_reach() */
 IdList* clive;  /* exported by init_reach() */
@@ -5697,6 +5711,15 @@ int id_fixed_point_sign(int idstd_a) {
     return idstd_ret_i;
 }
 
+int id_character_upper(int idstd_upper_code) {
+    int idstd_upper_result;
+    idstd_upper_result = idstd_upper_code;
+    if ((id_character_in(idstd_upper_code, 97, 122) == 1)) {
+        idstd_upper_result = (idstd_upper_code - 32);
+    }
+    return idstd_upper_result;
+}
+
 int id_character_lower(int idstd_lower_code) {
     int idstd_lower_result;
     idstd_lower_result = idstd_lower_code;
@@ -5715,6 +5738,12 @@ int id_character_in(int idstd_range_code, int idstd_lo, int idstd_hi) {
 int id_character_is_space(int idstd_space_code) {
     int idstd_ret_i;
     idstd_ret_i = ((((idstd_space_code == 32) || (idstd_space_code == 9)) || (idstd_space_code == 10)) || (idstd_space_code == 13));
+    return idstd_ret_i;
+}
+
+int id_character_is_digit(int idstd_digit_code) {
+    int idstd_ret_i;
+    idstd_ret_i = id_character_in(idstd_digit_code, 48, 57);
     return idstd_ret_i;
 }
 
@@ -6117,6 +6146,58 @@ int id_idstd_string_skip_until_byte(char* idstd_s, int idstd_i, int idstd_byte) 
         idstd_i = (idstd_i + 1);
     }
     return idstd_i;
+}
+
+int id_idstd_character_case_class(int idstd_class_code) {
+    int idstd_class_ret;
+    idstd_class_ret = 0;
+    if ((id_character_lower(idstd_class_code) != idstd_class_code)) {
+        idstd_class_ret = 1;
+    }
+    if ((id_character_upper(idstd_class_code) != idstd_class_code)) {
+        idstd_class_ret = 2;
+    }
+    if ((id_character_is_digit(idstd_class_code) == 1)) {
+        idstd_class_ret = 3;
+    }
+    return idstd_class_ret;
+}
+
+int id_idstd_string_snake_cut(char* idstd_cut_s, int idstd_cut_i) {
+    int idstd_cut_before;
+    int idstd_cut_here;
+    int idstd_cut_after;
+    int idstd_cut_ret;
+    idstd_cut_before = id_idstd_character_case_class(id_character_code_at(idstd_cut_s, (idstd_cut_i - 1)));
+    idstd_cut_here = id_idstd_character_case_class(id_character_code_at(idstd_cut_s, idstd_cut_i));
+    idstd_cut_after = id_idstd_character_case_class(id_character_code_at(idstd_cut_s, (idstd_cut_i + 1)));
+    idstd_cut_ret = 0;
+    if (((idstd_cut_here == 1) && ((idstd_cut_before >= 2) || ((idstd_cut_before == 1) && (idstd_cut_after == 2))))) {
+        idstd_cut_ret = 1;
+    }
+    return idstd_cut_ret;
+}
+
+char* id_string_snake(char* idstd_snake_s) {
+    IdList* idstd_snake_parts = NULL;
+    int idstd_snake_start;
+    int idstd_snake_i;
+    int idstd_snake_len;
+    char* idstd_snake_ret = NULL;
+    { IdList* idfe_o = idstd_snake_parts; idstd_snake_parts = id_list_lit(0); id_list_free_strs(idfe_o); }
+    idstd_snake_start = 0;
+    idstd_snake_i = 1;
+    while ((id_character_code_at(idstd_snake_s, idstd_snake_i) >= 0)) {
+        if ((id_idstd_string_snake_cut(idstd_snake_s, idstd_snake_i) == 1)) {
+            id_list_push(idstd_snake_parts, (long long)(intptr_t)(id_str_sub(idstd_snake_s, idstd_snake_start, (idstd_snake_i - idstd_snake_start))));
+            idstd_snake_start = idstd_snake_i;
+        }
+        idstd_snake_i = (idstd_snake_i + 1);
+    }
+    idstd_snake_len = id_len(idstd_snake_s);
+    id_list_push(idstd_snake_parts, (long long)(intptr_t)(id_str_sub(idstd_snake_s, idstd_snake_start, (idstd_snake_len - idstd_snake_start))));
+    { char* idfe_o = idstd_snake_ret; idstd_snake_ret = id_string_join(idstd_snake_parts, ID_S("_")); id_str_free(idfe_o); }
+    { id_list_free_strs(idstd_snake_parts); return idstd_snake_ret; }
 }
 
 void id_print_calls(void) {
@@ -6526,9 +6607,12 @@ void id_arg_flags2(int argc, IdList* argv) {
 
 void id_arg_flags3(int argc, IdList* argv) {
     int arg_flag_v;
+    int arg_strict_v;
     arg_flag_v = id_arg_flag(argc, argv, 1, ID_S("--runtime"));
     id_integer_list_set(rtc, 0, arg_flag_v);
     id_arg_flags4(argc, argv);
+    arg_strict_v = id_arg_flag(argc, argv, 1, ID_S("--bool-strict"));
+    id_integer_list_set(bsc, 0, arg_strict_v);
     return;
 }
 
@@ -6948,6 +7032,25 @@ IdList* idsq_16;
     return;
 }
 
+void id_seed_lists(void) {
+    if (((int)(id_list_get(rtc, 0)) == 1)) {
+        id_seed_list_names();
+    }
+    return;
+}
+
+void id_seed_list_names(void) {
+    IdList* wanted = NULL;
+    int wi;
+    { IdList* idfe_o = wanted; wanted = id_list_lit(4, (long long)(intptr_t)(ID_S("list_new")), (long long)(intptr_t)(ID_S("list_push")), (long long)(intptr_t)(ID_S("list_len")), (long long)(intptr_t)(ID_S("list_get"))); id_list_free(idfe_o); }
+    wi = 0;
+    while ((wi < id_list_len(wanted))) {
+        id_reach_add((char*)(intptr_t)(id_list_get(wanted, wi)));
+        wi = (wi + 1);
+    }
+    { id_list_free(wanted); return; }
+}
+
 void id_test_widen(IdList* pkeep, IdList* rkeep) {
     id_pred_wipe(prog);
     id_keep_ints(pkeep, prog);
@@ -6972,8 +7075,8 @@ void id_seed_tested(void) {
     id_rfn_reindex();
     ci = 0;
     while ((ci < id_list_len(casefn))) {
-IdList* idsq_51;
-        s1_of_v = (idsq_51 = ns1, (char*)(intptr_t)(id_list_get(idsq_51, (int)(id_list_get(casefn, ci)))));
+IdList* idsq_55;
+        s1_of_v = (idsq_55 = ns1, (char*)(intptr_t)(id_list_get(idsq_55, (int)(id_list_get(casefn, ci)))));
         if ((id_case_is_std(ci) == 0)) {
             id_reach_add(s1_of_v);
         }
@@ -6988,6 +7091,7 @@ IdList* idsq_51;
         }
         ni = (ni + 1);
     }
+    id_seed_lists();
     return;
 }
 
@@ -14267,6 +14371,24 @@ void id_emit_ty_body(char* ty) {
     { id_str_free(key); return; }
 }
 
+char* id_lcell_len(char* listname) {
+    char* so = NULL;
+    { char* idfe_o = so; so = id_concat(listname, ID_S("->len")); id_str_free(idfe_o); }
+    if (((int)(id_list_get(rtc, 0)) == 1)) {
+        { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat_f(id_fn_sym(ID_S("list_len")), ID_S("("), 1), listname, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    }
+    return so;
+}
+
+char* id_lcell_at(char* listname, char* cellindex) {
+    char* so = NULL;
+    { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat(listname, ID_S("->data[")), cellindex, 1), ID_S("]"), 1); id_str_free(idfe_o); }
+    if (((int)(id_list_get(rtc, 0)) == 1)) {
+        { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_fn_sym(ID_S("list_get")), ID_S("("), 1), listname, 1), ID_S(", "), 1), cellindex, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    }
+    return so;
+}
+
 void id_emit_ty_body2(char* key, char* et) {
     id_emit_eq_body(key, et);
     id_emit_show_body(key, et);
@@ -14277,8 +14399,8 @@ char* id_eq_cond(char* et) {
     char* ga = NULL;
     char* gb = NULL;
     char* so = NULL;
-    { char* idfe_o = ga; ga = id_unbox(ID_S("a->data[i]"), et); id_str_free(idfe_o); }
-    { char* idfe_o = gb; gb = id_unbox(ID_S("b->data[i]"), et); id_str_free(idfe_o); }
+    { char* idfe_o = ga; ga = ({ char* idft0 = id_lcell_at(ID_S("a"), ID_S("i")); char* idfr = id_unbox(idft0, et); id_str_free(idft0); idfr; }); id_str_free(idfe_o); }
+    { char* idfe_o = gb; gb = ({ char* idft0 = id_lcell_at(ID_S("b"), ID_S("i")); char* idfr = id_unbox(idft0, et); id_str_free(idft0); idfr; }); id_str_free(idfe_o); }
     { char* idfe_o = so; so = id_tc_compare(ga, gb, et); id_str_free(idfe_o); }
     { id_str_free(ga); id_str_free(gb); return so; }
 }
@@ -14286,7 +14408,9 @@ char* id_eq_cond(char* et) {
 void id_emit_eq_body(char* key, char* et) {
     char* cmp = NULL;
     { char* idfe_o = cmp; cmp = id_eq_cond(et); id_str_free(idfe_o); }
-    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static int idtc_eq_"), key), ID_S("(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!"), 1), cmp, 1), ID_S(") return 0;\n    return 1;\n}"), 1));
+char* idsq_22;
+char* idsq_16;
+    (idsq_22 = id_lcell_len(ID_S("a")), idsq_16 = id_lcell_len(ID_S("b")), id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static int idtc_eq_"), key), ID_S("(IdList* a, IdList* b) {\n    if ("), 1), idsq_22, 3), ID_S(" != "), 1), idsq_16, 3), ID_S(") return 0;\n    for (int i = 0; i < "), 1), id_lcell_len(ID_S("a")), 3), ID_S("; i++)\n        if (!"), 1), cmp, 1), ID_S(") return 0;\n    return 1;\n}"), 1)));
     { id_str_free(cmp); return; }
 }
 
@@ -14312,9 +14436,9 @@ char* id_key_code(int ch) {
 void id_emit_show_body(char* key, char* et) {
     char* ga = NULL;
     char* sh = NULL;
-    { char* idfe_o = ga; ga = id_unbox(ID_S("a->data[i]"), et); id_str_free(idfe_o); }
+    { char* idfe_o = ga; ga = ({ char* idft0 = id_lcell_at(ID_S("a"), ID_S("i")); char* idfr = id_unbox(idft0, et); id_str_free(idft0); idfr; }); id_str_free(idfe_o); }
     { char* idfe_o = sh; sh = id_tc_show(ga, et); id_str_free(idfe_o); }
-    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static void idtc_show_"), key), ID_S("(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        "), 1), sh, 1), ID_S("\n    }\n    fputs(\"]\", stderr);\n}"), 1));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static void idtc_show_"), key), ID_S("(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < "), 1), id_lcell_len(ID_S("a")), 3), ID_S("; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        "), 1), sh, 1), ID_S("\n    }\n    fputs(\"]\", stderr);\n}"), 1));
     { id_str_free(ga); id_str_free(sh); return; }
 }
 
@@ -15325,13 +15449,13 @@ void id_emit_setup(int ci, int si, char* nm) {
     items = id_given_items(ci, si);
     ps = id_list_lit(0);
     if ((id_list_len(items) > 0)) {
-IdList* idsq_52;
-        ps = (idsq_52 = nl1, (IdList*)(intptr_t)(id_list_get(idsq_52, id_func_node(nm))));
+IdList* idsq_54;
+        ps = (idsq_54 = nl1, (IdList*)(intptr_t)(id_list_get(idsq_54, id_func_node(nm))));
         id_print(ID_S("    {"));
     }
     { char* idfe_o = an; an = id_names_upto(id_list_len(items)); id_str_free(idfe_o); }
     id_emit_arg_lines(ps, items);
-    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    id_"), nm), ID_S("("), 1), an, 1), ID_S(");"), 1));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    "), id_fn_sym(nm), 2), ID_S("("), 1), an, 1), ID_S(");"), 1));
     if ((id_list_len(items) > 0)) {
         id_print(ID_S("    }"));
     }
@@ -17141,6 +17265,29 @@ char* id_tc_cbcell(int fn, int i, int v) {
     return s;
 }
 
+char* id_tc_list_rt(IdList* xs, char* et) {
+    char* pushes = NULL;
+    char* so = NULL;
+    { char* idfe_o = pushes; pushes = id_tc_rt_pushes(xs, et); id_str_free(idfe_o); }
+    { char* idfe_o = so; so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("({ IdList* idtc_l = "), id_fn_sym(ID_S("list_new")), 2), ID_S("();"), 1), pushes, 1), ID_S(" idtc_l; })"), 1); id_str_free(idfe_o); }
+    { id_str_free(pushes); return so; }
+}
+
+char* id_tc_rt_pushes(IdList* xs, char* et) {
+    char* out = NULL;
+    int i;
+    char* cv;
+    { char* idfe_o = out; out = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    i = 0;
+    while ((i < id_list_len(xs))) {
+        cv = id_tc_value((int)(id_list_get(xs, i)), et);
+char* idsq_18;
+        out = (idsq_18 = id_fn_sym(ID_S("list_push")), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(out, ID_S(" "), 1), idsq_18, 3), ID_S("(idtc_l, "), 1), id_box(cv, et), 3), ID_S(");"), 1));
+        i = (i + 1);
+    }
+    return out;
+}
+
 char* id_tc_compare(char* ga, char* gb, char* type) {
     char* so = NULL;
     char* key = NULL;
@@ -17283,6 +17430,9 @@ char* id_sizes_c(IdList* args) {
 char* id_tc_list_head(IdList* xs, char* et, char* want) {
     char* so = NULL;
     { char* idfe_o = so; so = id_tc_list_n(xs, et); id_str_free(idfe_o); }
+    if (((strcmp(want, ID_S("bytes")) != 0) && ((int)(id_list_get(rtc, 0)) == 1))) {
+        { char* idfe_o = so; so = id_tc_list_rt(xs, et); id_str_free(idfe_o); }
+    }
     if ((strcmp(want, ID_S("bytes")) == 0)) {
         { char* idfe_o = so; so = id_concat_f(ID_S("id_bytes_lit"), id_str_sub(so, 11, (id_len(so) - 11)), 2); id_str_free(idfe_o); }
     }
@@ -29123,7 +29273,7 @@ char* id_vocab_bad(char* vocab_name) {
     IdList* vocab_pieces = NULL;
     char* vocab_acc;
     int vocab_i;
-    { IdList* idfe_o = vocab_pieces; vocab_pieces = id_string_split(vocab_name, ID_S("_")); id_list_free(idfe_o); }
+    { IdList* idfe_o = vocab_pieces; vocab_pieces = ({ char* idft0 = id_string_snake(vocab_name); IdList* idfr = id_string_split(idft0, ID_S("_")); id_str_free(idft0); idfr; }); id_list_free(idfe_o); }
     vocab_acc = ID_S("");
     vocab_i = 0;
     while ((vocab_i < id_list_len(vocab_pieces))) {
@@ -29716,6 +29866,7 @@ void id_init_rtc(void) {
     id_init_bnames();
     id_init_resv_names();
     lvc = id_list_lit(1, (long long)(1));
+    bsc = id_list_lit(1, (long long)(0));
     return;
 }
 
@@ -36095,6 +36246,7 @@ void id_chk_cond(int id, char* msg) {
     i1_of_v = (int)(id_list_get(ni1, id));
     type_of_v = id_type_of(i1_of_v);
     id_cond_kind(id, msg, type_of_v);
+    id_cond_strict(id, type_of_v);
     return;
 }
 
@@ -36389,6 +36541,25 @@ char* id_bit_cmp_words(char* po, char* co) {
         { char* idfe_o = out; out = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a bitwise '"), po), ID_S("' with a comparison '"), 1), co, 1), ID_S("'"), 1); id_str_free(idfe_o); }
     }
     return out;
+}
+
+void id_cond_strict(int id, char* t) {
+    int cond_e;
+    if ((((int)(id_list_get(bsc, 0)) == 1) && ((strcmp(t, ID_S("int")) == 0) || (strcmp(t, ID_S("word")) == 0)))) {
+        cond_e = (int)(id_list_get(ni1, id));
+        id_cond_strict_say(id, t, id_show_expr(cond_e));
+    }
+    return;
+}
+
+void id_cond_strict_say(int id, char* t, char* cond_was) {
+    int cond_ln;
+    char* cond_fix = NULL;
+    cond_ln = id_tc_line(id);
+    { char* idfe_o = cond_fix; cond_fix = id_concat(cond_was, ID_S(" != 0")); id_str_free(idfe_o); }
+    ({ char* idft2 = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a condition must be a bool, got "), t), ID_S(" '"), 1), cond_was, 1), ID_S("'"), 1); char* idft5 = id_concat_f(id_concat(ID_S("write '"), cond_fix), ID_S("'"), 1); id_tc_diag(id, ID_S("E0646"), idft2, cond_was, ID_S("an int is not a truth value under --bool-strict; the condition says what is being tested, so write the comparison"), idft5); id_str_free(idft2); id_str_free(idft5); });
+    id_diag_edit(ID_S("machine"), ID_S("replace"), cond_ln, cond_was, cond_fix);
+    { id_str_free(cond_fix); return; }
 }
 
 int id_cmp_bad(char* lt, char* rt, int okk) {
