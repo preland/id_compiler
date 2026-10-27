@@ -1,0 +1,43 @@
+// The named token streams the block cases run on, loaded by `given
+// gblk_stream("NAME")`. One function with a name, not one fixture each: seven
+// fixtures that only differ in their literals are the duplicates E0407 refuses.
+//
+//   open      given vs { / ( ) : ( ) / ( ) : ( ) / }
+//   nest      a block opened inside a block
+//   empty     a block with no case
+//   unclosed  a block that runs into the next name
+//   share     two case lines both opening with `given vs`, then a name
+//   mixed     one such line and one plain case, then a name
+//   args      a case line whose given takes arguments: given vs() ():()
+gblk_stream(string gb_name) {
+  if(gb_name == "open") {
+    gblk_fix(["given", "vs", "{", "(", ")", ":", "(", ")", "(", ")", ":", "(", ")", "}"], [1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4]);
+  }
+  if(gb_name == "nest") {
+    gblk_fix(["given", "vs", "{", "given", "w", "{", "(", ")", ":", "(", ")", "}"], [1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4]);
+  }
+  if(gb_name == "empty") {
+    gblk_fix(["given", "vs", "{", "}"], [1, 1, 1, 2]);
+  }
+} chain (string gb_name) {
+  if(gb_name == "unclosed") {
+    gblk_fix(["given", "vs", "{", "(", ")", ":", "(", ")", "f"], [1, 1, 1, 2, 2, 2, 2, 2, 3]);
+  }
+  if(gb_name == "share") {
+    gblk_fix(["given", "vs", "(", ")", ":", "(", ")", "given", "vs", "(", ")", ":", "(", ")", "f"], [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3]);
+  }
+  if(gb_name == "mixed") {
+    gblk_fix(["given", "vs", "(", ")", ":", "(", ")", "(", ")", ":", "(", ")", "f"], [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3]);
+  }
+} chain (string gb_name) {
+  if(gb_name == "args") {
+    gblk_fix(["given", "vs", "(", ")", "(", ")", ":", "(", ")"], [1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  }
+} return void;
+("open"):() then len((import tkind)):(14) then (import tline)[13]:(4)
+("nest"):() then len((import tkind)):(12) then (import ttext)[5]:("{")
+("empty"):() then len((import tkind)):(4) then (import ttext)[3]:("}")
+("unclosed"):() then len((import tkind)):(9) then (import tkind)[8]:("ident")
+("share"):() then len((import tkind)):(15) then (import tline)[14]:(3)
+("mixed"):() then len((import tkind)):(13) then (import ttext)[7]:("(")
+("args"):() then len((import tkind)):(9) then (import ttext)[6]:(":")

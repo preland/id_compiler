@@ -16,6 +16,9 @@
 //           a bool declared int, a bool as an index, a 1/0 case for a bool
 //           result) is an error with an `edit:` fix instead of being accepted;
 //           temporary, until strict is the only behaviour (.handoff/bool/DESIGN.md)
+//           bsc[1] is 1 under `--given-blocks-strict`: E0523, every case of a
+//           function opening with the same given, is reported (and fixed by
+//           `--fix`) only then, until the compiler's own sources use blocks
 //   bnames  the builtin names, split out of one literal (see builtin/more/)
 
 // rtc: Whether this project is the runtime. Read by the reserved-name check and by
@@ -30,10 +33,11 @@ init_rtc() {
 } chain () {
   init_resv_names();
   export int[] lvc = [1];
-  export int[] bsc = [0];
+  export int[] bsc = [0, 0];
 } return void export rtc;
 ():() then (import rtc)[0]:(0)
 ():() then (import lvc)[0]:(1)
 ():() then (import bsc)[0]:(0)
+():() then (import bsc)[1]:(0)
 ():() then calls init_bnames:[1]
 

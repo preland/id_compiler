@@ -1,0 +1,34 @@
+// The two hooks take_cases calls: the block expansion, ahead of each case, and
+// the shared-setup check, once ahead of a function's cases.
+
+// 1 when the opener was refused and its tokens dropped, so the caller must look
+// at the store again; 0 when there was no block or it has been expanded, and
+// the cursor is on a case either way.
+gblk_open(int[] pos) {
+  int gb_skip = 0;
+  if(gblk_is_open(pos[0]) == 1) {
+    gb_skip = gblk_try(pos);
+  }
+} return int gb_skip;
+given gblk_stream("open") ([0]):(0) then (import tline)[7]:(3) then (import ttext)[2]:("(")
+given gblk_stream("empty") ([0]):(1) then len((import tkind)):(0)
+given gblk_stream("open") ([3]):(0) then (import ttext)[2]:("{")
+
+// E0523: every case of the function begins with the same first given and none
+// is inside a block, so the setup belongs in a block. Run on the cases as
+// written, before any block among them is expanded.
+gblk_share(int[] pos) {
+  int gb_first = pos[0];
+  int gb_gend = gblk_given_end(gb_first);
+  int gb_cnt = gblk_same(gb_first, gb_gend);
+} chain (int[] pos) {
+  if(gb_cnt >= 2) {
+    if((import bsc)[1] == 1) {
+      gblk_share_diag(pos, gb_first, gb_gend, gb_cnt);
+    }
+  }
+} return void;
+given gblk_stream("share") given init_rtc given integer_list_set((import bsc), 1, 1) ([0]):() then (import chkfail)[0]:(1) then (import synfail)[0]:(0)
+given gblk_stream("share") given init_rtc ([0]):() then (import chkfail)[0]:(0)
+given gblk_stream("mixed") given init_rtc given integer_list_set((import bsc), 1, 1) ([0]):() then (import synfail)[0]:(0)
+given gblk_stream("open") given init_rtc given integer_list_set((import bsc), 1, 1) ([0]):() then (import synfail)[0]:(0)

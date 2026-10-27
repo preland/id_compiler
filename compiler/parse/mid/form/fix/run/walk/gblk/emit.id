@@ -1,0 +1,28 @@
+// The three kinds of record that turn a group of cases into a block. Records
+// are one line, so the newline they insert is spelled \n (tools/fixapply.awk).
+// None of the spans overlap: the first covers only the gap between the first
+// case's given and its arguments, each other case covers its own given, and the
+// last is empty, at the end of the final case.
+
+fix_gblk_emit(int at, int n, int len_s) {
+  fix_gblk_first((import gbfix)[at], len_s);
+  fix_gblk_rest(at + 1, n - 1, len_s);
+  fix_gblk_close((import gbfix)[at + n]);
+} return void;
+given fix_gblk_fixture (3, 2, 2):() then prints:("@R||1|5|1|2|1| {\\n  \n@R||2|2|2|2|2|  \n@R||2|5|2|5|3|\\n}\n")
+given fix_gblk_fixture (3, 1, 2):() then prints:("@R||1|5|1|2|1| {\\n  \n@R||2|5|2|5|2|\\n}\n")
+
+fix_gblk_first(int gz_s1, int len_s) {
+  string gz_from = fix_after(gz_s1 + len_s - 1);
+  string gz_to = fix_at(gz_s1 + len_s);
+  fix_gblk_put(gz_from + "|" + gz_to, " {\\n  ");
+} return void;
+given fix_gblk_fixture (0, 2):() then prints:("@R||1|5|1|2|1| {\\n  \n")
+given fix_gblk_fixture (7, 2):() then prints:("@R||2|5|2|2|1| {\\n  \n")
+
+fix_gblk_close(int last) {
+  string gz_end = fix_after(last);
+  fix_gblk_put(gz_end + "|" + gz_end, "\\n}");
+} return void;
+given fix_gblk_fixture (13):() then prints:("@R||2|5|2|5|1|\\n}\n")
+given fix_gblk_fixture (6):() then prints:("@R||1|5|1|5|1|\\n}\n")

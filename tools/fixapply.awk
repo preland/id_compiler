@@ -60,10 +60,12 @@ function push_op(a, b, text, rank, seq) {
 }
 
 # @R|FILE|L0|C0|L1|C1|SEQ|TEXT -- TEXT is everything after the seventh bar.
+# A record is one line, so TEXT spells a newline as the two characters \n and a
+# backslash as \\ (see unescape).
 function add_r(f, whole,    text, p, i) {
     p = 0
     for (i = 1; i <= 7; i++) p = index(substr(whole, p + 1), "|") + p
-    text = substr(whole, p + 1)
+    text = unescape(substr(whole, p + 1))
     push_op(at(f[3], f[4]), at(f[5], f[6]), text, (f[4] == f[6] && f[3] == f[5]) ? 1 : 2, f[7] + 0)
 }
 
@@ -97,6 +99,18 @@ function add_d(f,    a, b, piece, ns, i, sa, sb, sname, k2, sk, sorder, m, j, te
     } else {
         push_op(p, p, text " ", 1, f[5] + 0)
     }
+}
+
+function unescape(t,    out, i, c, d) {
+    out = ""
+    for (i = 1; i <= length(t); i++) {
+        c = substr(t, i, 1)
+        d = substr(t, i + 1, 1)
+        if (c == "\\" && d == "n") { out = out "\n"; i++ }
+        else if (c == "\\" && d == "\\") { out = out "\\"; i++ }
+        else out = out c
+    }
+    return out
 }
 
 function lead(l,    s, e) {

@@ -1,0 +1,36 @@
+// What a block holds: the opener of a block inside it (an error), the first
+// token of each of its case lines, and the copy of its setup in front of each.
+
+gblk_nested(int gb_from, int gb_to) {
+  int gb_cur = gb_from;
+  int gb_found = -1;
+  while(gb_cur < gb_to && gb_found < 0) {
+    if(gblk_is_open(gb_cur) == 1) {
+      gb_found = gb_cur;
+    }
+    gb_cur = gblk_line_end(gb_cur);
+  }
+} return int gb_found;
+given gblk_stream("nest") (3, 11):(3)
+given gblk_stream("open") (3, 13):(-1)
+
+gblk_starts(int gb_from, int gb_to) {
+  int[] gb_out = [];
+  int gb_cur = gb_from;
+  while(gb_cur < gb_to) {
+    push(gb_out, gb_cur);
+    gb_cur = gblk_line_end(gb_cur);
+  }
+} return int[] gb_out;
+given gblk_stream("open") (3, 13):([3, 8])
+given gblk_stream("open") (3, 3):([])
+
+gblk_ins_all(int gb_at, int gb_pre, int[] gb_starts) {
+  int gb_j = len(gb_starts) - 1;
+  while(gb_j >= 0) {
+    gblk_ins(gb_starts[gb_j], gb_at, gb_pre, (import tline)[gb_starts[gb_j]]);
+    gb_j = gb_j - 1;
+  }
+} return void;
+given gblk_stream("open") (0, 2, [3, 8]):() then len((import tkind)):(18) then (import ttext)[10]:("given")
+given gblk_stream("open") (0, 2, []):() then len((import tkind)):(14)

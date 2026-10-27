@@ -1,0 +1,51 @@
+// The only edits a block makes to the token store, applied to every list that
+// runs parallel to tkind. tspan is empty in an ordinary build and holds one
+// packed column per token under `idc --fix`; the copies get -1 there, which
+// fix_packed reads as "no columns", so no fix rule rewrites a token that exists
+// only in the expansion.
+
+gblk_cut(int gb_lo, int gb_hi) {
+  string[] gb_none = [];
+  int[] gb_nones = [];
+  list_string_splice((import tkind), gb_lo, gb_hi, gb_none);
+} chain (int gb_lo, int gb_hi) {
+  list_string_splice((import ttext), gb_lo, gb_hi, gb_none);
+  list_splice((import tline), gb_lo, gb_hi, gb_nones);
+  if(len((import tspan)) > 0) {
+    list_splice((import tspan), gb_lo, gb_hi, gb_nones);
+  }
+} return void;
+given gblk_stream("open") (0, 3):() then len((import tkind)):(11) then (import ttext)[0]:("(")
+given gblk_stream("open") (13, 14):() then len((import tline)):(13) then len((import ttext)):(13)
+
+gblk_ins(int gb_at, int gb_from, int gb_to, int gb_line) {
+  int gb_size = gb_to - gb_from;
+  string[] gb_ks = list_string_tail((import tkind), gb_from);
+  string[] gb_ts = list_string_tail((import ttext), gb_from);
+} chain (int gb_at, int gb_from, int gb_to, int gb_line) {
+  while(len(gb_ks) > gb_size) {
+    pop(gb_ks);
+  }
+  while(len(gb_ts) > gb_size) {
+    pop(gb_ts);
+  }
+  int[] gb_ls = list_filled(gb_size, gb_line);
+} chain (int gb_at, int gb_from, int gb_to, int gb_line) {
+  list_string_splice((import tkind), gb_at, gb_at, gb_ks);
+  list_string_splice((import ttext), gb_at, gb_at, gb_ts);
+  list_splice((import tline), gb_at, gb_at, gb_ls);
+} chain (int gb_at, int gb_from, int gb_to, int gb_line) {
+  if(len((import tspan)) > 0) {
+    list_splice((import tspan), gb_at, gb_at, list_filled(gb_size, 0 - 1));
+  }
+} return void;
+given gblk_stream("open") (3, 0, 2, 9):() then len((import tkind)):(16) then (import ttext)[3]:("given") then (import tline)[3]:(9) then (import tline)[5]:(2)
+given gblk_span_fix (3, 0, 2, 9):() then len((import tspan)):(16) then (import tspan)[3]:(-1)
+
+gblk_pad_spans() {
+  while(len((import tspan)) > 0 && len((import tspan)) < len((import tkind))) {
+    push((import tspan), 0 - 1);
+  }
+} return void;
+given gblk_part_fix ():() then len((import tspan)):(14)
+given gblk_stream("open") ():() then len((import tspan)):(0)

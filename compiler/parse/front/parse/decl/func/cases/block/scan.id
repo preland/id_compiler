@@ -1,0 +1,36 @@
+// Finding where a block ends. A block's lines are case lines, so the scan for
+// the closing `}` stops at the first line that cannot be one; a block that runs
+// into the next declaration is reported as unclosed instead of swallowing it.
+
+gblk_lone(int gb_at) {
+  int gb_yes = 0;
+  if((import tkind)[gb_at] == "op" && (import ttext)[gb_at] == "}" && gblk_line_end(gb_at) == gb_at + 1) {
+    gb_yes = 1;
+  }
+} return int gb_yes;
+given gblk_stream("open") (13):(1)
+given gblk_stream("open") (2):(0)
+
+gblk_caseish(int gb_at) {
+  int gb_yes = 0;
+  if(((import tkind)[gb_at] == "op" && (import ttext)[gb_at] == "(") || ((import tkind)[gb_at] == "kw" && ((import ttext)[gb_at] == "given" || (import ttext)[gb_at] == "stdin" || (import ttext)[gb_at] == "timeout")) || gblk_lone(gb_at) == 1) {
+    gb_yes = 1;
+  }
+} return int gb_yes;
+given gblk_stream("open") (3):(1)
+given gblk_stream("open") (13):(1)
+given gblk_stream("open") (1):(0)
+
+gblk_close(int gb_from) {
+  int gb_cur = gb_from;
+  int gb_found = -1;
+  while(gb_cur < len((import tkind)) && gb_found < 0 && gblk_caseish(gb_cur) == 1) {
+    if(gblk_lone(gb_cur) == 1) {
+      gb_found = gb_cur;
+    }
+    gb_cur = gblk_line_end(gb_cur);
+  }
+} return int gb_found;
+given gblk_stream("open") (3):(13)
+given gblk_stream("open") (14):(-1)
+given gblk_stream("unclosed") (3):(-1)

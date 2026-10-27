@@ -1,0 +1,26 @@
+// Token readers that cannot run off the end of the store, for the scans that
+// look a few tokens past where they were told to stop.
+
+gblk_delta(int gb_at) {
+  int gb_step = 0;
+  if((import tkind)[gb_at] == "op" && (import ttext)[gb_at] == "(") {
+    gb_step = 1;
+  }
+  if((import tkind)[gb_at] == "op" && (import ttext)[gb_at] == ")") {
+    gb_step = 0 - 1;
+  }
+} return int gb_step;
+given gblk_stream("share") (2):(1)
+given gblk_stream("share") (3):(-1)
+given gblk_stream("share") (0):(0)
+
+gblk_join(int gb_from, int gb_to) {
+  string gb_words = "";
+  int gb_at = gb_from;
+  while(gb_at < gb_to) {
+    gb_words = gb_words + gblk_piece(gb_at);
+    gb_at = gb_at + 1;
+  }
+} return string gb_words;
+given gblk_stream("share") (0, 2):("given vs")
+given gblk_stream("args") (0, 4):("given vs()")

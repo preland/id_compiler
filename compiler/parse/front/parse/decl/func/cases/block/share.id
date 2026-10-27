@@ -1,0 +1,38 @@
+// Counting the case lines that open with the same given. The count is only
+// meaningful when it covers the whole group: one case that does not (a plain
+// `(1):(2)`, a different setup, a block) makes it 0, because then the cases
+// really do differ in what they set up.
+
+gblk_same(int gb_first, int gb_gend) {
+  int gb_j = gb_first;
+  int gb_cnt = 0;
+  while(gb_j < len((import tkind)) && gblk_matches(gb_first, gb_gend, gb_j) == 1) {
+    gb_cnt = gb_cnt + 1;
+    gb_j = gblk_line_end(gb_j);
+  }
+} chain (int gb_first, int gb_gend) {
+  if(gb_j < len((import tkind)) && gblk_caseish(gb_j) == 1) {
+    gb_cnt = 0;
+  }
+} return int gb_cnt;
+given gblk_stream("share") (0, 2):(2)
+given gblk_stream("mixed") (0, 2):(0)
+given gblk_stream("open") (0, 2):(0)
+
+gblk_matches(int gb_first, int gb_gend, int gb_at) {
+  int gb_yes = 0;
+  if(gb_at < len((import tkind)) && gblk_is_open(gb_at) == 0) {
+    gb_yes = gblk_same_run(gb_first, gb_gend, gb_at);
+  }
+} return int gb_yes;
+given gblk_stream("share") (0, 2, 7):(1)
+given gblk_stream("share") (0, 2, 14):(0)
+
+gblk_same_run(int gb_first, int gb_gend, int gb_at) {
+  int gb_yes = 0;
+  if((import ttext)[gb_at] == "given" && gblk_given_end(gb_at) - gb_at == gb_gend - gb_first) {
+    gb_yes = gblk_texts_equal(gb_first, gb_at, gb_gend - gb_first);
+  }
+} return int gb_yes;
+given gblk_stream("share") (0, 2, 7):(1)
+given gblk_stream("args") (0, 2, 0):(0)

@@ -1,0 +1,38 @@
+// Block cases: `given SETUP {` ... a line holding only `}` shares one setup
+// among the cases between them, so a function whose cases all need the same
+// state says it once. The block is not a new node: when take_cases meets the
+// opener it rewrites the token store, copying the setup tokens in front of
+// every case line of the block and dropping the opener and the closer, so every
+// later pass (case counting, --list-untested, mutation, the emitters) sees
+// ordinary cases. The store has no newline tokens, so a line is a run of tokens
+// with the same tline.
+
+gblk_line_end(int gb_at) {
+  int gb_end = gb_at + 1;
+  while(gb_end < len((import tline)) && (import tline)[gb_end] == (import tline)[gb_at]) {
+    gb_end = gb_end + 1;
+  }
+} return int gb_end;
+given gblk_stream("open") (0):(3)
+given gblk_stream("open") (3):(8)
+given gblk_stream("open") (13):(14)
+
+gblk_ends_brace(int gb_at) {
+  int gb_end = gblk_line_end(gb_at);
+  int gb_yes = 0;
+  if(gb_end - gb_at > 2 && (import tkind)[gb_end - 1] == "op" && (import ttext)[gb_end - 1] == "{") {
+    gb_yes = 1;
+  }
+} return int gb_yes;
+given gblk_stream("open") (0):(1)
+given gblk_stream("open") (3):(0)
+
+gblk_is_open(int gb_at) {
+  int gb_yes = 0;
+  if(gb_at + 2 < len((import tkind)) && (import tkind)[gb_at] == "kw" && (import ttext)[gb_at] == "given") {
+    gb_yes = gblk_ends_brace(gb_at);
+  }
+} return int gb_yes;
+given gblk_stream("open") (0):(1)
+given gblk_stream("open") (3):(0)
+given gblk_stream("open") (13):(0)

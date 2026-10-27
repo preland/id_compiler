@@ -1,0 +1,12 @@
+// EXPECT: this 'given SETUP {' block holds no cases [E0521]
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+():() then len((import buf)):(2)
+():() then (import buf)[1]:(0)
+
+bump(int[] b, int k) {
+  b[k] = b[k] + 1;
+} return void;
+given mk {
+}

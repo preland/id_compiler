@@ -1,0 +1,36 @@
+// The three ways a block can be wrong. Each reports at the opener (the line
+// pos is on), drops the tokens that would otherwise be read as stray cases or
+// a stray `}`, and returns 1 so the case loop re-reads the store instead of
+// parsing a case that is no longer there.
+
+gblk_unclosed(int[] pos, int gb_at, int gb_e, int gb_k) {
+  int gb_hit = 0;
+  if(gb_k < 0) {
+    syn_diag(pos, "E0522", "this 'given SETUP {' block is never closed by a line holding only '}'", "{", "the setup is applied to every case up to the closing brace, and the next line that is not a case ended the block first", "end the block with a line that is exactly '}' after its last case");
+    gblk_cut(gb_at, gb_e);
+    gb_hit = 1;
+  }
+} return int gb_hit;
+given gblk_stream("unclosed") ([0], 0, 3, -1):(1) then (import synfail)[0]:(1) then len((import tkind)):(6)
+given gblk_stream("open") ([0], 0, 3, 13):(0) then (import synfail)[0]:(0) then len((import tkind)):(14)
+
+gblk_empty(int[] pos, int gb_at, int gb_e, int gb_k) {
+  int gb_hit = 0;
+  if(gb_k == gb_e) {
+    syn_diag(pos, "E0521", "this 'given SETUP {' block holds no cases", "{", "a block only shares a setup among the cases written inside it, so one with none changes nothing", "write the cases that need the setup between the braces, or delete the block");
+    gblk_cut(gb_at, gb_k + 1);
+    gb_hit = 1;
+  }
+} return int gb_hit;
+given gblk_stream("empty") ([0], 0, 3, 3):(1) then (import synfail)[0]:(1) then len((import tkind)):(0)
+given gblk_stream("open") ([0], 0, 3, 13):(0) then (import synfail)[0]:(0) then len((import tkind)):(14)
+
+gblk_inner(int gb_at, int gb_k, int gb_in) {
+  int gb_hit = 0;
+  if(gb_in >= 0) {
+    gblk_inner_diag(gb_at, gb_k, gb_in);
+    gb_hit = 1;
+  }
+} return int gb_hit;
+given gblk_stream("nest") (0, 11, 3):(1) then (import synfail)[0]:(1) then len((import tkind)):(0)
+given gblk_stream("open") (0, 13, -1):(0) then (import synfail)[0]:(0) then len((import tkind)):(14)

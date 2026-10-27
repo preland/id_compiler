@@ -1,0 +1,43 @@
+// How much of a case line is its first given. `given NAME` is two tokens;
+// `given NAME(LIT, ...)` runs to the matching `)`. A `(` after the name that
+// is followed by `:` is the case's own argument tuple, not setup arguments
+// (`given f (1):(2)` against `given f(1) ():()`), the same split the parser
+// makes in given_call.
+
+gblk_texts_equal(int gb_a, int gb_b, int gb_size) {
+  int gb_yes = 1;
+  int gb_i = 0;
+  while(gb_i < gb_size && gb_yes == 1) {
+    if((import ttext)[gb_a + gb_i] != (import ttext)[gb_b + gb_i]) {
+      gb_yes = 0;
+    }
+    gb_i = gb_i + 1;
+  }
+} return int gb_yes;
+given gblk_stream("share") (0, 7, 2):(1)
+given gblk_stream("share") (0, 2, 2):(0)
+
+gblk_paren_end(int gb_at) {
+  int gb_cur = gb_at + 1;
+  int gb_depth = 1;
+  while(gb_cur < len((import ttext)) && gb_depth > 0) {
+    gb_depth = gb_depth + gblk_delta(gb_cur);
+    gb_cur = gb_cur + 1;
+  }
+} return int gb_cur;
+given gblk_stream("args") (2):(4)
+given gblk_stream("share") (2):(4)
+
+gblk_given_end(int gb_at) {
+  int gb_stop = gb_at + 2;
+  int gb_close = gb_stop;
+  if(tok_str(gb_stop) == "(") {
+    gb_close = gblk_paren_end(gb_stop);
+  }
+} chain (int gb_at) {
+  if(gb_close > gb_stop && tok_str(gb_close) != ":") {
+    gb_stop = gb_close;
+  }
+} return int gb_stop;
+given gblk_stream("share") (0):(2)
+given gblk_stream("args") (0):(4)

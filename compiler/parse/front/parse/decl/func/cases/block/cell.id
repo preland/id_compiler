@@ -1,0 +1,30 @@
+// A nested opener is reported on its own line, and a diagnostic reads its line
+// from a cursor cell, so the index is put in one.
+
+gblk_at_cell(int gb_at) {
+  int[] gb_cell = [0];
+  gb_cell[0] = gb_at;
+} return int[] gb_cell;
+(5):([5])
+(0):([0])
+
+gblk_inner_diag(int gb_at, int gb_k, int gb_in) {
+  int[] gb_where = gblk_at_cell(gb_in);
+  syn_diag(gb_where, "E0520", "a 'given SETUP {' block cannot be opened inside another block", "{", "one block shares its setup among its own cases, and a second opener inside it would need its own nesting level that cases do not have", "give the one block both setups, as in 'given A given B {', or close the first block with '}' before opening the second");
+  gblk_cut(gb_at, gblk_block_end(gb_k));
+} return void;
+given gblk_stream("nest") (0, 11, 3):() then (import synfail)[0]:(1) then len((import tkind)):(0)
+given gblk_stream("nest") (0, 6, 3):() then len((import tkind)):(5)
+
+// Where to resume after a nested opener: the inner block's `}` ends the inner
+// block, and the outer block's own `}` follows it if the cases after the inner
+// block were closed, so both go and no stray `}` is left to confuse the parser.
+gblk_block_end(int gb_k) {
+  int gb_outer = gblk_close(gb_k + 1);
+  int gb_stop = gb_k + 1;
+  if(gb_outer >= 0) {
+    gb_stop = gb_outer + 1;
+  }
+} return int gb_stop;
+given gblk_stream("open") (7):(14)
+given gblk_stream("nest") (11):(12)

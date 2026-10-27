@@ -8,6 +8,9 @@
 //   ngrpc    the closing parenthesis of that pair
 //   synfail  1 once a syntax error was reported, after which the tree is not
 //            what was written and nothing may be rewritten from it
+//   gbfix    one entry per E0523 group, for `idc --fix`: the owning function's
+//            node, the token length of the shared given, the case count, the
+//            first token of each case, and the last token of the last case
 // An expression's first token is not recorded: `idc --fix` works it out from
 // the node's kind and its children, which is what these lists are enough for.
 init_pos2() {
@@ -26,9 +29,11 @@ init_pos3() {
   export int[] synfail = [0];
 } chain () {
   export int[] beqtok = [];
+  export int[] gbfix = [];
 } return void;
 given full_env given grp_note(7, [5]) ():() then len((import ngrpc)):(0)
 given full_env ():() then len((import beqtok)):(0)
+given full_env ():() then len((import gbfix)):(0)
 given full_env given push_pos() ():() then len((import nst)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

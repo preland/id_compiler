@@ -1,0 +1,23 @@
+// E0523. The diagnostic names the shared setup and the shape of the fix, and the
+// group is noted in gbfix (note.id) so that `idc --fix` can make the rewrite. It
+// is not a syntax failure: the cases parse the same either way, so the fix may
+// rewrite from the tree.
+
+gblk_piece(int gb_at) {
+  string gb_word = (import ttext)[gb_at];
+  if(gb_word == "given" || gb_word == ",") {
+    gb_word = gb_word + " ";
+  }
+} return string gb_word;
+given gblk_stream("share") (0):("given ")
+given gblk_stream("share") (1):("vs")
+
+gblk_share_diag(int[] pos, int gb_first, int gb_gend, int gb_cnt) {
+  string gb_setup = gblk_join(gb_first, gb_gend);
+  string gb_loc = cur_file() + ":" + cur_ln(pos);
+  gblk_note(gb_first, gb_gend, gb_cnt);
+} chain (int[] pos, int gb_first, int gb_gend, int gb_cnt) {
+  diag("E0523", gb_loc, "all " + gb_cnt + " cases of this function begin with '" + gb_setup + "'; state that setup once for the function", gb_setup, "a setup repeated on every case line hides what the cases are testing, which is only their arguments and expected values", "wrap the cases in a block: write '" + gb_setup + " {' before the first case, delete '" + gb_setup + " ' from each case, and end with a line holding only '}'");
+} return void;
+given gblk_stream("share") ([0], 0, 2, 2):() then (import chkfail)[0]:(1) then (import synfail)[0]:(0) then len((import gbfix)):(6)
+given gblk_stream("args") ([0], 0, 4, 3):() then (import chkfail)[0]:(1) then (import synfail)[0]:(0)

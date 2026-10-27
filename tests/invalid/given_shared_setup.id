@@ -1,0 +1,13 @@
+// EXPECT: all 2 cases of this function begin with 'given mk'; state that setup once for the function [E0523]
+// FLAGS: --given-blocks-strict
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+():() then len((import buf)):(2)
+():() then (import buf)[1]:(0)
+
+bump(int[] b, int k) {
+  b[k] = b[k] + 1;
+} return void;
+given mk ((import buf), 0):((import buf)) then (import buf)[0]:(1)
+given mk ((import buf), 1):((import buf)) then (import buf)[1]:(1)

@@ -1,0 +1,21 @@
+main(int argc, string[] argv) {
+  vector_start();
+  print(icon_draws_cleanly(3));
+} return int 0;
+
+vector_start() {
+  export int[] vs_pts = [1, 2];
+} return void;
+
+icon_draws_cleanly(int n) {
+  int ok = 0;
+  if(len((import vs_pts)) + n > 2) {
+    ok = 1;
+  }
+} return int ok;
+given vector_start() {
+  (0):(0)
+  (1):(1)
+  (2):(1)
+  (3):(1)
+}

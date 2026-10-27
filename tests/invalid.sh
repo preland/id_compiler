@@ -63,7 +63,8 @@ for f in invalid/*.id; do
     if [ -z "$expect" ]; then
         echo "FAIL: $name (no '// EXPECT:' line in $f)"; fail=$((fail+1)); continue
     fi
-    check_one "$name" "$f" "$expect"
+    flags=$(sed -n 's@^// FLAGS: @@p' "$f" | head -1)
+    check_one "$name" "$f" "$expect" "$flags"
 done
 
 # A directory is a project: a struct is declared in a file of its own

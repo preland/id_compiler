@@ -1,0 +1,33 @@
+// Token streams for the block cases, given as their texts and the line each is
+// on. The kind follows from the text: `given` is a keyword, vs/w/f are names,
+// everything else is an operator. Tokens are `given vs {`, then case lines
+// written `( ) : ( )`, then the closing `}`.
+
+gblk_kind(string gb_word) {
+  string gb_kind = "op";
+  if(gb_word == "given") {
+    gb_kind = "kw";
+  }
+  if(gb_word == "vs" || gb_word == "w" || gb_word == "f") {
+    gb_kind = "ident";
+  }
+} return string gb_kind;
+("given"):("kw")
+("{"):("op")
+("vs"):("ident")
+
+gblk_fix(string[] gb_ws, int[] gb_ls) {
+  full_env();
+  int gb_i = 0;
+  while(gb_i < len(gb_ws)) {
+    push((import tkind), gblk_kind(gb_ws[gb_i]));
+    push((import ttext), gb_ws[gb_i]);
+    gb_i = gb_i + 1;
+  }
+} chain (string[] gb_ws, int[] gb_ls) {
+  list_extend((import tline), gb_ls);
+  push((import prog), 5);
+} return void;
+(["given", "vs"], [1, 1]):() then len((import tline)):(2) then (import tkind)[0]:("kw")
+(["f", "{"], [3, 3]):() then (import tkind)[1]:("op") then (import tline)[1]:(3)
+

@@ -1,0 +1,14 @@
+// One E0523 group as the parser notes it, on the share token stream (two case
+// lines of seven tokens, `given vs ( ) : ( )` each, then a name): owned by
+// function node 5, shared given of 2 tokens, 2 cases starting at tokens 0 and 7,
+// the last ending at token 13. Every token is at columns 2-5 of its line.
+
+fix_gblk_fixture() {
+  gblk_stream("share");
+  fix_state();
+  list_extend((import tspan), list_filled(15, 2 * 65536 + 5));
+} chain () {
+  list_extend((import gbfix), [5, 2, 2, 0, 7, 13]);
+} return void;
+():() then len((import tspan)):(15)
+():() then (import gbfix):([5, 2, 2, 0, 7, 13])

@@ -1,0 +1,43 @@
+// Expanding one block. Everything is done from the end of the store towards
+// the front, so the indices still to be used stay valid: the closer goes
+// first, then the setup is copied in front of each case line from the last to
+// the first, and the opener line goes last. The cursor is left on the first
+// case, which is now where the opener was.
+
+gblk_apply(int gb_at, int gb_e, int gb_k) {
+  gblk_pad_spans();
+  gblk_cut(gb_k, gb_k + 1);
+  int[] gb_starts = gblk_starts(gb_e, gb_k);
+} chain (int gb_at, int gb_e, int gb_k) {
+  gblk_ins_all(gb_at, gb_e - 1, gb_starts);
+  gblk_cut(gb_at, gb_e);
+} return void;
+given gblk_stream("open") (0, 3, 13):() then len((import tkind)):(14) then (import ttext)[2]:("(") then (import tline)[7]:(3) then (import ttext)[7]:("given")
+given gblk_span_fix (0, 3, 13):() then len((import tspan)):(14) then (import tspan)[0]:(-1) then (import tspan)[2]:(7)
+
+gblk_fault(int[] pos, int gb_at, int gb_e, int gb_k) {
+  int gb_in = gblk_nested(gb_e, gb_k);
+  int gb_bad = gblk_unclosed(pos, gb_at, gb_e, gb_k);
+  if(gb_bad == 0) {
+    gb_bad = gblk_empty(pos, gb_at, gb_e, gb_k);
+  }
+} chain (int[] pos, int gb_at, int gb_e, int gb_k) {
+  if(gb_bad == 0) {
+    gb_bad = gblk_inner(gb_at, gb_k, gb_in);
+  }
+} return int gb_bad;
+given gblk_stream("nest") ([0], 0, 3, 11):(1) then (import synfail)[0]:(1) then len((import tkind)):(0)
+given gblk_stream("open") ([0], 0, 3, 13):(0) then (import synfail)[0]:(0) then len((import tkind)):(14)
+
+gblk_try(int[] pos) {
+  int gb_at = pos[0];
+  int gb_e = gblk_line_end(gb_at);
+  int gb_k = gblk_close(gb_e);
+} chain (int[] pos) {
+  int gb_skip = gblk_fault(pos, gb_at, gb_e, gb_k);
+  if(gb_skip == 0) {
+    gblk_apply(gb_at, gb_e, gb_k);
+  }
+} return int gb_skip;
+given gblk_stream("open") ([0]):(0) then (import ttext)[2]:("(") then len((import tkind)):(14)
+given gblk_stream("nest") ([0]):(1) then len((import tkind)):(0)

@@ -1,0 +1,42 @@
+// Cases that all open with the same given (E0523) become one block. The parser
+// notes each such group in gbfix (front/parse/decl/func/cases/block/note.id);
+// the function that owns it is the one whose node the group names, so the file
+// in fixd_file is the right one for its records. A group is rewritten whole or
+// not at all, because a block opened and never closed would break the program.
+
+fix_gblk(int f) {
+  int i = 0;
+  while(i < len((import gbfix))) {
+    if((import gbfix)[i] == f) {
+      fix_gblk_group(i);
+    }
+    i = i + (import gbfix)[i + 2] + 4;
+  }
+} return void;
+given fix_gblk_fixture (5):() then prints:("@R||1|5|1|2|1| {\\n  \n@R||2|2|2|2|2|  \n@R||2|5|2|5|3|\\n}\n")
+given fix_gblk_fixture (4):() then prints:("")
+
+fix_gblk_group(int i) {
+  int n = (import gbfix)[i + 2];
+  int len_s = (import gbfix)[i + 1];
+  int ok = fix_gblk_ok(i + 3, n, len_s);
+} chain (int i) {
+  if(ok == 1) {
+    fix_gblk_emit(i + 3, n, len_s);
+  }
+} return void;
+given fix_gblk_fixture (0):() then prints:("@R||1|5|1|2|1| {\\n  \n@R||2|2|2|2|2|  \n@R||2|5|2|5|3|\\n}\n")
+given fix_gblk_fixture given integer_list_set((import tspan), 13, -1) (0):() then prints:("")
+
+fix_gblk_ok(int at, int n, int len_s) {
+  int ok = fix_packed((import gbfix)[at + n]) >= 0;
+  int gz_k = 0;
+  while(gz_k < n) {
+    if(fix_packed((import gbfix)[at + gz_k]) < 0 || fix_packed((import gbfix)[at + gz_k] + len_s) < 0) {
+      ok = 0;
+    }
+    gz_k = gz_k + 1;
+  }
+} return int ok;
+given fix_gblk_fixture (3, 2, 2):(1)
+given fix_gblk_fixture given integer_list_set((import tspan), 9, -1) (3, 2, 2):(0)

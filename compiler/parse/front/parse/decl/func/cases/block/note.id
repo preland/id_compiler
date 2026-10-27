@@ -1,0 +1,29 @@
+// What `idc --fix` needs to rewrite an E0523 group as a block, noted in gbfix as
+// it is reported: the function the cases belong to (the last one pushed, as in
+// case_owner), the token length of the shared given, the case count, the first
+// token of each case, and the last token of the last one. Entry i is followed by
+// 4 + its case count more numbers, which is how walk/gblk.id steps over a group.
+
+gblk_note(int gb_first, int gb_gend, int gb_cnt) {
+  int gb_np = len((import prog));
+  push((import gbfix), (import prog)[gb_np - 1]);
+  push((import gbfix), gb_gend - gb_first);
+} chain (int gb_first, int gb_gend, int gb_cnt) {
+  push((import gbfix), gb_cnt);
+  int gb_end = gblk_note_starts(gb_first, gb_cnt);
+  push((import gbfix), gb_end - 1);
+} return void;
+given gblk_stream("share") (0, 2, 2):() then (import gbfix):([5, 2, 2, 0, 7, 13])
+given gblk_stream("share") (0, 2, 1):() then (import gbfix):([5, 2, 1, 0, 6])
+
+gblk_note_starts(int gb_first, int gb_cnt) {
+  int gb_cur = gb_first;
+  int gb_k = 0;
+  while(gb_k < gb_cnt) {
+    push((import gbfix), gb_cur);
+    gb_cur = gblk_line_end(gb_cur);
+    gb_k = gb_k + 1;
+  }
+} return int gb_cur;
+given gblk_stream("share") (0, 2):(14) then (import gbfix):([0, 7])
+given gblk_stream("share") (0, 0):(0) then (import gbfix):([])

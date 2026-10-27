@@ -38,13 +38,17 @@ main(int argc, string[] argv) {
   load();
   int[] pos = [0];
 } chain (int argc, string[] argv) {
+  init_rtc();
+  arg_flags(argc, argv);
   parse_program(pos);
+} chain (int argc, string[] argv) {
   build_syms();
   collect_exports();
-} chain (int argc, string[] argv) {
   arg_setup(argc, argv);
+} chain (int argc, string[] argv) {
   check_program();
   check_asm_targets(argc, argv);
+  blank;
 } chain (int argc, string[] argv) {
   if(arg_flag(argc, argv, 1, "--calls") == 1) {
     print_calls();

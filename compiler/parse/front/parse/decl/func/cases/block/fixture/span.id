@@ -1,0 +1,15 @@
+// The open fixture with columns, whole and half-filled.
+
+gblk_span_fix() {
+  gblk_stream("open");
+  list_extend((import tspan), list_filled(14, 7));
+} return void;
+():() then len((import tspan)):(14)
+():() then (import tspan)[13]:(7)
+
+gblk_part_fix() {
+  gblk_stream("open");
+  push((import tspan), 5);
+} return void;
+():() then len((import tspan)):(1)
+():() then (import tspan)[0]:(5)

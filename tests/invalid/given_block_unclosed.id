@@ -1,0 +1,19 @@
+// EXPECT: this 'given SETUP {' block is never closed by a line holding only '}' [E0522]
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+():() then len((import buf)):(2)
+():() then (import buf)[1]:(0)
+
+bump(int[] b, int k) {
+  b[k] = b[k] + 1;
+} return void;
+given mk {
+  ((import buf), 0):((import buf)) then (import buf)[0]:(1)
+  ((import buf), 1):((import buf)) then (import buf)[1]:(1)
+
+main(int argc, string[] argv) {
+  int r = 0;
+} return int r;
+(0, []):(0)
+(1, []):(0)

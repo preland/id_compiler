@@ -8,6 +8,7 @@
 #            what --fix does: both must build and print the same thing, which
 #            is what shows a fix kept the program's behaviour
 #   want     (optional) lines that must appear in --fix's output
+#   flags    (optional) extra flags for the --fix runs (--given-blocks-strict)
 #   legal    (optional, empty) marks a case whose before/ is already legal: its
 #            --check and build must pass, --fix must make 0 edits, and the tree
 #            must stay equal to before/ (expect/ is then a copy of before/)
@@ -35,10 +36,11 @@ bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 for case_dir in fix/*/; do
     name=$(basename "$case_dir")
     work="$TMP/$name"
+    fixflags=$(cat "$case_dir/flags" 2>/dev/null)
     mkdir -p "$work"
     cp -r "$case_dir/before" "$work/tree"
 
-    "$IDC" "$work/tree" --fix --allow-untested >"$work/fix.out" 2>"$work/fix.err"
+    "$IDC" "$work/tree" --fix $fixflags --allow-untested >"$work/fix.out" 2>"$work/fix.err"
     if diff -r "$case_dir/expect" "$work/tree" >"$work/tree.diff" 2>&1; then
         ok "$name: --fix gives expect/"
     else
@@ -53,15 +55,15 @@ for case_dir in fix/*/; do
         done < "$case_dir/want"
     fi
 
-    "$IDC" "$work/tree" --fix --allow-untested >"$work/fix2.out" 2>&1
+    "$IDC" "$work/tree" --fix $fixflags --allow-untested >"$work/fix2.out" 2>&1
     if grep -q '^idc --fix: 0 edit(s) in 0 files' "$work/fix2.out" && diff -r "$case_dir/expect" "$work/tree" >/dev/null 2>&1; then
         ok "$name: a second --fix makes no edit"
     else
         bad "$name: a second --fix makes no edit ($(grep '^idc --fix' "$work/fix2.out"))"
     fi
 
-    "$IDC" "$case_dir/before" --check --allow-untested >"$work/check.out" 2>"$work/check.err"; crc=$?
-    "$IDC" "$case_dir/before" --allow-untested -o "$work/bin" >"$work/build.out" 2>"$work/build.err"; brc=$?
+    "$IDC" "$case_dir/before" --check $fixflags --allow-untested >"$work/check.out" 2>"$work/check.err"; crc=$?
+    "$IDC" "$case_dir/before" $fixflags --allow-untested -o "$work/bin">"$work/build.out" 2>"$work/build.err"; brc=$?
     if [ -f "$case_dir/legal" ]; then
         if [ "$crc" -eq 0 ] && [ "$brc" -eq 0 ] && grep -q '^idc --fix: 0 edit(s) in 0 files' "$work/fix.out" && diff -r "$case_dir/before" "$work/tree" >/dev/null 2>&1; then
             ok "$name: --check of before/ passes, and --fix makes no edit"

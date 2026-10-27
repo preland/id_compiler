@@ -1,0 +1,24 @@
+fix_gblk_put(string gz_span, string gz_text) {
+  int sq = fix_seq();
+  print("@R|" + (import fixd_file)[0] + "|" + gz_span + "|" + sq + "|" + gz_text);
+} return void;
+given fix_gblk_fixture ("1|2|1|3", "ab"):() then prints:("@R||1|2|1|3|1|ab\n")
+given fix_gblk_fixture ("4|0|4|0", "  "):() then prints:("@R||4|0|4|0|1|  \n")
+
+fix_gblk_rest(int at, int gz_cnt, int len_s) {
+  int gz_k = 0;
+  while(gz_k < gz_cnt) {
+    fix_gblk_drop((import gbfix)[at + gz_k], len_s);
+    gz_k = gz_k + 1;
+  }
+} return void;
+given fix_gblk_fixture (4, 1, 2):() then prints:("@R||2|2|2|2|1|  \n")
+given fix_gblk_fixture (4, 0, 2):() then prints:("")
+
+fix_gblk_drop(int gz_s, int len_s) {
+  string gz_from = fix_at(gz_s);
+  string gz_to = fix_at(gz_s + len_s);
+  fix_gblk_put(gz_from + "|" + gz_to, "  ");
+} return void;
+given fix_gblk_fixture (7, 2):() then prints:("@R||2|2|2|2|1|  \n")
+given fix_gblk_fixture (0, 2):() then prints:("@R||1|2|1|2|1|  \n")
