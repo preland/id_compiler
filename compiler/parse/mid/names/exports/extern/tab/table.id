@@ -12,6 +12,10 @@
 //           lets it define a function named after a runtime helper -- that is
 //           the whole point of it, and the collision the check exists to stop
 //           is a collision with a C runtime this build does not link
+//   bsc     1 under `--bool-strict`: an int where a bool belongs (a condition,
+//           a bool declared int, a bool as an index, a 1/0 case for a bool
+//           result) is an error with an `edit:` fix instead of being accepted;
+//           temporary, until strict is the only behaviour (.handoff/bool/DESIGN.md)
 //   bnames  the builtin names, split out of one literal (see builtin/more/)
 
 // rtc: Whether this project is the runtime. Read by the reserved-name check and by
@@ -26,8 +30,10 @@ init_rtc() {
 } chain () {
   init_resv_names();
   export int[] lvc = [1];
+  export int[] bsc = [0];
 } return void export rtc;
 ():() then (import rtc)[0]:(0)
 ():() then (import lvc)[0]:(1)
+():() then (import bsc)[0]:(0)
 ():() then calls init_bnames:[1]
 

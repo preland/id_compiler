@@ -7,6 +7,8 @@ chk_cond(int id, string msg) {
   int i1_of_v = (import ni1)[id];
   string type_of_v = type_of(i1_of_v);
   cond_kind(id, msg, type_of_v);
+} chain (int id, string msg) {
+  cond_strict(id, type_of_v);
 } return void;
 given cmp_fixture ((import bin_eq), "bad cond"):() then (import chkfail)[0]:(0)
 given cmp_fixture ((import bin_mixed), "bad cond"):() then (import chkfail)[0]:(0)

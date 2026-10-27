@@ -31,6 +31,8 @@ cmp_build2() {
   export int bin_mixed = node_txt2("bin", "<", (import bin_bitand), (import lit_a));
   export int print_call = node_call("print", [(import lit_str)]);
   export int exprstmt_bin = node_exprstmt((import bin_eq));
+} chain () {
+  init_rtc();
 } return void;
 given cmp_fixture ():() then calls node_txt2:("bin", "<", (import bin_bitand), (import lit_a))
 given cmp_fixture ():() then calls node_exprstmt:((import bin_eq))

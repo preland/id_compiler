@@ -62,7 +62,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O 0|1|2|3|s] [--emit-c FILE] [--emit-llvm FILE] [--lib | --lib-state] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--word-scan] [--fix] [--print-std] [--exports list|all] [--no-js]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O 0|1|2|3|s] [--emit-c FILE] [--emit-llvm FILE] [--lib | --lib-state] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--bool-strict] [--word-scan] [--fix] [--print-std] [--exports list|all] [--no-js]" >&2
     echo "       idc PATH [--diagnostics human|json|plain] [--color auto|always|never]    how diagnostics are printed (docs/DIAGNOSTICS.md)" >&2
     echo "       idc --explain CODE                                                       the long explanation of an error code, e.g. E0501" >&2
     echo "       idc --where NAME [PATH]                                                  FILE:LINE and signature of a function, in PATH or idstd; NAME or FILE::NAME" >&2
@@ -93,6 +93,7 @@ KEEPS=0
 CALLS=0
 CHECK=0
 WORD_SCAN=0
+BOOL_STRICT=0
 FIX=0
 PRINT_STD=0
 WEXPORT_SCOPE=list
@@ -153,6 +154,8 @@ while [ $# -gt 0 ]; do
             CALLS=1; shift ;;
         --check)
             CHECK=1; shift ;;
+        --bool-strict)
+            BOOL_STRICT=1; shift ;;
         --word-scan)
             WORD_SCAN=1; shift ;;
         --fix)
@@ -2015,6 +2018,7 @@ fi
 # decides which functions cannot be tested here (see --list-untested, below).
 PARSE_ARGS+=(--host-triple "$(host_triple)")
 [ "$WORD_SCAN" -eq 1 ] && PARSE_ARGS+=(--word-scan)
+[ "$BOOL_STRICT" -eq 1 ] && PARSE_ARGS+=(--bool-strict)
 if [ "$FINGERPRINTS" -eq 1 ]; then
     if [ "$KEEPS" -eq 1 ]; then PARSE_ARGS+=(--keeps); else PARSE_ARGS+=(--fingerprints); fi
 elif [ "$CALLS" -eq 1 ]; then

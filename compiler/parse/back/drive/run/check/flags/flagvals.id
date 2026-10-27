@@ -13,9 +13,14 @@ arg_flags3(int argc, string[] argv) {
   int arg_flag_v = arg_flag(argc, argv, 1, "--runtime");
   integer_list_set((import rtc), 0, arg_flag_v);
   arg_flags4(argc, argv);
+} chain (int argc, string[] argv) {
+  int arg_strict_v = arg_flag(argc, argv, 1, "--bool-strict");
+  integer_list_set((import bsc), 0, arg_strict_v);
 } return void;
 given flags_setup (1, ["prog"]):() then (import rtc)[0]:(0)
 given flags_setup (2, ["prog", "--runtime"]):() then (import rtc)[0]:(1)
+given flags_setup (1, ["prog"]):() then (import bsc)[0]:(0)
+given flags_setup (2, ["prog", "--bool-strict"]):() then (import bsc)[0]:(1)
 
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
