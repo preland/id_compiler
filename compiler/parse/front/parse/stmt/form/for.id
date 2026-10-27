@@ -1,0 +1,51 @@
+// `for (init; cond; step) { body }` is the while it abbreviates, built here and
+// not later: the init statement is pushed into the enclosing block, and the
+// step becomes the last statement of the loop body. Every pass after the parser
+// therefore sees only declarations, assignments and whiles, which is why a
+// for needs no backend, emitter or runtime support. The while is marked
+// (ni2) so --for-strict does not report the loop it was written as.
+
+parse_for(int[] pos, int[] stmts) {
+  advance(pos);
+  skip_text(pos, "(");
+  int for_first = parse_for_init(pos);
+} chain (int[] pos, int[] stmts) {
+  push(stmts, for_first);
+  int cond = parse_expr(pos);
+  skip_text(pos, ";");
+} chain (int[] pos, int[] stmts) {
+  int step = parse_for_step(pos);
+  int ret_i = parse_for_loop(pos, cond, step);
+  push(stmts, ret_i);
+} return int ret_i;
+given for_tokens {
+  ([0], []):(11)
+  ([0], [99]):(11)
+}
+
+parse_for_init(int[] pos) {
+  int t0 = pos[0];
+  int for_first = parse_stmt3(pos);
+  stmt_done(for_first, t0);
+} return int for_first;
+given for_tokens {
+  ([2]):(1)
+  ([3]):(1)
+}
+
+parse_for_step(int[] pos) {
+  int t0 = pos[0];
+  string name = cur_text(pos);
+  advance(pos);
+} chain (int[] pos) {
+  advance(pos);
+  int ex = parse_expr(pos);
+  skip_text(pos, ")");
+} chain (int[] pos) {
+  int ret_i = node_txt1("assign", name, ex);
+  stmt_done(ret_i, t0);
+} return int ret_i;
+given for_tokens {
+  ([11]):(3) then (import nkind)[3]:("assign")
+  ([11]):(3) then (import ns1)[3]:("i")
+}

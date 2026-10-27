@@ -1,0 +1,13 @@
+// A for runs its init once, tests before each pass and steps after each pass:
+// 0 + 1 + 2 + 3 is 6, and counting down from 3 to 1 adds 3 + 2 + 1, so 12.
+main(int argc, string[] argv) {
+  int total = 0;
+  for(int up = 0; up < 4; up = up + 1) {
+    total = total + up;
+  }
+} chain (int argc, string[] argv) {
+  for(int down = 3; down > 0; down = down - 1) {
+    total = total + down;
+  }
+  print("" + total);
+} return int 0;

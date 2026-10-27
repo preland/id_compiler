@@ -1,0 +1,31 @@
+// The condition, the body and the loops of wc_fixture (fixture.id).
+
+wc_build3() {
+  export int wc_three = node_txt2("int", "3", 3, 0);
+  export int wc_lt = node_txt2("bin", "<", (import wc_iv), (import wc_three));
+  export int wc_xa = node_txt1("assign", "x", (import wc_one));
+} return void;
+given wc_fixture {
+  ():() then (import ns1)[11]:("<")
+  ():() then (import ns1)[12]:("x")
+}
+
+wc_build4() {
+  export int wc_iw = node_txt("var", "i");
+  export int wc_plus = node_txt2("bin", "+", (import wc_iw), (import wc_one));
+  export int wc_stp = node_txt1("assign", "i", (import wc_plus));
+} return void;
+given wc_fixture {
+  ():() then (import ni1)[15]:(14)
+  ():() then (import ns1)[14]:("+")
+}
+
+wc_build5() {
+  export int wc_yv = node_txt("var", "y");
+  export int wc_while = node_while((import wc_lt), [(import wc_xa), (import wc_stp)]);
+  export int wc_other = node_while((import wc_lt), [(import wc_xa)]);
+} return void;
+given wc_fixture {
+  ():() then (import nkind)[17]:("while")
+  ():() then (import ni1)[18]:(11)
+}

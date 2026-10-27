@@ -35,6 +35,7 @@ tc_g2(int id) {
   }
   if((import nkind)[id] == "while") {
     chk_cond(id, "loop condition has type void");
+    chk_counter_while(id);
   }
   tc_g3(id);
 } return void;

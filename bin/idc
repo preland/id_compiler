@@ -95,6 +95,7 @@ CHECK=0
 WORD_SCAN=0
 BOOL_STRICT=0
 GIVEN_STRICT=0
+FOR_STRICT=0
 FIX=0
 PRINT_STD=0
 WEXPORT_SCOPE=list
@@ -155,6 +156,8 @@ while [ $# -gt 0 ]; do
             CALLS=1; shift ;;
         --check)
             CHECK=1; shift ;;
+        --for-strict)
+            FOR_STRICT=1; shift ;;
         --given-blocks-strict)
             GIVEN_STRICT=1; shift ;;
         --bool-strict)
@@ -2023,6 +2026,7 @@ PARSE_ARGS+=(--host-triple "$(host_triple)")
 [ "$WORD_SCAN" -eq 1 ] && PARSE_ARGS+=(--word-scan)
 [ "$BOOL_STRICT" -eq 1 ] && PARSE_ARGS+=(--bool-strict)
 [ "$GIVEN_STRICT" -eq 1 ] && PARSE_ARGS+=(--given-blocks-strict)
+[ "$FOR_STRICT" -eq 1 ] && PARSE_ARGS+=(--for-strict)
 if [ "$FINGERPRINTS" -eq 1 ]; then
     if [ "$KEEPS" -eq 1 ]; then PARSE_ARGS+=(--keeps); else PARSE_ARGS+=(--fingerprints); fi
 elif [ "$CALLS" -eq 1 ]; then

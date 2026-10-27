@@ -1,0 +1,41 @@
+// `--for-strict`: a while whose job is to count is a for. The shape is a
+// variable initialised by an earlier statement of the same block (no statement
+// in between mentions it), read by the loop condition, and moved by the loop
+// body's last statement (`v = v + K` or `v = v - K`, K a literal or a name the
+// body never writes), with no other write to it in the body. A while that the
+// parser built from a for carries ni2 1 and is not reported again.
+
+chk_counter_while(int wcw_id) {
+  if((import bsc)[2] == 1 && (import ni2)[wcw_id] == 0) {
+    wc_scan(wcw_id);
+  }
+} return void;
+given wc_fixture {
+  ((import wc_while)):() then (import chkfail)[0]:(0)
+  given integer_list_set((import bsc), 2, 1) ((import wc_while)):() then (import chkfail)[0]:(1)
+}
+
+wc_scan(int wcs_id) {
+  int[] wcs_body = (import nl1)[wcs_id];
+  string wcs_name = "";
+  if(len(wcs_body) > 0) {
+    wcs_name = wc_step(wcs_body[len(wcs_body) - 1]);
+  }
+} chain (int wcs_id) {
+  if(wcs_name != "" && wc_whole(wcs_id, wcs_name) == 1) {
+    wc_say(wcs_id, wcs_name);
+  }
+} return void;
+given wc_fixture {
+  ((import wc_while)):() then (import chkfail)[0]:(1)
+  ((import wc_other)):() then (import chkfail)[0]:(0)
+}
+
+wc_say(int wcy_id, string wcy_name) {
+  string wcy_help = "write for (int " + wcy_name + " = ...; the condition; " + wcy_name + " = ...) { ... } and delete the last statement of the body (--fix does not rewrite this yet)";
+  tc_diag(wcy_id, "E0651", "'" + wcy_name + "' counts this loop: write it as a for", wcy_name, "under --for-strict a while that only steps a counter from its initialisation to its condition is a for, which keeps the initialisation, the test and the step in one line", wcy_help);
+} return void;
+given wc_fixture {
+  ((import wc_while), "i"):() then (import chkfail)[0]:(1)
+  ((import wc_while), "i"):() then (import tcerrs)[0]:(1)
+}

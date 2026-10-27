@@ -1,0 +1,40 @@
+// Statement-level questions for the counter test (whole.id).
+
+wc_init(int wci_p, string wci_name) {
+  int wci_ok = 0;
+  if(((import nkind)[wci_p] == "decl" && (import ns2)[wci_p] == wci_name) || ((import nkind)[wci_p] == "assign" && (import ns1)[wci_p] == wci_name)) {
+    wci_ok = 1;
+  }
+} return int wci_ok;
+given wc_fixture {
+  ((import wc_decl), "i"):(1)
+  ((import wc_decl), "x"):(0)
+}
+
+wc_inside(int wcn_w, string wcn_name, int wcn_lo) {
+  int[] wcn_body = (import nl1)[wcn_w];
+  int wcn_k = (import ni2)[(import ni1)[wcn_body[len(wcn_body) - 1]]];
+  int wcn_ok = 0;
+} chain (int wcn_w, string wcn_name, int wcn_lo) {
+  if(wc_count((import ni1)[wcn_w], wcn_w - 1, wcn_name, "assign") == 1 && wc_count(wcn_lo, (import ni1)[wcn_w], wcn_name, "var") >= 1 && wc_kfree(wcn_w, wcn_k) == 1) {
+    wcn_ok = 1;
+  }
+} return int wcn_ok;
+given wc_fixture {
+  ((import wc_while), "i", (import wc_decl)):(1)
+  ((import wc_while), "x", (import wc_decl)):(0)
+}
+
+wc_pick(int wcp_p, int wcp_w) {
+  int[] wcp_r = [];
+  if(list_find((import nl1)[wcp_p], wcp_w) == 1) {
+    wcp_r = (import nl1)[wcp_p];
+  }
+  if(list_find((import nl2)[wcp_p], wcp_w) == 1) {
+    wcp_r = (import nl2)[wcp_p];
+  }
+} return int[] wcp_r;
+given wc_fixture {
+  ((import wc_fn), (import wc_while)):((import wc_blk_adj))
+  ((import wc_decl), (import wc_while)):([])
+}

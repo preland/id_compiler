@@ -1,0 +1,48 @@
+// The context half of the counter test (counter.id): walk back over the
+// statements before the while, in its own block, until one initialises the
+// counter. A statement that mentions the counter without initialising it ends
+// the walk. Node ids are allocated in parse order, so the nodes of statement j
+// are the ids after statement j-1 up to statement j.
+
+wc_whole(int wcl_w, string wcl_name) {
+  int[] wcl_blk = wc_home(wcl_w);
+  int wcl_k = list_index_of(wcl_blk, wcl_w);
+  int wcl_lo = wc_below(wcl_blk, wcl_k);
+} chain (int wcl_w, string wcl_name) {
+  int wcl_ok = 0;
+  if(wcl_k >= 1 && wc_inside(wcl_w, wcl_name, wcl_lo) == 1 && wc_found(wcl_blk, wcl_k, wcl_name) == 1) {
+    wcl_ok = 1;
+  }
+} return int wcl_ok;
+given wc_fixture {
+  ((import wc_while), "i"):(1)
+  ((import wc_while), "x"):(0)
+}
+
+wc_found(int[] wcf_blk, int wcf_k, string wcf_name) {
+  int wcf_j = wcf_k - 1;
+  int wcf_s = 0;
+  while(wcf_j >= 0 && wcf_s == 0) {
+    wcf_s = wc_visit(wcf_blk, wcf_j, wcf_name);
+    wcf_j = wcf_j - 1;
+  }
+} return int wcf_s;
+given wc_fixture {
+  ((import wc_blk_adj), 1, "i"):(1)
+  ((import wc_blk_far), 2, "i"):(1)
+  ((import wc_blk_mut), 2, "i"):(2)
+  ((import wc_blk_none), 1, "i"):(0)
+}
+
+wc_visit(int[] wcv_blk, int wcv_j, string wcv_name) {
+  int wcv_lo = wc_below(wcv_blk, wcv_j);
+  int wcv_s = wc_init(wcv_blk[wcv_j], wcv_name);
+  if(wcv_s == 0 && wc_mentions(wcv_lo, wcv_blk[wcv_j], wcv_name) == 1) {
+    wcv_s = 2;
+  }
+} return int wcv_s;
+given wc_fixture {
+  ((import wc_blk_far), 0, "i"):(1)
+  ((import wc_blk_far), 1, "i"):(0)
+  ((import wc_blk_mut), 1, "i"):(2)
+}

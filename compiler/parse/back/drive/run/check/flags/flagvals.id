@@ -19,6 +19,8 @@ arg_flags3(int argc, string[] argv) {
   int arg_strict_v = arg_flag(argc, argv, 1, "--bool-strict");
   integer_list_set((import bsc), 0, arg_strict_v);
   integer_list_set((import bsc), 1, arg_flag(argc, argv, 1, "--given-blocks-strict"));
+} chain (int argc, string[] argv) {
+  integer_list_set((import bsc), 2, arg_flag(argc, argv, 1, "--for-strict"));
 } return void;
 given flags_setup {
   (1, ["prog"]):() then (import rtc)[0]:(0)
@@ -27,6 +29,8 @@ given flags_setup {
   (2, ["prog", "--bool-strict"]):() then (import bsc)[0]:(1)
   (1, ["prog"]):() then (import bsc)[1]:(0)
   (2, ["prog", "--given-blocks-strict"]):() then (import bsc)[1]:(1)
+  (1, ["prog"]):() then (import bsc)[2]:(0)
+  (2, ["prog", "--for-strict"]):() then (import bsc)[2]:(1)
 }
 
 arg_flags4(int argc, string[] argv) {

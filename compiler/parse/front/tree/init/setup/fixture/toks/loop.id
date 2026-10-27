@@ -1,0 +1,8 @@
+// A token stream for a for statement:
+// `for (int i = 0; i < 3; i = i + 1) { x = 1; } x;`
+for_tokens() {
+  env_init();
+  push_toks(["kw", "op", "kw", "ident", "op", "int", "op", "ident", "op", "int", "op", "ident", "op", "ident", "op", "int", "op", "op", "ident", "op", "int", "op", "op", "ident", "op", "eof"], ["for", "(", "int", "i", "=", "0", ";", "i", "<", "3", ";", "i", "=", "i", "+", "1", ")", "{", "x", "=", "1", ";", "}", "x", ";", ""]);
+} return void;
+():() then calls push_toks:(["kw", "op", "kw", "ident", "op", "int", "op", "ident", "op", "int", "op", "ident", "op", "ident", "op", "int", "op", "op", "ident", "op", "int", "op", "op", "ident", "op", "eof"], ["for", "(", "int", "i", "=", "0", ";", "i", "<", "3", ";", "i", "=", "i", "+", "1", ")", "{", "x", "=", "1", ";", "}", "x", ";", ""])
+():() then len((import tkind)):(26)

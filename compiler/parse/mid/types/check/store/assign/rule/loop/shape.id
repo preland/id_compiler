@@ -1,0 +1,35 @@
+// The pieces of the counter test (counter.id).
+
+wc_step(int wst_s) {
+  string wst_v = "";
+  if((import nkind)[wst_s] == "assign") {
+    wst_v = wc_step_of(wst_s, (import ni1)[wst_s]);
+  }
+} return string wst_v;
+given wc_fixture {
+  ((import wc_stp)):("i")
+  ((import wc_xa)):("")
+}
+
+wc_step_of(int wso_s, int wso_e) {
+  string wso_v = "";
+  if((import nkind)[wso_e] == "bin" && ((import ns1)[wso_e] == "+" || (import ns1)[wso_e] == "-") && (import nkind)[(import ni1)[wso_e]] == "var" && (import ns1)[(import ni1)[wso_e]] == (import ns1)[wso_s]) {
+    wso_v = (import ns1)[wso_s];
+  }
+} return string wso_v;
+given wc_fixture {
+  ((import wc_stp), (import wc_plus)):("i")
+  ((import wc_xa), (import wc_one)):("")
+}
+
+wc_kfree(int wkf_w, int wkf_k) {
+  int wkf_ok = 0;
+  if((import nkind)[wkf_k] == "int" || ((import nkind)[wkf_k] == "var" && wc_count((import ni1)[wkf_w], wkf_w - 1, (import ns1)[wkf_k], "assign") == 0)) {
+    wkf_ok = 1;
+  }
+} return int wkf_ok;
+given wc_fixture {
+  ((import wc_while), (import wc_one)):(1)
+  ((import wc_while), (import wc_iw)):(0)
+  ((import wc_while), (import wc_yv)):(1)
+}

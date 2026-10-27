@@ -1,0 +1,12 @@
+// EXPECT: counts this loop: write it as a for [E0651]
+// FLAGS: --for-strict
+sum_to(int n) {
+  int i = 0;
+  int total = 0;
+  while(i < n) {
+    total = total + i;
+    i = i + 1;
+  }
+} return int total;
+(3):(3)
+(4):(6)

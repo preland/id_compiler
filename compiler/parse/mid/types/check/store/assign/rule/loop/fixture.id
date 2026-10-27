@@ -1,0 +1,44 @@
+// A function for the counter test, `wc_fn`: `int i = 0; while (i < 3) { x = 1;
+// i = i + 1; }`, with the nodes the cases name exported (wc_decl, wc_while,
+// wc_stp the step, wc_plus its expression, wc_one the literal 1), and a few
+// statement lists to walk back over: wc_blk_adj is the block as written,
+// wc_blk_far puts `y = 1` between the initialisation and the loop, wc_blk_mut
+// puts `y = i` there, and wc_blk_none has no initialisation. wc_other is a
+// while that does not count. Ids are allocated in this order on purpose: the
+// counter test reads statement boundaries off them.
+
+wc_fixture() {
+  fn_fixture();
+  wc_build();
+  wc_build2();
+} chain () {
+  wc_build3();
+  wc_build4();
+  wc_build5();
+} chain () {
+  wc_build6();
+  wc_build7();
+  wc_build8();
+} return void;
+():() then calls fn_fixture:()
+():() then len((import prog)):(2)
+
+wc_build() {
+  export int wc_zero = node_txt2("int", "0", 0, 0);
+  export int wc_decl = node_decl("int", "i", (import wc_zero), 0);
+  export int wc_one = node_txt2("int", "1", 1, 0);
+} return void;
+given wc_fixture {
+  ():() then len((import prog)):(2)
+  ():() then (import nkind)[5]:("decl")
+}
+
+wc_build2() {
+  export int wc_ya = node_txt1("assign", "y", (import wc_one));
+  export int wc_iv = node_txt("var", "i");
+  export int wc_yi = node_txt1("assign", "y", (import wc_iv));
+} return void;
+given wc_fixture {
+  ():() then (import ns1)[9]:("y")
+  ():() then (import nkind)[8]:("var")
+}

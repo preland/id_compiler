@@ -1,0 +1,29 @@
+// The statement lists and the function of wc_fixture (fixture.id).
+
+wc_build6() {
+  export int[] wc_blk_adj = [(import wc_decl), (import wc_while)];
+  export int[] wc_blk_far = [(import wc_decl), (import wc_ya), (import wc_while)];
+  export int[] wc_blk_mut = [(import wc_decl), (import wc_yi), (import wc_while)];
+} return void;
+given wc_fixture {
+  ():() then len((import wc_blk_far)):(3)
+  ():() then len((import wc_blk_adj)):(2)
+}
+
+wc_build7() {
+  export int[] wc_blk_none = [(import wc_ya), (import wc_while)];
+} return void;
+given wc_fixture {
+  ():() then len((import wc_blk_none)):(2)
+  ():() then (import wc_blk_none)[0]:(7)
+}
+
+wc_build8() {
+  int[] wcb_none = [];
+  export int wc_fn = node_func("wc_fn", "void", wcb_none, (import wc_blk_adj), 0 - 1);
+  push((import prog), (import wc_fn));
+} return void;
+given wc_fixture {
+  ():() then (import nkind)[19]:("func")
+  ():() then (import ni2)[19]:(0)
+}

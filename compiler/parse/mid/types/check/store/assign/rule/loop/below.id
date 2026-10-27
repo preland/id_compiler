@@ -1,0 +1,14 @@
+// The last id before statement k of a block: the nodes of statement k are the
+// ids after it. The first statement has nothing before it, so its bound is -1
+// (whole.id).
+
+wc_below(int[] wcb_blk, int wcb_k) {
+  int wcb_lo = 0 - 1;
+  if(wcb_k > 0) {
+    wcb_lo = wcb_blk[wcb_k - 1];
+  }
+} return int wcb_lo;
+given wc_fixture {
+  ((import wc_blk_far), 0):(-1)
+  ((import wc_blk_far), 2):((import wc_ya))
+}

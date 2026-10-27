@@ -1,0 +1,40 @@
+// Counting and finding over the node tables (whole.id, init.id).
+
+wc_count(int wcc_lo, int wcc_hi, string wcc_name, string wcc_kind) {
+  int wcc_n = 0;
+  int wcc_i = wcc_lo + 1;
+  while(wcc_i <= wcc_hi) {
+    if((import nkind)[wcc_i] == wcc_kind && (import ns1)[wcc_i] == wcc_name) {
+      wcc_n = wcc_n + 1;
+    }
+    wcc_i = wcc_i + 1;
+  }
+} return int wcc_n;
+given wc_fixture {
+  ((import wc_decl), (import wc_while), "i", "assign"):(1)
+  ((import wc_decl), (import wc_while), "i", "var"):(2)
+}
+
+wc_mentions(int wcm_lo, int wcm_hi, string wcm_name) {
+  int wcm_m = 0;
+  if(wc_count(wcm_lo, wcm_hi, wcm_name, "var") + wc_count(wcm_lo, wcm_hi, wcm_name, "assign") > 0) {
+    wcm_m = 1;
+  }
+} return int wcm_m;
+given wc_fixture {
+  ((import wc_decl), (import wc_yi), "i"):(1)
+  ((import wc_decl), (import wc_ya), "i"):(0)
+}
+
+wc_home(int wch_w) {
+  int[] wch_h = [];
+  int wch_p = 0;
+  while(wch_p < len((import nkind)) && len(wch_h) == 0) {
+    wch_h = wc_pick(wch_p, wch_w);
+    wch_p = wch_p + 1;
+  }
+} return int[] wch_h;
+given wc_fixture {
+  ((import wc_while)):((import wc_blk_adj))
+  ((import wc_other)):([])
+}

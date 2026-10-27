@@ -1,0 +1,19 @@
+// The body of a for, and the while node it becomes. loopd counts the enclosing
+// loop bodies for `break`, as in parse_while (branch/if_while.id); a break in a
+// for body leaves the loop without running the step, which is what leaving
+// means. The while's ni2 is set to 1: that marks it as written as a for, so
+// --for-strict does not report it.
+
+parse_for_loop(int[] pos, int cond, int step) {
+  integer_list_set((import loopd), 0, (import loopd)[0] + 1);
+  int[] body = parse_block(pos);
+  push(body, step);
+} chain (int[] pos, int cond, int step) {
+  integer_list_set((import loopd), 0, (import loopd)[0] - 1);
+  int ret_i = node_while(cond, body);
+  integer_list_set((import ni2), ret_i, 1);
+} return int ret_i;
+given for_tokens {
+  ([17], 3, 4):(2)
+  ([17], 5, 6):(2) then (import ni2)[2]:(1)
+}

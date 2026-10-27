@@ -1,0 +1,14 @@
+// A for is the one statement that yields two nodes in the block, so it is
+// told apart here, before the single-node path.
+fill_stmt(int[] pos, int[] stmts) {
+  if(cur_text(pos) == "for") {
+    int t0 = pos[0];
+    int for_node = parse_for(pos, stmts);
+    stmt_done(for_node, t0);
+  } else {
+    int stmt_at_line_v = stmt_at_line(pos);
+    push(stmts, stmt_at_line_v);
+  }
+} return void;
+given stmt_tokens ([16], []):([20], [1])
+given for_tokens ([0], []):([23], [1, 11])

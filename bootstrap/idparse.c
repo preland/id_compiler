@@ -3024,6 +3024,7 @@ char* id_peek_text(IdList* pos, int ahead);
 int id_parse_stmt(IdList* pos);
 int id_parse_stmt2(IdList* pos);
 int id_parse_stmt3(IdList* pos);
+void id_fill_stmt(IdList* pos, IdList* stmts);
 IdList* id_else_body(IdList* pos);
 int id_at_elif(IdList* pos);
 int id_if_tail(IdList* pos, int cond, IdList* thenl, int elif);
@@ -3040,6 +3041,10 @@ int id_parse_decl(IdList* pos);
 int id_take_export(IdList* pos);
 int id_finish_decl(IdList* pos, char* type, int exported);
 int id_parse_iassign(IdList* pos);
+int id_parse_for(IdList* pos, IdList* stmts);
+int id_parse_for_init(IdList* pos);
+int id_parse_for_step(IdList* pos);
+int id_parse_for_loop(IdList* pos, int cond, int step);
 int id_parse_blank(IdList* pos);
 int id_parse_ret_or(IdList* pos);
 int id_finish_decl_tail(IdList* pos, char* type, char* name, int exported);
@@ -4651,6 +4656,22 @@ char* id_bfl_tail(int bfl_f, char* bfl_nm);
 int id_bfl_class(int bfl_i, char* bfl_nm);
 int id_bfl_store_at(int bfl_i, char* bfl_nm);
 int id_bfl_store(int bfl_i);
+int id_wc_below(IdList* wcb_blk, int wcb_k);
+int id_wc_count(int wcc_lo, int wcc_hi, char* wcc_name, char* wcc_kind);
+int id_wc_mentions(int wcm_lo, int wcm_hi, char* wcm_name);
+IdList* id_wc_home(int wch_w);
+void id_chk_counter_while(int wcw_id);
+void id_wc_scan(int wcs_id);
+void id_wc_say(int wcy_id, char* wcy_name);
+int id_wc_init(int wci_p, char* wci_name);
+int id_wc_inside(int wcn_w, char* wcn_name, int wcn_lo);
+IdList* id_wc_pick(int wcp_p, int wcp_w);
+char* id_wc_step(int wst_s);
+char* id_wc_step_of(int wso_s, int wso_e);
+int id_wc_kfree(int wkf_w, int wkf_k);
+int id_wc_whole(int wcl_w, char* wcl_name);
+int id_wc_found(IdList* wcf_blk, int wcf_k, char* wcf_name);
+int id_wc_visit(IdList* wcv_blk, int wcv_j, char* wcv_name);
 int id_bad_init(char* want, char* got);
 int id_ty_known(char* t);
 int id_ty_pair_known(char* lt, char* rt);
@@ -6793,8 +6814,10 @@ void id_arg_flags3(int argc, IdList* argv) {
     id_arg_flags4(argc, argv);
     arg_strict_v = id_arg_flag(argc, argv, 1, ID_S("--bool-strict"));
     id_integer_list_set(bsc, 0, arg_strict_v);
+IdList* idsq_25;
+    (idsq_25 = bsc, id_integer_list_set(idsq_25, 1, id_arg_flag(argc, argv, 1, ID_S("--given-blocks-strict"))));
 IdList* idsq_11;
-    (idsq_11 = bsc, id_integer_list_set(idsq_11, 1, id_arg_flag(argc, argv, 1, ID_S("--given-blocks-strict"))));
+    (idsq_11 = bsc, id_integer_list_set(idsq_11, 2, id_arg_flag(argc, argv, 1, ID_S("--for-strict"))));
     return;
 }
 
@@ -22909,10 +22932,8 @@ void id_scan_block(IdList* pos, IdList* stmts) {
 }
 
 void id_fill_block(IdList* pos, IdList* stmts) {
-    int stmt_at_line_v;
     while (((strcmp(id_cur_text(pos), ID_S("}")) != 0) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
-        stmt_at_line_v = id_stmt_at_line(pos);
-        id_list_push(stmts, (long long)(stmt_at_line_v));
+        id_fill_stmt(pos, stmts);
     }
     return;
 }
@@ -23028,6 +23049,21 @@ int id_parse_stmt3(IdList* pos) {
         node = id_parse_blank_or(pos);
     }
     return node;
+}
+
+void id_fill_stmt(IdList* pos, IdList* stmts) {
+    int t0;
+    int for_node;
+    int stmt_at_line_v;
+    if ((strcmp(id_cur_text(pos), ID_S("for")) == 0)) {
+        t0 = (int)(id_list_get(pos, 0));
+        for_node = id_parse_for(pos, stmts);
+        id_stmt_done(for_node, t0);
+    } else {
+        stmt_at_line_v = id_stmt_at_line(pos);
+        id_list_push(stmts, (long long)(stmt_at_line_v));
+    }
+    return;
 }
 
 IdList* id_else_body(IdList* pos) {
@@ -23197,6 +23233,62 @@ int id_parse_iassign(IdList* pos) {
     expr = id_parse_expr(pos);
     id_skip_text(pos, ID_S(";"));
     ret_i = id_node_iassign(target, expr);
+    return ret_i;
+}
+
+int id_parse_for(IdList* pos, IdList* stmts) {
+    int for_first;
+    int cond;
+    int step;
+    int ret_i;
+    id_advance(pos);
+    id_skip_text(pos, ID_S("("));
+    for_first = id_parse_for_init(pos);
+    id_list_push(stmts, (long long)(for_first));
+    cond = id_parse_expr(pos);
+    id_skip_text(pos, ID_S(";"));
+    step = id_parse_for_step(pos);
+    ret_i = id_parse_for_loop(pos, cond, step);
+    id_list_push(stmts, (long long)(ret_i));
+    return ret_i;
+}
+
+int id_parse_for_init(IdList* pos) {
+    int t0;
+    int for_first;
+    t0 = (int)(id_list_get(pos, 0));
+    for_first = id_parse_stmt3(pos);
+    id_stmt_done(for_first, t0);
+    return for_first;
+}
+
+int id_parse_for_step(IdList* pos) {
+    int t0;
+    char* name;
+    int ex;
+    int ret_i;
+    t0 = (int)(id_list_get(pos, 0));
+    name = id_cur_text(pos);
+    id_advance(pos);
+    id_advance(pos);
+    ex = id_parse_expr(pos);
+    id_skip_text(pos, ID_S(")"));
+    ret_i = id_node_txt1(ID_S("assign"), name, ex);
+    id_stmt_done(ret_i, t0);
+    return ret_i;
+}
+
+int id_parse_for_loop(IdList* pos, int cond, int step) {
+    IdList* body;
+    int ret_i;
+IdList* idsq_44;
+    (idsq_44 = loopd, id_integer_list_set(idsq_44, 0, ((int)(id_list_get(loopd, 0)) + 1)));
+    body = id_parse_block(pos);
+    id_list_push(body, (long long)(step));
+IdList* idsq_22;
+    (idsq_22 = loopd, id_integer_list_set(idsq_22, 0, ((int)(id_list_get(loopd, 0)) - 1)));
+    ret_i = id_node_while(cond, body);
+    id_integer_list_set(ni2, ret_i, 1);
     return ret_i;
 }
 
@@ -30625,7 +30717,7 @@ void id_init_rtc(void) {
     id_init_bnames();
     id_init_resv_names();
     lvc = id_list_lit(1, (long long)(1));
-    bsc = id_list_lit(2, (long long)(0), (long long)(0));
+    bsc = id_list_lit(3, (long long)(0), (long long)(0), (long long)(0));
     return;
 }
 
@@ -40539,6 +40631,187 @@ int id_bfl_store(int bfl_i) {
     return bfl_c;
 }
 
+int id_wc_below(IdList* wcb_blk, int wcb_k) {
+    int wcb_lo;
+    wcb_lo = (0 - 1);
+    if ((wcb_k > 0)) {
+        wcb_lo = (int)(id_list_get(wcb_blk, (wcb_k - 1)));
+    }
+    return wcb_lo;
+}
+
+int id_wc_count(int wcc_lo, int wcc_hi, char* wcc_name, char* wcc_kind) {
+    int wcc_n;
+    int wcc_i;
+    wcc_n = 0;
+    wcc_i = (wcc_lo + 1);
+    while ((wcc_i <= wcc_hi)) {
+        if (((strcmp((char*)(intptr_t)(id_list_get(nkind, wcc_i)), wcc_kind) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, wcc_i)), wcc_name) == 0))) {
+            wcc_n = (wcc_n + 1);
+        }
+        wcc_i = (wcc_i + 1);
+    }
+    return wcc_n;
+}
+
+int id_wc_mentions(int wcm_lo, int wcm_hi, char* wcm_name) {
+    int wcm_m;
+    wcm_m = 0;
+int idsq_14;
+    if ((idsq_14 = id_wc_count(wcm_lo, wcm_hi, wcm_name, ID_S("var")), ((idsq_14 + id_wc_count(wcm_lo, wcm_hi, wcm_name, ID_S("assign"))) > 0))) {
+        wcm_m = 1;
+    }
+    return wcm_m;
+}
+
+IdList* id_wc_home(int wch_w) {
+    IdList* wch_h;
+    int wch_p;
+    wch_h = id_list_lit(0);
+    wch_p = 0;
+    while (((wch_p < id_list_len(nkind)) && (id_list_len(wch_h) == 0))) {
+        wch_h = id_wc_pick(wch_p, wch_w);
+        wch_p = (wch_p + 1);
+    }
+    return wch_h;
+}
+
+void id_chk_counter_while(int wcw_id) {
+    if ((((int)(id_list_get(bsc, 2)) == 1) && ((int)(id_list_get(ni2, wcw_id)) == 0))) {
+        id_wc_scan(wcw_id);
+    }
+    return;
+}
+
+void id_wc_scan(int wcs_id) {
+    IdList* wcs_body;
+    char* wcs_name;
+    wcs_body = (IdList*)(intptr_t)(id_list_get(nl1, wcs_id));
+    wcs_name = ID_S("");
+    if ((id_list_len(wcs_body) > 0)) {
+        wcs_name = id_wc_step((int)(id_list_get(wcs_body, (id_list_len(wcs_body) - 1))));
+    }
+    if (((strcmp(wcs_name, ID_S("")) != 0) && (id_wc_whole(wcs_id, wcs_name) == 1))) {
+        id_wc_say(wcs_id, wcs_name);
+    }
+    return;
+}
+
+void id_wc_say(int wcy_id, char* wcy_name) {
+    char* wcy_help = NULL;
+    { char* idfe_o = wcy_help; wcy_help = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("write for (int "), wcy_name), ID_S(" = ...; the condition; "), 1), wcy_name, 1), ID_S(" = ...) { ... } and delete the last statement of the body (--fix does not rewrite this yet)"), 1); id_str_free(idfe_o); }
+    ({ char* idft2 = id_concat_f(id_concat(ID_S("'"), wcy_name), ID_S("' counts this loop: write it as a for"), 1); id_tc_diag(wcy_id, ID_S("E0651"), idft2, wcy_name, ID_S("under --for-strict a while that only steps a counter from its initialisation to its condition is a for, which keeps the initialisation, the test and the step in one line"), wcy_help); id_str_free(idft2); });
+    { id_str_free(wcy_help); return; }
+}
+
+int id_wc_init(int wci_p, char* wci_name) {
+    int wci_ok;
+    wci_ok = 0;
+    if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, wci_p)), ID_S("decl")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns2, wci_p)), wci_name) == 0)) || ((strcmp((char*)(intptr_t)(id_list_get(nkind, wci_p)), ID_S("assign")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, wci_p)), wci_name) == 0)))) {
+        wci_ok = 1;
+    }
+    return wci_ok;
+}
+
+int id_wc_inside(int wcn_w, char* wcn_name, int wcn_lo) {
+    IdList* wcn_body;
+    int wcn_k;
+    int wcn_ok;
+    wcn_body = (IdList*)(intptr_t)(id_list_get(nl1, wcn_w));
+IdList* idsq_52;
+IdList* idsq_51;
+    wcn_k = (idsq_52 = ni2, idsq_51 = ni1, (int)(id_list_get(idsq_52, (int)(id_list_get(idsq_51, (int)(id_list_get(wcn_body, (id_list_len(wcn_body) - 1))))))));
+    wcn_ok = 0;
+    if ((((id_wc_count((int)(id_list_get(ni1, wcn_w)), (wcn_w - 1), wcn_name, ID_S("assign")) == 1) && (id_wc_count(wcn_lo, (int)(id_list_get(ni1, wcn_w)), wcn_name, ID_S("var")) >= 1)) && (id_wc_kfree(wcn_w, wcn_k) == 1))) {
+        wcn_ok = 1;
+    }
+    return wcn_ok;
+}
+
+IdList* id_wc_pick(int wcp_p, int wcp_w) {
+    IdList* wcp_r;
+    wcp_r = id_list_lit(0);
+    if ((id_list_find((IdList*)(intptr_t)(id_list_get(nl1, wcp_p)), wcp_w) == 1)) {
+        wcp_r = (IdList*)(intptr_t)(id_list_get(nl1, wcp_p));
+    }
+    if ((id_list_find((IdList*)(intptr_t)(id_list_get(nl2, wcp_p)), wcp_w) == 1)) {
+        wcp_r = (IdList*)(intptr_t)(id_list_get(nl2, wcp_p));
+    }
+    return wcp_r;
+}
+
+char* id_wc_step(int wst_s) {
+    char* wst_v;
+    wst_v = ID_S("");
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, wst_s)), ID_S("assign")) == 0)) {
+        wst_v = id_wc_step_of(wst_s, (int)(id_list_get(ni1, wst_s)));
+    }
+    return wst_v;
+}
+
+char* id_wc_step_of(int wso_s, int wso_e) {
+    char* wso_v;
+    wso_v = ID_S("");
+IdList* idsq_24;
+IdList* idsq_16;
+IdList* idsq_15;
+int idsq_13;
+char* idsq_12;
+    if (((((strcmp((char*)(intptr_t)(id_list_get(nkind, wso_e)), ID_S("bin")) == 0) && ((strcmp((char*)(intptr_t)(id_list_get(ns1, wso_e)), ID_S("+")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(ns1, wso_e)), ID_S("-")) == 0))) && (idsq_24 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_24, (int)(id_list_get(ni1, wso_e)))), ID_S("var")) == 0))) && (idsq_16 = ns1, idsq_15 = ni1, idsq_13 = (int)(id_list_get(idsq_15, wso_e)), idsq_12 = (char*)(intptr_t)(id_list_get(idsq_16, idsq_13)), (strcmp(idsq_12, (char*)(intptr_t)(id_list_get(ns1, wso_s))) == 0)))) {
+        wso_v = (char*)(intptr_t)(id_list_get(ns1, wso_s));
+    }
+    return wso_v;
+}
+
+int id_wc_kfree(int wkf_w, int wkf_k) {
+    int wkf_ok;
+    wkf_ok = 0;
+IdList* idsq_19;
+int idsq_17;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, wkf_k)), ID_S("int")) == 0) || ((strcmp((char*)(intptr_t)(id_list_get(nkind, wkf_k)), ID_S("var")) == 0) && (idsq_19 = ni1, idsq_17 = (int)(id_list_get(idsq_19, wkf_w)), (id_wc_count(idsq_17, (wkf_w - 1), (char*)(intptr_t)(id_list_get(ns1, wkf_k)), ID_S("assign")) == 0))))) {
+        wkf_ok = 1;
+    }
+    return wkf_ok;
+}
+
+int id_wc_whole(int wcl_w, char* wcl_name) {
+    IdList* wcl_blk;
+    int wcl_k;
+    int wcl_lo;
+    int wcl_ok;
+    wcl_blk = id_wc_home(wcl_w);
+    wcl_k = id_list_index_of(wcl_blk, wcl_w);
+    wcl_lo = id_wc_below(wcl_blk, wcl_k);
+    wcl_ok = 0;
+    if ((((wcl_k >= 1) && (id_wc_inside(wcl_w, wcl_name, wcl_lo) == 1)) && (id_wc_found(wcl_blk, wcl_k, wcl_name) == 1))) {
+        wcl_ok = 1;
+    }
+    return wcl_ok;
+}
+
+int id_wc_found(IdList* wcf_blk, int wcf_k, char* wcf_name) {
+    int wcf_j;
+    int wcf_s;
+    wcf_j = (wcf_k - 1);
+    wcf_s = 0;
+    while (((wcf_j >= 0) && (wcf_s == 0))) {
+        wcf_s = id_wc_visit(wcf_blk, wcf_j, wcf_name);
+        wcf_j = (wcf_j - 1);
+    }
+    return wcf_s;
+}
+
+int id_wc_visit(IdList* wcv_blk, int wcv_j, char* wcv_name) {
+    int wcv_lo;
+    int wcv_s;
+    wcv_lo = id_wc_below(wcv_blk, wcv_j);
+    wcv_s = id_wc_init((int)(id_list_get(wcv_blk, wcv_j)), wcv_name);
+    if (((wcv_s == 0) && (id_wc_mentions(wcv_lo, (int)(id_list_get(wcv_blk, wcv_j)), wcv_name) == 1))) {
+        wcv_s = 2;
+    }
+    return wcv_s;
+}
+
 int id_bad_init(char* want, char* got) {
     int ok;
     ok = 0;
@@ -41009,6 +41282,7 @@ void id_tc_g2(int id) {
     }
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("while")) == 0)) {
         id_chk_cond(id, ID_S("loop condition has type void"));
+        id_chk_counter_while(id);
     }
     id_tc_g3(id);
     return;
