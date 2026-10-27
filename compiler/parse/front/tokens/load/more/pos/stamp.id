@@ -24,8 +24,11 @@ init_pos3() {
   export int[] ngrpc = [];
   export int[] nst = [];
   export int[] synfail = [0];
+} chain () {
+  export int[] beqtok = [];
 } return void;
 given full_env given grp_note(7, [5]) ():() then len((import ngrpc)):(0)
+given full_env ():() then len((import beqtok)):(0)
 given full_env given push_pos() ():() then len((import nst)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

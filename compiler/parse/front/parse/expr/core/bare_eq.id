@@ -1,0 +1,36 @@
+// A bare `=` between two operands is equality in the grammar's relational
+// table, and every program that wrote it that way compiled. It reads as an
+// assignment to anyone who knows C or the statement form, so it is refused here
+// and the fix-it spells the `==` the author meant. The operator is handed back
+// as `==` so the tree built after the diagnostic does not cascade into more, and
+// the token is noted in beqtok, which is how `idc --fix` finds it (it is not a
+// syntax failure: the tree is what was meant, so the fix may rewrite from it).
+
+rel_op(int[] pos) {
+  string beq_op = cur_text(pos);
+  if(beq_op == "=") {
+    bare_eq_diag(pos);
+    push((import beqtok), pos[0]);
+    beq_op = "==";
+  }
+} return string beq_op;
+given toks_env(["ident", "op", "int"], ["a", "=", "1"]) ([1]):("==") then (import chkfail)[0]:(1) then (import beqtok):([1]) then (import synfail)[0]:(0)
+given toks_env(["ident", "op", "int"], ["a", "==", "1"]) ([1]):("==") then (import chkfail)[0]:(0)
+given toks_env(["ident", "op", "int"], ["a", "<", "1"]) ([1]):("<")
+
+bare_eq_diag(int[] pos) {
+  string beq_left = fix_xtext(pos[0] - 1);
+  string beq_right = fix_xtext(pos[0] + 1);
+  string beq_why = "in id a statement `x = y;` stores, and an expression compares with `==`; the single `=` between two operands is accepted by the grammar as a comparison but reads as a store to anyone who knows either form";
+} chain (int[] pos) {
+  string beq_from = beq_left + " = " + beq_right;
+  string beq_to = beq_left + " == " + beq_right;
+  string beq_loc = cur_file() + ":" + cur_ln(pos);
+} chain (int[] pos) {
+  diag("E0313", beq_loc, "'=' compares nothing here: equality in an expression is written '=='", "=", beq_why, "write '==' where the comparison is meant");
+  if(beq_left != "" && beq_right != "") {
+    diag_edit("machine", "replace", cur_ln(pos), beq_from, beq_to);
+  }
+} return void;
+given toks_env(["ident", "op", "int"], ["a", "=", "1"]) ([1]):() then prints:("<stdin>:1: error: '=' compares nothing here: equality in an expression is written '==' [E0313]\n  at: =\n  why: in id a statement `x = y;` stores, and an expression compares with `==`; the single `=` between two operands is accepted by the grammar as a comparison but reads as a store to anyone who knows either form\n  help: write '==' where the comparison is meant\n  edit: machine\treplace\t1\ta = 1\ta == 1\n")
+given toks_env(["op", "int"], ["=", "1"]) ([0]):() then prints:("<stdin>:1: error: '=' compares nothing here: equality in an expression is written '==' [E0313]\n  at: =\n  why: in id a statement `x = y;` stores, and an expression compares with `==`; the single `=` between two operands is accepted by the grammar as a comparison but reads as a store to anyone who knows either form\n  help: write '==' where the comparison is meant\n")

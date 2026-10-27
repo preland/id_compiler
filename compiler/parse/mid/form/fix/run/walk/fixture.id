@@ -1,0 +1,8 @@
+// Token 0 of fix_tokline_fixture2's two (line 3, columns 2-5) noted as a bare
+// `=`, for fix_beq_scan's cases (beq.id).
+fix_beq_fixture() {
+  fix_tokline_fixture2();
+  push((import beqtok), 0);
+} return void;
+():() then len((import beqtok)):(1)
+():() then (import beqtok)[0]:(0)

@@ -1,0 +1,34 @@
+// A bare `=` the parser took for equality (E0313) becomes `==`. The parser
+// notes the token of each in beqtok; the function whose tokens hold it is the
+// one whose nodes end at or after it and begin after the previous function's
+// last token, which is the same walk fix_enter makes over node ids.
+
+fix_beq(int lo, int f) {
+  int from = 0;
+  if(lo > 0) {
+    from = (import ntok)[lo - 1] + 1;
+  }
+  fix_beq_scan(from, (import ntok)[f]);
+} return void;
+given fix_ret_fixture (0, 0):() then calls fix_beq_scan:(0, 3)
+given fix_ret_fixture (1, 0):() then calls fix_beq_scan:(4, 3)
+
+fix_beq_scan(int from, int to) {
+  int i = 0;
+  while(i < len((import beqtok))) {
+    fix_beq_one((import beqtok)[i], from, to);
+    i = i + 1;
+  }
+} return void;
+given fix_beq_fixture (0, 5):() then prints:("@R||3|2|3|5|1|==\n")
+given fix_beq_fixture (1, 5):() then prints:("")
+
+fix_beq_one(int t0, int from, int to) {
+  if(t0 >= from && t0 <= to && fix_packed(t0) >= 0) {
+    int sq = fix_seq();
+    print("@R|" + (import fixd_file)[0] + "|" + fix_at(t0) + "|" + fix_after(t0) + "|" + sq + "|==");
+  }
+} return void;
+given fix_tokline_fixture2 (0, 0, 5):() then prints:("@R||3|2|3|5|1|==\n")
+given fix_tokline_fixture2 (0, 1, 5):() then prints:("")
+given fix_tokline_fixture2 (1, 0, 0):() then prints:("")

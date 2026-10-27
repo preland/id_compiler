@@ -33,7 +33,7 @@ given expr_tokens ([0]):(14)
 given expr_tokens ([14]):(0)
 
 fold_rel(int[] pos, int left) {
-  string op = cur_text(pos);
+  string op = rel_op(pos);
   advance(pos);
   int ret_i = fold_rel_tail(pos, left, op);
 } return int ret_i;

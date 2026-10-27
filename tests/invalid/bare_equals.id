@@ -1,0 +1,8 @@
+// EXPECT: [E0313]
+// a bare '=' between two operands used to compile as equality
+main(int argc, string[] argv) {
+  int a = argc;
+  if(a = 1) {
+    print(a);
+  }
+} return int 0;
