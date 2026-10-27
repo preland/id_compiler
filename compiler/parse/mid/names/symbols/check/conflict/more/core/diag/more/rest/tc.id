@@ -8,8 +8,10 @@ tc_diag(int dgn_node, string dgn_code, string dgn_msg, string dgn_at, string dgn
   diag(dgn_code, dgn_tc_where, dgn_msg, dgn_at, dgn_why, dgn_help);
   integer_list_set((import tcerrs), 0, (import tcerrs)[0] + 1);
 } return void;
-given fn_fixture ((import fixture_zero), "E0099", "bad", "x", "because", "do this"):() then prints:("<stdin>:1: error: bad [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import tcerrs)[0]:(1)
-given fn_fixture ((import fixture_zero), "E0098", "worse", "", "", ""):() then prints:("<stdin>:1: error: worse [E0098]\n") then (import chkfail)[0]:(1)
+given fn_fixture {
+  ((import fixture_zero), "E0099", "bad", "x", "because", "do this"):() then prints:("<stdin>:1: error: bad [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import tcerrs)[0]:(1)
+  ((import fixture_zero), "E0098", "worse", "", "", ""):() then prints:("<stdin>:1: error: worse [E0098]\n") then (import chkfail)[0]:(1)
+}
 
 // A function as its signature is written, `g(int p, string q)`, for a help line
 // that says how to call it.

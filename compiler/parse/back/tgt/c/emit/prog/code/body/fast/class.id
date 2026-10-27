@@ -13,11 +13,13 @@ lp_cls(string lq_nm) {
     lq_r = lp_unleaf((import fnodes)[lq_ix]);
   }
 } return int lq_r;
-given lpf_more ("push"):(1)
-given lpf_more ("len"):(0)
-given lpf_more ("lpf_leaf"):(0)
-given lpf_more ("lpf_grow"):(1)
-given lpf_more ("nosuchfn"):(1)
+given lpf_more {
+  ("push"):(1)
+  ("len"):(0)
+  ("lpf_leaf"):(0)
+  ("lpf_grow"):(1)
+  ("nosuchfn"):(1)
+}
 
 lp_known(string lq_nm) {
   int lq_r = 1;
@@ -25,12 +27,14 @@ lp_known(string lq_nm) {
     lq_r = 0;
   }
 } return int lq_r;
-given lpf_more ("push"):(1)
-given lpf_more ("pop"):(1)
-given lpf_more ("bytes_append"):(1)
-given lpf_more ("len"):(0)
-given lpf_more ("lpf_leaf"):(1)
-given lpf_more given sd_note("P", ["a"], ["int"], "p.id", 1) ("P"):(0)
+given lpf_more {
+  ("push"):(1)
+  ("pop"):(1)
+  ("bytes_append"):(1)
+  ("len"):(0)
+  ("lpf_leaf"):(1)
+  given sd_note("P", ["a"], ["int"], "p.id", 1) ("P"):(0)
+}
 
 lp_unleaf(int lq_fn) {
   int lq_r = 1;
@@ -38,6 +42,8 @@ lp_unleaf(int lq_fn) {
     lq_r = lp_wide(lq_fn);
   }
 } return int lq_r;
-given lpf_more ((import lpf_leaf)):(0)
-given lpf_more ((import lpf_grow)):(1)
-given lpf_more (-1):(1)
+given lpf_more {
+  ((import lpf_leaf)):(0)
+  ((import lpf_grow)):(1)
+  (-1):(1)
+}

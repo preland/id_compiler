@@ -8,8 +8,10 @@ reach_add(string name) {
     hash_map_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, len((import rfn)) - 1);
   }
 } return void;
-given seed_given_fixture ("main"):() then reach_pass:(2)
-given seed_given_fixture ("fx_target"):() then reach_pass:(3)
+given seed_given_fixture {
+  ("main"):() then reach_pass:(2)
+  ("fx_target"):() then reach_pass:(3)
+}
 
 regrow_prog() {
   regrow_fn();

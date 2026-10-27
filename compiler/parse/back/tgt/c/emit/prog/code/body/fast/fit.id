@@ -9,8 +9,10 @@ lp_lenw(string[] lq_tk, int lq_lnode) {
 } chain (string[] lq_tk, int lq_lnode) {
   push(lq_tk, "wide");
 } return void;
-given lpf_more ([], (import lpf_na)):(["v:lan", "len", "wide"])
-given lpf_more (["x"], (import lpf_q)):(["x", "v:lpfq", "len", "wide"])
+given lpf_more {
+  ([], (import lpf_na)):(["v:lan", "len", "wide"])
+  (["x"], (import lpf_q)):(["x", "v:lpfq", "len", "wide"])
+}
 
 lp_lenop(string lq_t) {
   string lq_op = "";
@@ -31,5 +33,7 @@ lp_fit(string[] lq_tk, int lq_lnode, int lq_k) {
 } chain (string[] lq_tk, int lq_lnode, int lq_k) {
   push(lq_tk, "<=");
 } return void;
-given lpf_more (["v:n"], (import lpf_na), 2):(["v:n", "v:lan", "len", "wide", "k:2", "-:2", "<="])
-given lpf_more ([], (import lpf_q), 0):(["v:lpfq", "len", "wide", "k:0", "-:2", "<="])
+given lpf_more {
+  (["v:n"], (import lpf_na), 2):(["v:n", "v:lan", "len", "wide", "k:2", "-:2", "<="])
+  ([], (import lpf_q), 0):(["v:lpfq", "len", "wide", "k:0", "-:2", "<="])
+}

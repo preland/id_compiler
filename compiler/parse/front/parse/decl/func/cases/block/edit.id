@@ -15,8 +15,10 @@ gblk_cut(int gb_lo, int gb_hi) {
     list_splice((import tspan), gb_lo, gb_hi, gb_nones);
   }
 } return void;
-given gblk_stream("open") (0, 3):() then len((import tkind)):(11) then (import ttext)[0]:("(")
-given gblk_stream("open") (13, 14):() then len((import tline)):(13) then len((import ttext)):(13)
+given gblk_stream("open") {
+  (0, 3):() then len((import tkind)):(11) then (import ttext)[0]:("(")
+  (13, 14):() then len((import tline)):(13) then len((import ttext)):(13)
+}
 
 gblk_ins(int gb_at, int gb_from, int gb_to, int gb_line) {
   int gb_size = gb_to - gb_from;

@@ -39,8 +39,10 @@ esc_mask_at(int ix, string cname) {
   }
   int m = (import esc_pe)[ix];
 } return int m;
-given esc_fix (0, "fa_sink"):(32770)
-given esc_fix (1, "fa_loc"):(-1073741823)
+given esc_fix {
+  (0, "fa_sink"):(32770)
+  (1, "fa_loc"):(-1073741823)
+}
 
 esc_low(int ix) {
   int elo = (import esc_dp)[ix];

@@ -2,8 +2,10 @@ fix_pick(int i) {
   string t = fix_evtype(i);
   string name = fix_pick_name(i, t);
 } return string name;
-given fix_decl_fixture (0):("len_v")
-given fix_decl_fixture (1):("n_v")
+given fix_decl_fixture {
+  (0):("len_v")
+  (1):("n_v")
+}
 
 // fixe_nm holds strings, so the sum that witnesses an lset into an int column
 // has no equivalent here: counting the entries that have been given a name

@@ -9,11 +9,13 @@ ll_pred(string op, string t) {
     s = ll_pred_word(op, "oeq", "une", "o");
   }
 } return string s;
-given init_tyreg ("<", "int"):("slt")
-given init_tyreg ("u<", "int"):("ult")
-given init_tyreg ("<", "float"):("olt")
-given init_tyreg ("!=", "int"):("ne")
-given init_tyreg ("==", "float"):("oeq")
+given init_tyreg {
+  ("<", "int"):("slt")
+  ("u<", "int"):("ult")
+  ("<", "float"):("olt")
+  ("!=", "int"):("ne")
+  ("==", "float"):("oeq")
+}
 
 // The word for a comparison: equality, inequality, or the relational one with
 // its prefix, each spelled by the caller (signed for integers, ordered for

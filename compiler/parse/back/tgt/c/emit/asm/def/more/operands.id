@@ -30,5 +30,7 @@ asm_in_ops(int[] params) {
     i = i + 1;
   }
 } return string out;
-given stmt_fix ([6]):("[p] \"r\" (p)")
-given stmt_fix ([]):("")
+given stmt_fix {
+  ([6]):("[p] \"r\" (p)")
+  ([]):("")
+}

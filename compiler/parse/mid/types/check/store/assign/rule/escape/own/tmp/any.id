@@ -12,6 +12,8 @@ esc_tmp_any(int etc_node) {
     i = i + 1;
   }
 } return int eta;
-given esc_ffix ((import eff_ctp)):(1)
-given esc_ffix ((import eff_cmk)):(0)
-given esc_ffix ((import eff_cbad)):(0)
+given esc_ffix {
+  ((import eff_ctp)):(1)
+  ((import eff_cmk)):(0)
+  ((import eff_cbad)):(0)
+}

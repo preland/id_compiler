@@ -10,8 +10,10 @@ chk_cond(int id, string msg) {
 } chain (int id, string msg) {
   cond_strict(id, type_of_v);
 } return void;
-given cmp_fixture ((import bin_eq), "bad cond"):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_mixed), "bad cond"):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  ((import bin_eq), "bad cond"):() then (import chkfail)[0]:(0)
+  ((import bin_mixed), "bad cond"):() then (import chkfail)[0]:(0)
+}
 
 // A function value is a value, but not a truth: C would test the address,
 // which is never zero, so the condition would always hold.
@@ -38,5 +40,7 @@ chk_bin(int id) {
   chk_bits(id);
   chk_mixed(id);
 } return void;
-given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(1)
+given cmp_fixture {
+  ((import bin_eq)):() then (import chkfail)[0]:(0)
+  ((import bin_mixed)):() then (import chkfail)[0]:(1)
+}

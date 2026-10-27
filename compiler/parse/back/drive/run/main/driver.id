@@ -65,5 +65,7 @@ main(int argc, string[] argv) {
 // to check" floor; the second is a real token stream (the lexer's own
 // "<kind> <value>" lines, as `load` reads them) for a function whose two
 // cases are identical tokens, which the duplicate-case rule always rejects.
-given full_env stdin "" (1, ["prog"]):(0)
-given full_env stdin "ident foo\nop (\nkw int\nident x\nop )\nop {\nline 2\nkw int\nident y\nop =\nident x\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident y\nop ;\nline 4\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 5\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 6\neof\n" (1, ["prog"]):(1)
+given full_env {
+  stdin "" (1, ["prog"]):(0)
+  stdin "ident foo\nop (\nkw int\nident x\nop )\nop {\nline 2\nkw int\nident y\nop =\nident x\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident y\nop ;\nline 4\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 5\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 6\neof\n" (1, ["prog"]):(1)
+}

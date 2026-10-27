@@ -30,6 +30,8 @@ exp_list(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
-given ifwhilefix ((import rgdeclist), "owner"):() then calls exp_one:[1] then calls exp_one:((import rgdecl_node), "owner")
-given ifwhilefix ((import rgdeclist), "second"):() then calls exp_one:((import rgdecl_node), "second")
-given ifwhilefix ([], "owner"):() then calls exp_one:[0]
+given ifwhilefix {
+  ((import rgdeclist), "owner"):() then calls exp_one:[1] then calls exp_one:((import rgdecl_node), "owner")
+  ((import rgdeclist), "second"):() then calls exp_one:((import rgdecl_node), "second")
+  ([], "owner"):() then calls exp_one:[0]
+}

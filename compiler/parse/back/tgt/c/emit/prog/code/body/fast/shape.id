@@ -11,8 +11,10 @@ lp_ixnode(int lq_x) {
     lq_v = (import ni1)[lq_x];
   }
 } return int lq_v;
-given lpf_more ((import lpf_ob)):((import lpf_oj))
-given lpf_more ((import lpf_n0)):(-1)
+given lpf_more {
+  ((import lpf_ob)):((import lpf_oj))
+  ((import lpf_n0)):(-1)
+}
 
 lp_ixoff(int lq_x) {
   int lq_k = 0;
@@ -23,9 +25,11 @@ lp_ixoff(int lq_x) {
     lq_k = 0 - 1;
   }
 } return int lq_k;
-given lpf_more ((import lpf_na)):(0)
-given lpf_more ((import lpf_ob)):(1)
-given lpf_more ((import lpf_n0)):(-1)
+given lpf_more {
+  ((import lpf_na)):(0)
+  ((import lpf_ob)):(1)
+  ((import lpf_n0)):(-1)
+}
 
 lp_plus(int lq_x) {
   int lq_r = 0;
@@ -33,7 +37,9 @@ lp_plus(int lq_x) {
     lq_r = lp_tail(lq_x);
   }
 } return int lq_r;
-given lpf_more ((import lpf_ob)):(1)
-given lpf_more ((import lpf_na)):(0)
-given lpf_more ((import lpf_bigr)):(0)
-given lpf_more ((import lpf_vvs)):(0)
+given lpf_more {
+  ((import lpf_ob)):(1)
+  ((import lpf_na)):(0)
+  ((import lpf_bigr)):(0)
+  ((import lpf_vvs)):(0)
+}

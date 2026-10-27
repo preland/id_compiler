@@ -7,8 +7,10 @@ chk_fstore(int id, string sd_bt) {
     chk_fstore_at(id, sd_bt, sd_f);
   }
 } return void;
-given sd_use_fixture ((import sd_wx), "P"):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_wn), "int"):() then (import chkfail)[0]:(1)
+given sd_use_fixture {
+  ((import sd_wx), "P"):() then (import chkfail)[0]:(0)
+  ((import sd_wn), "int"):() then (import chkfail)[0]:(1)
+}
 
 chk_fstore_at(int id, string sd_bt, string sd_f) {
   if(ty_kind_is(sd_bt, "struct") == 0) {
@@ -19,8 +21,10 @@ chk_fstore_at(int id, string sd_bt, string sd_f) {
     chk_fvalue(id, sd_bt, sd_f);
   }
 } return void;
-given sd_use_fixture ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_wz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y [E0629]\n  at: z\n  why: a struct is read and written only through the fields its declaration gives it\n  help: use one of its fields (x, y), or add 'z' to the struct\n")
+given sd_use_fixture {
+  ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
+  ((import sd_wz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y [E0629]\n  at: z\n  why: a struct is read and written only through the fields its declaration gives it\n  help: use one of its fields (x, y), or add 'z' to the struct\n")
+}
 
 chk_fvalue(int id, string sd_bt, string sd_f) {
   int sd_v = (import nl1)[id][0];
@@ -29,5 +33,7 @@ chk_fvalue(int id, string sd_bt, string sd_f) {
     tc_diag(id, "E0624", "cannot store a " + type_of(sd_v) + " into field '" + sd_f + "' (" + sd_ft + ") of struct '" + sd_bt + "'", sd_f, "a field holds only values of the type it was declared with", "store a " + sd_ft + " in this field, or change the field's type in the struct");
   }
 } return void;
-given sd_use_fixture ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_ws), "P", "x"):() then prints:("<stdin>:1: error: cannot store a string into field 'x' (int) of struct 'P' [E0624]\n  at: x\n  why: a field holds only values of the type it was declared with\n  help: store a int in this field, or change the field's type in the struct\n")
+given sd_use_fixture {
+  ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
+  ((import sd_ws), "P", "x"):() then prints:("<stdin>:1: error: cannot store a string into field 'x' (int) of struct 'P' [E0624]\n  at: x\n  why: a field holds only values of the type it was declared with\n  help: store a int in this field, or change the field's type in the struct\n")
+}

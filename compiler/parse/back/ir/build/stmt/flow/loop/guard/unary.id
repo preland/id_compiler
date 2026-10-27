@@ -9,13 +9,17 @@ gd_un_of(string gdu_op, int gdu_val) {
     gdu_out = gd_lenof(gdu_op, gdu_val);
   }
 } return int gdu_out;
-given gd_vals ("wide", 3):(5) then gd_last:("word sext ")
-given gd_vals ("cap", 4):(6) then calls lw_callf:("id_list_cap_raw", "int", [4])
+given gd_vals {
+  ("wide", 3):(5) then gd_last:("word sext ")
+  ("cap", 4):(6) then calls lw_callf:("id_list_cap_raw", "int", [4])
+}
 
 gd_un(string gdu_op) {
   int gdu_val = pop((import gdstk));
   int gdu_out = gd_un_of(gdu_op, gdu_val);
   push((import gdstk), gdu_out);
 } return void;
-given gd_vals given gd_two ("wide"):() then (import gdstk)[1]:(5)
-given gd_vals given gd_one_on ("len"):() then (import gdstk)[0]:(6)
+given gd_vals {
+  given gd_two ("wide"):() then (import gdstk)[1]:(5)
+  given gd_one_on ("len"):() then (import gdstk)[0]:(6)
+}

@@ -6,9 +6,11 @@ hoist(int id) {
   int[] l2_of_v = (import nl2)[id];
   hoist_list(l2_of_v);
 } return void;
-given tyc_fix (7):() then prints:("    int y;\n")
-given tyc_fix (7):() then calls hoist_list:([1, 2])
-given tyc_fix (4):() then prints:("")
+given tyc_fix {
+  (7):() then prints:("    int y;\n")
+  (7):() then calls hoist_list:([1, 2])
+  (4):() then prints:("")
+}
 
 hoist_list(int[] stmts) {
   int i = 0;
@@ -17,9 +19,11 @@ hoist_list(int[] stmts) {
     i = i + 1;
   }
 } return void;
-given tyc_fix ([1]):() then prints:("    int y;\n")
-given tyc_fix ([1, 1]):() then prints:("    int y;\n    int y;\n")
-given tyc_fix ([]):() then prints:("")
+given tyc_fix {
+  ([1]):() then prints:("    int y;\n")
+  ([1, 1]):() then prints:("    int y;\n    int y;\n")
+  ([]):() then prints:("")
+}
 
 hoist_one(int id) {
   if((import nkind)[id] == "decl") {
@@ -28,6 +32,8 @@ hoist_one(int id) {
     hoist_nested(id);
   }
 } return void;
-given tyc_fix (1):() then prints:("    int y;\n")
-given tyc_fix (3):() then calls hoist_nested:(3)
-given tyc_fix (3):() then prints:("")
+given tyc_fix {
+  (1):() then prints:("    int y;\n")
+  (3):() then calls hoist_nested:(3)
+  (3):() then prints:("")
+}

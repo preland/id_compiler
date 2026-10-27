@@ -23,9 +23,11 @@ esc_expr(int e, string nm, int ctx) {
     r = r | esc_elem(e, nm, ctx);
   }
 } return int r;
-given esc_fix ((import efa_vb), "b", 1):(1)
-given esc_fix ((import efa_vb), "b", 0):(0)
-given esc_fix ((import efa_va), "b", 1):(0)
+given esc_fix {
+  ((import efa_vb), "b", 1):(1)
+  ((import efa_vb), "b", 0):(0)
+  ((import efa_va), "b", 1):(0)
+}
 
 esc_node(int e, string nm) {
   int r = 0;
@@ -35,8 +37,10 @@ esc_node(int e, string nm) {
     r = esc_node2(e, nm);
   }
 } return int r;
-given esc_fix ((import efa_push), "b"):(512)
-given esc_fix ((import efa_push), "a"):(256)
+given esc_fix {
+  ((import efa_push), "b"):(512)
+  ((import efa_push), "a"):(256)
+}
 
 // `xs[i] = v`: the node carries the indexed list and the index, and the value
 // in its first child list. The list and the index are read; the value is kept.

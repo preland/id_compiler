@@ -13,8 +13,10 @@ acc_var(string name, string owner, int ln) {
     acc_name(name, owner, ln);
   }
 } return void;
-given pushfix ("push", "f", 10):() then calls report_builtin_value:("push", "f", 10)
-given pushfix ("z", "f", 10):() then calls acc_name:("z", "f", 10)
+given pushfix {
+  ("push", "f", 10):() then calls report_builtin_value:("push", "f", 10)
+  ("z", "f", 10):() then calls acc_name:("z", "f", 10)
+}
 
 // A called name that is a variable. Of a function type, it is resolved like
 // any other variable the function reads; of any other type, it is a variable
@@ -27,12 +29,16 @@ acc_call_var(int id, string owner, int ln) {
     report_name(s1_of_v, owner, ln, "E0306", "'" + s1_of_v + "' is a variable, not a function", (import nm_callvar_why), (import nm_callvar_help));
   }
 } return void;
-given pushfix ((import cm_push_call), "f", 10):() then calls report_name:[1] then (import chkfail)[0]:(1)
-given pushfix ((import cm_push_call), "g", 20):() then calls report_name:[1] then (import chkfail)[0]:(1)
+given pushfix {
+  ((import cm_push_call), "f", 10):() then calls report_name:[1] then (import chkfail)[0]:(1)
+  ((import cm_push_call), "g", 20):() then calls report_name:[1] then (import chkfail)[0]:(1)
+}
 
 report_builtin_value(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);
   var_report(loc_at_v + "'" + name + "' is a builtin, not a function defined in id; only a function written in id can be a value -- write one that calls '" + name + "' and pass that");
 } return void;
-given call2_setup ("push", "f", 10):() then (import chkfail)[0]:(1)
-given call2_setup ("pop", "g", 20):() then (import chkfail)[0]:(1)
+given call2_setup {
+  ("push", "f", 10):() then (import chkfail)[0]:(1)
+  ("pop", "g", 20):() then (import chkfail)[0]:(1)
+}

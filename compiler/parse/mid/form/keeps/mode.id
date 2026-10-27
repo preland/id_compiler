@@ -8,8 +8,10 @@ keeps_or_fp(int kp_mode) {
     print_fingerprints();
   }
 } return void;
-given lz_o (8):() then calls keeps_print:[1]
-given lz_o (1):() then calls print_fingerprints:[1]
+given lz_o {
+  (8):() then calls keeps_print:[1]
+  (1):() then calls print_fingerprints:[1]
+}
 
 keeps_at(int kp_x) {
   string kp_nm = (import fnames)[kp_x];
@@ -18,5 +20,7 @@ keeps_at(int kp_x) {
 } chain (int kp_x) {
   string kp_ln = keeps_row(kp_nm, kp_m, kp_n);
 } return string kp_ln;
-given esc_fix (0):("fa_sink\t11\t1")
-given esc_fix (1):("fa_loc\t1\t0")
+given esc_fix {
+  (0):("fa_sink\t11\t1")
+  (1):("fa_loc\t1\t0")
+}

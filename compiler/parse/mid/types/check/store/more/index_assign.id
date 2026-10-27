@@ -27,8 +27,10 @@ chk_iassign2(int id, string bt) {
     chk_iassign3(id, bt);
   }
 } return void;
-given iassign_build ((import idx_iassign_node), "int[]"):() then (import chkfail)[0]:(0)
-given iassign_build ((import idx_iassign_node), "string[]"):() then (import chkfail)[0]:(1)
+given iassign_build {
+  ((import idx_iassign_node), "int[]"):() then (import chkfail)[0]:(0)
+  ((import idx_iassign_node), "string[]"):() then (import chkfail)[0]:(1)
+}
 
 chk_iassign3(int id, string bt) {
   int v = (import nl1)[id][0];

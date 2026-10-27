@@ -16,12 +16,16 @@ case_ranges_rows() {
   case_ranges_row(10, 30);
   case_ranges_row(40, 50);
 } return void;
-given incase_init ():() then len((import casenode)):(3)
-given incase_init ():() then (import casenode)[2]:(50)
+given incase_init {
+  ():() then len((import casenode)):(3)
+  ():() then (import casenode)[2]:(50)
+}
 
 case_ranges_row(int crr_fn, int crr_node) {
   push((import casefn), crr_fn);
   push((import casenode), crr_node);
 } return void;
-given incase_init (7, 9):() then (import casefn)[0]:(7)
-given incase_init (7, 9):() then (import casenode)[0]:(9)
+given incase_init {
+  (7, 9):() then (import casefn)[0]:(7)
+  (7, 9):() then (import casenode)[0]:(9)
+}

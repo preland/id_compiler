@@ -24,10 +24,12 @@ esc_fs_a() {
   export int[] efs_np = [node_param("param", "int", "n")];
   export int efs_acc = node_func("fs_acc", "int", (import efs_np), [(import efs_d0), (import efs_a1)], (import efs_vn));
 } return void;
-given esc_sfix ():() then calls node_txt:("str", "") then calls node_decl:("string", "s", (import efs_lit0), 0)
-given esc_sfix ():() then calls node_txt2:("bin", "+", (import efs_vs), (import efs_vn)) then calls node_txt1:("assign", "s", (import efs_sum)) then calls node_func:("fs_acc", "int", (import efs_np), [(import efs_d0), (import efs_a1)], (import efs_vn))
-given esc_sfix ():() then (import chkfail)[0]:(0)
-given esc_sfix ():() then init_units:(0)
+given esc_sfix {
+  ():() then calls node_txt:("str", "") then calls node_decl:("string", "s", (import efs_lit0), 0)
+  ():() then calls node_txt2:("bin", "+", (import efs_vs), (import efs_vn)) then calls node_txt1:("assign", "s", (import efs_sum)) then calls node_func:("fs_acc", "int", (import efs_np), [(import efs_d0), (import efs_a1)], (import efs_vn))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_fs_b() {
   export int efs_vr = node_txt("var", "r");
@@ -37,10 +39,12 @@ esc_fs_b() {
   export int efs_ar = node_txt1("assign", "r", (import efs_rs));
   export int efs_ret = node_func("fs_ret", "string", (import efs_np), [(import efs_dr), (import efs_ar)], (import efs_vr));
 } return void;
-given esc_sfix ():() then calls node_txt:("var", "r") then calls node_decl:("string", "r", (import efs_lit0), 0)
-given esc_sfix ():() then calls node_txt2:("bin", "+", (import efs_vr), (import efs_vn)) then calls node_txt1:("assign", "r", (import efs_rs)) then calls node_func:("fs_ret", "string", (import efs_np), [(import efs_dr), (import efs_ar)], (import efs_vr))
-given esc_sfix ():() then (import chkfail)[0]:(0)
-given esc_sfix ():() then init_units:(0)
+given esc_sfix {
+  ():() then calls node_txt:("var", "r") then calls node_decl:("string", "r", (import efs_lit0), 0)
+  ():() then calls node_txt2:("bin", "+", (import efs_vr), (import efs_vn)) then calls node_txt1:("assign", "r", (import efs_rs)) then calls node_func:("fs_ret", "string", (import efs_np), [(import efs_dr), (import efs_ar)], (import efs_vr))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_fs_c() {
   export int efs_vl = node_txt("var", "l");
@@ -51,7 +55,9 @@ esc_fs_c() {
   export int efs_dc = node_decl("string", "c", (import efs_cl), 0);
   export int efs_call = node_func("fs_call", "int", (import efs_np), [(import efs_dc)], (import efs_vn));
 } return void;
-given esc_sfix ():() then calls node_txt:("var", "l") then calls node_txt:("str", "lit") then calls node_func:("fs_lit", "string", (import efs_np), [(import efs_dl)], (import efs_vl))
-given esc_sfix ():() then calls node_call:("fs_str", [(import efs_vn)]) then calls node_decl:("string", "c", (import efs_cl), 0) then calls node_func:("fs_call", "int", (import efs_np), [(import efs_dc)], (import efs_vn))
-given esc_sfix ():() then (import chkfail)[0]:(0)
-given esc_sfix ():() then init_units:(0)
+given esc_sfix {
+  ():() then calls node_txt:("var", "l") then calls node_txt:("str", "lit") then calls node_func:("fs_lit", "string", (import efs_np), [(import efs_dl)], (import efs_vl))
+  ():() then calls node_call:("fs_str", [(import efs_vn)]) then calls node_decl:("string", "c", (import efs_cl), 0) then calls node_func:("fs_call", "int", (import efs_np), [(import efs_dc)], (import efs_vn))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

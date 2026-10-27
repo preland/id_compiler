@@ -15,16 +15,20 @@ init_lw() {
   export int[] lwfn = [0];
   int ret_i = init_lw2();
 } return int ret_i;
-given ir_rows ():(0) then (import chkfail)[0]:(0)
-given ir_rows ():(0) then init_units:(0)
+given ir_rows {
+  ():(0) then (import chkfail)[0]:(0)
+  ():(0) then init_units:(0)
+}
 
 init_lw2() {
   export int[] lwent = [0];
   export int[] lwbody = [0];
   int ret_i = init_lw3();
 } return int ret_i;
-given ir_rows ():(0) then (import chkfail)[0]:(0)
-given ir_rows ():(0) then init_units:(0)
+given ir_rows {
+  ():(0) then (import chkfail)[0]:(0)
+  ():(0) then init_units:(0)
+}
 
 init_lw3() {
   export string[] lwvar = [];
@@ -33,5 +37,7 @@ init_lw3() {
 } chain () {
   export int[] lwloop = [];
 } return int ret_i;
-given ir_rows ():(0) then (import chkfail)[0]:(0)
-given ir_rows ():(0) then init_units:(0)
+given ir_rows {
+  ():(0) then (import chkfail)[0]:(0)
+  ():(0) then init_units:(0)
+}

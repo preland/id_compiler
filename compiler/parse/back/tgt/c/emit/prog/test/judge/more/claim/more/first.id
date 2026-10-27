@@ -25,5 +25,7 @@ emit_claim(int c) {
   int gn = claim_count(c);
   print("    bad |= idtc_claim((int[]){" + grp + "}, " + gn + ", \"" + (import conskind)[c] + "\", \"" + (import consbound)[c] + "\");");
 } return void;
-given claim_cols_fixture (0):() then prints:("    bad |= idtc_claim((int[]){0}, 1, \"time\", \"O(n)\");\n")
-given claim_cols_fixture (1):() then prints:("    bad |= idtc_claim((int[]){0}, 1, \"mem\", \"O(n)\");\n")
+given claim_cols_fixture {
+  (0):() then prints:("    bad |= idtc_claim((int[]){0}, 1, \"time\", \"O(n)\");\n")
+  (1):() then prints:("    bad |= idtc_claim((int[]){0}, 1, \"mem\", \"O(n)\");\n")
+}

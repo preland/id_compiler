@@ -24,8 +24,10 @@ then_arg_decl(int ti, int[] ps, int[] targs, int j) {
   string cv = tc_value(targs[j], pt);
   emit_tc_decl(pt, "idtc_t" + ti + "a" + j, cv);
 } return void;
-given calls_items_fixture (3, (import fixture_params), (import fixture_calls_one), 0):() then prints:("    int idtc_t3a0 = 1;\n")
-given calls_items_fixture (0, (import fixture_params), (import fixture_calls_one), 0):() then calls emit_tc_decl:("int", "idtc_t0a0", "1")
+given calls_items_fixture {
+  (3, (import fixture_params), (import fixture_calls_one), 0):() then prints:("    int idtc_t3a0 = 1;\n")
+  (0, (import fixture_params), (import fixture_calls_one), 0):() then calls emit_tc_decl:("int", "idtc_t0a0", "1")
+}
 
 then_label(string chk_nm, int[] targs) {
   string so = string_replace(call_c(chk_nm, targs), "%", "%%");

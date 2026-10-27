@@ -39,5 +39,7 @@ dg_visit(int dgv) {
     dg_pop(dgv);
   }
 } return void;
-given dg_t_graph (4):() then (import dg_ctr)[1]:(2)
-given dg_t_graph (2):() then (import dg_ctr)[1]:(1)
+given dg_t_graph {
+  (4):() then (import dg_ctr)[1]:(2)
+  (2):() then (import dg_ctr)[1]:(1)
+}

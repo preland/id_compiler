@@ -18,8 +18,10 @@ cn_seeded_fixture() {
 canon_native(int id, string out) {
   string ret_s = "(" + out + ")->" + (import ns2)[id] + " native " + (import ns1)[id];
 } return string ret_s;
-given paramlist_begun_fixture ((import f_other), "int 0"):("(int 0)->int native other")
-given paramlist_begun_fixture ((import f_other), ""):("()->int native other")
+given paramlist_begun_fixture {
+  ((import f_other), "int 0"):("(int 0)->int native other")
+  ((import f_other), ""):("()->int native other")
+}
 
 // farm_a's param node with a canonicalisation begun over it. farm_a runs
 // fwd_env, so the symbol index is there too -- but it is a sibling of

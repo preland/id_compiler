@@ -12,8 +12,10 @@ bytes_slot(int id) {
   }
   int ok = (import bytesmark)[id];
 } return int ok;
-given bm_fixture ((import bm_arr_decl)):(1)
-given bm_fixture ((import bm_arr_plain)):(0)
+given bm_fixture {
+  ((import bm_arr_decl)):(1)
+  ((import bm_arr_plain)):(0)
+}
 
 bytes_marks() {
   list_set_all((import bytesmark), len((import bytesmark)), 0);
@@ -25,8 +27,10 @@ bytes_marks() {
     i = i + 1;
   }
 } return void;
-given bm_fixture ():() then calls integer_list_set:((import bytesmark), (import bm_arr_fn), 1)
-given bm_fixture ():() then calls integer_list_set:[4]
+given bm_fixture {
+  ():() then calls integer_list_set:((import bytesmark), (import bm_arr_fn), 1)
+  ():() then calls integer_list_set:[4]
+}
 
 bm_sized() {
   bm_fixture();

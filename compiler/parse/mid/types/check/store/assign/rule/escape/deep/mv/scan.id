@@ -10,8 +10,10 @@
 esc_mvok(int fn, string nm) {
   int ok = esc_mvin(fn, (import nl2)[fn], nm);
 } return int ok;
-given esc_fm_fix ((import efm_fn), "t"):(1)
-given esc_fm_fix ((import efm_bad), "t"):(0)
+given esc_fm_fix {
+  ((import efm_fn), "t"):(1)
+  ((import efm_bad), "t"):(0)
+}
 
 esc_mvin(int fn, int[] stmts, string nm) {
   int ok = 1;
@@ -21,8 +23,10 @@ esc_mvin(int fn, int[] stmts, string nm) {
     i = i + 1;
   }
 } return int ok;
-given esc_fm_fix ((import efm_fn), (import efm_body), "t"):(1)
-given esc_fm_fix ((import efm_bad), (import efm_bbody), "t"):(0)
+given esc_fm_fix {
+  ((import efm_fn), (import efm_body), "t"):(1)
+  ((import efm_bad), (import efm_bbody), "t"):(0)
+}
 
 esc_mvone(int fn, int[] stmts, int i, string nm) {
   int sn = stmts[i];
@@ -33,5 +37,7 @@ esc_mvone(int fn, int[] stmts, int i, string nm) {
 } chain (int fn, int[] stmts, int i, string nm) {
   ok = ok & esc_pushat(fn, stmts, i, nm);
 } return int ok;
-given esc_fm_fix ((import efm_fn), (import efm_body), 2, "t"):(1)
-given esc_fm_fix ((import efm_bad), (import efm_bbody), 1, "t"):(0)
+given esc_fm_fix {
+  ((import efm_fn), (import efm_body), 2, "t"):(1)
+  ((import efm_bad), (import efm_bbody), 1, "t"):(0)
+}

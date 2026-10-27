@@ -19,11 +19,13 @@ esc_nf(int fn) {
     enf = esc_nf_bits(fn);
   }
 } return int enf;
-given esc_ffix ((import eff_pass)):(-1073741824)
-given esc_ffix ((import eff_make)):(0)
-given esc_ffix ((import eff_rleak)):(-2147483648)
-given esc_ffix ((import eff_use)):(0)
-given esc_ffix ((import eff_rows)):(0)
+given esc_ffix {
+  ((import eff_pass)):(-1073741824)
+  ((import eff_make)):(0)
+  ((import eff_rleak)):(-2147483648)
+  ((import eff_use)):(0)
+  ((import eff_rows)):(0)
+}
 
 esc_fresh_ret(int fn) {
   int e = (import ni1)[fn];
@@ -32,10 +34,12 @@ esc_fresh_ret(int fn) {
     ok = esc_fresh_val(fn, e);
   }
 } return int ok;
-given esc_ffix ((import eff_make)):(1)
-given esc_ffix ((import eff_early)):(0)
-given esc_ffix ((import eff_elit)):(1)
-given esc_ffix ((import eff_use)):(0)
+given esc_ffix {
+  ((import eff_make)):(1)
+  ((import eff_early)):(0)
+  ((import eff_elit)):(1)
+  ((import eff_use)):(0)
+}
 
 esc_fresh_val(int fn, int e) {
   int ok = 0;
@@ -45,7 +49,9 @@ esc_fresh_val(int fn, int e) {
     ok = esc_own(fn, (import ns1)[e]);
   }
 } return int ok;
-given esc_ffix ((import eff_make), (import eff_vr)):(1)
-given esc_ffix ((import eff_make), (import eff_vn)):(0)
-given esc_ffix ((import eff_glob), (import eff_vr)):(0)
-given esc_ffix ((import eff_make), (import eff_arr)):(1)
+given esc_ffix {
+  ((import eff_make), (import eff_vr)):(1)
+  ((import eff_make), (import eff_vn)):(0)
+  ((import eff_glob), (import eff_vr)):(0)
+  ((import eff_make), (import eff_arr)):(1)
+}

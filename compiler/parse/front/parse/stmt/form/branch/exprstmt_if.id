@@ -6,16 +6,20 @@ parse_exprstmt(int[] pos) {
   skip_text(pos, ";");
   int ret_i = node_exprstmt(expr);
 } return int ret_i;
-given stmt_tokens ([42]):(1)
-given stmt_tokens ([11]):(3)
+given stmt_tokens {
+  ([42]):(1)
+  ([11]):(3)
+}
 
 parse_if(int[] pos) {
   advance(pos);
   int cond = parse_paren(pos);
   int ret_i = if_body(pos, cond);
 } return int ret_i;
-given stmt_tokens ([9]):(7)
-given stmt_tokens ([28]):(7)
+given stmt_tokens {
+  ([9]):(7)
+  ([28]):(7)
+}
 
 // An early `return`: `return;`, or `return NAME;` / `return LITERAL;`, the
 // same shape the return clause takes. It costs no action. The node holds the
@@ -36,5 +40,7 @@ parse_ret(int[] pos) {
 } chain (int[] pos) {
   push((import pend_rets), ret_i);
 } return int ret_i;
-given flow_tokens ([2]):(1) then calls newnode:("ret", 0, 0, "", "", [], [])
-given flow_tokens ([5]):(0) then calls newnode:("ret", -1, 0, "", "", [], [])
+given flow_tokens {
+  ([2]):(1) then calls newnode:("ret", 0, 0, "", "", [], [])
+  ([5]):(0) then calls newnode:("ret", -1, 0, "", "", [], [])
+}

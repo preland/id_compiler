@@ -20,8 +20,10 @@ lw_fnref(int node) {
   string s1_of_v = (import ns1)[node];
   int ret_i = lw_fnval(s1_of_v, ety);
 } return int ret_i;
-given lw_fix_fnval ((import fix_fnval_n)):(2) then (import istr)[2]:("id_fn_plain")
-given lw_fix_fnval ((import fix_fnval_n)):(2) then (import istr)[0]:("idfn_a_fx_target__0")
+given lw_fix_fnval {
+  ((import fix_fnval_n)):(2) then (import istr)[2]:("id_fn_plain")
+  ((import fix_fnval_n)):(2) then (import istr)[0]:("idfn_a_fx_target__0")
+}
 
 // Operand B of the most recently created instruction, offset by one since a
 // case's literal cannot spell a negative number and B's usual value is -1 --

@@ -9,8 +9,10 @@ ret_shape_err(int id, int e) {
   string shape_word_v = shape_word(e);
   tc_diag(e, "E0206", "the return clause of '" + s1_of_v + "' is " + shape_word_v + "; it must be a name or a literal", s1_of_v, "a return clause is a name or a literal so the reader sees what is returned without evaluating anything", "name the value in the body and return the name");
 } return void;
-given fn_fixture ((import fixture_fn), (import fixture_zero)):() then prints:("<stdin>:1: error: the return clause of 'fx_target' is an expression; it must be a name or a literal [E0206]\n  at: fx_target\n  why: a return clause is a name or a literal so the reader sees what is returned without evaluating anything\n  help: name the value in the body and return the name\n")
-given fn_fixture ((import fixture_zero), (import fixture_zero)):() then prints:("<stdin>:1: error: the return clause of '0' is an expression; it must be a name or a literal [E0206]\n  at: 0\n  why: a return clause is a name or a literal so the reader sees what is returned without evaluating anything\n  help: name the value in the body and return the name\n")
+given fn_fixture {
+  ((import fixture_fn), (import fixture_zero)):() then prints:("<stdin>:1: error: the return clause of 'fx_target' is an expression; it must be a name or a literal [E0206]\n  at: fx_target\n  why: a return clause is a name or a literal so the reader sees what is returned without evaluating anything\n  help: name the value in the body and return the name\n")
+  ((import fixture_zero), (import fixture_zero)):() then prints:("<stdin>:1: error: the return clause of '0' is an expression; it must be a name or a literal [E0206]\n  at: 0\n  why: a return clause is a name or a literal so the reader sees what is returned without evaluating anything\n  help: name the value in the body and return the name\n")
+}
 
 shape_word(int e) {
   string w = "an expression";
@@ -46,5 +48,7 @@ wr_node(int nd, string wr_fname) {
     wr_root((import ni1)[nd], wr_fname);
   }
 } return void;
-given imp_use_fixture given wr_build ((import imp_use_call), "f"):() then (import wrx):(["i:gx"])
-given imp_use_fixture given wr_build ((import imp_use_len), "f"):() then len((import wrx)):(0)
+given imp_use_fixture {
+  given wr_build ((import imp_use_call), "f"):() then (import wrx):(["i:gx"])
+  given wr_build ((import imp_use_len), "f"):() then len((import wrx)):(0)
+}

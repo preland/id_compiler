@@ -27,10 +27,12 @@ case_is_std(int ci) {
     r = 1;
   }
 } return int r;
-given case_unit_fixture given integer_list_set((import stdunit), 0, 0) (0):(1)
-given case_unit_fixture given integer_list_set((import stdunit), 0, 9) given integer_list_set((import exclunit), 0, 0) (1):(0)
-given case_unit_fixture (0):(0)
-given case_unit_fixture (1):(1)
+given case_unit_fixture {
+  given integer_list_set((import stdunit), 0, 0) (0):(1)
+  given integer_list_set((import stdunit), 0, 9) given integer_list_set((import exclunit), 0, 0) (1):(0)
+  (0):(0)
+  (1):(1)
+}
 
 // exclunit is checked len() > 0 first, the same reason the boundary check
 // above reads `boundary >= 0` before touching (import nunit)[(import
@@ -47,10 +49,12 @@ unit_excluded(int ci) {
     r = 1;
   }
 } return int r;
-given case_unit_fixture given integer_list_set((import exclunit), 0, 0) (0):(1)
-given case_unit_fixture given integer_list_set((import exclunit), 0, 0) (1):(0)
-given case_unit_fixture (0):(0)
-given case_unit_fixture (1):(1)
+given case_unit_fixture {
+  given integer_list_set((import exclunit), 0, 0) (0):(1)
+  given integer_list_set((import exclunit), 0, 0) (1):(0)
+  (0):(0)
+  (1):(1)
+}
 
 // Test check: the whole variable-name table -- how many names and which,
 // joined by "|" -- so a case states the full state it expects, not one slot of

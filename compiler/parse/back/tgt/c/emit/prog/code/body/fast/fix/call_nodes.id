@@ -5,20 +5,26 @@ lpf_len(string lfs_list) {
   int[] lfl_args = [lfi_a];
   int lfi_r = node_call("len", lfl_args);
 } return int lfi_r;
-given lpf_env ("v"):(1) then (import ns1)[1]:("len")
-given lpf_env ("w"):(1) then (import ns1)[0]:("w")
+given lpf_env {
+  ("v"):(1) then (import ns1)[1]:("len")
+  ("w"):(1) then (import ns1)[0]:("w")
+}
 
 lpf_pushx(string lfs_list, int lfi_x) {
   int lfi_a = node_txt("var", lfs_list);
   int[] lfl_args = [lfi_a, lfi_x];
   int lfi_r = node_call("push", lfl_args);
 } return int lfi_r;
-given lpf_one ("v", 0):(2) then (import ns1)[2]:("push")
-given lpf_one ("w", 0):(2) then (import ns1)[1]:("w")
+given lpf_one {
+  ("v", 0):(2) then (import ns1)[2]:("push")
+  ("w", 0):(2) then (import ns1)[1]:("w")
+}
 
 lpf_call1(string lfs_f, int lfi_x) {
   int[] lfl_args = [lfi_x];
   int lfi_r = node_call(lfs_f, lfl_args);
 } return int lfi_r;
-given lpf_one ("g", 0):(1) then (import ns1)[1]:("g")
-given lpf_one ("h", 0):(1) then (import ns1)[1]:("h")
+given lpf_one {
+  ("g", 0):(1) then (import ns1)[1]:("g")
+  ("h", 0):(1) then (import ns1)[1]:("h")
+}

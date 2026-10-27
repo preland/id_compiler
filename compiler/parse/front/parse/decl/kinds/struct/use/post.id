@@ -22,5 +22,7 @@ fold_field(int[] pos, int base) {
 } chain (int[] pos, int base) {
   int ret_i = node_index(base, sd_lf);
 } return int ret_i;
-given sd_dot_toks ([0], 5):(1) then last_kind:("kind index") then calls newleaf:("fld", 0, 0, "x", "")
-given sd_dot_toks ([0], 9):(1) then last_i2:("i2 0")
+given sd_dot_toks {
+  ([0], 5):(1) then last_kind:("kind index") then calls newleaf:("fld", 0, 0, "x", "")
+  ([0], 9):(1) then last_i2:("i2 0")
+}

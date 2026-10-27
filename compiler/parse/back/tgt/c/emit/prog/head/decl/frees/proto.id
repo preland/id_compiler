@@ -16,5 +16,7 @@ emit_free_proto(string nm) {
     print("static void idfs_" + nm + "(void*, IdFrSt*);");
   }
 } return void;
-given esc_fm_fix ("Tr"):() then prints:("static void idfs_Tr(void*, IdFrSt*);\n")
-given esc_fm_fix ("int"):() then prints:("")
+given esc_fm_fix {
+  ("Tr"):() then prints:("static void idfs_Tr(void*, IdFrSt*);\n")
+  ("int"):() then prints:("")
+}

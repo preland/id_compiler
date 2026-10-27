@@ -15,10 +15,12 @@ esc_xfx_a() {
   export int exa_len = node_call("len", [(import exa_imq)]);
   export int exa_dr = node_decl("int[]", "xr", (import exa_arr), 1);
 } return void;
-given esc_xfix ():() then calls node_index:((import exa_imp), (import exa_zero))
-given esc_xfix ():() then calls node_call:("len", [(import exa_imq)])
-given esc_xfix ():() then (import chkfail)[0]:(0)
-given esc_xfix ():() then init_units:(0)
+given esc_xfix {
+  ():() then calls node_index:((import exa_imp), (import exa_zero))
+  ():() then calls node_call:("len", [(import exa_imq)])
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_xfx_b() {
   export int exa_imr = node_txt("import", "xr");
@@ -32,7 +34,9 @@ esc_xfx_b() {
   export int exa_un = node_txt1("un", "-", (import exa_f));
   export int exa_bin = node_txt2("bin", "+", (import exa_zero), (import exa_f));
 } return void;
-given esc_xfix ():() then calls node_index:((import exa_imi), (import exa_f))
-given esc_xfix ():() then calls node_txt2:("bin", "+", (import exa_zero), (import exa_f))
-given esc_xfix ():() then (import chkfail)[0]:(0)
-given esc_xfix ():() then init_units:(0)
+given esc_xfix {
+  ():() then calls node_index:((import exa_imi), (import exa_f))
+  ():() then calls node_txt2:("bin", "+", (import exa_zero), (import exa_f))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

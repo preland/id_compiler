@@ -9,8 +9,10 @@ bi_arg_err(int id, int i, string want, string t) {
     bi_arg_err2(id, i, want, t);
   }
 } return void;
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "index", "string"):() then (import chkfail)[0]:(1)
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err2:((import bi_mismatch_call), 0, "list", "int")
+given bi_mismatch_setup {
+  ((import bi_mismatch_call), 0, "index", "string"):() then (import chkfail)[0]:(1)
+  ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err2:((import bi_mismatch_call), 0, "list", "int")
+}
 
 // str_of_mem names neither the position nor the type: both of its arguments
 // are addresses-or-lengths, and idc.py says so once.
@@ -23,9 +25,11 @@ bi_arg_err2(int id, int i, string want, string t) {
     bi_arg_err3(id, i, want, t);
   }
 } return void;
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "addr", "int"):() then (import chkfail)[0]:(1)
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err3:((import bi_mismatch_call), 0, "list", "int")
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "uword", "int"):() then calls bi_arg_err_uword:((import bi_mismatch_call), 0, "int")
+given bi_mismatch_setup {
+  ((import bi_mismatch_call), 0, "addr", "int"):() then (import chkfail)[0]:(1)
+  ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err3:((import bi_mismatch_call), 0, "list", "int")
+  ((import bi_mismatch_call), 0, "uword", "int"):() then calls bi_arg_err_uword:((import bi_mismatch_call), 0, "int")
+}
 
 // The flat-store group is the only family that reports at the *argument's*
 // line rather than the call's -- idc.py raises it from inside the loop over
@@ -42,5 +46,7 @@ bi_arg_err3(int id, int i, string want, string t) {
     tc_err(id, s1_of_v2 + " " + bi_verb_v + ", got " + t);
   }
 } return void;
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "word", "string"):() then (import chkfail)[0]:(1)
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_verb:("list")
+given bi_mismatch_setup {
+  ((import bi_mismatch_call), 0, "word", "string"):() then (import chkfail)[0]:(1)
+  ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_verb:("list")
+}

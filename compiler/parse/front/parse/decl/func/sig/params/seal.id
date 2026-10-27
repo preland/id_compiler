@@ -11,8 +11,10 @@ seal_rets(string name, string rt) {
     string_list_set((import ns2), seal_r, rt);
   }
 } return void;
-given seal_fixture ("f", "int"):() then last_s1:("s1 f")
-given seal_fixture ("g", "void"):() then last_s1:("s1 g")
+given seal_fixture {
+  ("f", "int"):() then last_s1:("s1 f")
+  ("g", "void"):() then last_s1:("s1 g")
+}
 
 // One pending early return, created with an empty name for seal_rets to fill.
 seal_fixture() {
@@ -34,5 +36,7 @@ retexp_bind(int fnode) {
     integer_list_set((import ni2), fnode, len((import retexp)) + 1);
   }
 } return void;
-given fn_fixture given list_string_extend((import retexp_pend), ["gx"]) ((import fixture_fn)):() then len((import retexp)):(1) then len((import retexp_pend)):(0)
-given fn_fixture ((import fixture_fn)):() then len((import retexp)):(0)
+given fn_fixture {
+  given list_string_extend((import retexp_pend), ["gx"]) ((import fixture_fn)):() then len((import retexp)):(1) then len((import retexp_pend)):(0)
+  ((import fixture_fn)):() then len((import retexp)):(0)
+}

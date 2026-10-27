@@ -9,10 +9,12 @@ esc_cmarg(int sn, string nm) {
     cmv_r = esc_cmcall((import ni1)[sn], nm);
   }
 } return int cmv_r;
-given esc_cm_fix ((import ecm_ps), "mrows"):(50)
-given esc_cm_fix ((import ecm_ps), "mrow"):(-1)
-given esc_cm_fix ((import ecm_dc), "mrows"):(50)
-given esc_cm_fix ((import emp_dm), "mrows"):(-1)
+given esc_cm_fix {
+  ((import ecm_ps), "mrows"):(50)
+  ((import ecm_ps), "mrow"):(-1)
+  ((import ecm_dc), "mrows"):(50)
+  ((import emp_dm), "mrows"):(-1)
+}
 
 // The same for the expression `e`: a call whose callee takes one of the
 // arguments into the argument that is the name `nm`.
@@ -22,9 +24,11 @@ esc_cmcall(int e, string nm) {
     cmv_r = esc_cmfind((import nl1)[e], (import ns1)[e], nm);
   }
 } return int cmv_r;
-given esc_cm_fix ((import ecm_call), "mrows"):(50)
-given esc_cm_fix ((import ecm_call), "mn"):(-1)
-given esc_cm_fix ((import emp_pc), "mrows"):(-1)
+given esc_cm_fix {
+  ((import ecm_call), "mrows"):(50)
+  ((import ecm_call), "mn"):(-1)
+  ((import emp_pc), "mrows"):(-1)
+}
 
 // The first argument node whose parameter `cname` takes into the argument that
 // is the name `nm`, or -1.
@@ -36,6 +40,8 @@ esc_cmfind(int[] cmv_as, string cname, string nm) {
     cmv_k = cmv_k + 1;
   }
 } return int cmv_r;
-given esc_cm_fix ((import ecm_as), "cm_ok", "mrows"):(50)
-given esc_cm_fix ((import ecm_as), "cm_bad", "mrows"):(-1)
-given esc_cm_fix ((import ecm_as), "cm_ok", "mn"):(-1)
+given esc_cm_fix {
+  ((import ecm_as), "cm_ok", "mrows"):(50)
+  ((import ecm_as), "cm_bad", "mrows"):(-1)
+  ((import ecm_as), "cm_ok", "mn"):(-1)
+}

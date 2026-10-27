@@ -6,8 +6,10 @@ void_close(int at, int n, int lo) {
     at = at + 1;
   }
 } return int at;
-given decl_tokens (1, 0, 1):(8)
-given decl_tokens (2, 0, 2):(3)
+given decl_tokens {
+  (1, 0, 1):(8)
+  (2, 0, 2):(3)
+}
 
 void_step(int at, int n) {
   int r = n;
@@ -17,8 +19,10 @@ void_step(int at, int n) {
     r = n - 1;
   }
 } return int r;
-given decl_tokens (1, 0):(1)
-given decl_tokens (7, 1):(0)
+given decl_tokens {
+  (1, 0):(1)
+  (7, 1):(0)
+}
 
 // `} return void export NAME;`: the function is still void, and the clause says
 // which exported variable it exists to initialize (docs/SPEC.md 7.5). The name is
@@ -33,5 +37,7 @@ void_export(int[] pos) {
     }
   }
 } return void;
-given env_init given toks_push(["kw", "ident", "op"], ["export", "gx", ";"]) ([0]):() then (import retexp_pend)[0]:("gx")
-given env_init given toks_push(["kw", "ident", "op", "ident"], ["export", "gx", ",", "gy"]) ([0]):() then prints:("<stdin>:1: error: a return clause names exactly one exported variable: write '} return void export NAME;' with the one variable this function exists to initialize\n")
+given env_init {
+  given toks_push(["kw", "ident", "op"], ["export", "gx", ";"]) ([0]):() then (import retexp_pend)[0]:("gx")
+  given toks_push(["kw", "ident", "op", "ident"], ["export", "gx", ",", "gy"]) ([0]):() then prints:("<stdin>:1: error: a return clause names exactly one exported variable: write '} return void export NAME;' with the one variable this function exists to initialize\n")
+}

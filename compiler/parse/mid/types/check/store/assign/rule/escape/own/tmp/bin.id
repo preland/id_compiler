@@ -9,6 +9,8 @@ esc_tmp_bin(int a) {
     ok = is_concat(a);
   }
 } return int ok;
-given fresh_fixture ((import bin_concat)):(1)
-given fresh_fixture ((import bin_plus)):(0)
-given fresh_fixture ((import fr_chr)):(0)
+given fresh_fixture {
+  ((import bin_concat)):(1)
+  ((import bin_plus)):(0)
+  ((import fr_chr)):(0)
+}

@@ -26,6 +26,8 @@ emit_free_one(string nm) {
     print("static void idfr_" + nm + "(IdList* p) { id_frs_run(p, idfs_" + nm + "); }");
   }
 } return void;
-given esc_fm_fix ("Tr"):() then prints:("static void idfs_Tr(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } } } id_list_free(L); }\nstatic void idfr_Tr(IdList* p) { id_frs_run(p, idfs_Tr); }\n")
-given esc_fm_fix ("Tr"):() then calls frs_step:("Tr")
-given esc_fm_fix ("int"):() then prints:("")
+given esc_fm_fix {
+  ("Tr"):() then prints:("static void idfs_Tr(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } } } id_list_free(L); }\nstatic void idfr_Tr(IdList* p) { id_frs_run(p, idfs_Tr); }\n")
+  ("Tr"):() then calls frs_step:("Tr")
+  ("int"):() then prints:("")
+}

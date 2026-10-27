@@ -29,5 +29,7 @@ emit_if(int id, string ind) {
   string[] cond_texts = seq_conds(if_ids);
   render_chain(if_ids, cond_texts, 0, ind);
 } return void;
-given nz_if_fixture ((import nz_ifn), "  "):() then prints:("  if (7) {\n  }\n")
-given nz_if_fixture ((import nz_ifn), ""):() then prints:("if (7) {\n}\n")
+given nz_if_fixture {
+  ((import nz_ifn), "  "):() then prints:("  if (7) {\n  }\n")
+  ((import nz_ifn), ""):() then prints:("if (7) {\n}\n")
+}

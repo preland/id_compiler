@@ -23,5 +23,7 @@ lw_arr_val(int node, int i, string elem) {
   int v = lw_as(els[i], elem);
   int boxed = lw_box(v, elem);
 } return int boxed;
-given lw_fix_arr ((import fix_arr_n), 0, "int"):(1)
-given lw_fix_arr ((import fix_arr_n), 0, "word"):(1)
+given lw_fix_arr {
+  ((import fix_arr_n), 0, "int"):(1)
+  ((import fix_arr_n), 0, "word"):(1)
+}

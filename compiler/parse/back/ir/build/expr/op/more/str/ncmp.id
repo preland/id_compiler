@@ -5,8 +5,10 @@ lw_ncmp(int node, string t) {
   int a = lw_as(i1_of_v, t);
   int ret_i = lw_ncmp_b(node, t, a);
 } return int ret_i;
-given str_fixture2 ((import cmp_node), "int"):(5)
-given str_fixture2 ((import cmp_node), "word"):(7)
+given str_fixture2 {
+  ((import cmp_node), "int"):(5)
+  ((import cmp_node), "word"):(7)
+}
 
 // libc's strcmp when there is a libc, and the runtime's own when there is not.
 // A freestanding module links nothing unprefixed, and an `id` function named

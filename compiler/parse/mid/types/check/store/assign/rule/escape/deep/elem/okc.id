@@ -12,6 +12,8 @@ esc_okc(int[] els) {
     i = i + 1;
   }
 } return int ok;
-given esc_ms_fix ([(import ems_lit), (import ems_cat)]):(1)
-given esc_ms_fix ([(import ems_lit), (import ems_sv)]):(0)
-given esc_ms_fix ([]):(1)
+given esc_ms_fix {
+  ([(import ems_lit), (import ems_cat)]):(1)
+  ([(import ems_lit), (import ems_sv)]):(0)
+  ([]):(1)
+}

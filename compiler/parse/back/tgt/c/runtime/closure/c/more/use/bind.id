@@ -9,8 +9,10 @@ emit_bind(int id) {
   string clo0 = bind_new(args);
   string s = bind_sets(clo0, fn_node_of((import ns1)[args[0]]), args);
 } return string s;
-given clo_bind_fixture ((import cb_call)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
-given clo_bind_fixture ((import cb_var)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(n))")
+given clo_bind_fixture {
+  ((import cb_call)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
+  ((import cb_var)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(n))")
+}
 
 
 bind_new(int[] args) {
@@ -18,8 +20,10 @@ bind_new(int[] args) {
   int nd = len(args) - 1;
   string s = "id_clo_new(" + fv_ref(nm, nd) + ")";
 } return string s;
-given clo_bind_fixture ([(import cb_name), (import cb_lit)]):("id_clo_new(ID_FNV(fx_target__1))")
-given clo_bind_fixture ([(import cb_name)]):("id_clo_new(ID_FNV(fx_target__0))")
+given clo_bind_fixture {
+  ([(import cb_name), (import cb_lit)]):("id_clo_new(ID_FNV(fx_target__1))")
+  ([(import cb_name)]):("id_clo_new(ID_FNV(fx_target__0))")
+}
 
 bind_sets(string clo0, int fn, int[] args) {
   string s = clo0;
@@ -29,5 +33,7 @@ bind_sets(string clo0, int fn, int[] args) {
     i = i + 1;
   }
 } return string s;
-given clo_bind_fixture ("n", (import fixture_fn), [(import cb_name), (import cb_lit)]):("id_clo_set(n, 0, (long long)(7))")
-given clo_bind_fixture ("n", (import fixture_fn), [(import cb_name)]):("n")
+given clo_bind_fixture {
+  ("n", (import fixture_fn), [(import cb_name), (import cb_lit)]):("id_clo_set(n, 0, (long long)(7))")
+  ("n", (import fixture_fn), [(import cb_name)]):("n")
+}

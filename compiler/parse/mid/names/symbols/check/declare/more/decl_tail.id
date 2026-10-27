@@ -13,8 +13,10 @@ reg_decl_var(int id, string owner, string rdv_name, string rdv_type) {
   int i2_of_v = (import ni2)[id];
   reg_var(rdv_name, rdv_type, owner, i2_of_v, (import nline)[id], (import nunit)[id]);
 } return void;
-given declfix ((import rgdecl_node), "f", "q", "int"):() then len((import dvname)):(2)
-given declfix ((import rgdecl_node), "g2", "z", "word"):() then len((import dvname)):(2)
+given declfix {
+  ((import rgdecl_node), "f", "q", "int"):() then len((import dvname)):(2)
+  ((import rgdecl_node), "g2", "z", "word"):() then len((import dvname)):(2)
+}
 
 // Also the tail of reg_func: both just register whatever declarations sit in
 // id's second statement list, one under the else arm's owner and one under

@@ -60,6 +60,8 @@ ut_note(int i, string name) {
   string ut_why_v = ut_why(name);
   push((import utnote), note_at + "function '" + name + "' " + ut_why_v + "; it is exempt from the two-case minimum");
 } return void;
-given ut_host_seeded given edge_fixture (0, "port_byte"):() then len((import utnote)):(1)
-given ut_host_seeded given edge_fixture (1, "caller"):() then len((import utnote)):(1)
-given ut_host_seeded given edge_fixture (0, "port_byte"):() then (import utnote)[0]:("fixture.id:7: note: function 'port_byte' cannot be tested on the build host (x86_64-unknown-none): it is asm 'in8'; it is exempt from the two-case minimum")
+given ut_host_seeded {
+  given edge_fixture (0, "port_byte"):() then len((import utnote)):(1)
+  given edge_fixture (1, "caller"):() then len((import utnote)):(1)
+  given edge_fixture (0, "port_byte"):() then (import utnote)[0]:("fixture.id:7: note: function 'port_byte' cannot be tested on the build host (x86_64-unknown-none): it is asm 'in8'; it is exempt from the two-case minimum")
+}

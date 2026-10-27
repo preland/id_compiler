@@ -19,17 +19,21 @@ wsc_cvalue(string wcv_name) {
     wcv_i = wcv_i + 1;
   }
 } return int wcv_r;
-given wsc_marks ("wsget"):(1)
-given wsc_marks ("wsnest"):(2)
-given wsc_marks ("wsput"):(0)
+given wsc_marks {
+  ("wsget"):(1)
+  ("wsnest"):(2)
+  ("wsput"):(0)
+}
 
 wsc_case_refs(string wcc_name, int wcc_c) {
   int wcc_a = wsc_refs_list(wcc_name, (import nl1)[wcc_c]);
   int wcc_e = wsc_refs_list(wcc_name, (import nl2)[wcc_c]);
   int wcc_r = wcc_a + wcc_e;
 } return int wcc_r;
-given wsc_marks ("wsget", (import wx_case)):(1)
-given wsc_marks ("wsput", (import wx_case)):(0)
+given wsc_marks {
+  ("wsget", (import wx_case)):(1)
+  ("wsput", (import wx_case)):(0)
+}
 
 wsc_refs_list(string wrl_name, int[] wrl_l) {
   int wrl_r = 0;
@@ -39,5 +43,7 @@ wsc_refs_list(string wrl_name, int[] wrl_l) {
     wrl_i = wrl_i + 1;
   }
 } return int wrl_r;
-given wsc_marks ("wsget", (import wx_cargs)):(1)
-given wsc_marks ("wsput", (import wx_cargs)):(0)
+given wsc_marks {
+  ("wsget", (import wx_cargs)):(1)
+  ("wsput", (import wx_cargs)):(0)
+}

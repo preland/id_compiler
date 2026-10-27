@@ -10,8 +10,10 @@ lp_rprev(int lr_i) {
     lr_p = (import lpg)[lr_i - 1];
   }
 } return string lr_p;
-given lpf_conds (0):("")
-given lpf_conds (6):("k:0")
+given lpf_conds {
+  (0):("")
+  (6):("k:0")
+}
 
 lp_rleaf(string[] lr_st, string lr_tok) {
   if(string_starts_with(lr_tok, "k:") == 1) {

@@ -8,8 +8,10 @@ bytes_mark_at(int i) {
     bytes_mark_store(i);
   }
 } return void;
-given bm_sized ((import bm_dec_bytes)):() then calls bytes_mark_store:((import bm_dec_bytes))
-given bm_sized ((import bm_call_fn)):() then calls bytes_mark_args:((import bm_call_fn))
+given bm_sized {
+  ((import bm_dec_bytes)):() then calls bytes_mark_store:((import bm_dec_bytes))
+  ((import bm_call_fn)):() then calls bytes_mark_args:((import bm_call_fn))
+}
 
 bytes_mark_store(int i) {
   string bm_want = bytes_store_type(i);
@@ -35,6 +37,8 @@ bytes_store_type(int i) {
     bm_t = var_type_at(i);
   }
 } return string bm_t;
-given bm_fixture ((import bm_dec_bytes)):("bytes")
-given bm_fixture ((import bm_asg_bytes)):("bytes")
-given bm_fixture ((import bm_arr_plain)):("")
+given bm_fixture {
+  ((import bm_dec_bytes)):("bytes")
+  ((import bm_asg_bytes)):("bytes")
+  ((import bm_arr_plain)):("")
+}

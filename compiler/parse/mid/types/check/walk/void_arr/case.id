@@ -44,5 +44,7 @@ in_case_at(int i, int id, int ok) {
     r = 1;
   }
 } return int r;
-given incase_fixture (0, (import lit_a), 0):(1)
-given incase_fixture (0, 100000, 0):(0)
+given incase_fixture {
+  (0, (import lit_a), 0):(1)
+  (0, 100000, 0):(0)
+}

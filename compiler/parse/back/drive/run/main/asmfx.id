@@ -18,8 +18,10 @@ asmfx_push() {
   push((import afret), "int");
   push((import aftriple), "x86_64-unknown-linux-gnu");
 } return void;
-given env_init ():() then (import afname)[0]:("foo") then (import afret)[0]:("int")
-given env_init ():() then (import aftriple)[0]:("x86_64-unknown-linux-gnu") then len((import afname)):(1)
-given env_init ():() then (import chkfail)[0]:(0)
-given env_init ():() then init_units:(0)
+given env_init {
+  ():() then (import afname)[0]:("foo") then (import afret)[0]:("int")
+  ():() then (import aftriple)[0]:("x86_64-unknown-linux-gnu") then len((import afname)):(1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 

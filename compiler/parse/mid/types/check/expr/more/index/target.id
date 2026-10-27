@@ -39,5 +39,7 @@ ia_hit(int i, int id, int ok) {
     r = 1;
   }
 } return int r;
-given iafix ((import ia_node), (import rgidx_node), 0):(1)
-given iafix ((import rgidx_node), (import rgidx_node), 0):(0)
+given iafix {
+  ((import ia_node), (import rgidx_node), 0):(1)
+  ((import rgidx_node), (import rgidx_node), 0):(0)
+}

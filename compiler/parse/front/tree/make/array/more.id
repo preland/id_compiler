@@ -5,8 +5,10 @@ node_iassign_tail(int target, int[] vlist, int[] none) {
   int i2_of_v = (import ni2)[target];
   int ret_i = newnode("iassign", i1_of_v, i2_of_v, "", "", vlist, none);
 } return int ret_i;
-given mk_two_nodes (0, [5], []):(2) then calls newnode:("iassign", 1, 0, "", "", [5], [])
-given mk_two_nodes (1, [6], []):(2) then calls newnode:("iassign", 2, 1, "", "", [6], [])
+given mk_two_nodes {
+  (0, [5], []):(2) then calls newnode:("iassign", 1, 0, "", "", [5], [])
+  (1, [6], []):(2) then calls newnode:("iassign", 2, 1, "", "", [6], [])
+}
 
 // Two ordinary leaves, id 0 ("kw" 1/0 "if"/"") and id 1 ("func" 2/1 "y"/"z"),
 // for the field accessors' and last_kind/last_s1's own cases.

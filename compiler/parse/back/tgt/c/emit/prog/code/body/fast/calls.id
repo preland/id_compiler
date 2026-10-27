@@ -7,10 +7,12 @@ lp_callbad(int lq_id, int lq_md) {
     lq_r = lp_named((import ns1)[lq_id], lq_md);
   }
 } return int lq_r;
-given lpf_more ((import lpf_kg), 0):(1)
-given lpf_more ((import lpf_kg), 1):(0)
-given lpf_more ((import lpf_kc), 1):(1)
-given lpf_more ((import lpf_xa), 0):(0)
+given lpf_more {
+  ((import lpf_kg), 0):(1)
+  ((import lpf_kg), 1):(0)
+  ((import lpf_kc), 1):(1)
+  ((import lpf_xa), 0):(0)
+}
 
 lp_named(string lq_nm, int lq_md) {
   int lq_r = lp_known(lq_nm);
@@ -18,10 +20,12 @@ lp_named(string lq_nm, int lq_md) {
     lq_r = lp_cls(lq_nm);
   }
 } return int lq_r;
-given lpf_more ("lpf_leaf", 0):(1)
-given lpf_more ("lpf_leaf", 1):(0)
-given lpf_more ("push", 1):(1)
-given lpf_more ("len", 0):(0)
+given lpf_more {
+  ("lpf_leaf", 0):(1)
+  ("lpf_leaf", 1):(0)
+  ("push", 1):(1)
+  ("len", 0):(0)
+}
 
 lp_ucall(int lq_id) {
   int lq_r = 0;
@@ -29,6 +33,8 @@ lp_ucall(int lq_id) {
     lq_r = fix_fnix((import ns1)[lq_id]) >= 0;
   }
 } return int lq_r;
-given lpf_more ((import lpf_kg)):(1)
-given lpf_more ((import lpf_kc)):(0)
-given lpf_more ((import lpf_xa)):(0)
+given lpf_more {
+  ((import lpf_kg)):(1)
+  ((import lpf_kc)):(0)
+  ((import lpf_xa)):(0)
+}

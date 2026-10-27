@@ -21,5 +21,7 @@ emit_scell(int id) {
 } chain (int id) {
   string s = "((int)(unsigned char)(" + lq_sb + ")[" + lq_sx + "])";
 } return string s;
-given lpf_lsc ((import lpf_hx)):("((int)(unsigned char)(lsv)[lsj])")
-given lpf_lsc ((import lpf_hy)):("((int)(unsigned char)(lsv)[(lpfq + lpfq)])")
+given lpf_lsc {
+  ((import lpf_hx)):("((int)(unsigned char)(lsv)[lsj])")
+  ((import lpf_hy)):("((int)(unsigned char)(lsv)[(lpfq + lpfq)])")
+}

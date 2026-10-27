@@ -25,5 +25,7 @@ lw_fcall_emit(int node, int callee, int[] args) {
 } chain (int node, int callee, int[] args) {
   int ret_i = lw_emit("call", ety, fnp, 0 - 1, "", lw_obj_args(callee, args), none);
 } return int ret_i;
-given fcallv_fixture ((import fcallv_node), 5, []):(1) then ir_last_b:(0) then (import istr)[0]:("id_clo_fn")
-given fcallv_fixture ((import fcallv_node), 5, [1, 2]):(1) then (import ilist)[1]:([5, 1, 2]) then (import ia)[1]:(0)
+given fcallv_fixture {
+  ((import fcallv_node), 5, []):(1) then ir_last_b:(0) then (import istr)[0]:("id_clo_fn")
+  ((import fcallv_node), 5, [1, 2]):(1) then (import ilist)[1]:([5, 1, 2]) then (import ia)[1]:(0)
+}

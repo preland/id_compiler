@@ -21,10 +21,12 @@ init_tyc_rows() {
   push((import tyc), "long long");
   init_tyc_rows2();
 } return void;
-given lc_env2 ():() then (import tyc)[7]:("int") then (import tyc)[8]:("long long")
-given lc_env2 ():() then len((import tyc)):(14) then (import tyc)[12]:("IdBytes*") then (import tyc)[13]:("int")
-given lc_env2 ():() then (import chkfail)[0]:(0)
-given lc_env2 ():() then init_units:(0)
+given lc_env2 {
+  ():() then (import tyc)[7]:("int") then (import tyc)[8]:("long long")
+  ():() then len((import tyc)):(14) then (import tyc)[12]:("IdBytes*") then (import tyc)[13]:("int")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // `string` is a char*, and `void` is C's own void. `float` is a double: id's
 // float is binary64, and C's `float` is not.
@@ -33,8 +35,10 @@ init_tyc_rows2() {
   push((import tyc), "char*");
   init_tyc_rows3();
 } return void;
-given lc_env2 ():() then (import tyc)[7]:("double") then (import tyc)[8]:("char*")
-given lc_env2 ():() then len((import tyc)):(12) then (import tyc)[10]:("IdBytes*") then (import tyc)[11]:("int")
-given lc_env2 ():() then (import tyc)[9]:("void")
-given lc_env2 ():() then (import chkfail)[0]:(0)
-given lc_env2 ():() then init_units:(0)
+given lc_env2 {
+  ():() then (import tyc)[7]:("double") then (import tyc)[8]:("char*")
+  ():() then len((import tyc)):(12) then (import tyc)[10]:("IdBytes*") then (import tyc)[11]:("int")
+  ():() then (import tyc)[9]:("void")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

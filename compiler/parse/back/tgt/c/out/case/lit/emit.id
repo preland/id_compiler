@@ -25,12 +25,16 @@ tc_cbsets(string clo0, int fn, int[] items) {
     j = j + 1;
   }
 } return string s;
-given clo_case_fixture ("n", (import fixture_fn), [(import clo_cfn), (import cb_lit)]):("id_clo_set(n, 0, (long long)(7))")
-given clo_case_fixture ("n", (import fixture_fn), [(import clo_cfn)]):("n")
+given clo_case_fixture {
+  ("n", (import fixture_fn), [(import clo_cfn), (import cb_lit)]):("id_clo_set(n, 0, (long long)(7))")
+  ("n", (import fixture_fn), [(import clo_cfn)]):("n")
+}
 
 tc_cbcell(int fn, int i, int v) {
   string pt = bind_pt(fn, i);
   string s = bind_cell(fn, i, tc_value(v, pt));
 } return string s;
-given clo_case_fixture ((import fixture_fn), 0, (import cb_lit)):("(long long)(7)")
-given clo_case_fixture ((import fixture_fn), 0, (import cb_lit2)):("(long long)(9)")
+given clo_case_fixture {
+  ((import fixture_fn), 0, (import cb_lit)):("(long long)(7)")
+  ((import fixture_fn), 0, (import cb_lit2)):("(long long)(9)")
+}

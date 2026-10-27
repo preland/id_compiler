@@ -14,8 +14,10 @@ ut_func(int f, int lo) {
   }
   int ret_i = (import prog)[f] + 1;
 } return int ret_i;
-given notes_base given edge_fixture (0, (import fixture_fn)):(4) then calls ut_range:("fx_target", (import fixture_fn), (import fixture_fn))
-given notes_base given edge_fixture (1, (import edge_caller_fn)):(8) then calls ut_range:("edge_caller", (import edge_caller_fn), (import edge_caller_fn))
+given notes_base {
+  given edge_fixture (0, (import fixture_fn)):(4) then calls ut_range:("fx_target", (import fixture_fn), (import fixture_fn))
+  given edge_fixture (1, (import edge_caller_fn)):(8) then calls ut_range:("edge_caller", (import edge_caller_fn), (import edge_caller_fn))
+}
 
 ut_range(string fname, int lo, int hi) {
   while(lo <= hi) {
@@ -23,8 +25,10 @@ ut_range(string fname, int lo, int hi) {
     lo = lo + 1;
   }
 } return void;
-given fn_fixture ("f", 0, 0):() then calls ut_node:("f", 0)
-given fn_fixture ("f", 0, 2):() then calls ut_node:("f", 2)
+given fn_fixture {
+  ("f", 0, 0):() then calls ut_node:("f", 0)
+  ("f", 0, 2):() then calls ut_node:("f", 2)
+}
 
 // A call, or a function named as a value: the two ways scan_reach reaches a
 // function (mid/names/exports/reach/dead/more/scan.id), since a value may be

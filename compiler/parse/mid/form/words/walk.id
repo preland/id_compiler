@@ -9,8 +9,10 @@ vocab_scan_fns(int vocab_i) {
     vocab_i = vocab_i + 1;
   }
 } return void;
-given edge_fixture given vocab_words (0):() then (import vocab_totals)[0]:(2)
-given edge_fixture given vocab_words (2):() then (import vocab_totals)[0]:(0)
+given edge_fixture {
+  given vocab_words (0):() then (import vocab_totals)[0]:(2)
+  given vocab_words (2):() then (import vocab_totals)[0]:(0)
+}
 
 vocab_scan_vars(int vocab_i) {
   while(vocab_i < len((import dvname))) {
@@ -18,8 +20,10 @@ vocab_scan_vars(int vocab_i) {
     vocab_i = vocab_i + 1;
   }
 } return void;
-given regrow_d given vocab_words (0):() then (import vocab_totals)[0]:(1)
-given regrow_d given vocab_words (1):() then (import vocab_totals)[0]:(0)
+given regrow_d {
+  given vocab_words (0):() then (import vocab_totals)[0]:(1)
+  given vocab_words (1):() then (import vocab_totals)[0]:(0)
+}
 
 vocab_scan_exports(int vocab_i) {
   while(vocab_i < len((import enames))) {

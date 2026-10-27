@@ -8,10 +8,12 @@ natcall_fixture_tail(int natfn, int[] none) {
   push((import prog), natfn);
   export int natcall_node = node_call("nat_target", none);
 } return void;
-given natcall_fixture (0, []):() then calls add_func:("nat_target", "int", 0) then calls node_call:("nat_target", [])
-given natcall_fixture (7, []):() then calls add_func:("nat_target", "int", 7)
-given natcall_fixture (0, []):() then (import chkfail)[0]:(0)
-given natcall_fixture (0, []):() then init_units:(0)
+given natcall_fixture {
+  (0, []):() then calls add_func:("nat_target", "int", 0) then calls node_call:("nat_target", [])
+  (7, []):() then calls add_func:("nat_target", "int", 7)
+  (0, []):() then (import chkfail)[0]:(0)
+  (0, []):() then init_units:(0)
+}
 
 nat_row_setup() {
   natcall_fixture();

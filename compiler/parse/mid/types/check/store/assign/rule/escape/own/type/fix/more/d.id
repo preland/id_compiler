@@ -7,26 +7,32 @@ esc_fx_b4() {
   export int efb_un = node_txt1("un", "-", (import efb_call));
   export int efb_arr = node_arr((import efb_args));
 } return void;
-given esc_fix ():() then calls node_txt1:("un", "-", (import efb_call))
-given esc_fix ():() then calls node_txt2:("int", "1", 1, 0)
-given esc_fix ():() then (import chkfail)[0]:(0)
-given esc_fix ():() then init_units:(0)
+given esc_fix {
+  ():() then calls node_txt1:("un", "-", (import efb_call))
+  ():() then calls node_txt2:("int", "1", 1, 0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_fx_b5() {
   export int[] efb_stmts = [(import efb_dt), node_exprstmt((import efb_call)), (import efb_dv)];
   export int[] efb_ps = [node_param("param", "int[]", "p")];
 } return void;
-given esc_fix ():() then (import efb_stmts)[1]:(49)
-given esc_fix ():() then calls node_exprstmt:((import efb_call))
-given esc_fix ():() then (import chkfail)[0]:(0)
-given esc_fix ():() then init_units:(0)
+given esc_fix {
+  ():() then (import efb_stmts)[1]:(49)
+  ():() then calls node_exprstmt:((import efb_call))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_fx_c4() {
   export int efc_fn = node_func("fa_nest", "int[]", [node_param("param", "int[]", "s")], (import efc_stmts), node_txt("var", "z"));
   export int efc_three = node_txt2("int", "3", 3, 0);
   export int efc_ife = node_if((import efc_cond), (import ef_none), (import efc_wl), 0);
 } return void;
-given esc_fix ():() then calls node_if:((import efc_cond), (import ef_none), (import efc_wl), 0)
-given esc_fix ():() then calls node_txt:("var", "z")
-given esc_fix ():() then (import chkfail)[0]:(0)
-given esc_fix ():() then init_units:(0)
+given esc_fix {
+  ():() then calls node_if:((import efc_cond), (import ef_none), (import efc_wl), 0)
+  ():() then calls node_txt:("var", "z")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

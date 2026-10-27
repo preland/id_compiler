@@ -10,8 +10,10 @@ seed_fn_args(int ci) {
     j = j + 1;
   }
 } return void;
-given seed_cfn_fixture (0):() then len((import rfn)):(2)
-given seed_cfn_fixture (1):() then len((import rfn)):(3)
+given seed_cfn_fixture {
+  (0):() then len((import rfn)):(2)
+  (1):() then len((import rfn)):(3)
+}
 
 seed_fn_arg(int e) {
   if((import nkind)[e] == "cfn") {

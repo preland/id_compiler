@@ -13,8 +13,10 @@ syn_unclosed(int[] pos, string dgn_close, int dgn_open_ln) {
 } chain (int[] pos, string dgn_close, int dgn_open_ln) {
   diag_related(dgn_ufile + ":" + dgn_open_ln, "the '" + dgn_uopen + "' that is not closed was opened here");
 } return void;
-given mk_two_toks ([1], ")", 1):() then prints:("<stdin>:1: error: unclosed '(': expected ')', found 'return' [E0105]\n  at: return\n  why: every '(' needs its ')', and the parser will not supply a missing one at the end of the statement\n  help: add ')' to close the '(' opened on line 1; it usually belongs just before the token named in 'at'\n  related: <stdin>:1: note: the '(' that is not closed was opened here\n") then (import synfail)[0]:(1)
-given mk_two_toks ([0], "]", 7):() then prints:("<stdin>:1: error: unclosed '[': expected ']', found '=' [E0105]\n  at: =\n  why: every '[' needs its ']', and the parser will not supply a missing one at the end of the statement\n  help: add ']' to close the '[' opened on line 7; it usually belongs just before the token named in 'at'\n  related: <stdin>:7: note: the '[' that is not closed was opened here\n") then (import chkfail)[0]:(1)
+given mk_two_toks {
+  ([1], ")", 1):() then prints:("<stdin>:1: error: unclosed '(': expected ')', found 'return' [E0105]\n  at: return\n  why: every '(' needs its ')', and the parser will not supply a missing one at the end of the statement\n  help: add ')' to close the '(' opened on line 1; it usually belongs just before the token named in 'at'\n  related: <stdin>:1: note: the '(' that is not closed was opened here\n") then (import synfail)[0]:(1)
+  ([0], "]", 7):() then prints:("<stdin>:1: error: unclosed '[': expected ']', found '=' [E0105]\n  at: =\n  why: every '[' needs its ']', and the parser will not supply a missing one at the end of the statement\n  help: add ']' to close the '[' opened on line 7; it usually belongs just before the token named in 'at'\n  related: <stdin>:7: note: the '[' that is not closed was opened here\n") then (import chkfail)[0]:(1)
+}
 
 syn_stray(int[] pos, string dgn_stray) {
   string dgn_sbopen = str_pick(dgn_stray, "]", "[", "(");
@@ -23,5 +25,7 @@ syn_stray(int[] pos, string dgn_stray) {
 } chain (int[] pos, string dgn_stray) {
   syn_diag(pos, "E0106", "unmatched '" + dgn_stray + "'", dgn_stray, dgn_swhy, dgn_shelp);
 } return void;
-given mk_two_toks ([0], ")"):() then prints:("<stdin>:1: error: unmatched ')' [E0106]\n  at: )\n  why: this ')' closes a '(' that was never opened, so the brackets on this statement do not balance\n  help: remove this ')', or add the missing '(' earlier in the statement\n") then (import synfail)[0]:(1)
-given mk_two_toks ([1], "]"):() then prints:("<stdin>:1: error: unmatched ']' [E0106]\n  at: ]\n  why: this ']' closes a '[' that was never opened, so the brackets on this statement do not balance\n  help: remove this ']', or add the missing '[' earlier in the statement\n") then (import chkfail)[0]:(1)
+given mk_two_toks {
+  ([0], ")"):() then prints:("<stdin>:1: error: unmatched ')' [E0106]\n  at: )\n  why: this ')' closes a '(' that was never opened, so the brackets on this statement do not balance\n  help: remove this ')', or add the missing '(' earlier in the statement\n") then (import synfail)[0]:(1)
+  ([1], "]"):() then prints:("<stdin>:1: error: unmatched ']' [E0106]\n  at: ]\n  why: this ']' closes a '[' that was never opened, so the brackets on this statement do not balance\n  help: remove this ']', or add the missing '[' earlier in the statement\n") then (import chkfail)[0]:(1)
+}

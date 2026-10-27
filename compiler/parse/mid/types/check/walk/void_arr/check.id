@@ -32,5 +32,7 @@ void_arr_type(int id, string t) {
     tc_err(id, "'void[]' is not a valid type");
   }
 } return void;
-given cmp_fixture (0, "void[]"):() then (import chkfail)[0]:(1)
-given cmp_fixture (0, "int[]"):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  (0, "void[]"):() then (import chkfail)[0]:(1)
+  (0, "int[]"):() then (import chkfail)[0]:(0)
+}

@@ -9,9 +9,11 @@ fix_xadopt(int[] xblock, int xinloop) {
   }
   integer_list_set((import fixx_loop), 0, xinloop);
 } return void;
-given fix_xfixture ([7, 8], 1):() then (import fixx_hit):([7, 8])
-given fix_xfixture ([7, 8], 1):() then (import fixx_loop):([1])
-given fix_xfixture ([], 0):() then (import fixx_hit):([])
+given fix_xfixture {
+  ([7, 8], 1):() then (import fixx_hit):([7, 8])
+  ([7, 8], 1):() then (import fixx_loop):([1])
+  ([], 0):() then (import fixx_hit):([])
+}
 
 fix_xskipping() {
   fix_xfixture();

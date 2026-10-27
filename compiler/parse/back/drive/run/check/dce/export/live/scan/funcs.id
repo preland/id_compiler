@@ -10,8 +10,10 @@ const_funcs(int cv_f, int cv_lo) {
     cv_f = cv_f + 1;
   }
 } return void;
-given cvl_setup (0, 8):() then clive_str:("live cb,cd")
-given cvl_setup (0, 0):() then clive_str:("live ca,cb,cd")
+given cvl_setup {
+  (0, 8):() then clive_str:("live cb,cd")
+  (0, 0):() then clive_str:("live ca,cb,cd")
+}
 
 const_func(int cv_f, int cv_lo) {
   string cv_name = (import ns1)[((import prog)[cv_f])];
@@ -20,8 +22,10 @@ const_func(int cv_f, int cv_lo) {
   }
   int cv_next = (import prog)[cv_f] + 1;
 } return int cv_next;
-given cvl_setup (0, 9):(11) then clive_str:("live cd")
-given cvl_setup given reach_seed("zz") (0, 8):(11) then clive_str:("live ")
+given cvl_setup {
+  (0, 9):(11) then clive_str:("live cd")
+  given reach_seed("zz") (0, 8):(11) then clive_str:("live ")
+}
 
 const_one(int cv_k, int cv_lo) {
   int cv_d = (import cdecl)[cv_k];
@@ -32,5 +36,7 @@ const_one(int cv_k, int cv_lo) {
 } chain (int cv_k, int cv_lo) {
   int cv_next = cv_d + 1;
 } return int cv_next;
-given cvl_setup given cvl_scan (1, 0):(4) then clive_str:("live cb,cd,ca")
-given cvl_setup given cvl_scan (2, 4):(6) then clive_str:("live cb,cd")
+given cvl_setup {
+  given cvl_scan (1, 0):(4) then clive_str:("live cb,cd,ca")
+  given cvl_scan (2, 4):(6) then clive_str:("live cb,cd")
+}

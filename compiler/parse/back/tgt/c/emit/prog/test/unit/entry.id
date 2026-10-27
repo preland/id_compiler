@@ -22,10 +22,12 @@ emit_tests_maybe(int argc, string[] argv) {
     emit_tests(build_host_v);
   }
 } return void;
-given env_init (1, ["prog"]):() then (import harn)[0]:(0)
-given env_init given build_host_fixture2 (2, ["prog", "--harness"]):() then calls emit_tests:("wasm32-unknown-unknown")
-given env_init (1, ["prog"]):() then calls harn_init:[1] then calls emit_tests:[0]
-given env_init (3, ["prog", "a", "b"]):() then calls harn_init:[1] then calls emit_tests:[0]
+given env_init {
+  (1, ["prog"]):() then (import harn)[0]:(0)
+  given build_host_fixture2 (2, ["prog", "--harness"]):() then calls emit_tests:("wasm32-unknown-unknown")
+  (1, ["prog"]):() then calls harn_init:[1] then calls emit_tests:[0]
+  (3, ["prog", "a", "b"]):() then calls harn_init:[1] then calls emit_tests:[0]
+}
 
 // The case keys come first, while `prog` is still every function as parsed
 // (mid/form/unique/dump/digest/keys/emit.id): bin/idc reads them to decide
@@ -37,13 +39,17 @@ emit_tests(string triple) {
   }
   print("/* ---- end of test harness ---- */");
 } return void;
-given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n")
-given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n") then (import chkfail)[0]:(0)
+given env_init {
+  ("abc"):() then prints:("/* ---- end of test harness ---- */\n")
+  ("abc"):() then prints:("/* ---- end of test harness ---- */\n") then (import chkfail)[0]:(0)
+}
 
 emit_test_unit(string triple) {
   integer_list_set((import harn), 0, 1);
   emit_test_head();
   emit_test_body(triple);
 } return void;
-given test_body_fixture ("abc"):() then calls emit_test_head:[1] then calls emit_test_body:("abc")
-given test_body_fixture ("xyz"):() then calls emit_test_head:[1] then calls emit_test_body:("xyz")
+given test_body_fixture {
+  ("abc"):() then calls emit_test_head:[1] then calls emit_test_body:("abc")
+  ("xyz"):() then calls emit_test_head:[1] then calls emit_test_body:("xyz")
+}

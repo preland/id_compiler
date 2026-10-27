@@ -15,8 +15,10 @@ wsc_report(int wrp_f) {
 } chain (int wrp_f) {
   diag("E0408", wrp_where, wrp_msg, wrp_name, (import wsc_why), wrp_help);
 } return void;
-given wsc_world ((import wx_fget)):() then prints:("<stdin>:1: error: function 'wsget' is only `st[a]` [VALUE] [E0408]\n  at: wsget\n  why: a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more\n  help: write `st[a]` at each call site; if a literal in it needs a name, make it a conf.id constant\n") then (import chkfail)[0]:(1)
-given wsc_world ((import wx_fput)):() then prints:("<stdin>:1: error: function 'wsput' is only `foo(a)` [VOID-CALL] [E0408]\n  at: wsput\n  why: a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more\n  help: write `foo(a)` at each call site; if a literal in it needs a name, make it a conf.id constant\n") then (import chkfail)[0]:(1)
+given wsc_world {
+  ((import wx_fget)):() then prints:("<stdin>:1: error: function 'wsget' is only `st[a]` [VALUE] [E0408]\n  at: wsget\n  why: a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more\n  help: write `st[a]` at each call site; if a literal in it needs a name, make it a conf.id constant\n") then (import chkfail)[0]:(1)
+  ((import wx_fput)):() then prints:("<stdin>:1: error: function 'wsput' is only `foo(a)` [VOID-CALL] [E0408]\n  at: wsput\n  why: a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more\n  help: write `foo(a)` at each call site; if a literal in it needs a name, make it a conf.id constant\n") then (import chkfail)[0]:(1)
+}
 
 wsc_tag(int wtg_f) {
   string wtg_tag = "VALUE";
@@ -24,12 +26,16 @@ wsc_tag(int wtg_f) {
     wtg_tag = "VOID-CALL";
   }
 } return string wtg_tag;
-given wsc_world ((import wx_fget)):("VALUE")
-given wsc_world ((import wx_fput)):("VOID-CALL")
+given wsc_world {
+  ((import wx_fget)):("VALUE")
+  ((import wx_fput)):("VOID-CALL")
+}
 
 wsc_expr(int wex_f) {
   int wex_root = wsc_root(wex_f);
   string wex_text = wsc_show(wex_f, wex_root);
 } return string wex_text;
-given wsc_world ((import wx_fget)):("st[a]")
-given wsc_world ((import wx_fput)):("foo(a)")
+given wsc_world {
+  ((import wx_fget)):("st[a]")
+  ((import wx_fput)):("foo(a)")
+}

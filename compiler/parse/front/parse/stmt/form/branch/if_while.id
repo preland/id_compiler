@@ -7,8 +7,10 @@ if_body(int[] pos, int cond) {
   int elif = at_elif(pos);
   int ret_i = if_tail(pos, cond, thenl, elif);
 } return int ret_i;
-given stmt_tokens ([15], 100):(4)
-given stmt_tokens ([22], 200):(2)
+given stmt_tokens {
+  ([15], 100):(4)
+  ([22], 200):(2)
+}
 
 parse_else(int[] pos) {
   int[] elsel = [];
@@ -17,8 +19,10 @@ parse_else(int[] pos) {
     elsel = else_body(pos);
   }
 } return int[] elsel;
-given stmt_tokens ([21]):([1])
-given stmt_tokens ([28]):([])
+given stmt_tokens {
+  ([21]):([1])
+  ([28]):([])
+}
 
 // loopd counts the enclosing while bodies, so a `break` knows whether it has a
 // loop to leave (../more.id).
@@ -31,5 +35,7 @@ parse_while(int[] pos) {
   integer_list_set((import loopd), 0, (import loopd)[0] - 1);
   int ret_i = node_while(cond, parse_block_v);
 } return int ret_i;
-given stmt_tokens ([28]):(7)
-given stmt_tokens ([9]):(5)
+given stmt_tokens {
+  ([28]):(7)
+  ([9]):(5)
+}

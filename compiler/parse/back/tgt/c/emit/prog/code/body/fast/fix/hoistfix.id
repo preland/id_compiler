@@ -6,19 +6,25 @@ lpf_planb() {
   lp_plan((import lpf_wb));
   integer_list_set((import lpon), 0, 1);
 } return void;
-given lpf_in(0) ():() then lpf_nset:(3)
-given lpf_in(0) ():() then len((import lpn)):(1)
+given lpf_in(0) {
+  ():() then lpf_nset:(3)
+  ():() then len((import lpn)):(1)
+}
 
 lpf_on_hdr() {
   lpf_on();
   push((import lph), "lav");
 } return void;
-given lpf_on ():() then len((import lph)):(1)
-given lpf_on ():() then (import lph)[0]:("lav")
+given lpf_on {
+  ():() then len((import lph)):(1)
+  ():() then (import lph)[0]:("lav")
+}
 
 lpf_on_len() {
   lpf_on();
   push((import lphn), "w");
 } return void;
-given lpf_on ():() then len((import lphn)):(1)
-given lpf_on ():() then (import lphn)[0]:("w")
+given lpf_on {
+  ():() then len((import lphn)):(1)
+  ():() then (import lphn)[0]:("w")
+}

@@ -8,9 +8,11 @@ init_line_kept(int i) {
     init_line_emit(name);
   }
 } return void;
-given lc_dce_setup (0):() then prints:("    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n")
-given lc_dce_setup (0):() then calls init_line_emit:("a")
-given lc_dce_setup (1):() then prints:("")
+given lc_dce_setup {
+  (0):() then prints:("    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n")
+  (0):() then calls init_line_emit:("a")
+  (1):() then prints:("")
+}
 
 init_line_emit(string name) {
   string s = init_line(name);

@@ -6,28 +6,34 @@ init_rest() {
   init_d();
   init_sym();
 } return void;
-given full_env given push_ll([1], [2]) ():() then len((import nl1)):(0)
-given full_env given add_func("f", "int", 0) ():() then len((import fnames)):(0)
-given full_env ():() then len((import nl1)):(0)
-given full_env ():() then init_units:(0)
-given full_env ():() then calls init_c:[1]
+given full_env {
+  given push_ll([1], [2]) ():() then len((import nl1)):(0)
+  given add_func("f", "int", 0) ():() then len((import fnames)):(0)
+  ():() then len((import nl1)):(0)
+  ():() then init_units:(0)
+  ():() then calls init_c:[1]
+}
 
 init_c() {
   export string[] ns2 = [];
   export int[][] nl1 = [];
   export int[][] nl2 = [];
 } return void;
-given full_env given push_ss("a", "b") ():() then len((import ns2)):(0)
-given full_env given push_ll([1], [2]) ():() then len((import nl2)):(0)
-given full_env ():() then (import chkfail)[0]:(0)
-given full_env ():() then init_units:(0)
+given full_env {
+  given push_ss("a", "b") ():() then len((import ns2)):(0)
+  given push_ll([1], [2]) ():() then len((import nl2)):(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 init_d() {
   export int[] prog = [];
   export string[] vnames = [];
   export string[] vtypes = [];
 } return void;
-given full_env given add_var("a", "int", 0) ():() then len((import vnames)):(0)
-given full_env given add_var("b", "string", 1) ():() then len((import vtypes)):(0)
-given full_env ():() then (import chkfail)[0]:(0)
-given full_env ():() then init_units:(0)
+given full_env {
+  given add_var("a", "int", 0) ():() then len((import vnames)):(0)
+  given add_var("b", "string", 1) ():() then len((import vtypes)):(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

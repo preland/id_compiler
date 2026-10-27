@@ -11,8 +11,10 @@ ul_fill() {
   ul_fill_all();
   integer_list_set((import cloose), 0, 0);
 } return void;
-given lz_o ():() then (import cloose)[0]:(0)
-given lz_o ():() then len((import cfpl)):(4)
+given lz_o {
+  ():() then (import cloose)[0]:(0)
+  ():() then len((import cfpl)):(4)
+}
 
 ul_fill_all() {
   int ulf_i = 0;
@@ -31,5 +33,7 @@ ul_fill_at(int i) {
   string ulf_fp = unit_kind(ulf_fid);
   push((import cfpl), ulf_fp);
 } return void;
-given lz_o (0):() then calls unit_kind:(22)
-given lz_o (1):() then calls unit_kind:(23)
+given lz_o {
+  (0):() then calls unit_kind:(22)
+  (1):() then calls unit_kind:(23)
+}

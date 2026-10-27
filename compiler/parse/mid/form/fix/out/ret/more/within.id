@@ -6,8 +6,10 @@ fix_within_at(int i, int b, int e, int ok) {
     r = 1;
   }
 } return int r;
-given fix_note_fixture (0, 1, 2, 0):(1)
-given fix_note_fixture (0, 0, 3, 7):(7)
+given fix_note_fixture {
+  (0, 1, 2, 0):(1)
+  (0, 0, 3, 7):(7)
+}
 
 // fix_seq's own two cases need a second call already run, and out/emit/resid/
 // is at its three-function cap, so this one is filed here instead.

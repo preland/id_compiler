@@ -12,10 +12,12 @@ esc_cmvto(string cname, int cmv_k) {
     cmv_j = esc_cmvscan(cmv_fn, cmv_k);
   }
 } return int cmv_j;
-given esc_cm_fix ("cm_ok", 1):(0)
-given esc_cm_fix ("cm_bad", 1):(-1)
-given esc_cm_fix ("cm_ok", 2):(-1)
-given esc_cm_fix ("nosuch", 0):(-1)
+given esc_cm_fix {
+  ("cm_ok", 1):(0)
+  ("cm_bad", 1):(-1)
+  ("cm_ok", 2):(-1)
+  ("nosuch", 0):(-1)
+}
 
 // The same for the function node `cmv_fn`.
 esc_cmvscan(int cmv_fn, int cmv_k) {
@@ -25,9 +27,11 @@ esc_cmvscan(int cmv_fn, int cmv_k) {
     cmv_j = esc_cmvstmts(cmv_fn, (import nl2)[cmv_fn], (import ns2)[(cmv_ps[cmv_k])]);
   }
 } return int cmv_j;
-given esc_cm_fix ((import ecm_fn), 1):(0)
-given esc_cm_fix ((import ecm_fn), 0):(-1)
-given esc_cm_fix ((import ecm_bad), 1):(-1)
+given esc_cm_fix {
+  ((import ecm_fn), 1):(0)
+  ((import ecm_fn), 0):(-1)
+  ((import ecm_bad), 1):(-1)
+}
 
 // The parameter the top-level `push` of the name `cmv_kn` in `cmv_ss` fills, or
 // -1. The name is mentioned once in the whole function, so at most one
@@ -40,6 +44,8 @@ esc_cmvstmts(int cmv_fn, int[] cmv_ss, string cmv_kn) {
     cmv_i = cmv_i + 1;
   }
 } return int cmv_j;
-given esc_cm_fix ((import ecm_fn), (import ecm_ok), "mrow"):(0)
-given esc_cm_fix ((import ecm_fn), (import ecm_ok), "mn"):(-1)
-given esc_cm_fix ((import ecm_bad), (import ecm_badbody), "mn"):(-1)
+given esc_cm_fix {
+  ((import ecm_fn), (import ecm_ok), "mrow"):(0)
+  ((import ecm_fn), (import ecm_ok), "mn"):(-1)
+  ((import ecm_bad), (import ecm_badbody), "mn"):(-1)
+}

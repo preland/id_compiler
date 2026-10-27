@@ -6,5 +6,7 @@ emit_export_line_kept(int i) {
     emit_set_decl(i);
   }
 } return void;
-given lc_dce_setup (0):() then prints:("IdList* a;  /* constant from conf.id */\n")
-given lc_dce_setup (1):() then prints:("int b = 2;  /* constant from conf.id */\n")
+given lc_dce_setup {
+  (0):() then prints:("IdList* a;  /* constant from conf.id */\n")
+  (1):() then prints:("int b = 2;  /* constant from conf.id */\n")
+}

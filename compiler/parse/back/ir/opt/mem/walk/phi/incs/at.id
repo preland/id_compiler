@@ -13,8 +13,10 @@ m2r_pos(int f, int b) {
   int[] irf_blk_v = (import fnblk)[f];
   int ret_i = list_index_of(irf_blk_v, b);
 } return int ret_i;
-given cfg_fixture (0, 0):(0)
-given cfg_fixture (0, 1):(1)
+given cfg_fixture {
+  (0, 0):(0)
+  (0, 1):(1)
+}
 
 // phiof is written in place: m2r_phi_make (../../../phi/more.id) lsets the
 // phi it has just built into a row m2r_row already pushed, so neither the

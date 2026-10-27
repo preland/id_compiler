@@ -17,10 +17,12 @@ call_fixture_extern() {
   int[] args = [];
   export int unresolved_call = node_call("unknown", args);
 } return void;
-given pushfix ():() then (import unresolved_call):(6)
-given pushfix ():() then calls node_call:("unknown", [])
-given pushfix ():()
-given pushfix ():() then calls init_rtc:[1]
+given pushfix {
+  ():() then (import unresolved_call):(6)
+  ():() then calls node_call:("unknown", [])
+  ():()
+  ():() then calls init_rtc:[1]
+}
 
 scnames_fix() {
   ifwhilefix();

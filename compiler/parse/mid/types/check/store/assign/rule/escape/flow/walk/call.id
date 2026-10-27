@@ -21,9 +21,11 @@ esc_args(int[] args, string cname, string nm) {
     i = i + 1;
   }
 } return int r;
-given esc_fix ((import efb_args), "fa_sink", "p"):(512)
-given esc_fix ((import efb_args), "fa_sink", "t"):(256)
-given esc_fix ((import efa_args), "len", "b"):(0)
+given esc_fix {
+  ((import efb_args), "fa_sink", "p"):(512)
+  ((import efb_args), "fa_sink", "t"):(256)
+  ((import efa_args), "len", "b"):(0)
+}
 
 // An element of a list literal is kept by the list.
 esc_list(int[] xs, string nm, int ctx) {
@@ -34,6 +36,8 @@ esc_list(int[] xs, string nm, int ctx) {
     i = i + 1;
   }
 } return int r;
-given esc_fix ((import efb_args), "p", 1):(1)
-given esc_fix ((import efb_args), "p", 0):(0)
+given esc_fix {
+  ((import efb_args), "p", 1):(1)
+  ((import efb_args), "p", 0):(0)
+}
 

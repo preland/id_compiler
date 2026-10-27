@@ -9,18 +9,22 @@ ixw_exports() {
     ixw_k = ixw_k + 1;
   }
 } return void;
-given env_init given add_export("gx", "int", "o1") given add_export("gy", "string", "o2") ():() then prints:("X\to1\tgx\tint\nX\to2\tgy\tstring\n")
-given env_init given add_export("gx", "int", "o1") ():() then prints:("X\to1\tgx\tint\n")
-given env_init ():() then prints:("")
+given env_init {
+  given add_export("gx", "int", "o1") given add_export("gy", "string", "o2") ():() then prints:("X\to1\tgx\tint\nX\to2\tgy\tstring\n")
+  given add_export("gx", "int", "o1") ():() then prints:("X\to1\tgx\tint\n")
+  ():() then prints:("")
+}
 
 ixw_export(int ixw_k) {
   if((import eowners)[ixw_k] != "conf.id") {
     ixw_put(["X", (import eowners)[ixw_k], (import enames)[ixw_k], (import etypes)[ixw_k]]);
   }
 } return void;
-given env_init given add_export("gx", "int", "o1") (0):() then prints:("X\to1\tgx\tint\n")
-given env_init given add_export("gz", "string", "o3") (0):() then prints:("X\to3\tgz\tstring\n")
-given env_init given add_export("cc", "int", "conf.id") (0):() then prints:("")
+given env_init {
+  given add_export("gx", "int", "o1") (0):() then prints:("X\to1\tgx\tint\n")
+  given add_export("gz", "string", "o3") (0):() then prints:("X\to3\tgz\tstring\n")
+  given add_export("cc", "int", "conf.id") (0):() then prints:("")
+}
 
 ixw_vars() {
   int ixw_k = 0;
@@ -29,5 +33,7 @@ ixw_vars() {
     ixw_k = ixw_k + 1;
   }
 } return void;
-given regrow_d given reg_push("e", "int", "g", 1, 0) given reg_push("y", "string", "h", 0, 0) given list_extend((import dvline), [20, 30]) ():() then prints:("V\tf\tx\tint\t10\nV\th\ty\tstring\t30\n")
-given regrow_d ():() then prints:("V\tf\tx\tint\t10\n")
+given regrow_d {
+  given reg_push("e", "int", "g", 1, 0) given reg_push("y", "string", "h", 0, 0) given list_extend((import dvline), [20, 30]) ():() then prints:("V\tf\tx\tint\t10\nV\th\ty\tstring\t30\n")
+  ():() then prints:("V\tf\tx\tint\t10\n")
+}

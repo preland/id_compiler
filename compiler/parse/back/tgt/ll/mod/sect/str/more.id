@@ -3,8 +3,10 @@ ll_str_emit(int i) {
   string s = (import istr)[i];
   ll_str_bytes("@.str" + i, s);
 } return void;
-given ll_str_fixture ((import ir_str_const)):() then prints:("@.str0.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.str0 = private alias i8, getelementptr inbounds (i8, ptr @.str0.d, i64 8)\n")
-given ll_str_fixture ((import ir_str_const2)):() then prints:("@.str1.d = private unnamed_addr constant <{ i64, [2 x i8] }> <{ i64 1, [2 x i8] c\"\\61\\00\" }>, align 8\n@.str1 = private alias i8, getelementptr inbounds (i8, ptr @.str1.d, i64 8)\n")
+given ll_str_fixture {
+  ((import ir_str_const)):() then prints:("@.str0.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.str0 = private alias i8, getelementptr inbounds (i8, ptr @.str0.d, i64 8)\n")
+  ((import ir_str_const2)):() then prints:("@.str1.d = private unnamed_addr constant <{ i64, [2 x i8] }> <{ i64 1, [2 x i8] c\"\\61\\00\" }>, align 8\n@.str1 = private alias i8, getelementptr inbounds (i8, ptr @.str1.d, i64 8)\n")
+}
 
 // A string literal's bytes as a private global called `gname`. A literal in a
 // function body is named for its IR value; a conf.id constant's, for the

@@ -3,8 +3,10 @@ fix_ret_decl(int f, int e, string t, string name) {
   string spn = fix_span(e);
   print("@D|" + (import fixd_file)[0] + "|" + where + "|" + t + " " + name + " = |" + spn);
 } return void;
-given fix_ret_fixture (2, 0, "int", "myname"):() then prints:("@D||10|5|1|5|int myname = |10|5|10|8\n")
-given fix_ret_fixture (3, 0, "string", "other"):() then prints:("@D||10|5|1|0|string other = |10|5|10|8\n")
+given fix_ret_fixture {
+  (2, 0, "int", "myname"):() then prints:("@D||10|5|1|5|int myname = |10|5|10|8\n")
+  (3, 0, "string", "other"):() then prints:("@D||10|5|1|0|string other = |10|5|10|8\n")
+}
 
 // Before the closing brace, indented as the body's last statement is; an empty
 // body gives line 0, and the driver indents one step past the brace.
@@ -13,8 +15,10 @@ fix_ret_pos(int f, int e) {
   int sq = fix_seq();
   string ret_s = (import tline)[cb] + "|" + fix_col(cb) + "|" + sq + "|" + fix_indent_line(f);
 } return string ret_s;
-given fix_ret_fixture (2, 0):("10|5|1|5")
-given fix_ret_fixture (3, 0):("10|5|1|0")
+given fix_ret_fixture {
+  (2, 0):("10|5|1|5")
+  (3, 0):("10|5|1|0")
+}
 
 fix_indent_line(int f) {
   int[] body = (import nl2)[f];
@@ -23,5 +27,7 @@ fix_indent_line(int f) {
     n = (import nline)[body[len(body) - 1]];
   }
 } return int n;
-given fix_ret_fixture (2):(5)
-given fix_ret_fixture (3):(0)
+given fix_ret_fixture {
+  (2):(5)
+  (3):(0)
+}

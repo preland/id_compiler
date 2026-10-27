@@ -13,8 +13,10 @@ syn_err(int[] pos, string msg) {
   int cur_ln_v = cur_ln(pos);
   syn_err_tail(cur_file_v, cur_ln_v, msg);
 } return void;
-given mk_two_toks ([0], "custom msg"):() then prints:("<stdin>:1: error: custom msg\n") then (import chkfail)[0]:(1)
-given mk_two_toks ([1], "other msg"):() then prints:("<stdin>:1: error: other msg\n") then (import chkfail)[0]:(1)
+given mk_two_toks {
+  ([0], "custom msg"):() then prints:("<stdin>:1: error: custom msg\n") then (import chkfail)[0]:(1)
+  ([1], "other msg"):() then prints:("<stdin>:1: error: other msg\n") then (import chkfail)[0]:(1)
+}
 
 expect_text(int[] pos, string want) {
   if(cur_text(pos) != want) {
@@ -22,8 +24,10 @@ expect_text(int[] pos, string want) {
     syn_expected(pos, want, cur_text_v);
   }
 } return void;
-given mk_two_toks ([0], "="):() then (import chkfail)[0]:(0)
-given mk_two_toks ([1], "="):() then (import chkfail)[0]:(1) then prints:("<stdin>:1: error: expected '=', found 'return' [E0101]\n  at: return\n  why: the grammar needs '=' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '=' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+given mk_two_toks {
+  ([0], "="):() then (import chkfail)[0]:(0)
+  ([1], "="):() then (import chkfail)[0]:(1) then prints:("<stdin>:1: error: expected '=', found 'return' [E0101]\n  at: return\n  why: the grammar needs '=' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '=' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+}
 
 // The rest of push_tok (../load/more/push_tok.id, at its three-function cap):
 // a `tcc KEY` line is not a token either -- it is a type-check key bin/idc
@@ -40,6 +44,8 @@ push_tok2(string kind, string text) {
     push_tok3(kind, text);
   }
 } return void;
-given full_env ("tcc", "123"):() then len((import tkind)):(0)
-given full_env ("kw", "int"):() then len((import tkind)):(1)
-given full_env ("ext", "M\tlazy"):() then len((import tkind)):(0)
+given full_env {
+  ("tcc", "123"):() then len((import tkind)):(0)
+  ("kw", "int"):() then len((import tkind)):(1)
+  ("ext", "M\tlazy"):() then len((import tkind)):(0)
+}

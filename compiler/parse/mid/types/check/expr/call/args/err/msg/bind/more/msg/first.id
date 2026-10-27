@@ -9,8 +9,10 @@ bind_notfn(int id, int a) {
     tc_err(id, msg);
   }
 } return void;
-given bind_fixture ((import bind_var), (import bind_cvar)):() then (import chkfail)[0]:(1)
-given bind_fixture ((import bind_var), (import bind_unknown)):() then (import chkfail)[0]:(0)
+given bind_fixture {
+  ((import bind_var), (import bind_cvar)):() then (import chkfail)[0]:(1)
+  ((import bind_var), (import bind_unknown)):() then (import chkfail)[0]:(0)
+}
 
 bind_notfn_msg(int a) {
   string t = type_of(a);
@@ -23,9 +25,11 @@ bind_notfn_msg(int a) {
     msg = "'bind' takes the name of a function written in id, but '" + nm + "' is a variable of type " + t + "; bind the function by its own name where it is known, or pass '" + nm + "' on unchanged";
   }
 } return string msg;
-given bind_fixture ((import bind_cvar)):("'bind' takes the name of a function written in id, but 'cv' is a variable of type func(int) return int; bind the function by its own name where it is known, or pass 'cv' on unchanged")
-given bind_fixture ((import bind_lit)):("'bind' takes the name of a function written in id as its first argument, but it is a int; write bind(NAME, value, ...)")
-given bind_fixture ((import bind_blt)):("'bind' cannot bind 'len': it is a builtin, not a function defined in id; write a function that calls 'len' and bind that")
+given bind_fixture {
+  ((import bind_cvar)):("'bind' takes the name of a function written in id, but 'cv' is a variable of type func(int) return int; bind the function by its own name where it is known, or pass 'cv' on unchanged")
+  ((import bind_lit)):("'bind' takes the name of a function written in id as its first argument, but it is a int; write bind(NAME, value, ...)")
+  ((import bind_blt)):("'bind' cannot bind 'len': it is a builtin, not a function defined in id; write a function that calls 'len' and bind that")
+}
 
 bind_kind_msg(string t) {
   string msg = "";

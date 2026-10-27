@@ -5,9 +5,11 @@ tc_collect_case(int ci) {
   int[] expd = (import nl2)[((import casenode)[ci])];
   tc_collect_expd(fn, expd);
 } return void;
-given wrap_fixture (0):() then calls chk_type:((import fixture_fn), 0)
-given wrap_fixture (0):() then calls note_ty:("int")
-given wrap_fixture (0):() then calls chk_type:[1]
+given wrap_fixture {
+  (0):() then calls chk_type:((import fixture_fn), 0)
+  (0):() then calls note_ty:("int")
+  (0):() then calls chk_type:[1]
+}
 
 tc_collect_expd(int fn, int[] expd) {
   int j = 0;
@@ -17,10 +19,12 @@ tc_collect_expd(int fn, int[] expd) {
     j = j + 1;
   }
 } return void;
-given print_fixture ((import fixture_fn), (import fixture_print_two)):() then calls chk_type:((import fixture_fn), 1)
-given print_fixture given tc_types_init ((import fixture_fn), (import fixture_print_none)):() then len((import tctys)):(0)
-given print_fixture ((import fixture_fn), (import fixture_print_two)):() then calls chk_type:[2]
-given print_fixture ((import fixture_fn), (import fixture_print_none)):() then calls chk_type:[0]
+given print_fixture {
+  ((import fixture_fn), (import fixture_print_two)):() then calls chk_type:((import fixture_fn), 1)
+  given tc_types_init ((import fixture_fn), (import fixture_print_none)):() then len((import tctys)):(0)
+  ((import fixture_fn), (import fixture_print_two)):() then calls chk_type:[2]
+  ((import fixture_fn), (import fixture_print_none)):() then calls chk_type:[0]
+}
 
 note_ty(string ty) {
   while(ty_is_list(ty) == 1) {
@@ -29,6 +33,8 @@ note_ty(string ty) {
   }
   note_struct(ty);
 } return void;
-given sd_note_fixture ("int[]"):() then len((import tctys)):(1)
-given sd_note_fixture ("int"):() then len((import tctys)):(0)
-given sd_note_fixture ("P[]"):() then len((import tcsts)):(1)
+given sd_note_fixture {
+  ("int[]"):() then len((import tctys)):(1)
+  ("int"):() then len((import tctys)):(0)
+  ("P[]"):() then len((import tcsts)):(1)
+}

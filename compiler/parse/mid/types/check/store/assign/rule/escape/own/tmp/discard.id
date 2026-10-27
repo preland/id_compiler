@@ -6,6 +6,8 @@ esc_discard(int e, string code) {
     etx_code = esc_free_of(e) + "(" + code + ")";
   }
 } return string etx_code;
-given esc_ffix ((import eff_cmk), "id_ff_make(n)"):("id_list_free(id_ff_make(n))")
-given esc_ffix ((import eff_csr), "id_fs_ret(n)"):("id_str_free(id_fs_ret(n))")
-given esc_ffix ((import eff_cl), "id_len(ys)"):("id_len(ys)")
+given esc_ffix {
+  ((import eff_cmk), "id_ff_make(n)"):("id_list_free(id_ff_make(n))")
+  ((import eff_csr), "id_fs_ret(n)"):("id_str_free(id_fs_ret(n))")
+  ((import eff_cl), "id_len(ys)"):("id_len(ys)")
+}

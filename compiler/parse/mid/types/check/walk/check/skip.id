@@ -36,5 +36,7 @@ tk_row_at(int i) {
   }
   integer_list_set((import tkcur), 0, tkc);
 } return int tkc;
-given tk_t_prep (3):(0)
-given tk_t_prep (7):(1)
+given tk_t_prep {
+  (3):(0)
+  (7):(1)
+}

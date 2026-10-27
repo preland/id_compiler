@@ -24,9 +24,11 @@ ty_kind(string t) {
     s = "func";
   }
 } return string s;
-given init_tyreg ("int[]"):("list")
-given init_tyreg ("func(int) return int"):("func")
-given init_tyreg ("int"):("int")
+given init_tyreg {
+  ("int[]"):("list")
+  ("func(int) return int"):("func")
+  ("int"):("int")
+}
 
 ty_row_kind(string t) {
   int r = find_str((import tyname), t);
@@ -35,5 +37,7 @@ ty_row_kind(string t) {
     s = (import tykind)[r];
   }
 } return string s;
-given init_tyreg ("string"):("ref")
-given init_tyreg ("nope"):("?")
+given init_tyreg {
+  ("string"):("ref")
+  ("nope"):("?")
+}

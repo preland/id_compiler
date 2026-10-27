@@ -9,8 +9,10 @@ lw_clo(int node) {
   int o = lw_clo_new(args);
   int ret_i = lw_clo_sets(o, fn_node_of((import ns1)[args[0]]), args);
 } return int ret_i;
-given lw_clo_fixture ((import lb_call)):(2) then (import istr)[0]:("idfn_a_bf__1")
-given lw_clo_fixture ((import lb_call)):(2) then (import istr)[2]:("id_clo_make")
+given lw_clo_fixture {
+  ((import lb_call)):(2) then (import istr)[0]:("idfn_a_bf__1")
+  ((import lb_call)):(2) then (import istr)[2]:("id_clo_make")
+}
 
 lw_clo_new(int[] args) {
   string sym = fv_sym((import ns1)[args[0]], len(args) - 1);
@@ -19,8 +21,10 @@ lw_clo_new(int[] args) {
 } chain (int[] args) {
   int ret_i = lw_callf("id_clo_make", "string", [fa, nc]);
 } return int ret_i;
-given lw_clo_fixture ([(import lb_name), (import lb_lit)]):(2) then (import istr)[1]:("1")
-given lw_clo_fixture ([(import lb_name)]):(2) then (import istr)[0]:("idfn_a_bf__0")
+given lw_clo_fixture {
+  ([(import lb_name), (import lb_lit)]):(2) then (import istr)[1]:("1")
+  ([(import lb_name)]):(2) then (import istr)[0]:("idfn_a_bf__0")
+}
 
 lw_clo_sets(int o, int fn, int[] args) {
   int i = 1;
@@ -30,5 +34,7 @@ lw_clo_sets(int o, int fn, int[] args) {
     i = i + 1;
   }
 } return int o;
-given lw_clo_fixture (5, (import lb_fn), [(import lb_name), (import lb_lit)]):(5) then (import istr)[3]:("id_clo_set")
-given lw_clo_fixture (5, (import lb_fn), [(import lb_name)]):(5) then len((import iop)):(0)
+given lw_clo_fixture {
+  (5, (import lb_fn), [(import lb_name), (import lb_lit)]):(5) then (import istr)[3]:("id_clo_set")
+  (5, (import lb_fn), [(import lb_name)]):(5) then len((import iop)):(0)
+}

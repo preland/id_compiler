@@ -7,10 +7,12 @@ print_calls() {
   print_call_cases();
   print_asm_cases();
 } return void;
-given edge_fixture ():() then prints:("edge_caller|fixture.id:20|fx_target|fixture.id:7|call\nedge_caller|fixture.id:20|fx_target|fixture.id:7|value\nfx_target|fixture.id:7|0\nedge_caller|fixture.id:20|0\n")
-given edge_fixture ():() then calls call_case_row:(1)
-given edge_fixture ():() then (import chkfail)[0]:(0)
-given edge_fixture ():() then init_units:(0)
+given edge_fixture {
+  ():() then prints:("edge_caller|fixture.id:20|fx_target|fixture.id:7|call\nedge_caller|fixture.id:20|fx_target|fixture.id:7|value\nfx_target|fixture.id:7|0\nedge_caller|fixture.id:20|0\n")
+  ():() then calls call_case_row:(1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // `--calls`'s case-count section: one row per function, printed after every
 // edge. `fn|file:line|cases` -- distinct from an edge row by field count (3
@@ -24,10 +26,12 @@ print_call_cases() {
     i = i + 1;
   }
 } return void;
-given edge_fixture ():() then prints:("fx_target|fixture.id:7|0\nedge_caller|fixture.id:20|0\n")
-given edge_fixture ():() then calls call_case_row:(0) then calls call_case_row:(1)
-given edge_fixture ():() then (import chkfail)[0]:(0)
-given edge_fixture ():() then init_units:(0)
+given edge_fixture {
+  ():() then prints:("fx_target|fixture.id:7|0\nedge_caller|fixture.id:20|0\n")
+  ():() then calls call_case_row:(0) then calls call_case_row:(1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // count_cases (mid/names/limits/shape/cases/more/flag/count.id) already
 // counts a function's cases for the two-case minimum; this reads it rather
@@ -37,5 +41,7 @@ call_case_row(int i) {
   int n = count_cases((import prog)[i]);
   string ret_s = name + "|" + (import pfile)[i] + ":" + (import pline)[i] + "|" + n;
 } return string ret_s;
-given edge_fixture (0):("fx_target|fixture.id:7|0")
-given edge_fixture (1):("edge_caller|fixture.id:20|0")
+given edge_fixture {
+  (0):("fx_target|fixture.id:7|0")
+  (1):("edge_caller|fixture.id:20|0")
+}

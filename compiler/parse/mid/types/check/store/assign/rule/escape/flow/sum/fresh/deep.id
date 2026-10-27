@@ -10,9 +10,11 @@ esc_deep_ret(int fn) {
     ok = esc_deep_val(fn, e);
   }
 } return int ok;
-given esc_ffix ((import eff_rows)):(1)
-given esc_ffix ((import eff_rleak)):(0)
-given esc_ffix ((import eff_make)):(0)
+given esc_ffix {
+  ((import eff_rows)):(1)
+  ((import eff_rleak)):(0)
+  ((import eff_make)):(0)
+}
 
 esc_deep_val(int fn, int e) {
   int ok = 0;
@@ -22,14 +24,18 @@ esc_deep_val(int fn, int e) {
     ok = esc_deep(fn, (import ns1)[e]);
   }
 } return int ok;
-given esc_ffix ((import eff_rows), (import eff_rl)):(1)
-given esc_ffix ((import eff_rows), (import eff_vr)):(0)
-given esc_ffix ((import eff_rows), (import eff_vn)):(0)
-given esc_ffix ((import eff_rows), (import eff_rlb)):(1)
+given esc_ffix {
+  ((import eff_rows), (import eff_rl)):(1)
+  ((import eff_rows), (import eff_vr)):(0)
+  ((import eff_rows), (import eff_vn)):(0)
+  ((import eff_rows), (import eff_rlb)):(1)
+}
 
 esc_deep_ok(int fn) {
   int ok = esc_dkind((import ns2)[fn]) == 0 || esc_deep_ret(fn) == 1;
 } return int ok;
-given esc_ffix ((import eff_make)):(1)
-given esc_ffix ((import eff_rows)):(1)
-given esc_ffix ((import eff_rleak)):(0)
+given esc_ffix {
+  ((import eff_make)):(1)
+  ((import eff_rows)):(1)
+  ((import eff_rleak)):(0)
+}

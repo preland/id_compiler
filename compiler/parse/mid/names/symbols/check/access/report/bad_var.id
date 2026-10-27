@@ -9,16 +9,20 @@ report_bad_var(string name, string owner, int ln) {
     report_owned_var(name, owner, ln);
   }
 } return void;
-given regrow_d ("z", "f", 10):() then calls report_undef_var:("z", "f", 10)
-given regrow_d ("x", "f", 10):() then calls report_owned_var:("x", "f", 10)
+given regrow_d {
+  ("z", "f", 10):() then calls report_undef_var:("z", "f", 10)
+  ("x", "f", 10):() then calls report_owned_var:("x", "f", 10)
+}
 
 report_undef_var(string name, string owner, int ln) {
   string undef_where = diag_fn_loc(owner, ln);
   string undef_help = "declare '" + name + "' before this line, as in `int " + name + " = 0;`, or correct the spelling if it is a typo for a variable that exists";
   diag("E0301", undef_where, "undefined variable '" + name + "'", name, "a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program", undef_help);
 } return void;
-given env_init ("z", "f", 10):() then prints:("<stdin>:10: error: undefined variable 'z' [E0301]\n  at: z\n  why: a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program\n  help: declare 'z' before this line, as in `int z = 0;`, or correct the spelling if it is a typo for a variable that exists\n") then (import chkfail)[0]:(1)
-given env_init ("y", "g", 20):() then prints:("<stdin>:20: error: undefined variable 'y' [E0301]\n  at: y\n  why: a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program\n  help: declare 'y' before this line, as in `int y = 0;`, or correct the spelling if it is a typo for a variable that exists\n") then (import chkfail)[0]:(1)
+given env_init {
+  ("z", "f", 10):() then prints:("<stdin>:10: error: undefined variable 'z' [E0301]\n  at: z\n  why: a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program\n  help: declare 'z' before this line, as in `int z = 0;`, or correct the spelling if it is a typo for a variable that exists\n") then (import chkfail)[0]:(1)
+  ("y", "g", 20):() then prints:("<stdin>:20: error: undefined variable 'y' [E0301]\n  at: y\n  why: a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program\n  help: declare 'y' before this line, as in `int y = 0;`, or correct the spelling if it is a typo for a variable that exists\n") then (import chkfail)[0]:(1)
+}
 
 report_owned_var(string name, string owner, int ln) {
   if(find_str((import enames), name) >= 0) {

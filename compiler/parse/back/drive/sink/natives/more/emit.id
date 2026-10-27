@@ -18,8 +18,10 @@ natives_then_prune() {
     dce_prune();
   }
 } return void;
-given natcall_fixture ():() then calls nat_scan:("program", 1)
-given natcall_fixture ():() then calls nat_scan:("program", 1) then (import chkfail)[0]:(0)
+given natcall_fixture {
+  ():() then calls nat_scan:("program", 1)
+  ():() then calls nat_scan:("program", 1) then (import chkfail)[0]:(0)
+}
 
 nat_print() {
   int i = 0;
@@ -56,6 +58,8 @@ exclunit_seed(string raw) {
 } chain (string raw) {
   int excl_n = len((import exclunit));
 } return int excl_n;
-given env_init ("5"):(1)
-given env_init ("5,9"):(2)
-given env_init (""):(0)
+given env_init {
+  ("5"):(1)
+  ("5,9"):(2)
+  (""):(0)
+}

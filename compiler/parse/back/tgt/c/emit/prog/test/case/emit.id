@@ -47,8 +47,10 @@ emit_case_fn(int ci) {
 } chain (int ci) {
   print("    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
 } return void;
-given void_call_fixture (0):() then calls emit_case_pre:(0) then calls emit_case_call_wrapped:(0)
-given void_call_fixture (1):() then calls emit_case_pre:(1) then calls emit_case_call_wrapped:(1)
+given void_call_fixture {
+  (0):() then calls emit_case_pre:(0) then calls emit_case_call_wrapped:(0)
+  (1):() then calls emit_case_pre:(1) then calls emit_case_call_wrapped:(1)
+}
 
 // A `traps` case skips the return-value machinery entirely (emit_case_expd,
 // emit_case_fail, emit_case_thens): all three read what the call under test

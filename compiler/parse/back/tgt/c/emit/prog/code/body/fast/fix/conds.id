@@ -27,5 +27,7 @@ lpf_conds3() {
 lpf_planned() {
   lp_plan((import lpf_wa));
 } return void;
-given lpf_in(0) ():() then lpf_nset:(1)
-given lpf_in(0) ():() then lpf_flag:(1)
+given lpf_in(0) {
+  ():() then lpf_nset:(1)
+  ():() then lpf_flag:(1)
+}

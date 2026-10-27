@@ -15,8 +15,10 @@ fix_choose_base(string bstem, string sfx, string t) {
   string name = fix_try(bstem, sfx, t);
   fix_take(name, t);
 } return string name;
-given fix_fixture ("foo", "_v", "int"):("foo_v")
-given fix_fixture ("bar", "_v", "string"):("bar_v")
+given fix_fixture {
+  ("foo", "_v", "int"):("foo_v")
+  ("bar", "_v", "string"):("bar_v")
+}
 
 // A leaf node at token 0 of ../../pick/reuse/lookup/at.id's
 // fix_tokline_fixture3, for a fix_span case that needs a token position
@@ -26,6 +28,8 @@ fix_tokline_node_fixture2() {
   int e = newleaf("ident", 0, 0, "len", "");
   fix_span_fixture2(e);
 } return void;
-given fix_tokline_fixture3 ():() then calls newleaf:("ident", 0, 0, "len", "")
-given fix_tokline_fixture3 ():() then (import fixd_gcl)[0]:(-1)
-given fix_tokline_fixture3 ():() then init_units:(0)
+given fix_tokline_fixture3 {
+  ():() then calls newleaf:("ident", 0, 0, "len", "")
+  ():() then (import fixd_gcl)[0]:(-1)
+  ():() then init_units:(0)
+}

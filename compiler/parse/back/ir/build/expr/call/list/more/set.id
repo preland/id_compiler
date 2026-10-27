@@ -8,8 +8,10 @@ lw_iset(int node, int a, string elem) {
   lw_callf(lv_f, "", [a, i, v]);
   lw_slot_free(node, lv_old);
 } return void;
-given lw_fix_iassign ((import fix_iassign_n), 0, "i"):() then calls lw_callf:("id_list_set", "", [0, 0, 2])
-given lw_fix_iassign ((import fix_iassign_n), 5, "x"):() then calls lw_callf:("id_list_set", "", [5, 0, 2])
+given lw_fix_iassign {
+  ((import fix_iassign_n), 0, "i"):() then calls lw_callf:("id_list_set", "", [0, 0, 2])
+  ((import fix_iassign_n), 5, "x"):() then calls lw_callf:("id_list_set", "", [5, 0, 2])
+}
 
 // A fresh list. Its own function because the runtime call takes no arguments
 // and an empty list literal needs a typed context, which an argument position
@@ -24,6 +26,8 @@ lw_new(string ty) {
 } chain (string ty) {
   int ret_i = lw_callf(maker, ty, none);
 } return int ret_i;
-given lw_env_fixture ("int"):(0)
-given lw_env_fixture ("string"):(0)
-given lw_env_fixture ("bytes"):(1)
+given lw_env_fixture {
+  ("int"):(0)
+  ("string"):(0)
+  ("bytes"):(1)
+}

@@ -7,16 +7,20 @@ native_ret(int[] pos, string name, int[] params) {
   advance(pos);
   int ret_i = native_type(pos, name, params);
 } return int ret_i;
-given decl_tokens ([33], "nm1", []):(0) then prints:("<stdin>:1: error: expected ';', found 's' [E0101]\n  at: s\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
-given decl_tokens ([2], "nm2", []):(0) then prints:("<stdin>:1: error: expected 'return', found 'int' [E0101]\n  at: int\n  why: the grammar needs 'return' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put 'return' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n<stdin>:1: error: expected ';', found ',' [E0101]\n  at: ,\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+given decl_tokens {
+  ([33], "nm1", []):(0) then prints:("<stdin>:1: error: expected ';', found 's' [E0101]\n  at: s\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+  ([2], "nm2", []):(0) then prints:("<stdin>:1: error: expected 'return', found 'int' [E0101]\n  at: int\n  why: the grammar needs 'return' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put 'return' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n<stdin>:1: error: expected ';', found ',' [E0101]\n  at: ,\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+}
 
 native_type(int[] pos, string name, int[] params) {
   string rt = parse_type(pos);
   expect_text(pos, ";");
   int ret_i = native_node(pos, name, rt, params);
 } return int ret_i;
-given decl_tokens ([34], "nm1", []):(0) then prints:("<stdin>:1: error: expected ';', found 's' [E0101]\n  at: s\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
-given decl_tokens ([3], "nm2", []):(0) then prints:("<stdin>:1: error: expected ';', found ',' [E0101]\n  at: ,\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+given decl_tokens {
+  ([34], "nm1", []):(0) then prints:("<stdin>:1: error: expected ';', found 's' [E0101]\n  at: s\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+  ([3], "nm2", []):(0) then prints:("<stdin>:1: error: expected ';', found ',' [E0101]\n  at: ,\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+}
 
 // -1 for the return expression, as for `return void`: there is none to check.
 native_node(int[] pos, string name, string rt, int[] params) {
@@ -24,5 +28,7 @@ native_node(int[] pos, string name, string rt, int[] params) {
   int[] none = [];
   int ret_i = newnode("func", 0 - 1, 1, name, rt, params, none);
 } return int ret_i;
-given decl_tokens ([36], "nm1", "int", []):(0)
-given decl_tokens ([4], "nm2", "int", []):(0)
+given decl_tokens {
+  ([36], "nm1", "int", []):(0)
+  ([4], "nm2", "int", []):(0)
+}

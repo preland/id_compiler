@@ -7,8 +7,10 @@ ut_callee(string fname, string callee_nm) {
     ut_add(fname, ut_what_v, ut_via_v);
   }
 } return void;
-given ut_host_seeded ("newfn", "port_byte"):() then len((import utwhat)):(3)
-given ut_host_seeded ("port_byte", "port_byte"):() then len((import utwhat)):(2)
+given ut_host_seeded {
+  ("newfn", "port_byte"):() then len((import utwhat)):(3)
+  ("port_byte", "port_byte"):() then len((import utwhat)):(2)
+}
 
 // A callee is named only when it is a caller itself. When it is the thing that
 // cannot run, the message names that thing directly instead.
@@ -19,9 +21,11 @@ ut_via(string callee_nm) {
     via_nm = callee_nm;
   }
 } return string via_nm;
-given ut_host_seeded ("port_byte"):("")
-given ut_host_seeded ("nobody"):("")
-given ut_host_seeded ("caller"):("caller")
+given ut_host_seeded {
+  ("port_byte"):("")
+  ("nobody"):("")
+  ("caller"):("caller")
+}
 
 ut_add(string fname, string what_s, string via_s) {
   push((import utname), fname);

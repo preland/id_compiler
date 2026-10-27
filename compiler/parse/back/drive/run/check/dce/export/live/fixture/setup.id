@@ -33,12 +33,16 @@ cvl_setup() {
 clive_str() {
   string cvf_s_t = "live " + (string_join((import clive), ","));
 } return string cvf_s_t;
-given cvl_setup ():("live ")
-given cvl_setup given const_mark(0) ():("live cb,cd,ca")
+given cvl_setup {
+  ():("live ")
+  given const_mark(0) ():("live cb,cd,ca")
+}
 
 cvl_scan() {
   int cvf_base = const_base();
   const_funcs(0, cvf_base);
 } return void;
-given cvl_setup ():() then (import chkfail)[0]:(0)
-given cvl_setup ():() then clive_str:("live cb,cd")
+given cvl_setup {
+  ():() then (import chkfail)[0]:(0)
+  ():() then clive_str:("live cb,cd")
+}

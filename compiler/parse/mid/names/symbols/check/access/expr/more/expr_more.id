@@ -17,8 +17,10 @@ acc_pair(int id, string owner, int ln) {
 } chain (int id, string owner, int ln) {
   acc_expr(i2_of_v, owner, ln);
 } return void;
-given cmp_fixture ((import bin_eq), "f", 10):() then calls acc_expr:((import lit_a), "f", 10) then calls acc_expr:((import lit_b), "f", 10)
-given cmp_fixture ((import bin_mixed), "f", 10):() then calls acc_expr:((import bin_bitand), "f", 10) then calls acc_expr:((import lit_a), "f", 10)
+given cmp_fixture {
+  ((import bin_eq), "f", 10):() then calls acc_expr:((import lit_a), "f", 10) then calls acc_expr:((import lit_b), "f", 10)
+  ((import bin_mixed), "f", 10):() then calls acc_expr:((import bin_bitand), "f", 10) then calls acc_expr:((import lit_a), "f", 10)
+}
 
 acc_expr4(int id, string owner, int ln) {
   if((import nkind)[id] == "un") {

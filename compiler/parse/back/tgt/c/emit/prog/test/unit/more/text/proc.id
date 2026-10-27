@@ -17,8 +17,10 @@ emit_test_tail() {
   emit_tc_helpers();
   emit_tc_rest();
 } return void;
-given env_init ():() then calls emit_tc_run:() then calls emit_tc_rest:()
-given env_init ():() then (import chkfail)[0]:(0)
+given env_init {
+  ():() then calls emit_tc_run:() then calls emit_tc_rest:()
+  ():() then (import chkfail)[0]:(0)
+}
 
 emit_tc_run() {
   int n = len((import casefn));

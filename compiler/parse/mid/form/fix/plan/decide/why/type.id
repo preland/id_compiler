@@ -5,8 +5,10 @@ fix_type_ok(int i) {
     ok = fix_spanok((import fixe_n)[i]);
   }
 } return int ok;
-given fix_type_ok_fixture (0):(1)
-given fix_type_ok_fixture (1):(0)
+given fix_type_ok_fixture {
+  (0):(1)
+  (1):(0)
+}
 
 // The statement's first token has to have columns, or there is nowhere to put
 // the declarations.
@@ -24,5 +26,7 @@ fix_refuse(int last, string why) {
   int tkn = (import ntok)[e];
   print("@N|" + (import fixd_file)[0] + "|" + (import tline)[tkn] + "|" + why);
 } return void;
-given fix_tokline_node_fixture (0, "reason A"):() then prints:("@N||3|reason A\n")
-given fix_tokline_node_fixture (0, "reason B"):() then prints:("@N||3|reason B\n")
+given fix_tokline_node_fixture {
+  (0, "reason A"):() then prints:("@N||3|reason A\n")
+  (0, "reason B"):() then prints:("@N||3|reason B\n")
+}

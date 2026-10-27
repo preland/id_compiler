@@ -9,9 +9,11 @@ esc_cnt3(int e, string nm) {
     c = esc_cntl((import nl1)[e], nm);
   }
 } return int c;
-given esc_sfix ((import efs_cl), "n"):(1)
-given esc_sfix ((import efs_arr), "n"):(1)
-given esc_sfix ((import efs_vn), "n"):(0)
+given esc_sfix {
+  ((import efs_cl), "n"):(1)
+  ((import efs_arr), "n"):(1)
+  ((import efs_vn), "n"):(0)
+}
 
 esc_cntl(int[] xs, string nm) {
   int c = 0;
@@ -21,5 +23,7 @@ esc_cntl(int[] xs, string nm) {
     i = i + 1;
   }
 } return int c;
-given esc_sfix ([(import efs_vn), (import efs_vn)], "n"):(2)
-given esc_sfix ([], "n"):(0)
+given esc_sfix {
+  ([(import efs_vn), (import efs_vn)], "n"):(2)
+  ([], "n"):(0)
+}

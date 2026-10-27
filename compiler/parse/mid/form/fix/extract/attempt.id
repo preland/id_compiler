@@ -10,8 +10,10 @@ fix_xattempt(int xaf, int xalo, int xaskip) {
     fix_xplan(xaf, xalo);
   }
 } return void;
-given fix_xplanned (7, 0, 0):() then calls fix_xplan:(7, 0)
-given fix_xplanned (7, 0, 5):() then (import fixx_skip):([4])
-given fix_xplanned (10, 0, 0):() then calls fix_xplan:[0]
-given fix_xplanned (7, 0, 1):() then calls fix_xplan:[0]
-given fix_xplanned (8, 0, 1):() then calls fix_xplan:[0]
+given fix_xplanned {
+  (7, 0, 0):() then calls fix_xplan:(7, 0)
+  (7, 0, 5):() then (import fixx_skip):([4])
+  (10, 0, 0):() then calls fix_xplan:[0]
+  (7, 0, 1):() then calls fix_xplan:[0]
+  (8, 0, 1):() then calls fix_xplan:[0]
+}

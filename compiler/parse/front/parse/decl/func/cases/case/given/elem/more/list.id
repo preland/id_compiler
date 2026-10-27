@@ -20,8 +20,10 @@ case_list(int[] pos) {
   advance(pos);
   int ret_i = node_arr(items);
 } return int ret_i;
-given list_fix ([0]):(2) then calls node_arr:([0, 1])
-given list_fix ([8]):(2) then calls node_arr:([0])
+given list_fix {
+  ([0]):(2) then calls node_arr:([0, 1])
+  ([8]):(2) then calls node_arr:([0])
+}
 
 // Two lists: `[5, (import zz)]` from 0, and `[[5]]` from 8.
 list_fix() {

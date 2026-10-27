@@ -39,8 +39,10 @@ dg_emit_key(int dgc) {
   string dgkey = dg_case_key(dgc);
   print("// idtc key " + dgc + " " + dgkey);
 } return void;
-given dg_t_built (0):() then prints:("// idtc key 0 -5465788173469261037\n")
-given dg_t_built (3):() then prints:("// idtc key 3 -26172764691117968\n")
+given dg_t_built {
+  (0):() then prints:("// idtc key 0 -5465788173469261037\n")
+  (3):() then prints:("// idtc key 3 -26172764691117968\n")
+}
 
 dg_case_key(int dgc) {
   string dgkey = "std";

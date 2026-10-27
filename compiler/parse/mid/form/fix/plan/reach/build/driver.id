@@ -42,5 +42,7 @@ fix_winit2() {
     i = i + 1;
   }
 } return void;
-given fix_wfill_fixture ():() then len((import fixd_wadj)):(2)
-given fix_wfill_fixture ():() then (import fixd_wadj):([[], []])
+given fix_wfill_fixture {
+  ():() then len((import fixd_wadj)):(2)
+  ():() then (import fixd_wadj):([[], []])
+}

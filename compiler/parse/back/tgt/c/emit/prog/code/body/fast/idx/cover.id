@@ -34,5 +34,7 @@ lx_base(int lg_id, int lg_lo, int lg_hi) {
     lg_r = lp_cnt(lg_lo, lg_hi, (import ns1)[((import ni1)[lg_id])], 0) == 0;
   }
 } return int lg_r;
-given lpq_cs(0) ((import lpq_xs), (import lpq_los), (import lpq_his)):(1)
-given lpq_cs(0) ((import lpf_xw), (import lpf_low), (import lpf_hiw)):(0)
+given lpq_cs(0) {
+  ((import lpq_xs), (import lpq_los), (import lpq_his)):(1)
+  ((import lpf_xw), (import lpf_low), (import lpf_hiw)):(0)
+}

@@ -26,6 +26,8 @@ emit_case_traps_fail(int ci) {
   string want = tc_value((import nl1)[tnid][0], "string");
   print("    fprintf(stderr, \"%s: test failed: %s \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n    fprintf(stderr, \"expected a trap containing %s, but it returned\\n\", " + want + ");\n    return 3;");
 } return void;
-given traps_case_fixture ((import fixture_ci)):() then prints:("    fprintf(stderr, \"%s: test failed: %s \", idtc_where[0], idtc_call[0]);\n    fprintf(stderr, \"expected a trap containing %s, but it returned\\n\", 0);\n    return 3;\n")
-given traps_case_fixture ((import fixture_ci)):() then calls case_traps_node:((import fixture_ci))
-given traps_case_fixture ((import fixture_ci)):() then calls tc_value:[1]
+given traps_case_fixture {
+  ((import fixture_ci)):() then prints:("    fprintf(stderr, \"%s: test failed: %s \", idtc_where[0], idtc_call[0]);\n    fprintf(stderr, \"expected a trap containing %s, but it returned\\n\", 0);\n    return 3;\n")
+  ((import fixture_ci)):() then calls case_traps_node:((import fixture_ci))
+  ((import fixture_ci)):() then calls tc_value:[1]
+}

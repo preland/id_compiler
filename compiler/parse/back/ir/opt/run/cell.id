@@ -23,8 +23,10 @@ init_opt() {
   export int[][] phiof = [];
   export int[][] outv = [];
 } return int 0;
-given env_init ():(0) then (import chkfail)[0]:(0)
-given env_init ():(0)
+given env_init {
+  ():(0) then (import chkfail)[0]:(0)
+  ():(0)
+}
 
 // The optimisation level, from `--opt N`. Level 0 emits the lowering as it
 // stands, which is the property that makes the lowering trustworthy: a program

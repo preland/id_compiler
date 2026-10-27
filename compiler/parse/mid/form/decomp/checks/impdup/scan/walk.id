@@ -17,8 +17,10 @@ imd_at(int imd_x) {
     imd_report(imd_x, imd_y);
   }
 } return void;
-given imd_pair_base given imd_fill (1):() then (import chkfail)[0]:(1)
-given imd_pair_base given imd_fill (0):() then (import chkfail)[0]:(0)
+given imd_pair_base {
+  given imd_fill (1):() then (import chkfail)[0]:(1)
+  given imd_fill (0):() then (import chkfail)[0]:(0)
+}
 
 imd_find(int imd_x) {
   int imd_y = 0;
@@ -28,5 +30,7 @@ imd_find(int imd_x) {
     imd_y = imd_y + 1;
   }
 } return int imd_found;
-given imd_pair_base given imd_fill (1):(0)
-given imd_pair_base given imd_fill (0):(-1)
+given imd_pair_base {
+  given imd_fill (1):(0)
+  given imd_fill (0):(-1)
+}

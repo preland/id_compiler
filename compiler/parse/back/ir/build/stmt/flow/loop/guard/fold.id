@@ -10,8 +10,10 @@ gd_run(string gdf_op, int gdf_at, int gdf_n) {
     gdf_k = gdf_k + 1;
   }
 } return int gdf_acc;
-given gd_words given gd_trio ("-", 0, 3):(8) then gd_last:("word sub ")
-given gd_words given gd_trio ("+", 2, 1):(5)
+given gd_words {
+  given gd_trio ("-", 0, 3):(8) then gd_last:("word sub ")
+  given gd_trio ("+", 2, 1):(5)
+}
 
 gd_drop(int gdf_n) {
   int gdf_d = 0;
@@ -20,8 +22,10 @@ gd_drop(int gdf_n) {
     gdf_d = gdf_d + 1;
   }
 } return void;
-given gd_words given gd_trio (2):() then len((import gdstk)):(1)
-given gd_words given gd_trio (0):() then len((import gdstk)):(3)
+given gd_words {
+  given gd_trio (2):() then len((import gdstk)):(1)
+  given gd_trio (0):() then len((import gdstk)):(3)
+}
 
 gd_fold(string gdf_tok) {
   int gdf_n = gt_arity(gdf_tok);
@@ -32,6 +36,8 @@ gd_fold(string gdf_tok) {
   gd_drop(gdf_n);
   push((import gdstk), gdf_acc);
 } return void;
-given gd_words given gd_trio ("-:3"):() then (import gdstk)[0]:(8)
-given gd_words given gd_trio ("+:1"):() then len((import gdstk)):(3)
-given gd_words given gd_trio ("*:2"):() then (import gdstk)[1]:(7)
+given gd_words {
+  given gd_trio ("-:3"):() then (import gdstk)[0]:(8)
+  given gd_trio ("+:1"):() then len((import gdstk)):(3)
+  given gd_trio ("*:2"):() then (import gdstk)[1]:(7)
+}

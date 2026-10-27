@@ -9,10 +9,12 @@ fix_xassign(string xbefore) {
     xasg = 2;
   }
 } return int xasg;
-given fix_xfixture (";"):(2)
-given fix_xfixture ("}"):(2)
-given fix_xfixture ("int"):(3)
-given fix_xfixture ("]"):(3)
+given fix_xfixture {
+  (";"):(2)
+  ("}"):(2)
+  ("int"):(3)
+  ("]"):(3)
+}
 
 fix_xadd(string[] xlist, string xname) {
   if(find_str(xlist, xname) < 0) {
@@ -30,6 +32,8 @@ fix_xpick(int xrole) {
     xpicked = (import fixx_dc);
   }
 } return string[] xpicked;
-given fix_xfilled (1):(["r"])
-given fix_xfilled (2):(["w"])
-given fix_xfilled (3):(["d"])
+given fix_xfilled {
+  (1):(["r"])
+  (2):(["w"])
+  (3):(["d"])
+}

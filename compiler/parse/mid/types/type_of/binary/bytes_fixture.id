@@ -23,8 +23,10 @@ bm_slots() {
 } chain () {
   export int bm_asg_bytes = node_txt1("assign", "bm_var", (import bm_arr_asg));
 } return void;
-given leaves_fixture ():() then calls add_var:("bm_var", "bytes", 0)
-given leaves_fixture ():() then calls node_decl:[2]
+given leaves_fixture {
+  ():() then calls add_var:("bm_var", "bytes", 0)
+  ():() then calls node_decl:[2]
+}
 
 bm_calls() {
   int bm_param = node_param("param", "bytes", "bm_p");
@@ -43,5 +45,7 @@ bm_calls() {
   export int bm_call_ctor = node_call("BmS", [(import bm_arr_ctor)]);
   export int bm_call_int = node_call("bm_f", [(import lit_a)]);
 } return void;
-given call2_setup given leaves_fixture ():() then calls node_param:("param", "bytes", "bm_p")
-given call2_setup given leaves_fixture ():() then calls node_call:[3]
+given call2_setup {
+  given leaves_fixture ():() then calls node_param:("param", "bytes", "bm_p")
+  given leaves_fixture ():() then calls node_call:[3]
+}

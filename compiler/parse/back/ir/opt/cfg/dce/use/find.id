@@ -6,8 +6,10 @@ dce_lists(int at, int id) {
   int[] l = (import ilist)[at];
   int r = list_find(l, id);
 } return int r;
-given dce_fixture (0, 5):(1)
-given dce_fixture (0, 99):(0)
+given dce_fixture {
+  (0, 5):(1)
+  (0, 99):(0)
+}
 
 // cfg_fixture plus a second block-0 instruction that references id0 -- so a
 // use can be found beyond the first block, for dce_used's own cases.
@@ -25,5 +27,7 @@ ret1_add() {
   int idret = ir_insn("ret", "", 0, 0, "", none, none);
   ir_add(1, idret);
 } return void;
-given cfg_fixture ():() then chk_blk_count:(2)
-given cfg_fixture ():() then chk_ins0_count:(1)
+given cfg_fixture {
+  ():() then chk_blk_count:(2)
+  ():() then chk_ins0_count:(1)
+}

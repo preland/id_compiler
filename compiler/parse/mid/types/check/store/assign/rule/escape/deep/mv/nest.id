@@ -10,8 +10,10 @@ esc_stgt(int sn) {
     dz_g = (import ns1)[sn];
   }
 } return string dz_g;
-given esc_fm_fix ((import efm_ds)):("kids")
-given esc_fm_fix ((import efm_ps)):("")
+given esc_fm_fix {
+  ((import efm_ds)):("kids")
+  ((import efm_ps)):("")
+}
 
 // The proof for the statements inside a branch or a loop; 1 for any other.
 esc_mvnest(int fn, int sn, string nm) {
@@ -20,8 +22,10 @@ esc_mvnest(int fn, int sn, string nm) {
     ok = esc_mvin(fn, (import nl1)[sn], nm) & esc_mvin(fn, (import nl2)[sn], nm);
   }
 } return int ok;
-given esc_fm_fix ((import efm_fn), (import efm_if), "t"):(1)
-given esc_fm_fix ((import efm_bad), (import efm_bif), "t"):(0)
+given esc_fm_fix {
+  ((import efm_fn), (import efm_if), "t"):(1)
+  ((import efm_bad), (import efm_bif), "t"):(0)
+}
 
 // Every heap argument that is a name, at statement `i` of `stmts`.
 esc_mvctor(int fn, int[] stmts, int i, int e) {
@@ -34,5 +38,7 @@ esc_mvctor(int fn, int[] stmts, int i, int e) {
     dz_k = dz_k + 1;
   }
 } return int ok;
-given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_cc)):(1)
-given esc_fm_fix ((import efm_bad), (import efm_bbody), 1, (import efm_cc)):(0)
+given esc_fm_fix {
+  ((import efm_fn), (import efm_body), 2, (import efm_cc)):(1)
+  ((import efm_bad), (import efm_bbody), 1, (import efm_cc)):(0)
+}

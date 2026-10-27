@@ -11,8 +11,10 @@ rfx_fn(string name) {
     ok = rfx_scan(name, rfm);
   }
 } return int ok;
-given seed_given_fixture ("fx_target"):(1)
-given seed_given_fixture ("nope"):(0)
+given seed_given_fixture {
+  ("fx_target"):(1)
+  ("nope"):(0)
+}
 
 rfx_scan(string name, int rfm) {
   int ok = 1;
@@ -21,8 +23,10 @@ rfx_scan(string name, int rfm) {
     hash_map_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, rfm);
   }
 } return int ok;
-given seed_given_fixture ("fx_target", -3):(1)
-given seed_given_fixture ("nope", -3):(0)
+given seed_given_fixture {
+  ("fx_target", -3):(1)
+  ("nope", -3):(0)
+}
 
 conf_reached() {
   int ok = is_reach("conf.id");

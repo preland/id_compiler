@@ -7,8 +7,10 @@ emit_entry(int id) {
   emit_count("    ");
   emit_rec_call(id);
 } return void;
-given entry_fixture ((import fixture_fn)):() then prints:("    id_ctr_time++;\n")
-given entry_fixture ((import fixture_zero)):() then prints:("    id_ctr_time++;\n")
+given entry_fixture {
+  ((import fixture_fn)):() then prints:("    id_ctr_time++;\n")
+  ((import fixture_zero)):() then prints:("    id_ctr_time++;\n")
+}
 
 // harn_init/harn_set (test/unit/more/flag.id, pre-existing) export and set
 // the flag (import harn)[0] reads; env_init does not, since it is a

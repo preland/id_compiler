@@ -8,8 +8,10 @@ bind_isfn(int a) {
     ok = 1;
   }
 } return int ok;
-given bind_fixture ((import bind_fnname)):(1)
-given bind_fixture ((import bind_lit)):(0)
+given bind_fixture {
+  ((import bind_fnname)):(1)
+  ((import bind_lit)):(0)
+}
 
 bind_fit(int id, int n) {
   string[] pts = fn_params(type_of((import nl1)[id][0]));
@@ -19,12 +21,16 @@ bind_fit(int id, int n) {
     bind_vals(id, pts, n - 1);
   }
 } return void;
-given bind_fixture ((import bind_toomany), 3):() then (import chkfail)[0]:(1)
-given bind_fixture ((import bind_ok), 2):() then (import chkfail)[0]:(0)
+given bind_fixture {
+  ((import bind_toomany), 3):() then (import chkfail)[0]:(1)
+  ((import bind_ok), 2):() then (import chkfail)[0]:(0)
+}
 
 bind_many(int id, int np) {
   string msg = "'bind' gives " + (len((import nl1)[id]) - 1) + " values to '" + (import ns1)[(import nl1)[id][0]] + "', which takes " + np + " parameter(s); bind fixes the leading parameters, so give at most " + np;
   tc_err(id, msg);
 } return void;
-given bind_fixture ((import bind_toomany), 1):() then (import chkfail)[0]:(1)
-given bind_fixture ((import bind_toomany), 1):() then prints:("<stdin>:1: error: 'bind' gives 2 values to 'fx_target', which takes 1 parameter(s); bind fixes the leading parameters, so give at most 1\n")
+given bind_fixture {
+  ((import bind_toomany), 1):() then (import chkfail)[0]:(1)
+  ((import bind_toomany), 1):() then prints:("<stdin>:1: error: 'bind' gives 2 values to 'fx_target', which takes 1 parameter(s); bind fixes the leading parameters, so give at most 1\n")
+}

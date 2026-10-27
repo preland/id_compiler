@@ -15,6 +15,8 @@ lw_truth(int v, string t) {
   int z = ir_leaf("const", t, 0 - 1, 0 - 1, lw_zero_v);
   int ret_i = lw_truth_tail(v, t, z);
 } return int ret_i;
-given bound_fixture (2, "int"):(4)
-given bound_fixture (2, "float"):(4)
+given bound_fixture {
+  (2, "int"):(4)
+  (2, "float"):(4)
+}
 

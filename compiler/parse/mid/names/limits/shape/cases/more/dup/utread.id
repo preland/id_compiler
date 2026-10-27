@@ -11,8 +11,10 @@
 then_path_step(string ty, string name) {
   string ft = sd_cell((import sdftype), ty, sd_fpos(ty, name));
 } return string ft;
-given sd_pair ("P", "y"):("int")
-given sd_pair ("P", "z"):("")
+given sd_pair {
+  ("P", "y"):("int")
+  ("P", "z"):("")
+}
 
 // The type a path of fields ".a.b" (the clause's s2, "" for none) reaches from an export of type `ty`: "" when a
 // step is not a field of the struct before it.
@@ -26,9 +28,11 @@ then_path_type(string ty, string path) {
     pi = pi + 1;
   }
 } return string pt;
-given sd_pair ("P", ""):("P")
-given sd_pair given sd_note("R", ["p", "q"], ["P", "int"], "r.id", 9) ("R", ".p.y"):("int")
-given sd_pair ("P", ".z"):("")
+given sd_pair {
+  ("P", ""):("P")
+  given sd_note("R", ["p", "q"], ["P", "int"], "r.id", 9) ("R", ".p.y"):("int")
+  ("P", ".z"):("")
+}
 
 // What is wrong with a path then_path_type found no type for: the first step that is not a field, named with
 // what comes before it, and what would fix it.

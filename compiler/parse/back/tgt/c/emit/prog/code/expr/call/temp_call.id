@@ -12,8 +12,10 @@ tmp_wrap(int id) {
     tx_w = emit_gcall(id);
   }
 } return string tx_w;
-given esc_ffix ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
-given esc_ffix ((import eff_cmk)):("id_ff_make(n)")
+given esc_ffix {
+  ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
+  ((import eff_cmk)):("id_ff_make(n)")
+}
 
 tmp_text(int id) {
   string tx_call = fn_sym((import ns1)[id]) + "(" + tmp_all(id, 1) + ")";
@@ -22,8 +24,10 @@ tmp_text(int id) {
 } chain (int id) {
   string tx_t = tmp_join(type_of(id), tx_pre, tx_call, tx_fr);
 } return string tx_t;
-given esc_ffix ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
-given esc_ffix ((import eff_csc)):("({ char* idft0 = id_fs_ret(n); int idfr = id_ff_slen(idft0); id_str_free(idft0); idfr; })")
+given esc_ffix {
+  ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
+  ((import eff_csc)):("({ char* idft0 = id_fs_ret(n); int idfr = id_ff_slen(idft0); id_str_free(idft0); idfr; })")
+}
 
 tmp_join(string tx_rt, string tx_pre, string tx_cl, string tx_fr) {
   string tx_j = "({ " + tx_pre + tx_cl + "; " + tx_fr + "})";

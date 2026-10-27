@@ -2,8 +2,10 @@ fix_paren_two(int x, int a, int b) {
   fix_paren_side(x, a);
   fix_paren_side(x, b);
 } return void;
-given lz_c ((import lz_binid), (import lz_var), (import lz_i1)):() then calls fix_paren_side:[2] then calls fix_paren_side:((import lz_binid), (import lz_var)) then calls fix_paren_side:((import lz_binid), (import lz_i1))
-given lz_c ((import lz_binid), (import lz_i1), (import lz_i1)):() then calls fix_paren_side:[2] then calls fix_paren_side:((import lz_binid), (import lz_i1))
+given lz_c {
+  ((import lz_binid), (import lz_var), (import lz_i1)):() then calls fix_paren_side:[2] then calls fix_paren_side:((import lz_binid), (import lz_var)) then calls fix_paren_side:((import lz_binid), (import lz_i1))
+  ((import lz_binid), (import lz_i1), (import lz_i1)):() then calls fix_paren_side:[2] then calls fix_paren_side:((import lz_binid), (import lz_i1))
+}
 
 // Not inside text another edit of this run moves: that text is copied from the
 // source as it was, and gets its parentheses on the next run.
@@ -12,9 +14,11 @@ fix_paren_side(int x, int c) {
     fix_paren_emit(c);
   }
 } return void;
-given fix_paren_side_fixture ((import bin_mixed), (import bin_bitand)):() then calls fix_paren_emit:((import bin_bitand))
-given fix_paren_side_fixture ((import bin_mixed), (import bin_bitand)):() then prints:("@R||1|5|1|5|1|(\n@R||1|8|1|8|2|)\n")
-given fix_paren_side_fixture ((import bin_eq), (import bin_lt)):() then calls fix_paren_emit:[0]
+given fix_paren_side_fixture {
+  ((import bin_mixed), (import bin_bitand)):() then calls fix_paren_emit:((import bin_bitand))
+  ((import bin_mixed), (import bin_bitand)):() then prints:("@R||1|5|1|5|1|(\n@R||1|8|1|8|2|)\n")
+  ((import bin_eq), (import bin_lt)):() then calls fix_paren_emit:[0]
+}
 
 fix_paren_emit(int c) {
   int b = fix_nbeg(c);

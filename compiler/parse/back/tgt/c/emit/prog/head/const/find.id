@@ -12,13 +12,17 @@ const_decl(string name) {
     i = i + 1;
   }
 } return int d;
-given cl_setup ("k"):((import cl_d))
-given cl_setup ("nope"):(-1)
+given cl_setup {
+  ("k"):((import cl_d))
+  ("nope"):(-1)
+}
 
 const_pick(int i, string name, int d) {
   if((import ns2)[((import cdecl)[i])] == name) {
     d = (import cdecl)[i];
   }
 } return int d;
-given cl_setup (0, "k", -1):((import cl_d))
-given cl_setup (0, "nope", -1):(-1)
+given cl_setup {
+  (0, "k", -1):((import cl_d))
+  (0, "nope", -1):(-1)
+}

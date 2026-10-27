@@ -10,18 +10,22 @@ fix_xfind(int[] xbody, int xinloop) {
     xfi = xfi + 1;
   }
 } return void;
-given fix_xnodes ([5], 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
-given fix_xnodes ([1, 6], 0):() then calls fix_xrecord:([1, 2, 3, 4], 1)
-given fix_xnodes ([9], 0):() then calls fix_xrecord:[0]
+given fix_xnodes {
+  ([5], 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
+  ([1, 6], 0):() then calls fix_xrecord:([1, 2, 3, 4], 1)
+  ([9], 0):() then calls fix_xrecord:[0]
+}
 
 fix_xnode(int xnd, int xinloop) {
   if((import nkind)[xnd] == "if" || (import nkind)[xnd] == "while") {
     fix_xarms(xnd, xinloop);
   }
 } return void;
-given fix_xnodes (5, 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
-given fix_xnodes (6, 0):() then calls fix_xrecord:([1, 2, 3, 4], 1)
-given fix_xnodes (1, 0):() then calls fix_xrecord:[0]
+given fix_xnodes {
+  (5, 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
+  (6, 0):() then calls fix_xrecord:([1, 2, 3, 4], 1)
+  (1, 0):() then calls fix_xrecord:[0]
+}
 
 fix_xblock(int[] xarm, int xinloop) {
   if(count_actions(xarm) > 3) {
@@ -30,6 +34,8 @@ fix_xblock(int[] xarm, int xinloop) {
     fix_xfind(xarm, xinloop);
   }
 } return void;
-given fix_xnodes ([1, 2, 3, 4], 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
-given fix_xnodes ([1, 2, 3, 4, 1], 1):() then calls fix_xrecord:([1, 2, 3, 4, 1], 1)
-given fix_xnodes ([1, 2], 0):() then calls fix_xrecord:[0]
+given fix_xnodes {
+  ([1, 2, 3, 4], 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
+  ([1, 2, 3, 4, 1], 1):() then calls fix_xrecord:([1, 2, 3, 4, 1], 1)
+  ([1, 2], 0):() then calls fix_xrecord:[0]
+}

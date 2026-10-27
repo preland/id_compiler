@@ -10,10 +10,12 @@ bfl_class(int bfl_i, string bfl_nm) {
     bfl_c = bfl_store_at(bfl_i, bfl_nm);
   }
 } return int bfl_c;
-given bfl_fixture ((import bfl_d0), "fx_flag"):(1)
-given bfl_fixture ((import bfl_a1), "fx_flag"):(2)
-given bfl_fixture ((import bfl_plus), "fx_cnt"):(3)
-given bfl_fixture ((import bfl_d0), "other"):(0)
+given bfl_fixture {
+  ((import bfl_d0), "fx_flag"):(1)
+  ((import bfl_a1), "fx_flag"):(2)
+  ((import bfl_plus), "fx_cnt"):(3)
+  ((import bfl_d0), "other"):(0)
+}
 
 bfl_store_at(int bfl_i, string bfl_nm) {
   int bfl_c = 0;
@@ -24,10 +26,12 @@ bfl_store_at(int bfl_i, string bfl_nm) {
     bfl_c = bfl_store(bfl_i);
   }
 } return int bfl_c;
-given bfl_fixture ((import bfl_d0), "fx_flag"):(1)
-given bfl_fixture ((import bfl_a1), "fx_flag"):(2)
-given bfl_fixture ((import bfl_a1), "other"):(0)
-given bfl_fixture ((import bfl_cas), "fx_cnt"):(3)
+given bfl_fixture {
+  ((import bfl_d0), "fx_flag"):(1)
+  ((import bfl_a1), "fx_flag"):(2)
+  ((import bfl_a1), "other"):(0)
+  ((import bfl_cas), "fx_cnt"):(3)
+}
 
 bfl_store(int bfl_i) {
   int bfl_v = bfl_lit((import ni1)[bfl_i]);
@@ -40,6 +44,8 @@ bfl_store(int bfl_i) {
     bfl_c = 2;
   }
 } return int bfl_c;
-given bfl_fixture ((import bfl_d0)):(1)
-given bfl_fixture ((import bfl_a1)):(2)
-given bfl_fixture ((import bfl_cas)):(3)
+given bfl_fixture {
+  ((import bfl_d0)):(1)
+  ((import bfl_a1)):(2)
+  ((import bfl_cas)):(3)
+}

@@ -8,8 +8,10 @@ frs_step(string fz_t) {
   string fz_a = "static void idfs_" + fz_t + "(void* p, IdFrSt* s) { IdList* L = p; (void)s; ";
   string fz_r = fz_a + "if (!L) return; if (L->cap != INT_MIN) { " + frs_fields(fz_t) + "} id_list_free(L); }";
 } return string fz_r;
-given esc_ty_fix ("Tr"):("static void idfs_Tr(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } } } id_list_free(L); }")
-given esc_ty_fix ("Pt"):("static void idfs_Pt(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { } id_list_free(L); }")
+given esc_ty_fix {
+  ("Tr"):("static void idfs_Tr(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { { IdList* L1 = (void*)(intptr_t)L->data[0]; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } } } id_list_free(L); }")
+  ("Pt"):("static void idfs_Pt(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { } id_list_free(L); }")
+}
 
 frs_fields(string fz_t) {
   int fz_k = find_str((import sdname), fz_t);
@@ -21,8 +23,10 @@ frs_fields(string fz_t) {
     fz_j = fz_j + 1;
   }
 } return string fz_r;
-given esc_ty_fix ("Pt"):("")
-given esc_ty_fix ("Pg"):("id_str_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); id_frs_push(s, (void*)(intptr_t)L->data[2], idfs_Tr); ")
+given esc_ty_fix {
+  ("Pt"):("")
+  ("Pg"):("id_str_free((void*)(intptr_t)L->data[0]); id_list_free((void*)(intptr_t)L->data[1]); id_frs_push(s, (void*)(intptr_t)L->data[2], idfs_Tr); ")
+}
 
 frs_field(string fz_ft, int fz_j) {
   string fz_r = frs_val(fz_ft, "L->data[" + fz_j + "]", 1);
@@ -30,5 +34,7 @@ frs_field(string fz_ft, int fz_j) {
     fz_r = fz_r + " ";
   }
 } return string fz_r;
-given esc_ty_fix ("int", 0):("")
-given esc_ty_fix ("string", 3):("id_str_free((void*)(intptr_t)L->data[3]); ")
+given esc_ty_fix {
+  ("int", 0):("")
+  ("string", 3):("id_str_free((void*)(intptr_t)L->data[3]); ")
+}

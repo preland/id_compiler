@@ -13,8 +13,10 @@ acc_while(int id, string owner) {
   acc_expr(i1_of_v, owner, (import nline)[id]);
   acc_while_body(id, owner);
 } return void;
-given loopfix ((import rgwhile_node), "f"):() then calls acc_while_body:((import rgwhile_node), "f")
-given loopfix ((import rgwhile_node), "g"):() then calls acc_while_body:((import rgwhile_node), "g")
+given loopfix {
+  ((import rgwhile_node), "f"):() then calls acc_while_body:((import rgwhile_node), "f")
+  ((import rgwhile_node), "g"):() then calls acc_while_body:((import rgwhile_node), "g")
+}
 
 acc_stmt3(int id, string owner) {
   if((import nkind)[id] == "assign") {
@@ -23,5 +25,7 @@ acc_stmt3(int id, string owner) {
     acc_stmt4(id, owner);
   }
 } return void;
-given scnames_fix ((import rgdecl_node), "f"):() then (import chkfail)[0]:(0)
-given scnames_fix ((import rgif_node), "f"):() then (import chkfail)[0]:(0)
+given scnames_fix {
+  ((import rgdecl_node), "f"):() then (import chkfail)[0]:(0)
+  ((import rgif_node), "f"):() then (import chkfail)[0]:(0)
+}

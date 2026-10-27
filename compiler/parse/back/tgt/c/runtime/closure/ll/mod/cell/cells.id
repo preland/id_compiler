@@ -11,8 +11,10 @@ fv_ll_cells(int fn, int nd) {
     i = i + 1;
   }
 } return string out;
-given clo_fixture ((import fixture_fn), 0):("")
-given clo_fixture ((import fixture_fn), 1):("  %w0 = call i64 @id_clo_cell(ptr %c, i32 0)\n  %u0 = trunc i64 %w0 to i32\n")
+given clo_fixture {
+  ((import fixture_fn), 0):("")
+  ((import fixture_fn), 1):("  %w0 = call i64 @id_clo_cell(ptr %c, i32 0)\n  %u0 = trunc i64 %w0 to i32\n")
+}
 
 fv_ll_cell(int i, string pt) {
   string s = "  %w" + i + " = call i64 @id_clo_cell(ptr %c, i32 " + i + ")\n" + fv_ll_conv(i, pt);

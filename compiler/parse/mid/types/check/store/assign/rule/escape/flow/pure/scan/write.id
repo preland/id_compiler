@@ -9,18 +9,22 @@ pure_decl(int id, int fn) {
     pure_err_export(id, fn);
   }
 } return void;
-given pure_fix_prog ((import pfx_dcl), (import pfx_fa)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_dcl), (import pfx_fb)):() then (import chkfail)[0]:(0)
-given pure_fix_prog ((import pfx_k), (import pfx_fa)):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_dcl), (import pfx_fa)):() then (import chkfail)[0]:(1)
+  ((import pfx_dcl), (import pfx_fb)):() then (import chkfail)[0]:(0)
+  ((import pfx_k), (import pfx_fa)):() then (import chkfail)[0]:(0)
+}
 
 pure_import(int id, int fn) {
   if(list_find((import purenode), fn) == 1 && pure_mutable((import ns1)[id]) == 1) {
     pure_err_import(id, fn);
   }
 } return void;
-given pure_fix_prog ((import pfx_imp), (import pfx_fa)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_imp), (import pfx_fb)):() then (import chkfail)[0]:(0)
-given pure_fix_prog ((import pfx_impk), (import pfx_fa)):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_imp), (import pfx_fa)):() then (import chkfail)[0]:(1)
+  ((import pfx_imp), (import pfx_fb)):() then (import chkfail)[0]:(0)
+  ((import pfx_impk), (import pfx_fa)):() then (import chkfail)[0]:(0)
+}
 
 pure_mutable(string name) {
   int pq_idx = find_str((import enames), name);
@@ -29,6 +33,8 @@ pure_mutable(string name) {
     pq_mut = 1;
   }
 } return int pq_mut;
-given pure_fix_prog ("pfgx"):(1)
-given pure_fix_prog ("pfk"):(0)
-given pure_fix_prog ("nosuch"):(0)
+given pure_fix_prog {
+  ("pfgx"):(1)
+  ("pfk"):(0)
+  ("nosuch"):(0)
+}

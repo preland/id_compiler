@@ -35,10 +35,12 @@ seq_own(int id, int sk) {
     sk_n = 1;
   }
 } return int sk_n;
-given sq_fixture ((import nz_call_foo), 0):(1)
-given sq_fixture ((import sq_and), 2):(1)
-given sq_fixture ((import nz_int), 0):(0)
-given sq_fixture ((import sq_two), 2):(2)
+given sq_fixture {
+  ((import nz_call_foo), 0):(1)
+  ((import sq_and), 2):(1)
+  ((import nz_int), 0):(0)
+  ((import sq_two), 2):(2)
+}
 
 is_unit(int id) {
   int ok = div_traps(id);
@@ -48,8 +50,10 @@ is_unit(int id) {
     ok = 1;
   }
 } return int ok;
-given sq_fixture ((import nz_call_foo)):(1)
-given sq_fixture ((import nz_int)):(0)
-given sq_fixture ((import sq_mod)):(1)
-given sq_fixture ((import sq_div3)):(0)
-given sq_fixture ((import sq_and)):(1)
+given sq_fixture {
+  ((import nz_call_foo)):(1)
+  ((import nz_int)):(0)
+  ((import sq_mod)):(1)
+  ((import sq_div3)):(0)
+  ((import sq_and)):(1)
+}

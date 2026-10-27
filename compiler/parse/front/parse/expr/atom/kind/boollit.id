@@ -20,5 +20,7 @@ parse_bool(int[] pos) {
   advance(pos);
   int ret_i = node_bool(text);
 } return int ret_i;
-given atom_tokens ([17]):(0)
-given atom_tokens ([35]):(0)
+given atom_tokens {
+  ([17]):(0)
+  ([35]):(0)
+}

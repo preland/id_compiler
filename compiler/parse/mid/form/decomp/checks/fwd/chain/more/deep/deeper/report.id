@@ -9,15 +9,19 @@ fwd_report(int i, string callee_name) {
 } chain (int i, string callee_name) {
   diag("E0406", fwd_loc, fwd_m, (import ns1)[((import prog)[i])], (import fwdd_why), fwd_h);
 } return void;
-given farm_i (0, "target"):() then prints:("test.id:7: error: function 'fwd1' only forwards to 'target' [E0406]\n  at: fwd1\n  why: a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not\n  help: delete 'fwd1' and call 'target' directly at every site that called it; move any test cases of 'fwd1' onto 'target'\n") then (import chkfail)[0]:(1)
-given farm_i (0, "other"):() then prints:("test.id:7: error: function 'fwd1' only forwards to 'other' [E0406]\n  at: fwd1\n  why: a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not\n  help: delete 'fwd1' and call 'other' directly at every site that called it; move any test cases of 'fwd1' onto 'other'\n") then (import chkfail)[0]:(1)
+given farm_i {
+  (0, "target"):() then prints:("test.id:7: error: function 'fwd1' only forwards to 'target' [E0406]\n  at: fwd1\n  why: a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not\n  help: delete 'fwd1' and call 'target' directly at every site that called it; move any test cases of 'fwd1' onto 'target'\n") then (import chkfail)[0]:(1)
+  (0, "other"):() then prints:("test.id:7: error: function 'fwd1' only forwards to 'other' [E0406]\n  at: fwd1\n  why: a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not\n  help: delete 'fwd1' and call 'other' directly at every site that called it; move any test cases of 'fwd1' onto 'other'\n") then (import chkfail)[0]:(1)
+}
 
 fwd_msg(int i, string callee_name) {
   string fname = (import ns1)[((import prog)[i])];
   string ret_s = "function '" + fname + "' only forwards to '" + callee_name + "'";
 } return string ret_s;
-given farm_i (0, "target"):("function 'fwd1' only forwards to 'target'")
-given farm_i (0, "other"):("function 'fwd1' only forwards to 'other'")
+given farm_i {
+  (0, "target"):("function 'fwd1' only forwards to 'target'")
+  (0, "other"):("function 'fwd1' only forwards to 'other'")
+}
 
 // (import fwd_fids) [0] a plain function, [1] one named "main"
 // (../../../decl_ok.id's fs_build2).

@@ -31,5 +31,7 @@ scope_add(int id) {
     push((import scnames), s2_of_v);
   }
 } return void;
-given scnames_fix ((import rgdecl_node)):() then (import chkfail)[0]:(0)
-given scnames_fix ((import rgif_node)):() then (import chkfail)[0]:(0)
+given scnames_fix {
+  ((import rgdecl_node)):() then (import chkfail)[0]:(0)
+  ((import rgif_node)):() then (import chkfail)[0]:(0)
+}

@@ -11,8 +11,10 @@ const_cases(int cv_on) {
     cv_ci = cv_ci + 1;
   }
 } return void;
-given cvl_setup given cvl_case (1):() then clive_str:("live cc")
-given cvl_setup given cvl_case (0):() then clive_str:("live ")
+given cvl_setup {
+  given cvl_case (1):() then clive_str:("live cc")
+  given cvl_case (0):() then clive_str:("live ")
+}
 
 const_case(int cv_ci) {
   int cv_lo = (import casefn)[cv_ci] + 1;
@@ -21,8 +23,10 @@ const_case(int cv_ci) {
     const_range(cv_lo, cv_hi);
   }
 } return void;
-given cvl_setup given cvl_case (0):() then clive_str:("live cc")
-given cvl_setup given cvl_case given cvl_std (0):() then clive_str:("live ")
+given cvl_setup {
+  given cvl_case (0):() then clive_str:("live cc")
+  given cvl_case given cvl_std (0):() then clive_str:("live ")
+}
 
 // Where the functions' nodes begin: just past the last constant's, which are
 // all made first. Filed here because scan/ has no other room; it is

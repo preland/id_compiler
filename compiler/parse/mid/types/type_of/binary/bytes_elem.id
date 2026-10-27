@@ -11,9 +11,11 @@ bytes_mark_to(int bm_val, string bm_want) {
     bytes_mark_each(bm_val, elem_type(bm_want));
   }
 } return void;
-given bm_nest ((import bm_in_a), "bytes"):() then calls integer_list_set:((import bytesmark), (import bm_in_a), 1)
-given bm_nest ((import bm_outer), "bytes[]"):() then calls integer_list_set:((import bytesmark), (import bm_in_b), 1)
-given bm_nest ((import bm_outer), "int[]"):() then calls integer_list_set:[0]
+given bm_nest {
+  ((import bm_in_a), "bytes"):() then calls integer_list_set:((import bytesmark), (import bm_in_a), 1)
+  ((import bm_outer), "bytes[]"):() then calls integer_list_set:((import bytesmark), (import bm_in_b), 1)
+  ((import bm_outer), "int[]"):() then calls integer_list_set:[0]
+}
 
 bytes_mark_each(int bm_val, string bm_et) {
   int bm_j = 0;
@@ -23,12 +25,16 @@ bytes_mark_each(int bm_val, string bm_et) {
     bm_j = bm_j + 1;
   }
 } return void;
-given bm_nest ((import bm_outer), "bytes"):() then calls integer_list_set:[2]
-given bm_nest ((import bm_outer), "int"):() then calls integer_list_set:[0]
+given bm_nest {
+  ((import bm_outer), "bytes"):() then calls integer_list_set:[2]
+  ((import bm_outer), "int"):() then calls integer_list_set:[0]
+}
 
 bytes_push_elem(int i) {
   int[] bm_pl = (import nl1)[i];
   string bm_t = elem_type(type_of(bm_pl[0]));
 } return string bm_t;
-given bm_nest ((import bm_push_call)):("bytes")
-given bm_nest ((import bm_call_fn)):("int")
+given bm_nest {
+  ((import bm_push_call)):("bytes")
+  ((import bm_call_fn)):("int")
+}

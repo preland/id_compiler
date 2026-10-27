@@ -4,8 +4,10 @@ emit_tc_decl(string pt, string nm, string cv) {
   string ct = c_type(pt);
   print("    " + ct + " " + nm + " = " + cv + ";");
 } return void;
-given lc_env2 ("int", "idtc_a0", "5"):() then prints:("    int idtc_a0 = 5;\n")
-given lc_env2 ("string", "idtc_a1", "\"hi\""):() then prints:("    char* idtc_a1 = \"hi\";\n")
+given lc_env2 {
+  ("int", "idtc_a0", "5"):() then prints:("    int idtc_a0 = 5;\n")
+  ("string", "idtc_a1", "\"hi\""):() then prints:("    char* idtc_a1 = \"hi\";\n")
+}
 
 arg_names(int fn) {
   int n = len(((import nl1)[fn]));

@@ -6,8 +6,10 @@
 esc_early(int fn) {
   int ee = esc_early_in((import nl2)[fn]);
 } return int ee;
-given esc_ffix ((import eff_early)):(1)
-given esc_ffix ((import eff_elit)):(0)
+given esc_ffix {
+  ((import eff_early)):(1)
+  ((import eff_elit)):(0)
+}
 
 esc_early_in(int[] stmts) {
   int ee = 0;
@@ -17,9 +19,11 @@ esc_early_in(int[] stmts) {
     i = i + 1;
   }
 } return int ee;
-given esc_ffix ([(import eff_rtp)]):(1)
-given esc_ffix ([(import eff_rtl)]):(0)
-given esc_ffix ([(import eff_dz), (import eff_ife)]):(1)
+given esc_ffix {
+  ([(import eff_rtp)]):(1)
+  ([(import eff_rtl)]):(0)
+  ([(import eff_dz), (import eff_ife)]):(1)
+}
 
 esc_early_one(int sn) {
   int ee = 0;
@@ -29,8 +33,10 @@ esc_early_one(int sn) {
     ee = esc_early_nest(sn);
   }
 } return int ee;
-given esc_ffix ((import eff_rtp)):(1)
-given esc_ffix ((import eff_ife)):(1)
-given esc_ffix ((import eff_ifl)):(0)
-given esc_ffix ((import eff_dz)):(0)
+given esc_ffix {
+  ((import eff_rtp)):(1)
+  ((import eff_ife)):(1)
+  ((import eff_ifl)):(0)
+  ((import eff_dz)):(0)
+}
 

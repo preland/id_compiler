@@ -22,6 +22,8 @@ lx_dec(int lg_f, int lg_id, int lg_lo, int lg_hi) {
     lg_r = list_find((import nl1)[lg_hi + 1], lg_f);
   }
 } return int lg_r;
-given lpq_cs(1) ((import lpq_dv), (import lpq_xv), (import lpq_lov), (import lpq_hiv)):(1)
-given lpq_cs(1) ((import lpq_dv), (import lpq_mv), (import lpq_lov), (import lpq_hiv)):(0)
-given lpq_cs(1) ((import lpq_mv), (import lpq_xv), (import lpq_lov), (import lpq_hiv)):(0)
+given lpq_cs(1) {
+  ((import lpq_dv), (import lpq_xv), (import lpq_lov), (import lpq_hiv)):(1)
+  ((import lpq_dv), (import lpq_mv), (import lpq_lov), (import lpq_hiv)):(0)
+  ((import lpq_mv), (import lpq_xv), (import lpq_lov), (import lpq_hiv)):(0)
+}

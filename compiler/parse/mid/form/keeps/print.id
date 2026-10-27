@@ -44,5 +44,7 @@ keeps_print() {
     kp_x = kp_x + 1;
   }
 } return void;
-given esc_fix ():() then prints:("fa_sink\t11\t1\nfa_loc\t1\t0\nfa_nest\t1\t1\n")
-given esc_fix ():() then calls keeps_at:[3]
+given esc_fix {
+  ():() then prints:("fa_sink\t11\t1\nfa_loc\t1\t0\nfa_nest\t1\t1\n")
+  ():() then calls keeps_at:[3]
+}

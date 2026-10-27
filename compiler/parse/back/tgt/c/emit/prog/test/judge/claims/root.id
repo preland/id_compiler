@@ -19,8 +19,10 @@ ur_seed(string urs) {
     keep_strs(urparts, (import uroots));
   }
 } return void;
-given case_fixture ("/a"):() then len((import uroots)):(1)
-given case_fixture (""):() then len((import uroots)):(0)
+given case_fixture {
+  ("/a"):() then len((import uroots)):(1)
+  (""):() then len((import uroots)):(0)
+}
 
 // The digest's parsed pair (mid/form/unique/dump/digest/graph/state/
 // parsed.id: four cases, all in unit 0) with unit 0's root set, for this

@@ -8,8 +8,10 @@ tc_node(int id) {
   tc_g1(id);
   tc_g2(id);
 } return void;
-given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
-given decltype_fixture ((import decl_scalar)):() then (import chkfail)[0]:(0)
+given decltype_fixture {
+  ((import decl_list)):() then (import chkfail)[0]:(1)
+  ((import decl_scalar)):() then (import chkfail)[0]:(0)
+}
 
 tc_g1(int id) {
   if((import nkind)[id] == "decl") {
@@ -36,5 +38,7 @@ tc_g2(int id) {
   }
   tc_g3(id);
 } return void;
-given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(1)
-given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  ((import bin_mixed)):() then (import chkfail)[0]:(1)
+  ((import bin_eq)):() then (import chkfail)[0]:(0)
+}

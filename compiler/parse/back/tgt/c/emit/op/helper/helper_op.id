@@ -34,5 +34,7 @@ helper_op(int id) {
     h = hop_div(id);
   }
 } return string h;
-given arith_fix (2):("id_idiv")
-given arith_fix (0):("")
+given arith_fix {
+  (2):("id_idiv")
+  (0):("")
+}

@@ -9,8 +9,10 @@ ixw_refs(int ixw_lo, int ixw_hi) {
 } chain (int ixw_lo, int ixw_hi) {
   string ixw_row = string_join(ixw_out, " ");
 } return string ixw_row;
-given ixn_fx (0, 5):("foo zz gx Point int")
-given ixn_fx (0, 3):("foo zz gx")
+given ixn_fx {
+  (0, 5):("foo zz gx Point int")
+  (0, 3):("foo zz gx")
+}
 
 ixw_locals(int ixw_lo, int ixw_hi) {
   string[] ixw_names = [];
@@ -20,8 +22,10 @@ ixw_locals(int ixw_lo, int ixw_hi) {
     ixw_id = ixw_id + 1;
   }
 } return string[] ixw_names;
-given ixn_fx (0, 5):(["pts", "arg"])
-given ixn_fx (0, 3):([])
+given ixn_fx {
+  (0, 5):(["pts", "arg"])
+  (0, 3):([])
+}
 
 ixw_walk(string[] ixw_out, string[] ixw_own, int ixw_lo, int ixw_hi) {
   int ixw_id = ixw_lo;
@@ -30,5 +34,7 @@ ixw_walk(string[] ixw_out, string[] ixw_own, int ixw_lo, int ixw_hi) {
     ixw_id = ixw_id + 1;
   }
 } return void;
-given ixn_fx ([], [], 0, 5):(["foo", "zz", "gx", "Point", "int"])
-given ixn_fx ([], ["zz", "int"], 0, 5):(["foo", "gx", "Point"])
+given ixn_fx {
+  ([], [], 0, 5):(["foo", "zz", "gx", "Point", "int"])
+  ([], ["zz", "int"], 0, 5):(["foo", "gx", "Point"])
+}

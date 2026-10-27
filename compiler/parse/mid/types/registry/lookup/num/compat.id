@@ -9,8 +9,10 @@ ty_num(string t) {
     ok = 1;
   }
 } return int ok;
-given init_tyreg ("word"):(1)
-given init_tyreg ("string"):(0)
+given init_tyreg {
+  ("word"):(1)
+  ("string"):(0)
+}
 
 // Whether a type's kind is the given one. ty_kind_is(t, "int") is idc.py's
 // is_integral: the same question as ty_num with "float" left out, which is
@@ -39,5 +41,7 @@ ty_compat(string want, string got) {
     ok = 1;
   }
 } return int ok;
-given init_tyreg ("int", "word"):(1)
-given init_tyreg ("int", "string"):(0)
+given init_tyreg {
+  ("int", "word"):(1)
+  ("int", "string"):(0)
+}

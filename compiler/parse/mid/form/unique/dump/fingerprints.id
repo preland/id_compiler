@@ -15,9 +15,11 @@ print_fingerprints() {
     i = i + 1;
   }
 } return void;
-given lz_o ():() then calls print_fp_line:(0) then calls print_fp_line:(1)
-given lz_o ():() then prints:("|()->int=>v0{d:int 0=I5}\tdup5\t<stdin>:1\n|()->int=>v0{d:int 0=I9}\tdup9\t<stdin>:1\n")
-given lz_o ():() then calls print_fp_line:[2]
+given lz_o {
+  ():() then calls print_fp_line:(0) then calls print_fp_line:(1)
+  ():() then prints:("|()->int=>v0{d:int 0=I5}\tdup5\t<stdin>:1\n|()->int=>v0{d:int 0=I9}\tdup9\t<stdin>:1\n")
+  ():() then calls print_fp_line:[2]
+}
 
 // `i` indexes the fingerprints; the function it belongs to is resolved by
 // fname_at (../scan/more/report/dup.id), the checker's one place for that
@@ -27,8 +29,10 @@ print_fp_line(int i) {
   string line = fp_line(name, (import cfp)[i]);
   print(line);
 } return void;
-given lz_o (0):() then prints:("|()->int=>v0{d:int 0=I5}\tdup5\t<stdin>:1\n")
-given lz_o (1):() then prints:("|()->int=>v0{d:int 0=I9}\tdup9\t<stdin>:1\n")
+given lz_o {
+  (0):() then prints:("|()->int=>v0{d:int 0=I5}\tdup5\t<stdin>:1\n")
+  (1):() then prints:("|()->int=>v0{d:int 0=I9}\tdup9\t<stdin>:1\n")
+}
 
 // file:line, the same two facts a diagnostic's prefix names (../../names/
 // limits/report/more/prefix.id), without the ": error: " a diagnostic adds.
@@ -36,5 +40,7 @@ fp_line(string name, string fp) {
   string tab = chr(9);
   string ret_s = fp + tab + name + tab + func_file(name) + ":" + func_line(name);
 } return string ret_s;
-given env_init ("f", "X"):("X\tf\t<stdin>:1")
-given env_init ("g", "Y"):("Y\tg\t<stdin>:1")
+given env_init {
+  ("f", "X"):("X\tf\t<stdin>:1")
+  ("g", "Y"):("Y\tg\t<stdin>:1")
+}

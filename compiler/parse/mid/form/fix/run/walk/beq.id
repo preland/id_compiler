@@ -10,8 +10,10 @@ fix_beq(int lo, int f) {
   }
   fix_beq_scan(from, (import ntok)[f]);
 } return void;
-given fix_ret_fixture (0, 0):() then calls fix_beq_scan:(0, 3)
-given fix_ret_fixture (1, 0):() then calls fix_beq_scan:(4, 3)
+given fix_ret_fixture {
+  (0, 0):() then calls fix_beq_scan:(0, 3)
+  (1, 0):() then calls fix_beq_scan:(4, 3)
+}
 
 fix_beq_scan(int from, int to) {
   int i = 0;
@@ -20,8 +22,10 @@ fix_beq_scan(int from, int to) {
     i = i + 1;
   }
 } return void;
-given fix_beq_fixture (0, 5):() then prints:("@R||3|2|3|5|1|==\n")
-given fix_beq_fixture (1, 5):() then prints:("")
+given fix_beq_fixture {
+  (0, 5):() then prints:("@R||3|2|3|5|1|==\n")
+  (1, 5):() then prints:("")
+}
 
 fix_beq_one(int t0, int from, int to) {
   if(t0 >= from && t0 <= to && fix_packed(t0) >= 0) {
@@ -29,6 +33,8 @@ fix_beq_one(int t0, int from, int to) {
     print("@R|" + (import fixd_file)[0] + "|" + fix_at(t0) + "|" + fix_after(t0) + "|" + sq + "|==");
   }
 } return void;
-given fix_tokline_fixture2 (0, 0, 5):() then prints:("@R||3|2|3|5|1|==\n")
-given fix_tokline_fixture2 (0, 1, 5):() then prints:("")
-given fix_tokline_fixture2 (1, 0, 0):() then prints:("")
+given fix_tokline_fixture2 {
+  (0, 0, 5):() then prints:("@R||3|2|3|5|1|==\n")
+  (0, 1, 5):() then prints:("")
+  (1, 0, 0):() then prints:("")
+}

@@ -31,5 +31,7 @@ report_main() {
   string loc_at_v = loc_at("main", func_line_v);
   var_report(loc_at_v + "'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status");
 } return void;
-given env_init ():() then prints:("<stdin>:1: error: 'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status\n") then (import chkfail)[0]:(1)
-given env_init ():() then calls var_report:("<stdin>:1: error: 'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status")
+given env_init {
+  ():() then prints:("<stdin>:1: error: 'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status\n") then (import chkfail)[0]:(1)
+  ():() then calls var_report:("<stdin>:1: error: 'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status")
+}

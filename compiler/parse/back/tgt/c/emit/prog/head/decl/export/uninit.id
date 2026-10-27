@@ -26,10 +26,12 @@ checked_read(string nm) {
     s = "((void)(idtc_set_" + nm + " || (id_null_read(), 0)), " + nm + ")";
   }
 } return string s;
-given uninit_fixture ("gx"):("((void)(idtc_set_gx || (id_null_read(), 0)), gx)")
-given uninit_fixture given add_export("gy", "int", "other_fn") ("gy"):("((void)(idtc_set_gy || (id_null_read(), 0)), gy)")
-given uninit_fixture ("gc"):("gc")
-given uninit_fixture ("zz"):("zz")
+given uninit_fixture {
+  ("gx"):("((void)(idtc_set_gx || (id_null_read(), 0)), gx)")
+  given add_export("gy", "int", "other_fn") ("gy"):("((void)(idtc_set_gy || (id_null_read(), 0)), gy)")
+  ("gc"):("gc")
+  ("zz"):("zz")
+}
 
 // lz_j's exported decl `int z = 3` (lz_edecl), with the harness flag on, one
 // export owned by a function (gx, index 0), one conf.id constant (gc, index

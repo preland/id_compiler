@@ -4,14 +4,18 @@
 lp_lit(int lq_b) {
   int lq_r = (import ni2)[lq_b] == 0 && (import ni1)[lq_b] >= 0;
 } return int lq_r;
-given lpf_more ((import lpf_n0)):(1)
-given lpf_more ((import lpf_ngl)):(0)
-given lpf_more ((import lpf_bgl)):(0)
+given lpf_more {
+  ((import lpf_n0)):(1)
+  ((import lpf_ngl)):(0)
+  ((import lpf_bgl)):(0)
+}
 
 lp_one(int lq_b) {
   int lq_r = (import nkind)[lq_b] == "int" && (import ni1)[lq_b] == 1 && (import ni2)[lq_b] == 0;
 } return int lq_r;
-given lpf_more ((import lpf_n0)):(1)
-given lpf_more ((import lpf_n1)):(0)
-given lpf_more ((import lpf_q)):(0)
-given lpf_more ((import lpf_bgl)):(0)
+given lpf_more {
+  ((import lpf_n0)):(1)
+  ((import lpf_n1)):(0)
+  ((import lpf_q)):(0)
+  ((import lpf_bgl)):(0)
+}

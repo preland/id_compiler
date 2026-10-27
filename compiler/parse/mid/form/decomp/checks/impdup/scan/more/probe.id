@@ -11,8 +11,10 @@ imd_probe(int imd_x, int imd_y) {
     imd_found = imd_y;
   }
 } return int imd_found;
-given imd_pair_base given imd_fill (1, 0):(0)
-given imd_pair_base given imd_fill (0, 0):(-1)
+given imd_pair_base {
+  given imd_fill (1, 0):(0)
+  given imd_fill (0, 0):(-1)
+}
 
 imd_pair(string imd_va, string imd_vb) {
   int imd_ok = 0;

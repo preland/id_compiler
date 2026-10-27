@@ -9,9 +9,11 @@ esc_type_of(int sn, string nm) {
     t = esc_type_nest(sn, nm);
   }
 } return string t;
-given esc_fix ((import efc_z), "z"):("int[]")
-given esc_fix ((import efc_loop), "w"):("int[]")
-given esc_fix ((import efc_z), "w"):("")
+given esc_fix {
+  ((import efc_z), "z"):("int[]")
+  ((import efc_loop), "w"):("int[]")
+  ((import efc_z), "w"):("")
+}
 
 esc_type_decl(int sn, string nm) {
   string t = "";
@@ -19,8 +21,10 @@ esc_type_decl(int sn, string nm) {
     t = (import ns1)[sn];
   }
 } return string t;
-given esc_fix ((import efc_z), "z"):("int[]")
-given esc_fix ((import efc_z), "w"):("")
+given esc_fix {
+  ((import efc_z), "z"):("int[]")
+  ((import efc_z), "w"):("")
+}
 
 esc_type_nest(int sn, string nm) {
   string t = esc_decl_type((import nl1)[sn], nm);
@@ -28,6 +32,8 @@ esc_type_nest(int sn, string nm) {
     t = esc_decl_type((import nl2)[sn], nm);
   }
 } return string t;
-given esc_fix ((import efc_loop), "w"):("int[]")
-given esc_fix ((import efc_loop), "q"):("")
-given esc_fix ((import efc_ife), "w"):("int[]")
+given esc_fix {
+  ((import efc_loop), "w"):("int[]")
+  ((import efc_loop), "q"):("")
+  ((import efc_ife), "w"):("int[]")
+}

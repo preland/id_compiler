@@ -9,8 +9,10 @@ bad_init(string want, string got) {
     ok = 1;
   }
 } return int ok;
-given init_tyreg ("int", "string"):(1)
-given init_tyreg ("int", "word"):(0)
+given init_tyreg {
+  ("int", "string"):(1)
+  ("int", "word"):(0)
+}
 
 // Is this a type at all? Asked of the registry, not of the string: type_of
 // answers "" for a name it cannot resolve (an unknown variable, or a call to
@@ -27,9 +29,11 @@ ty_known(string t) {
     ok = 1;
   }
 } return int ok;
-given init_tyreg ("int"):(1)
-given init_tyreg ("nope"):(0)
-given init_tyreg ("sender(int)[]"):(1)
+given init_tyreg {
+  ("int"):(1)
+  ("nope"):(0)
+  ("sender(int)[]"):(1)
+}
 
 ty_pair_known(string lt, string rt) {
   int ok = 0;
@@ -37,5 +41,7 @@ ty_pair_known(string lt, string rt) {
     ok = 1;
   }
 } return int ok;
-given init_tyreg ("int", "word"):(1)
-given init_tyreg ("int", "nope"):(0)
+given init_tyreg {
+  ("int", "word"):(1)
+  ("int", "nope"):(0)
+}

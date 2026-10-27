@@ -14,8 +14,10 @@ bind_val_msg(int id, int i, string pt, int v) {
     msg = who + " narrows " + t + " to " + pt + "; declare a " + pt + " local and pass that";
   }
 } return string msg;
-given bind_fixture ((import bind_str), 0, "string", (import bind_lit)):("'bind' value 0 for 'fx_target' expects string, got int")
-given bind_fixture ((import bind_str), 0, "int", (import bind_big)):("'bind' value 0 for 'fx_target' narrows word to int; declare a int local and pass that")
+given bind_fixture {
+  ((import bind_str), 0, "string", (import bind_lit)):("'bind' value 0 for 'fx_target' expects string, got int")
+  ((import bind_str), 0, "int", (import bind_big)):("'bind' value 0 for 'fx_target' narrows word to int; declare a int local and pass that")
+}
 
 bind_cap_msg(string who, string pt) {
   string msg = "";
@@ -25,8 +27,10 @@ bind_cap_msg(string who, string pt) {
     msg = who + " cannot be captured: it is a " + pt + ", a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)";
   }
 } return string msg;
-given bind_fixture ("w", "int[][]"):("w cannot be captured: it is a int[][], a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)")
-given bind_fixture ("w", "int[]"):("")
+given bind_fixture {
+  ("w", "int[][]"):("w cannot be captured: it is a int[][], a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)")
+  ("w", "int[]"):("")
+}
 
 bind_nested(string pt) {
   string et = elem_type(pt);
@@ -35,5 +39,7 @@ bind_nested(string pt) {
     ok = 1;
   }
 } return int ok;
-given bind_fixture ("int[][]"):(1)
-given bind_fixture ("string[]"):(0)
+given bind_fixture {
+  ("int[][]"):(1)
+  ("string[]"):(0)
+}

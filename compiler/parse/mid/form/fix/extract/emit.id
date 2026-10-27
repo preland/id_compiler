@@ -12,17 +12,21 @@ fix_xjudge(int xjf, int xjlo, int xja, int xjb, string xjwhy) {
     fix_xrefuse(xja, xjwhy);
   }
 } return void;
-given fix_xplanned (7, 0, 1, 6, "bad"):() then prints:("@N||7|bad\n")
-given fix_xplanned (7, 0, 1, 6, ""):() then calls fix_xemit:(7, 0, 1, 6)
+given fix_xplanned {
+  (7, 0, 1, 6, "bad"):() then prints:("@N||7|bad\n")
+  (7, 0, 1, 6, ""):() then calls fix_xemit:(7, 0, 1, 6)
+}
 
 fix_xrefuse(int xrt, string xrwhy) {
   string xrline = "@N|" + (import fixd_file)[0] + "|" + (import tline)[xrt] + "|" + xrwhy;
   print(xrline);
   integer_list_set((import fixx_again), 0, 1);
 } return void;
-given fix_xplanned (1, "why"):() then prints:("@N||7|why\n")
-given fix_xplanned (2, "no"):() then prints:("@N||7|no\n")
-given fix_xplanned (2, "no"):() then (import fixx_again)[0]:(1)
+given fix_xplanned {
+  (1, "why"):() then prints:("@N||7|why\n")
+  (2, "no"):() then prints:("@N||7|no\n")
+  (2, "no"):() then (import fixx_again)[0]:(1)
+}
 
 fix_xemit(int xef2, int xelo2, int xea, int xeb) {
   fix_xparams(xelo2, xef2);

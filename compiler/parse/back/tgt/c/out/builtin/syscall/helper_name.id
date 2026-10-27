@@ -29,5 +29,7 @@ arg_cast(string name, int arg) {
     pre_cast = "(long long)(unsigned int)(";
   }
 } return string pre_cast;
-given call_args_fixture ("peek8", (import call_e1)):("(long long)(")
-given call_args_fixture ("ushr", (import call_e1)):("(long long)(unsigned int)(")
+given call_args_fixture {
+  ("peek8", (import call_e1)):("(long long)(")
+  ("ushr", (import call_e1)):("(long long)(unsigned int)(")
+}

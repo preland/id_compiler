@@ -8,9 +8,11 @@ cond_strict(int id, string t) {
     cond_strict_say(id, t, show_expr(cond_e));
   }
 } return void;
-given cmp_fixture given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int"):() then (import chkfail)[0]:(1)
-given cmp_fixture given integer_list_set((import bsc), 0, 1) ((import bin_eq), "bool"):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_eq), "int"):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int"):() then (import chkfail)[0]:(1)
+  given integer_list_set((import bsc), 0, 1) ((import bin_eq), "bool"):() then (import chkfail)[0]:(0)
+  ((import bin_eq), "int"):() then (import chkfail)[0]:(0)
+}
 
 cond_strict_say(int id, string t, string cond_was) {
   int cond_ln = tc_line(id);
@@ -19,5 +21,7 @@ cond_strict_say(int id, string t, string cond_was) {
 } chain (int id, string t, string cond_was) {
   diag_edit("machine", "replace", cond_ln, cond_was, cond_fix);
 } return void;
-given cmp_fixture ((import bin_eq), "int", "n"):() then prints:("<stdin>:1: error: a condition must be a bool, got int 'n' [E0646]\n  at: n\n  why: an int is not a truth value under --bool-strict; the condition says what is being tested, so write the comparison\n  help: write 'n != 0'\n  edit: machine\treplace\t1\tn\tn != 0\n")
-given cmp_fixture ((import bin_eq), "word", "w"):() then prints:("<stdin>:1: error: a condition must be a bool, got word 'w' [E0646]\n  at: w\n  why: an int is not a truth value under --bool-strict; the condition says what is being tested, so write the comparison\n  help: write 'w != 0'\n  edit: machine\treplace\t1\tw\tw != 0\n")
+given cmp_fixture {
+  ((import bin_eq), "int", "n"):() then prints:("<stdin>:1: error: a condition must be a bool, got int 'n' [E0646]\n  at: n\n  why: an int is not a truth value under --bool-strict; the condition says what is being tested, so write the comparison\n  help: write 'n != 0'\n  edit: machine\treplace\t1\tn\tn != 0\n")
+  ((import bin_eq), "word", "w"):() then prints:("<stdin>:1: error: a condition must be a bool, got word 'w' [E0646]\n  at: w\n  why: an int is not a truth value under --bool-strict; the condition says what is being tested, so write the comparison\n  help: write 'w != 0'\n  edit: machine\treplace\t1\tw\tw != 0\n")
+}

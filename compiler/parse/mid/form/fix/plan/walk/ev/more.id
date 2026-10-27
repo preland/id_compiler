@@ -4,8 +4,10 @@ fix_condop(int e, int cd) {
     c = 1;
   }
 } return int c;
-given fix_walk_arg2_fixture ((import wa2_e1), 0):(0)
-given fix_walk_arg2_fixture ((import wa2_e2), 1):(1)
+given fix_walk_arg2_fixture {
+  ((import wa2_e1), 0):(0)
+  ((import wa2_e2), 1):(1)
+}
 
 fix_walk_more(int e, int cd) {
   if((import nkind)[e] == "un") {
@@ -15,8 +17,10 @@ fix_walk_more(int e, int cd) {
     fix_walk_arr(e, cd);
   }
 } return void;
-given fix_walk_more_fixture ((import wm_un), 0):() then calls fix_walk:((import wm_a), 0, 0, "", "")
-given fix_walk_more_fixture ((import wm_arr), 1):() then calls fix_walk_arr:((import wm_arr), 1)
+given fix_walk_more_fixture {
+  ((import wm_un), 0):() then calls fix_walk:((import wm_a), 0, 0, "", "")
+  ((import wm_arr), 1):() then calls fix_walk_arr:((import wm_arr), 1)
+}
 
 fix_walk_more_fixture() {
   fix_fixture();

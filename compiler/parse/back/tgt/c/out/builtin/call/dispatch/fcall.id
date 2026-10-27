@@ -20,5 +20,7 @@ emit_fcall(int id) {
   string nm = (import ns1)[id];
   string ret_s = "((" + c_clo_ptr(callee_var_type(id)) + ")" + nm + "->fn)(" + nm + sep_at(", ", len(l1_of_v)) + emit_args(l1_of_v) + ")";
 } return string ret_s;
-given clo_call_fixture ((import cv_call)):("((int (*)(IdFn*, int))cv->fn)(cv, 5)")
-given clo_call_fixture ((import cw_call)):("((void (*)(IdFn*))cw->fn)(cw)")
+given clo_call_fixture {
+  ((import cv_call)):("((int (*)(IdFn*, int))cv->fn)(cv, 5)")
+  ((import cw_call)):("((void (*)(IdFn*))cw->fn)(cw)")
+}

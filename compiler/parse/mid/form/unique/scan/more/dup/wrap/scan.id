@@ -21,8 +21,10 @@ cw_at(int i) {
     cw_report(id, val);
   }
 } return void;
-given lz_o (0):() then calls cw_report:((import lz_fn5), "I5")
-given lz_o (1):() then calls cw_report:((import lz_fn9), "I9")
+given lz_o {
+  (0):() then calls cw_report:((import lz_fn5), "I5")
+  (1):() then calls cw_report:((import lz_fn9), "I9")
+}
 
 // "" unless the function is a constant wrapper, else the constant's
 // fingerprint.
@@ -32,5 +34,7 @@ cw_value(int id) {
     val = cw_body(id);
   }
 } return string val;
-given lz_o ((import lz_fn5)):("I5")
-given lz_o ((import lz_fn9)):("I9")
+given lz_o {
+  ((import lz_fn5)):("I5")
+  ((import lz_fn9)):("I9")
+}

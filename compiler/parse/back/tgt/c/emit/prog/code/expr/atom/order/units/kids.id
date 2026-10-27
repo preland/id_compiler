@@ -14,10 +14,12 @@ seq_kids(int id) {
     sq_kids = [(import ni1)[id]];
   }
 } return int[] sq_kids;
-given sq_fixture ((import sq_two)):([7, 9])
-given sq_fixture ((import sq_mod)):([0, 13])
-given sq_fixture ((import sq_at)):([16, 7])
-given sq_fixture ((import nz_int)):([])
+given sq_fixture {
+  ((import sq_two)):([7, 9])
+  ((import sq_mod)):([0, 13])
+  ((import sq_at)):([16, 7])
+  ((import nz_int)):([])
+}
 
 seq_fold(int[] sq_kids) {
   int sk = 0;
@@ -28,9 +30,11 @@ seq_fold(int[] sq_kids) {
     i = i + 1;
   }
 } return int sk;
-given sq_fixture ([7, 9]):(2)
-given sq_fixture ([7, 0]):(1)
-given sq_fixture ([]):(0)
+given sq_fixture {
+  ([7, 9]):(2)
+  ([7, 0]):(1)
+  ([]):(0)
+}
 
 // Two operands that each need ordering make the parent need it; so does one
 // that already did.

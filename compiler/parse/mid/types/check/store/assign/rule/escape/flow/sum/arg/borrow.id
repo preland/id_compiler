@@ -18,8 +18,10 @@ esc_borrow_mask(int fn) {
   int[] ps = (import nl1)[fn];
   int m = esc_borrow_loop(ps);
 } return int m;
-given esc_fix ((import efa_fn)):(-1)
-given esc_fix ((import efb_fn)):(-1)
+given esc_fix {
+  ((import efa_fn)):(-1)
+  ((import efb_fn)):(-1)
+}
 
 esc_borrow_loop(int[] ps) {
   int m = 0 - 1;

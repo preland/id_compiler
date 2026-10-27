@@ -30,8 +30,10 @@ given dg_t_vol (1):(-1)
 dg_link(int dgf, int dgw) {
   push((import dg_out)[dgf], dgw);
 } return void;
-given dg_t_graph (1, 3):() then dg_nout1:("out1 3")
-given dg_t_graph (0, 3):() then dg_nout1:("out1 2")
+given dg_t_graph {
+  (1, 3):() then dg_nout1:("out1 3")
+  (0, 3):() then dg_nout1:("out1 2")
+}
 
 // The same edge into dg_cout, unless node dgid is an `(import NAME)`: reading
 // an export is a dependency for a key, but it runs nothing, so a setup does

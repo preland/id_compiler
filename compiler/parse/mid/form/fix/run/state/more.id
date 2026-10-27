@@ -5,10 +5,12 @@ fix_gcl_at(int i) {
     integer_list_set((import fixd_gcl), n, (import ngrpc)[i]);
   }
 } return void;
-given fix_gcl_fixture (1):() then (import fixd_gcl)[0]:(99)
-given fix_gcl_fixture (0):() then (import fixd_gcl)[0]:(10)
-given fix_gcl_fixture (0):() then calls integer_list_set:[0]
-given fix_gcl_fixture (1):() then calls integer_list_set:[1]
+given fix_gcl_fixture {
+  (1):() then (import fixd_gcl)[0]:(99)
+  (0):() then (import fixd_gcl)[0]:(10)
+  (0):() then calls integer_list_set:[0]
+  (1):() then calls integer_list_set:[1]
+}
 
 // The events of one statement, reset by declaring them again (plan/walk/).
 //   fixe_n   each node, in the order it is evaluated

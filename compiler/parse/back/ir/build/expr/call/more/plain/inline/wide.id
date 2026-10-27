@@ -7,8 +7,10 @@ lw_inline_turn32(int[] ih_args) {
 } chain (int[] ih_args) {
   int ret_i = lw_op("sext", "word", ih_rot, 0 - 1, "");
 } return int ret_i;
-given lw_env_fixture ([0, 1]):(3) then (import istr)[2]:("llvm.fshl.i32")
-given lw_env_fixture ([2, 5]):(3) then (import iop)[3]:("sext")
+given lw_env_fixture {
+  ([0, 1]):(3) then (import istr)[2]:("llvm.fshl.i32")
+  ([2, 5]):(3) then (import iop)[3]:("sext")
+}
 
 // The high half of the 128-bit product of two unsigned words.
 lw_inline_high(int[] ih_args) {
@@ -19,5 +21,7 @@ lw_inline_high(int[] ih_args) {
   int ih_top = lw_op("lshr", "wide", ih_prod, lw_const("wide", "64"), "");
   int ret_i = lw_op("trunc", "word", ih_top, 0 - 1, "");
 } return int ret_i;
-given lw_env_fixture ([0, 1]):(5) then (import iop)[4]:("lshr")
-given lw_env_fixture ([2, 3]):(5) then (import iop)[2]:("mul")
+given lw_env_fixture {
+  ([0, 1]):(5) then (import iop)[4]:("lshr")
+  ([2, 3]):(5) then (import iop)[2]:("mul")
+}

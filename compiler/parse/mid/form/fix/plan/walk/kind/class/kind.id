@@ -8,8 +8,10 @@ fix_class3(int e) {
     cl = 2;
   }
 } return int cl;
-given fix_class3_setup ((import ck_import)):(4)
-given fix_class3_setup ((import ck_int)):(0)
+given fix_class3_setup {
+  ((import ck_import)):(4)
+  ((import ck_int)):(0)
+}
 
 fix_class3_setup() {
   fix_fixture();
@@ -22,5 +24,7 @@ fix_class3_setup() {
 ck_import_check() {
   string k = (import nkind)[(import ck_import)];
 } return string k;
-given fix_class3_setup ():("import")
-given fix_class3_setup ():("import") then (import chkfail)[0]:(0)
+given fix_class3_setup {
+  ():("import")
+  ():("import") then (import chkfail)[0]:(0)
+}

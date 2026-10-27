@@ -8,18 +8,22 @@ emit_asm_all(string triple) {
     i = i + 1;
   }
 } return void;
-given casm_row_fixture ("x86_64-unknown-none"):() then prints:("int id_portout(int x) {\n    int result;\n    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
-given casm_row_fixture ("x86_64-unknown-none"):() then calls emit_asm_row:(0, "x86_64-unknown-none")
-given casm_row_fixture ("nope"):() then prints:("")
+given casm_row_fixture {
+  ("x86_64-unknown-none"):() then prints:("int id_portout(int x) {\n    int result;\n    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+  ("x86_64-unknown-none"):() then calls emit_asm_row:(0, "x86_64-unknown-none")
+  ("nope"):() then prints:("")
+}
 
 emit_asm_row(int i, string triple) {
   if((import aftriple)[i] == triple) {
     emit_asm_one(i);
   }
 } return void;
-given casm_row_fixture (0, "x86_64-unknown-none"):() then prints:("int id_portout(int x) {\n    int result;\n    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
-given casm_row_fixture (0, "x86_64-unknown-none"):() then calls emit_asm_one:(0)
-given casm_row_fixture (0, "nope"):() then prints:("")
+given casm_row_fixture {
+  (0, "x86_64-unknown-none"):() then prints:("int id_portout(int x) {\n    int result;\n    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+  (0, "x86_64-unknown-none"):() then calls emit_asm_one:(0)
+  (0, "nope"):() then prints:("")
+}
 
 // A row written for another platform is fine, as long as some row of the same
 // name matches this one. Reported only on the first row of a name, so a
@@ -29,5 +33,7 @@ asm_check(int i, string triple) {
     asm_error((import afname)[i], triple);
   }
 } return void;
-given asmfx_setup (0, "x86_64-unknown-linux-gnu"):() then (import chkfail)[0]:(0)
-given asmfx_setup (0, "aarch64-unknown-linux-gnu"):() then prints:("error: no 'asm' definition of 'foo' for target 'aarch64-unknown-linux-gnu'; defined for: x86_64-unknown-linux-gnu\n") then (import chkfail)[0]:(1)
+given asmfx_setup {
+  (0, "x86_64-unknown-linux-gnu"):() then (import chkfail)[0]:(0)
+  (0, "aarch64-unknown-linux-gnu"):() then prints:("error: no 'asm' definition of 'foo' for target 'aarch64-unknown-linux-gnu'; defined for: x86_64-unknown-linux-gnu\n") then (import chkfail)[0]:(1)
+}

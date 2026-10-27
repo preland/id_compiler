@@ -10,9 +10,11 @@ fix_xtype(string xtname, int xtlo, int xtf) {
     xtk = xtk + 1;
   }
 } return string xtty;
-given fix_xnodes ("a", 0, 12):("int")
-given fix_xnodes ("b", 0, 12):("string")
-given fix_xnodes ("zz", 0, 12):("")
+given fix_xnodes {
+  ("a", 0, 12):("int")
+  ("b", 0, 12):("string")
+  ("zz", 0, 12):("")
+}
 
 fix_xtypeat(int xtai, string xtaname, string xtaso) {
   string xtares = xtaso;
@@ -20,8 +22,10 @@ fix_xtypeat(int xtai, string xtaname, string xtaso) {
     xtares = (import ns1)[xtai];
   }
 } return string xtares;
-given fix_xnodes (11, "a", "old"):("int")
-given fix_xnodes (11, "b", "old"):("old")
+given fix_xnodes {
+  (11, "a", "old"):("int")
+  (11, "b", "old"):("old")
+}
 
 fix_xname(int xnf) {
   string[] xnwords = ["part", "piece", "step", "stage", "section", "portion", "chunk", "segment"];
@@ -33,5 +37,7 @@ fix_xname(int xnf) {
     xncand = (import ns1)[xnf] + "_" + xnwords[xnwi];
   }
 } return string xncand;
-given fix_xnodes (7):("xa_part")
-given fix_xnodes (8):("xb_part")
+given fix_xnodes {
+  (7):("xa_part")
+  (8):("xb_part")
+}

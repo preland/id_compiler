@@ -6,8 +6,10 @@ lp_tail(int lq_x) {
   int lq_b = (import ni2)[lq_x];
   int lq_r = lp_vlit(lq_a, lq_b);
 } return int lq_r;
-given lpf_more ((import lpf_ob)):(1)
-given lpf_more ((import lpf_vvs)):(0)
+given lpf_more {
+  ((import lpf_ob)):(1)
+  ((import lpf_vvs)):(0)
+}
 
 lp_vlit(int lq_a, int lq_b) {
   int lq_r = 0;
@@ -15,7 +17,9 @@ lp_vlit(int lq_a, int lq_b) {
     lq_r = lp_lit(lq_b);
   }
 } return int lq_r;
-given lpf_more ((import lpf_q), (import lpf_n0)):(1)
-given lpf_more ((import lpf_n0), (import lpf_n0)):(0)
-given lpf_more ((import lpf_q), (import lpf_ngl)):(0)
-given lpf_more ((import lpf_q), (import lpf_bgl)):(0)
+given lpf_more {
+  ((import lpf_q), (import lpf_n0)):(1)
+  ((import lpf_n0), (import lpf_n0)):(0)
+  ((import lpf_q), (import lpf_ngl)):(0)
+  ((import lpf_q), (import lpf_bgl)):(0)
+}

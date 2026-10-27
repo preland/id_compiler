@@ -43,5 +43,7 @@ vocab_words() {
   hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "width");
   hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "utf8");
 } return void;
-given full_env ():() then (import vocab_count)[0]:(3)
-given full_env ():() then (import chkfail)[0]:(0)
+given full_env {
+  ():() then (import vocab_count)[0]:(3)
+  ():() then (import chkfail)[0]:(0)
+}

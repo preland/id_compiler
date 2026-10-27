@@ -13,10 +13,12 @@ esc_xfx_c() {
   export int exa_two = node_call("len", [(import exa_imt), (import exa_imt)]);
   export int exa_main = node_func("main", "void", (import ef_none), (import ef_none), 0 - 1);
 } return void;
-given esc_xfix ():() then calls node_decl:("int[]", "xs", (import exa_vp), 1)
-given esc_xfix ():() then calls node_func:("main", "void", (import ef_none), (import ef_none), -1)
-given esc_xfix ():() then (import chkfail)[0]:(0)
-given esc_xfix ():() then init_units:(0)
+given esc_xfix {
+  ():() then calls node_decl:("int[]", "xs", (import exa_vp), 1)
+  ():() then calls node_func:("main", "void", (import ef_none), (import ef_none), -1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_xfx_d() {
   add_export("xg", "int[]", "xo");
@@ -30,10 +32,12 @@ esc_xfx_d() {
   esc_seed();
   harn_init();
 } return void;
-given esc_xfix ():() then calls add_export:("xg", "int[]", "xo")
-given esc_xfix ():() then calls add_func:("main", "void", (import exa_main))
-given esc_xfix ():() then (import chkfail)[0]:(0)
-given esc_xfix ():() then init_units:(0)
+given esc_xfix {
+  ():() then calls add_export:("xg", "int[]", "xo")
+  ():() then calls add_func:("main", "void", (import exa_main))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_xfix() {
   esc_fix();

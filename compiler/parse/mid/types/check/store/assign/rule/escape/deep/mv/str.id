@@ -15,7 +15,9 @@ esc_mvstr(int[] stmts, int i, int a) {
     ok = str_fresh_node((import ni1)[(stmts[dz_j])]) == 1 && esc_cntr(stmts, dz_j, i, (import ns1)[a]) == 2;
   }
 } return int ok;
-given esc_ms_fix ((import ems_body), 2, (import ems_sv)):(1)
-given esc_ms_fix ((import ems_lbody), 2, (import ems_sv)):(0)
-given esc_ms_fix ((import ems_abody), 3, (import ems_sv)):(0)
-given esc_ms_fix ((import ems_body), 2, (import ems_nv)):(1)
+given esc_ms_fix {
+  ((import ems_body), 2, (import ems_sv)):(1)
+  ((import ems_lbody), 2, (import ems_sv)):(0)
+  ((import ems_abody), 3, (import ems_sv)):(0)
+  ((import ems_body), 2, (import ems_nv)):(1)
+}

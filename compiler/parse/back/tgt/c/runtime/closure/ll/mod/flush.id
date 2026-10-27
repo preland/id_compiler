@@ -25,5 +25,7 @@ fv_ll_def(string name, int nd) {
   int fn = fn_node_of(name);
   print(fv_ll_adapter(fn, name, nd));
 } return void;
-given clo_fixture ("fx_target", 0):() then prints:("define i32 @idfn_a_fx_target__0(ptr %c, i32 %a0) {\n  %r = call i32 @id_fx_target(i32 %a0)\n  ret i32 %r\n}\n")
-given clo_fixture ("fx_target", 1):() then prints:("define i32 @idfn_a_fx_target__1(ptr %c) {\n  %w0 = call i64 @id_clo_cell(ptr %c, i32 0)\n  %u0 = trunc i64 %w0 to i32\n  %r = call i32 @id_fx_target(i32 %u0)\n  ret i32 %r\n}\n")
+given clo_fixture {
+  ("fx_target", 0):() then prints:("define i32 @idfn_a_fx_target__0(ptr %c, i32 %a0) {\n  %r = call i32 @id_fx_target(i32 %a0)\n  ret i32 %r\n}\n")
+  ("fx_target", 1):() then prints:("define i32 @idfn_a_fx_target__1(ptr %c) {\n  %w0 = call i64 @id_clo_cell(ptr %c, i32 0)\n  %u0 = trunc i64 %w0 to i32\n  %r = call i32 @id_fx_target(i32 %u0)\n  ret i32 %r\n}\n")
+}

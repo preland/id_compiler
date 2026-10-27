@@ -6,9 +6,11 @@ fix_wprop(int gi) {
     i = i + 1;
   }
 } return void;
-given fix_wprop_fixture (0):() then calls fix_wseed:(-1) then calls fix_wseed:(-2)
-given fix_wprop_fixture (0):() then calls fix_wseed:(-2)
-given fix_wprop_fixture (1):() then calls fix_wseed:[0]
+given fix_wprop_fixture {
+  (0):() then calls fix_wseed:(-1) then calls fix_wseed:(-2)
+  (0):() then calls fix_wseed:(-2)
+  (1):() then calls fix_wseed:[0]
+}
 
 // fixd_wm is deliberately left empty by fix_winit (fix_wfill pushes one entry
 // per name in fnames, which every --fix fixture leaves empty), so a seeded

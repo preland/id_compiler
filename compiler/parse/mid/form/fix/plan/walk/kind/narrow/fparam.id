@@ -7,8 +7,10 @@ fix_fparam(int e, int i) {
     pt = pts[i];
   }
 } return string pt;
-given fix_pparam_fixture ((import ppvarcall), 0):("int")
-given fix_pparam_fixture ((import ppvarcall), 1):("")
+given fix_pparam_fixture {
+  ((import ppvarcall), 0):("int")
+  ((import ppvarcall), 1):("")
+}
 
 fix_simple_fixture() {
   fix_fixture();

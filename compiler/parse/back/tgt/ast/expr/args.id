@@ -8,5 +8,7 @@ pe_args(int[] args) {
     i = i + 1;
   }
 } return string out;
-given bin_fix ([0, 1]):(" 5 x")
-given bin_fix ([]):("")
+given bin_fix {
+  ([0, 1]):(" 5 x")
+  ([]):("")
+}

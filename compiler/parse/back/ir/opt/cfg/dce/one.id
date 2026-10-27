@@ -6,8 +6,10 @@ dce_one(int f, int id, int n) {
     n = n + 1;
   }
 } return int n;
-given cfg_fixture (0, 0, 0):(1) then iop_state:("ops 1:nop")
-given cfg_fixture (0, 0, 5):(6) then iop_state:("ops 1:nop")
+given cfg_fixture {
+  (0, 0, 0):(1) then iop_state:("ops 1:nop")
+  (0, 0, 5):(6) then iop_state:("ops 1:nop")
+}
 
 // How many instructions of this function name the value. An SSA value is
 // local to its function, so the whole store need not be scanned -- and at the

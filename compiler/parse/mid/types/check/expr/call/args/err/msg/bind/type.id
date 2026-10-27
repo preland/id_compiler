@@ -11,9 +11,11 @@ bind_type(int id) {
     t = bind_tail(type_of(args[0]), len(args) - 1);
   }
 } return string t;
-given bind_fixture ((import bind_ok)):("func() return int")
-given bind_fixture ((import bind_none)):("")
-given bind_fixture ((import bind_var)):("")
+given bind_fixture {
+  ((import bind_ok)):("func() return int")
+  ((import bind_none)):("")
+  ((import bind_var)):("")
+}
 
 // ft with its first nd parameters dropped, spelled as the parser spells every
 // function type; "" when ft is not a function type or has fewer parameters.

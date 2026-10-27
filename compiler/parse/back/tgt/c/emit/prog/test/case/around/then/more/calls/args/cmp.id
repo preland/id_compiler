@@ -13,8 +13,10 @@ calls_row_cmp(string nm, int ti, string pt, string fld, int item, string out) {
   string want = tc_value(item, pt);
   string so = out + " && " + tc_compare(code, want, pt);
 } return string so;
-given fn_fixture ("f", 0, "int", "x", (import fixture_zero), "1"):("1 && (idtc_rc_f_buf[idtc_j0].x == 0)")
-given fn_fixture ("g", 2, "int", "y", (import fixture_zero), "0"):("0 && (idtc_rc_g_buf[idtc_j2].y == 0)")
+given fn_fixture {
+  ("f", 0, "int", "x", (import fixture_zero), "1"):("1 && (idtc_rc_f_buf[idtc_j0].x == 0)")
+  ("g", 2, "int", "y", (import fixture_zero), "0"):("0 && (idtc_rc_g_buf[idtc_j2].y == 0)")
+}
 
 
 emit_calls_args_emit(int ci, int ti, string nm, string rowcond, string rowshow, int[] items) {
@@ -30,5 +32,7 @@ calls_show_step(string nm, int ti, int[] params, string out, int i) {
   string code = "idtc_rc_" + nm + "_buf[idtc_j" + ti + "]." + (import ns2)[(params[i])];
   string so = out + sep_at("fputs(\", \", stderr); ", i) + tc_show(code, pt) + " ";
 } return string so;
-given calls_items_fixture ("f", 0, (import fixture_params), "", 0):("fprintf(stderr, \"%d\", idtc_rc_f_buf[idtc_j0].x); ")
-given calls_items_fixture ("g", 2, (import fixture_params), "fputs(\"g(\", stderr); ", 0):("fputs(\"g(\", stderr); fprintf(stderr, \"%d\", idtc_rc_g_buf[idtc_j2].x); ")
+given calls_items_fixture {
+  ("f", 0, (import fixture_params), "", 0):("fprintf(stderr, \"%d\", idtc_rc_f_buf[idtc_j0].x); ")
+  ("g", 2, (import fixture_params), "fputs(\"g(\", stderr); ", 0):("fputs(\"g(\", stderr); fprintf(stderr, \"%d\", idtc_rc_g_buf[idtc_j2].x); ")
+}

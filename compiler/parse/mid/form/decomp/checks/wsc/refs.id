@@ -16,8 +16,10 @@ wsc_refs(string wrf_name, int wrf_e) {
     wrf_r = wsc_refs(wrf_name, (import ni1)[wrf_e]);
   }
 } return int wrf_r;
-given wsc_marks ("wsget", (import wx_bindcall)):(1)
-given wsc_marks ("wsput", (import wx_bindcall)):(0)
-given wsc_marks ("a", (import wx_sum)):(1)
-given wsc_marks ("a", (import wx_neg)):(1)
-given wsc_marks ("b", (import wx_neg)):(0)
+given wsc_marks {
+  ("wsget", (import wx_bindcall)):(1)
+  ("wsput", (import wx_bindcall)):(0)
+  ("a", (import wx_sum)):(1)
+  ("a", (import wx_neg)):(1)
+  ("b", (import wx_neg)):(0)
+}

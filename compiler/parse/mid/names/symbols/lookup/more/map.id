@@ -34,5 +34,7 @@ ni2_pick(int id, string no_word, string yes_word) {
     ret_s = yes_word;
   }
 } return string ret_s;
-given leaves_fixture ((import lit_a), "int", "word"):("int")
-given leaves_fixture ((import lit_word), "int", "word"):("word")
+given leaves_fixture {
+  ((import lit_a), "int", "word"):("int")
+  ((import lit_word), "int", "word"):("word")
+}

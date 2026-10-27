@@ -8,8 +8,10 @@ rc_visit(int[] rcfl, int[] rctodo, int rcw) {
     push(rctodo, rcw);
   }
 } return void;
-given rc_t_ready ([0, 0, 0], [], 1):([0, 1, 0], [1])
-given rc_t_ready ([0, 1, 0], [], 1):([0, 1, 0], [])
+given rc_t_ready {
+  ([0, 0, 0], [], 1):([0, 1, 0], [1])
+  ([0, 1, 0], [], 1):([0, 1, 0], [])
+}
 
 rc_walk(int[] rcfl, int[] rctodo) {
   while(len(rctodo) > 0) {
@@ -17,8 +19,10 @@ rc_walk(int[] rcfl, int[] rctodo) {
     rc_step(rcfl, rctodo, rcrow, 0);
   }
 } return void;
-given rc_t_ready ([0, 1, 0], [1]):([1, 1, 0], [])
-given rc_t_ready ([1, 0, 0], [0]):([1, 0, 0], [])
+given rc_t_ready {
+  ([0, 1, 0], [1]):([1, 1, 0], [])
+  ([1, 0, 0], [0]):([1, 0, 0], [])
+}
 
 rc_step(int[] rcfl, int[] rctodo, int rcrow, int rci) {
   while(rci < len((import dg_cout)[rcrow])) {
@@ -26,5 +30,7 @@ rc_step(int[] rcfl, int[] rctodo, int rcrow, int rci) {
     rci = rci + 1;
   }
 } return void;
-given rc_t_ready ([0, 1, 0], [], 1, 0):([1, 1, 0], [0])
-given rc_t_ready ([0, 1, 0], [], 1, 2):([0, 1, 0], [])
+given rc_t_ready {
+  ([0, 1, 0], [], 1, 0):([1, 1, 0], [0])
+  ([0, 1, 0], [], 1, 2):([0, 1, 0], [])
+}

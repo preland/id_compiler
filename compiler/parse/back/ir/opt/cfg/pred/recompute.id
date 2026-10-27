@@ -17,8 +17,10 @@ pred_clear(int f, int i) {
     i = i + 1;
   }
 } return void;
-given br_fixture_p (0, 0):() then (import bpred)[1]:([])
-given br_fixture_p (0, 2):() then (import bpred)[1]:([0])
+given br_fixture_p {
+  (0, 0):() then (import bpred)[1]:([])
+  (0, 2):() then (import bpred)[1]:([0])
+}
 
 pred_scan(int f, int i) {
   while(i < blk_count(f)) {
@@ -27,5 +29,7 @@ pred_scan(int f, int i) {
     i = i + 1;
   }
 } return void;
-given br_fixture (0, 0):() then (import bpred)[1]:([0])
-given br_fixture (0, 2):() then (import bpred)[1]:([])
+given br_fixture {
+  (0, 0):() then (import bpred)[1]:([0])
+  (0, 2):() then (import bpred)[1]:([])
+}

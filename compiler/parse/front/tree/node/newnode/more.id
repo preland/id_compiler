@@ -5,8 +5,10 @@ newnode_tail(int[] l1, int[] l2) {
   push_pos();
   int ret_i = len((import nkind)) - 1;
 } return int ret_i;
-given mk_one_kind ([1, 2], [3]):(0) then calls push_ll:([1, 2], [3])
-given mk_one_kind ([], [4]):(0) then calls push_ll:([], [4])
+given mk_one_kind {
+  ([1, 2], [3]):(0) then calls push_ll:([1, 2], [3])
+  ([], [4]):(0) then calls push_ll:([], [4])
+}
 
 // A node's last token, and its first-token slot, which only a statement fills
 // (front/tokens/load/more/pos/stmt.id).

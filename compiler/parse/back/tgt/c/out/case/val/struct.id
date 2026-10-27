@@ -20,8 +20,10 @@ tc_struct(int e, string want) {
   string cells = tc_fcells(xs, want);
   string so = "id_list_lit(" + len(xs) + ", " + cells + ")";
 } return string so;
-given sd_case_fixture ((import sd_ce), "P"):("id_list_lit(2, (long long)(1), (long long)(1))")
-given sd_case_fixture ((import sd_cl), "P"):("id_list_lit(1, (long long)(1))")
+given sd_case_fixture {
+  ((import sd_ce), "P"):("id_list_lit(2, (long long)(1), (long long)(1))")
+  ((import sd_cl), "P"):("id_list_lit(1, (long long)(1))")
+}
 
 // bind(NAME, v1, ..., vk) in a test case (docs/TESTS.md): the object the bind of
 // a program makes (runtime/closure/c/more/use/bind.id), from the template of
@@ -31,5 +33,7 @@ tc_cbind(int e) {
   string clo0 = "id_clo_new(" + fv_ref((import ns1)[items[0]], len(items) - 1) + ")";
   string so = tc_cbsets(clo0, fn_node_of((import ns1)[items[0]]), items);
 } return string so;
-given clo_case_fixture ((import cc_e)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
-given clo_case_fixture ((import cc_f)):("id_clo_new(ID_FNV(fx_target__0))")
+given clo_case_fixture {
+  ((import cc_e)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
+  ((import cc_f)):("id_clo_new(ID_FNV(fx_target__0))")
+}

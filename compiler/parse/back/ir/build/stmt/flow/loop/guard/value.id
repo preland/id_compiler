@@ -9,8 +9,10 @@ gd_load(string gdv_name) {
   string gdv_ty = (import ity)[gdv_slot];
   int gdv_val = lw_load_at(gdv_slot, gdv_ty);
 } return int gdv_val;
-given gd_fix ("j"):(3) then gd_last:("int load ")
-given gd_fix ("v"):(3) then gd_last:("int[] load ")
+given gd_fix {
+  ("j"):(3) then gd_last:("int load ")
+  ("v"):(3) then gd_last:("int[] load ")
+}
 
 gd_wide(int gdv_val) {
   int gdv_out = gdv_val;
@@ -18,8 +20,10 @@ gd_wide(int gdv_val) {
     gdv_out = lw_conv(gdv_val, "int", "word");
   }
 } return int gdv_out;
-given gd_vals (3):(5) then gd_last:("word sext ")
-given gd_vals (4):(4) then gd_last:("int[] load ")
+given gd_vals {
+  (3):(5) then gd_last:("word sext ")
+  (4):(4) then gd_last:("int[] load ")
+}
 
 gd_raw(string gdv_op, int gdv_list) {
   string gdv_fn = lw_bfn(gdv_list, "id_list_len_raw", "id_bytes_len_raw");

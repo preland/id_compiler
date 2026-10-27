@@ -5,8 +5,10 @@ nat_node(string kind, int id) {
     nat_call(kind, id);
   }
 } return void;
-given natcall_fixture ("harness", (import natcall_node)):() then len((import natrow)):(1)
-given natcall_fixture ("program", (import natcall_node)):() then len((import natrow)):(1)
+given natcall_fixture {
+  ("harness", (import natcall_node)):() then len((import natrow)):(1)
+  ("program", (import natcall_node)):() then len((import natrow)):(1)
+}
 
 // fn_node_of is -1 for a builtin or an asm function, and the && stops there,
 // so is_native is only ever asked of a func node. A native is a func node

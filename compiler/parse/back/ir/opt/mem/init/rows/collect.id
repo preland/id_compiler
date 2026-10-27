@@ -19,8 +19,10 @@ m2r_collect(int f) {
     i = i + 1;
   }
 } return void;
-given m2r_alloca_fixture (0):() then calls m2r_collect_at:(0, 0) then calls m2r_collect_at:(0, 1)
-given m2r_alloca_fixture (1):() then calls m2r_collect_at:[0] then len((import pra)):(0)
+given m2r_alloca_fixture {
+  (0):() then calls m2r_collect_at:(0, 0) then calls m2r_collect_at:(0, 1)
+  (1):() then calls m2r_collect_at:[0] then len((import pra)):(0)
+}
 
 // cfg_fixture's two blocks, with pra/phiof/outv exported: for m2r_phis and
 // m2r_walk cases that need blk_count(f) > 1 without crashing on the tables

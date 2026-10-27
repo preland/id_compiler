@@ -54,5 +54,7 @@ init_ty_rows() {
   ty_row("int", "int", 4, 1);
   init_ty_rows2();
 } return void;
-given init_ty_cols ():() then len((import tyname)):(7)
-given init_ty_cols ():() then reg_last_width:(4)
+given init_ty_cols {
+  ():() then len((import tyname)):(7)
+  ():() then reg_last_width:(4)
+}

@@ -7,8 +7,10 @@ arg_setup(int argc, string[] argv) {
   init_rtc();
   arg_flags(argc, argv);
 } return void;
-given env_init (1, ["prog"]):() then (import reqc)[0]:(0)
-given env_init (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
+given env_init {
+  (1, ["prog"]):() then (import reqc)[0]:(0)
+  (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
+}
 
 // The build flags, set together: this block has the room that arg_setup's
 // does not.
@@ -16,8 +18,10 @@ arg_flags(int argc, string[] argv) {
   reqtests_init();
   arg_flags2(argc, argv);
 } return void;
-given flags_setup (1, ["prog"]):() then (import reqc)[0]:(0)
-given flags_setup (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
+given flags_setup {
+  (1, ["prog"]):() then (import reqc)[0]:(0)
+  (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
+}
 
 // init_rtc() (mid/names/exports/extern/tab/table.id) and reqtests_init()
 // (mid/names/limits/shape/cases/more/flag/reqtests.id), both needed before a

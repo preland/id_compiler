@@ -28,5 +28,7 @@ dg_const_edges_of(int dgi, int dglo) {
     dglo = dglo + 1;
   }
 } return int dglo;
-given dg_t_crows2 (1, 0):(6) then dg_nout1:("out1 1")
-given dg_t_crows2 (0, 0):(2) then dg_nout1:("out1 0")
+given dg_t_crows2 {
+  (1, 0):(6) then dg_nout1:("out1 1")
+  (0, 0):(2) then dg_nout1:("out1 0")
+}

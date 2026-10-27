@@ -8,5 +8,7 @@ op_at(int[] pos, string[] ops) {
   string s = cur_text(pos);
   int ok = str_in(ops, s);
 } return int ok;
-given expr_tokens ([3], ["*", "/"]):(1)
-given expr_tokens ([3], ["+", "-"]):(0)
+given expr_tokens {
+  ([3], ["*", "/"]):(1)
+  ([3], ["+", "-"]):(0)
+}

@@ -6,8 +6,10 @@ dg_seal_out(word[] dgacc, int[] dgbad, int dgm, int dgi) {
     dgi = dgi + 1;
   }
 } return void;
-given dg_t_scc ([0, 0], [0], 4, 0):([0, 2586336722068730772], [1])
-given dg_t_scc ([0, 0], [0], 4, 1):([0, 0], [0])
+given dg_t_scc {
+  ([0, 0], [0], 4, 0):([0, 2586336722068730772], [1])
+  ([0, 0], [0], 4, 1):([0, 0], [0])
+}
 
 // An edge to a sealed component adds that component's hash and dirt. One to
 // a function with no component yet is one the walk has not finished, which
@@ -21,6 +23,8 @@ dg_seal_edge(word[] dgacc, int[] dgbad, int dgw) {
     dgbad[0] = dgbad[0] | (import dg_dirty)[dgwc];
   }
 } return void;
-given dg_t_marked ([0, 0], [0], 2):([0, 3433123315665011780], [0])
-given dg_t_marked ([0, 0], [0], 3):([0, 0], [1])
+given dg_t_marked {
+  ([0, 0], [0], 2):([0, 3433123315665011780], [0])
+  ([0, 0], [0], 3):([0, 0], [1])
+}
 

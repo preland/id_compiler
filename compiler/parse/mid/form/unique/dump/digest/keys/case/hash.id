@@ -27,8 +27,10 @@ given dg_t_natv (2, 1):("1118206258217500576")
 dg_deep_fn(int dgf) {
   word dgd = (import dg_deep)[(import dg_comp)[dgf]];
 } return word dgd;
-given dg_t_scc (0):(4863496796159887835)
-given dg_t_scc (2):(5376189763659863551)
+given dg_t_scc {
+  (0):(4863496796159887835)
+  (2):(5376189763659863551)
+}
 
 dg_case_toks(word[] dgacc, int dgfrom, int dgto) {
   while(dgfrom < dgto) {
@@ -36,5 +38,7 @@ dg_case_toks(word[] dgacc, int dgfrom, int dgto) {
     dgfrom = dgfrom + 1;
   }
 } return void;
-given dg_t_built ([0, 0], 0, 0):([0, 0])
-given dg_t_built ([0, 0], 41, 42):([8248207263563534326, 0])
+given dg_t_built {
+  ([0, 0], 0, 0):([0, 0])
+  ([0, 0], 41, 42):([8248207263563534326, 0])
+}

@@ -9,21 +9,27 @@ esc_block(int[] stmts, string nm) {
     i = i + 1;
   }
 } return int r;
-given esc_fix ((import efb_stmts), "p"):(513)
-given esc_fix ((import efb_stmts), "v"):(2)
-given esc_fix ((import efb_stmts), "t"):(256)
+given esc_fix {
+  ((import efb_stmts), "p"):(513)
+  ((import efb_stmts), "v"):(2)
+  ((import efb_stmts), "t"):(256)
+}
 
 esc_if(int sn, string nm) {
   int r = esc_expr((import ni1)[sn], nm, 0);
   r = r | esc_block((import nl1)[sn], nm);
   r = r | esc_block((import nl2)[sn], nm);
 } return int r;
-given esc_fix ((import efc_if), "y"):(2)
-given esc_fix ((import efc_if), "s"):(1)
+given esc_fix {
+  ((import efc_if), "y"):(2)
+  ((import efc_if), "s"):(1)
+}
 
 esc_while(int sn, string nm) {
   int r = esc_expr((import ni1)[sn], nm, 0);
   r = r | esc_block((import nl1)[sn], nm);
 } return int r;
-given esc_fix ((import efc_loop), "s"):(1)
-given esc_fix ((import efc_loop), "w"):(0)
+given esc_fix {
+  ((import efc_loop), "s"):(1)
+  ((import efc_loop), "w"):(0)
+}

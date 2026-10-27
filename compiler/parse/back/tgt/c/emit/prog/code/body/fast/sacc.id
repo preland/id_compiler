@@ -11,5 +11,7 @@ lp_sacc(int lq_id, int lq_lo, int lq_hi) {
     lp_take(lq_id, lq_jn, lp_ixoff(lq_x));
   }
 } return void;
-given lpf_lsc ((import lpf_hx), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(1)
-given lpf_lsc ((import lpf_hy), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(0)
+given lpf_lsc {
+  ((import lpf_hx), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(1)
+  ((import lpf_hy), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(0)
+}

@@ -17,8 +17,10 @@ cell_int_fits(int cbx_node) {
     cbx_ok = cell_literal_fits((import ns1)[cbx_node]);
   }
 } return int cbx_ok;
-given lpf_on ((import lpf_n0)):(1)
-given lpf_on ((import lpf_xa)):(0)
+given lpf_on {
+  ((import lpf_n0)):(1)
+  ((import lpf_xa)):(0)
+}
 
 cell_derived_fits(int cbx_node) {
   int cbx_ok = 0;
@@ -28,5 +30,7 @@ cell_derived_fits(int cbx_node) {
     cbx_ok = cell_mask_fits(cbx_node);
   }
 } return int cbx_ok;
-given lpf_on ((import lpf_xa)):(0)
-given lpf_on ((import lpf_n0)):(0)
+given lpf_on {
+  ((import lpf_xa)):(0)
+  ((import lpf_n0)):(0)
+}

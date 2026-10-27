@@ -13,9 +13,11 @@ vocab_loc(int vocab_kind, int vocab_row, string vocab_name) {
     vocab_where = vocab_loc_var(vocab_kind, vocab_row, vocab_name);
   }
 } return string vocab_where;
-given vocab_world (0, 0, "x"):("fixture.id:7")
-given vocab_world (1, 0, "x"):("<stdin>:10")
-given vocab_world (2, 0, "g"):("<stdin>:0")
+given vocab_world {
+  (0, 0, "x"):("fixture.id:7")
+  (1, 0, "x"):("<stdin>:10")
+  (2, 0, "g"):("<stdin>:0")
+}
 
 vocab_loc_var(int vocab_kind, int vocab_row, string vocab_name) {
   string vocab_where = "";
@@ -25,8 +27,10 @@ vocab_loc_var(int vocab_kind, int vocab_row, string vocab_name) {
     vocab_where = vocab_loc_rest(vocab_kind, vocab_row, vocab_name);
   }
 } return string vocab_where;
-given vocab_world (1, 0, "x"):("<stdin>:10")
-given vocab_world (2, 0, "g"):("<stdin>:0")
+given vocab_world {
+  (1, 0, "x"):("<stdin>:10")
+  (2, 0, "g"):("<stdin>:0")
+}
 
 vocab_loc_rest(int vocab_kind, int vocab_row, string vocab_name) {
   string vocab_where = "";

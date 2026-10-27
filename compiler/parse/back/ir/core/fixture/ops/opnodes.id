@@ -27,7 +27,9 @@ lw_fix_index_tail(int b) {
   int i = node_txt2("int", "0", 0, 0);
   export int fix_index_n = node_index(b, i);
 } return void;
-given lw_env_fixture (1):() then calls node_txt2:("int", "0", 0, 0)
-given lw_env_fixture (1):() then calls node_index:(1, 1)
-given lw_env_fixture (1):() then (import chkfail)[0]:(0)
-given lw_env_fixture (1):() then init_units:(0)
+given lw_env_fixture {
+  (1):() then calls node_txt2:("int", "0", 0, 0)
+  (1):() then calls node_index:(1, 1)
+  (1):() then (import chkfail)[0]:(0)
+  (1):() then init_units:(0)
+}

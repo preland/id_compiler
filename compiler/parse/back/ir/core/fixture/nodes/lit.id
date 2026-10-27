@@ -29,7 +29,9 @@ lw_fix_var_ty() {
   push((import enames), "x");
   push((import etypes), "int");
 } return void;
-given env_init ():() then (import enames)[0]:("x")
-given env_init ():() then (import etypes)[0]:("int")
-given env_init ():() then (import chkfail)[0]:(0)
-given env_init ():() then init_units:(0)
+given env_init {
+  ():() then (import enames)[0]:("x")
+  ():() then (import etypes)[0]:("int")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

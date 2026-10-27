@@ -24,5 +24,7 @@ fix_xjump(int xja, int xjb) {
     xjwhy = "the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand";
   }
 } return string xjwhy;
-given fix_xjumpy (17, 18):("the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand")
-given fix_xjumpy (1, 16):("")
+given fix_xjumpy {
+  (17, 18):("the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand")
+  (1, 16):("")
+}

@@ -7,12 +7,14 @@ note_fn_ret(int cfn) {
     note_ty(rt);
   }
 } return void;
-given fn_fixture ((import fixture_fn)):() then calls note_ty:("int")
-given fn_fixture given tc_types_init (-1):() then len((import tctys)):(0)
-given fn_fixture ((import fixture_fn)):() then calls note_ty:[1]
-given fn_fixture (-1):() then calls note_ty:[0]
-given fn_fixture ((import fixture_fn)):()
-given fn_fixture (-1):()
+given fn_fixture {
+  ((import fixture_fn)):() then calls note_ty:("int")
+  given tc_types_init (-1):() then len((import tctys)):(0)
+  ((import fixture_fn)):() then calls note_ty:[1]
+  (-1):() then calls note_ty:[0]
+  ((import fixture_fn)):()
+  (-1):()
+}
 
 tctys_note_one_setup() {
   env_init();

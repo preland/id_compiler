@@ -20,5 +20,7 @@ limit_diag(string fname, int ln, string lcode, string lmsg, string lwhy, string 
   string lim_where = diag_fn_loc(fname, ln);
   diag(lcode, lim_where, lmsg, "", lwhy, lhelp);
 } return void;
-given edge_fixture ("fx_target", 4, "E0201", "m", "w", "h"):() then prints:("fixture.id:4: error: m [E0201]\n  why: w\n  help: h\n")
-given edge_fixture ("nosuchfn", 9, "E0204", "msg", "why", "help"):() then prints:("<stdin>:9: error: msg [E0204]\n  why: why\n  help: help\n")
+given edge_fixture {
+  ("fx_target", 4, "E0201", "m", "w", "h"):() then prints:("fixture.id:4: error: m [E0201]\n  why: w\n  help: h\n")
+  ("nosuchfn", 9, "E0204", "msg", "why", "help"):() then prints:("<stdin>:9: error: msg [E0204]\n  why: why\n  help: help\n")
+}

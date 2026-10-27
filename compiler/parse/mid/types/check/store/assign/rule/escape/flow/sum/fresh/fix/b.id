@@ -21,10 +21,12 @@ esc_ff_e() {
   export int eff_exs = node_exprstmt((import eff_cmk));
   export int eff_exl = node_exprstmt((import eff_cl));
 } return void;
-given esc_ffix ():() then calls node_call:("ff_make", [(import eff_vn)]) then calls node_decl:("int[]", "ys", (import eff_cmk), 0) then calls node_decl:("int", "t", (import eff_cl), 0)
-given esc_ffix ():() then calls node_param:("param", "int[]", "q") then calls node_call:("ff_len", [(import eff_cmk)]) then calls node_exprstmt:((import eff_cmk)) then calls node_exprstmt:((import eff_cl))
-given esc_ffix ():() then (import chkfail)[0]:(0)
-given esc_ffix ():() then init_units:(0)
+given esc_ffix {
+  ():() then calls node_call:("ff_make", [(import eff_vn)]) then calls node_decl:("int[]", "ys", (import eff_cmk), 0) then calls node_decl:("int", "t", (import eff_cl), 0)
+  ():() then calls node_param:("param", "int[]", "q") then calls node_call:("ff_len", [(import eff_cmk)]) then calls node_exprstmt:((import eff_cmk)) then calls node_exprstmt:((import eff_cl))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_ff_f() {
   export int eff_rtp = newnode("ret", (import eff_vp), 0, "", "", (import ef_none), (import ef_none));
@@ -39,10 +41,12 @@ esc_ff_f() {
   export int eff_early = node_func("ff_early", "int[]", (import eff_pp), [(import eff_ife), (import eff_dz)], node_txt("var", "z"));
   export int eff_elit = node_func("ff_elit", "int[]", (import eff_pp), [(import eff_ifl), (import eff_dz)], node_txt("var", "z"));
 } return void;
-given esc_ffix ():() then calls newnode:("ret", (import eff_vp), 0, "", "", (import ef_none), (import ef_none)) then calls node_call:("len", [(import eff_vp)])
-given esc_ffix ():() then calls node_txt2:("int", "3", 3, 0) then calls node_if:((import eff_cp3), [(import eff_rtp)], (import ef_none), 0) then calls node_if:((import eff_cp3), [(import eff_rtl)], (import ef_none), 0)
-given esc_ffix ():() then (import chkfail)[0]:(0)
-given esc_ffix ():() then init_units:(0)
+given esc_ffix {
+  ():() then calls newnode:("ret", (import eff_vp), 0, "", "", (import ef_none), (import ef_none)) then calls node_call:("len", [(import eff_vp)])
+  ():() then calls node_txt2:("int", "3", 3, 0) then calls node_if:((import eff_cp3), [(import eff_rtp)], (import ef_none), 0) then calls node_if:((import eff_cp3), [(import eff_rtl)], (import ef_none), 0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_ff_g() {
   export int eff_ctor = node_call("FfPt", [(import eff_vn)]);
@@ -57,7 +61,9 @@ esc_ff_g() {
   export int eff_slen = node_func("ff_slen", "int", (import eff_sq), [(import eff_dl)], node_txt("var", "l"));
   export int eff_csc = node_call("ff_slen", [(import eff_csr)]);
 } return void;
-given esc_ffix ():() then calls node_call:("FfPt", [(import eff_vn)]) then calls node_decl:("FfPt", "p", (import eff_ctor), 0) then calls node_func:("ff_pt", "FfPt", (import eff_np), [(import eff_dpt)], (import eff_vp))
-given esc_ffix ():() then calls node_call:("fs_ret", [(import efs_vn)]) then calls node_decl:("string", "c", (import eff_csr), 0) then calls node_func:("ff_sown", "int", (import efs_np), [(import eff_dcs)], (import efs_vn)) then calls node_param:("param", "string", "q") then calls node_call:("ff_slen", [(import eff_csr)])
-given esc_ffix ():() then (import chkfail)[0]:(0)
-given esc_ffix ():() then init_units:(0)
+given esc_ffix {
+  ():() then calls node_call:("FfPt", [(import eff_vn)]) then calls node_decl:("FfPt", "p", (import eff_ctor), 0) then calls node_func:("ff_pt", "FfPt", (import eff_np), [(import eff_dpt)], (import eff_vp))
+  ():() then calls node_call:("fs_ret", [(import efs_vn)]) then calls node_decl:("string", "c", (import eff_csr), 0) then calls node_func:("ff_sown", "int", (import efs_np), [(import eff_dcs)], (import efs_vn)) then calls node_param:("param", "string", "q") then calls node_call:("ff_slen", [(import eff_csr)])
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

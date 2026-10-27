@@ -5,5 +5,7 @@ lpq_wh3(int lfi_c, int lfi_a, int lfi_b, int lfi_d) {
   int[] lfl_body = [lfi_a, lfi_b, lfi_d];
   int lfi_r = node_while(lfi_c, lfl_body);
 } return int lfi_r;
-given lpf_two (1, 0, 0, 1):(2) then (import nl1)[2]:([0, 0, 1])
-given lpf_two (0, 1, 1, 0):(2) then (import ni1)[2]:(0)
+given lpf_two {
+  (1, 0, 0, 1):(2) then (import nl1)[2]:([0, 0, 1])
+  (0, 1, 1, 0):(2) then (import ni1)[2]:(0)
+}

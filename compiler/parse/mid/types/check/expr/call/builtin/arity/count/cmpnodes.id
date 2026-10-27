@@ -17,10 +17,12 @@ cmp_build() {
   export int bin_lt = node_txt2("bin", "<", (import lit_a), (import lit_b));
   export int bin_bitand = node_txt2("bin", "&", (import lit_a), (import lit_b));
 } return void;
-given composite_fixture ():() then calls node_txt2:("bin", "<", (import lit_a), (import lit_b))
-given composite_fixture ():() then calls node_txt2:("bin", "==", (import lit_a), (import lit_b))
-given composite_fixture ():() then (import chkfail)[0]:(0)
-given composite_fixture ():() then init_units:(0)
+given composite_fixture {
+  ():() then calls node_txt2:("bin", "<", (import lit_a), (import lit_b))
+  ():() then calls node_txt2:("bin", "==", (import lit_a), (import lit_b))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // bin_mixed is unparenthesized (nothing here pushes it to nparen), so it is
 // the "needs parens" shape mixed_side looks for. print_call is a builtin
@@ -34,7 +36,9 @@ cmp_build2() {
 } chain () {
   init_rtc();
 } return void;
-given cmp_fixture ():() then calls node_txt2:("bin", "<", (import bin_bitand), (import lit_a))
-given cmp_fixture ():() then calls node_exprstmt:((import bin_eq))
-given cmp_fixture ():() then (import chkfail)[0]:(0)
-given cmp_fixture ():() then init_units:(0)
+given cmp_fixture {
+  ():() then calls node_txt2:("bin", "<", (import bin_bitand), (import lit_a))
+  ():() then calls node_exprstmt:((import bin_eq))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

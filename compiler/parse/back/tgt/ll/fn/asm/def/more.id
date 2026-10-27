@@ -40,5 +40,7 @@ ll_asm_body3(int r, string ty, string q, string text, string cons) {
   print("  %r = call " + ty + " asm sideeffect " + q + text + q + ", " + q + cons + q + "(" + par + ")");
   print("  ret " + ty + " %r");
 } return void;
-given llasm_row_fixture (0, "i32", "\"", "nop", "=r"):() then prints:("  %r = call i32 asm sideeffect \"nop\", \"=r\"(i32 %a0)\n  ret i32 %r\n")
-given llasm_row_fixture (0, "ptr", "\"", "ret", "=r,r"):() then prints:("  %r = call ptr asm sideeffect \"ret\", \"=r,r\"(i32 %a0)\n  ret ptr %r\n")
+given llasm_row_fixture {
+  (0, "i32", "\"", "nop", "=r"):() then prints:("  %r = call i32 asm sideeffect \"nop\", \"=r\"(i32 %a0)\n  ret i32 %r\n")
+  (0, "ptr", "\"", "ret", "=r,r"):() then prints:("  %r = call ptr asm sideeffect \"ret\", \"=r,r\"(i32 %a0)\n  ret ptr %r\n")
+}

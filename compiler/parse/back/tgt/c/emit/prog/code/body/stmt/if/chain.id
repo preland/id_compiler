@@ -15,8 +15,10 @@ collect_chain(int id) {
     push(if_ids, cur_id);
   }
 } return int[] if_ids;
-given stmt_fix (4):([4])
-given stmt_fix (3):([3])
+given stmt_fix {
+  (4):([4])
+  (3):([3])
+}
 
 seq_conds(int[] if_ids) {
   string[] cond_texts = [];
@@ -27,9 +29,11 @@ seq_conds(int[] if_ids) {
     i = i + 1;
   }
 } return string[] cond_texts;
-given stmt_fix ([4]):(["5"])
-given stmt_fix ([3, 4]):(["5", "5"])
-given stmt_fix ([]):([])
+given stmt_fix {
+  ([4]):(["5"])
+  ([3, 4]):(["5", "5"])
+  ([]):([])
+}
 
 // Render one level of the chain, using its precomputed condition text rather
 // than computing it here: computing it here, for an else-if, would run at
@@ -59,5 +63,7 @@ render_chain(int[] if_ids, string[] cond_texts, int lvl, string ind) {
     emit_else(cur_id, ind);
   }
 } return void;
-given stmt_fix ([4], ["5"], 0, ""):() then prints:("if (5) {\n}\n")
-given stmt_fix ([4], ["5"], 0, "  "):() then prints:("  if (5) {\n  }\n")
+given stmt_fix {
+  ([4], ["5"], 0, ""):() then prints:("if (5) {\n}\n")
+  ([4], ["5"], 0, "  "):() then prints:("  if (5) {\n  }\n")
+}

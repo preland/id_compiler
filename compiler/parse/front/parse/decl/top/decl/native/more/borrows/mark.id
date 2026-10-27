@@ -13,16 +13,20 @@ take_borrows(int[] pos) {
     advance(pos);
   }
 } return int bflag;
-given full_env given push_toks(["ident", "kw"], ["borrows", "string"]) ([0]):(1)
-given full_env given push_toks(["kw", "ident"], ["string", "s"]) ([0]):(0)
+given full_env {
+  given push_toks(["ident", "kw"], ["borrows", "string"]) ([0]):(1)
+  given push_toks(["kw", "ident"], ["string", "s"]) ([0]):(0)
+}
 
 borrow_mark(int[] pos, string kind, int bflag, string type, int node) {
   if(bflag == 1) {
     borrow_check(pos, kind, type, node);
   }
 } return void;
-given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", 0, "string", 4):() then len((import borrownode)):(0)
-given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", 1, "string", 4):() then (import borrownode)[0]:(4)
+given full_env {
+  given push_toks(["ident"], ["g"]) ([0], "nparam", 0, "string", 4):() then len((import borrownode)):(0)
+  given push_toks(["ident"], ["g"]) ([0], "nparam", 1, "string", 4):() then (import borrownode)[0]:(4)
+}
 
 borrow_check(int[] pos, string kind, string type, int node) {
   int bad = borrow_bad(kind, type);
@@ -32,5 +36,7 @@ borrow_check(int[] pos, string kind, string type, int node) {
     push((import borrownode), node);
   }
 } return void;
-given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", "int", 4):() then len((import borrownode)):(0)
-given full_env given push_toks(["ident"], ["g"]) ([0], "nparam", "int[]", 4):() then (import borrownode)[0]:(4)
+given full_env {
+  given push_toks(["ident"], ["g"]) ([0], "nparam", "int", 4):() then len((import borrownode)):(0)
+  given push_toks(["ident"], ["g"]) ([0], "nparam", "int[]", 4):() then (import borrownode)[0]:(4)
+}

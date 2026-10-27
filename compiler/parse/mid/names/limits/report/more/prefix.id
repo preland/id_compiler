@@ -6,8 +6,10 @@
 loc_at(string fname, int ln) {
   string ret_s = func_file(fname) + ":" + ln + ": error: ";
 } return string ret_s;
-given edge_fixture ("fx_target", 4):("fixture.id:4: error: ")
-given edge_fixture ("nosuchfn", 9):("<stdin>:9: error: ")
+given edge_fixture {
+  ("fx_target", 4):("fixture.id:4: error: ")
+  ("nosuchfn", 9):("<stdin>:9: error: ")
+}
 
 // What a statement's expression is a path into: its root is an (import NAME) or
 // a bare variable name, recorded as a write of that variable by `wr_fname`.

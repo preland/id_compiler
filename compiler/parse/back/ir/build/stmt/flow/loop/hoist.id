@@ -18,8 +18,10 @@ lh_hoist(int lh_w, int lh_on) {
     lh_k = lh_k + 1;
   }
 } return void;
-given lv_fix given lv_hit ((import lpf_wa), 1):() then len((import lphv)):(0)
-given lv_fix given lv_hit ((import lpf_wa), 0):() then len((import lphn)):(0)
+given lv_fix {
+  given lv_hit ((import lpf_wa), 1):() then len((import lphv)):(0)
+  given lv_hit ((import lpf_wa), 0):() then len((import lphn)):(0)
+}
 
 lh_take(int lh_n, int lh_lo, int lh_hi) {
   string lh_nm = lp_lname(lh_n);
@@ -29,8 +31,10 @@ lh_take(int lh_n, int lh_lo, int lh_hi) {
     push((import lphv), lh_v);
   }
 } return void;
-given lv_fix given lv_hit ((import lpf_na), 0, 0):() then len((import lphn)):(0)
-given lv_fix given lv_hit ((import lpf_wa), 0, 0):() then len((import lphv)):(0)
+given lv_fix {
+  given lv_hit ((import lpf_na), 0, 0):() then len((import lphn)):(0)
+  given lv_hit ((import lpf_wa), 0, 0):() then len((import lphv)):(0)
+}
 
 lh_pick(int lh_a) {
   int lh_r = 0 - 1;
@@ -38,6 +42,8 @@ lh_pick(int lh_a) {
     lh_r = (import lphv)[find_str((import lphn), (import ns1)[lh_a])];
   }
 } return int lh_r;
-given lv_fix given lv_hit ((import lpf_na)):(-1)
-given lv_fix given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) ((import lpf_na)):(9)
-given lv_fix given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) given integer_list_set((import lpon), 0, 0) ((import lpf_na)):(-1)
+given lv_fix {
+  given lv_hit ((import lpf_na)):(-1)
+  given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) ((import lpf_na)):(9)
+  given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) given integer_list_set((import lpon), 0, 0) ((import lpf_na)):(-1)
+}

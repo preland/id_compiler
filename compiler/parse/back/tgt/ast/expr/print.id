@@ -10,8 +10,10 @@ print_expr(int id) {
     s = pe_op(id);
   }
 } return string s;
-given bin_fix (0):("5")
-given bin_fix (2):("(+ 5 x)")
+given bin_fix {
+  (0):("5")
+  (2):("(+ 5 x)")
+}
 
 pe_op(int id) {
   string s = "";
@@ -23,8 +25,10 @@ pe_op(int id) {
     s = pe_atom(id);
   }
 } return string s;
-given bin_fix (2):("(+ 5 x)")
-given bin_fix (1):("x")
+given bin_fix {
+  (2):("(+ 5 x)")
+  (1):("x")
+}
 
 pe_atom(int id) {
   string s = (import ns1)[id];

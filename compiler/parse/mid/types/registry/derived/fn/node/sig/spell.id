@@ -28,5 +28,7 @@ fn_type_list(int[] ps) {
     i = i + 1;
   }
 } return string out;
-given fn_fixture ((import fixture_params)):("int")
-given fn_fixture ([]):("")
+given fn_fixture {
+  ((import fixture_params)):("int")
+  ([]):("")
+}

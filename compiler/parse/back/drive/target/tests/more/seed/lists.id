@@ -8,8 +8,10 @@ seed_lists() {
     seed_list_names();
   }
 } return void;
-given seed_given_fixture given init_rtc ():() then len((import rfn)):(2)
-given seed_given_fixture given lcell_rt_fixture ():() then len((import rfn)):(4)
+given seed_given_fixture {
+  given init_rtc ():() then len((import rfn)):(2)
+  given lcell_rt_fixture ():() then len((import rfn)):(4)
+}
 
 seed_list_names() {
   string[] wanted = ["list_new", "list_push", "list_len", "list_get"];
@@ -19,5 +21,7 @@ seed_list_names() {
     wi = wi + 1;
   }
 } return void;
-given seed_given_fixture given lcell_rt_fixture ():() then len((import rfn)):(4)
-given seed_given_fixture given lcell_rt_fixture ():() then (import rfn)[0]:("main")
+given seed_given_fixture {
+  given lcell_rt_fixture ():() then len((import rfn)):(4)
+  given lcell_rt_fixture ():() then (import rfn)[0]:("main")
+}

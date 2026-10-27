@@ -25,8 +25,10 @@ fit_struct(int i, int e, string want) {
     fit_ctor(i, e, want);
   }
 } return void;
-given sd_case_fixture ((import fixture_ci), (import sd_ca), "P"):() then prints:("fixture.id:4: error: this case gives 1 where a P is required; write the struct as P(x, y) [E0631]\n  why: a struct is written in a case the way it is built, with its name and one value for each field\n  help: write the struct as P(x, y)\n")
-given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
+given sd_case_fixture {
+  ((import fixture_ci), (import sd_ca), "P"):() then prints:("fixture.id:4: error: this case gives 1 where a P is required; write the struct as P(x, y) [E0631]\n  why: a struct is written in a case the way it is built, with its name and one value for each field\n  help: write the struct as P(x, y)\n")
+  ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
+}
 
 fit_ctor(int i, int e, string want) {
   if(find_str((import sdname), ((import ns1)[e])) < 0) {
@@ -37,6 +39,8 @@ fit_ctor(int i, int e, string want) {
     fit_fields(i, e, want);
   }
 } return void;
-given sd_case_fixture ((import fixture_ci), (import sd_ce), "Q"):() then prints:("fixture.id:4: error: this case builds a P where a Q is required\n")
-given sd_case_fixture ((import fixture_ci), (import sd_cn), "P"):() then prints:("fixture.id:4: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); 'nope' is not a struct\n")
-given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
+given sd_case_fixture {
+  ((import fixture_ci), (import sd_ce), "Q"):() then prints:("fixture.id:4: error: this case builds a P where a Q is required\n")
+  ((import fixture_ci), (import sd_cn), "P"):() then prints:("fixture.id:4: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); 'nope' is not a struct\n")
+  ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
+}

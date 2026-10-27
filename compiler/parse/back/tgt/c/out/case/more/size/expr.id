@@ -31,5 +31,7 @@ size_neg(int e) {
   int i1_of_v = (import ni1)[e];
   string so = "-" + size_leaf(i1_of_v);
 } return string so;
-given lit_un_fixture ((import lit_un_e)):("-(long long)(5)")
-given lit_un_fixture ((import lit_un_e2)):("-(long long)(4)")
+given lit_un_fixture {
+  ((import lit_un_e)):("-(long long)(5)")
+  ((import lit_un_e2)):("-(long long)(4)")
+}

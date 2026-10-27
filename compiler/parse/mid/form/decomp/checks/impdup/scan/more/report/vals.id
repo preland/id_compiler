@@ -4,8 +4,10 @@
 imd_vals(int imd_x, int imd_y) {
   string ret_s = imd_vals_of((import imd_tab)[imd_x * 2 + 1], (import imd_tab)[imd_y * 2 + 1]);
 } return string ret_s;
-given imd_pair_base given imd_fill (1, 0):("(import beta) in one, (import alpha) in the other")
-given imd_pair_base given imd_fill (0, 1):("(import alpha) in one, (import beta) in the other")
+given imd_pair_base {
+  given imd_fill (1, 0):("(import beta) in one, (import alpha) in the other")
+  given imd_fill (0, 1):("(import alpha) in one, (import beta) in the other")
+}
 
 imd_first(string[] imd_xa, string[] imd_xb) {
   int imd_k = 0;

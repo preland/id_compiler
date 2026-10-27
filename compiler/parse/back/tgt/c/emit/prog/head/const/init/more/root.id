@@ -18,10 +18,12 @@ const_root(int e) {
     hops = hops + 1;
   }
 } return int e;
-given cl_fwd_setup ((import cl_fwd_ie)):((import cl_fwd_lit))
-given cl_fwd_setup ((import cl_fwd_ie)):((import cl_fwd_lit)) then calls const_hop:[4]
-given cl_fwd_setup ((import cl_fwd_lit)):((import cl_fwd_lit))
-given cl_fwd_setup ((import cl_cyc_ic)):((import cl_cyc_ic))
+given cl_fwd_setup {
+  ((import cl_fwd_ie)):((import cl_fwd_lit))
+  ((import cl_fwd_ie)):((import cl_fwd_lit)) then calls const_hop:[4]
+  ((import cl_fwd_lit)):((import cl_fwd_lit))
+  ((import cl_cyc_ic)):((import cl_cyc_ic))
+}
 
 const_hop(int e) {
   if((import nkind)[e] == "import") {
@@ -31,6 +33,8 @@ const_hop(int e) {
     }
   }
 } return int e;
-given cl_fwd_setup ((import cl_fwd_ie)):((import cl_fwd_lit))
-given cl_fwd_setup ((import cl_fwd_ie)):((import cl_fwd_lit)) then calls const_decl:("fb")
-given cl_fwd_setup ((import cl_fwd_lit)):((import cl_fwd_lit))
+given cl_fwd_setup {
+  ((import cl_fwd_ie)):((import cl_fwd_lit))
+  ((import cl_fwd_ie)):((import cl_fwd_lit)) then calls const_decl:("fb")
+  ((import cl_fwd_lit)):((import cl_fwd_lit))
+}

@@ -17,5 +17,7 @@ lw_has_par(int f, int i) {
   int n = len(pars);
   int ok = i < n;
 } return int ok;
-given pcall_fixture ((import pcall_fn), 0):(1)
-given pcall_fixture ((import pcall_fn), 1):(0)
+given pcall_fixture {
+  ((import pcall_fn), 0):(1)
+  ((import pcall_fn), 1):(0)
+}

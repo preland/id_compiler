@@ -8,8 +8,10 @@ tc_list_rt(int[] xs, string et) {
   string pushes = tc_rt_pushes(xs, et);
   string so = "({ IdList* idtc_l = " + fn_sym("list_new") + "();" + pushes + " idtc_l; })";
 } return string so;
-given lit_rt_fixture ([], "int"):("({ IdList* idtc_l = idr_list_new(); idtc_l; })")
-given lit_rt_fixture ((import lit_cells_xs), "int"):("({ IdList* idtc_l = idr_list_new(); idr_list_push(idtc_l, (long long)(5)); idr_list_push(idtc_l, (long long)(4)); idtc_l; })")
+given lit_rt_fixture {
+  ([], "int"):("({ IdList* idtc_l = idr_list_new(); idtc_l; })")
+  ((import lit_cells_xs), "int"):("({ IdList* idtc_l = idr_list_new(); idr_list_push(idtc_l, (long long)(5)); idr_list_push(idtc_l, (long long)(4)); idtc_l; })")
+}
 
 tc_rt_pushes(int[] xs, string et) {
   string out = "";
@@ -20,8 +22,10 @@ tc_rt_pushes(int[] xs, string et) {
     i = i + 1;
   }
 } return string out;
-given lit_rt_fixture ([], "int"):("")
-given lit_rt_fixture ((import lit_cells_xs), "int"):(" idr_list_push(idtc_l, (long long)(5)); idr_list_push(idtc_l, (long long)(4));")
+given lit_rt_fixture {
+  ([], "int"):("")
+  ((import lit_cells_xs), "int"):(" idr_list_push(idtc_l, (long long)(5)); idr_list_push(idtc_l, (long long)(4));")
+}
 
 lit_rt_fixture() {
   lit_cells_fixture();

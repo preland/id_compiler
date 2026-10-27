@@ -9,8 +9,10 @@ fit_fields(int i, int e, string want) {
     fit_fvals(i, sd_xs, want);
   }
 } return void;
-given sd_case_fixture ((import fixture_ci), (import sd_cl), "P"):() then prints:("fixture.id:4: error: struct 'P' takes 2 field(s) (x, y), but this case gives 1 [E0632]\n  why: a struct in a case is built like a constructor call, with one value for each field in order\n  help: give one value for each field: P(x, y)\n")
-given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
+given sd_case_fixture {
+  ((import fixture_ci), (import sd_cl), "P"):() then prints:("fixture.id:4: error: struct 'P' takes 2 field(s) (x, y), but this case gives 1 [E0632]\n  why: a struct in a case is built like a constructor call, with one value for each field in order\n  help: give one value for each field: P(x, y)\n")
+  ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
+}
 
 fit_fvals(int i, int[] sd_xs, string want) {
   int sd_k = 0;
@@ -19,5 +21,7 @@ fit_fvals(int i, int[] sd_xs, string want) {
     sd_k = sd_k + 1;
   }
 } return void;
-given sd_case_fixture ((import fixture_ci), [(import sd_ca), (import sd_ca)], "P"):() then (import chkfail)[0]:(0)
-given sd_case_fixture ((import fixture_ci), [(import sd_ca), (import sd_cs)], "P"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given sd_case_fixture {
+  ((import fixture_ci), [(import sd_ca), (import sd_ca)], "P"):() then (import chkfail)[0]:(0)
+  ((import fixture_ci), [(import sd_ca), (import sd_cs)], "P"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+}

@@ -7,13 +7,15 @@ lw_irop(string op, string t) {
     p = str_map((import irop_fk), (import irop_fv), op, "fadd");
   }
 } return string p;
-given ir_rows ("+", "int"):("add")
-given ir_rows ("-", "int"):("sub")
-given ir_rows ("*", "int"):("mul")
-given ir_rows ("&", "int"):("and")
-given ir_rows ("|", "int"):("or")
-given ir_rows ("^", "int"):("xor")
-given ir_rows ("-", "float"):("fsub")
-given ir_rows ("*", "float"):("fmul")
-given ir_rows ("/", "float"):("fdiv")
-given ir_rows ("+", "float"):("fadd")
+given ir_rows {
+  ("+", "int"):("add")
+  ("-", "int"):("sub")
+  ("*", "int"):("mul")
+  ("&", "int"):("and")
+  ("|", "int"):("or")
+  ("^", "int"):("xor")
+  ("-", "float"):("fsub")
+  ("*", "float"):("fmul")
+  ("/", "float"):("fdiv")
+  ("+", "float"):("fadd")
+}

@@ -13,8 +13,10 @@ esc_free_sh(int e) {
     etx_fn = "id_bytes_free";
   }
 } return string etx_fn;
-given esc_ffix ((import eff_cmk)):("id_list_free")
-given esc_ffix ((import eff_csr)):("id_str_free")
+given esc_ffix {
+  ((import eff_cmk)):("id_list_free")
+  ((import eff_csr)):("id_str_free")
+}
 
 esc_free_of(int e) {
   string etx_fn = esc_free_sh(e);
@@ -22,9 +24,11 @@ esc_free_of(int e) {
     etx_fn = esc_dfn(type_of(e));
   }
 } return string etx_fn;
-given esc_ffix ((import eff_cmk)):("id_list_free")
-given esc_ffix ((import eff_csr)):("id_str_free")
-given esc_ffix ((import eff_crows)):("id_list_free_deep")
+given esc_ffix {
+  ((import eff_cmk)):("id_list_free")
+  ((import eff_csr)):("id_str_free")
+  ((import eff_crows)):("id_list_free_deep")
+}
 
 esc_deepcall(int e) {
   int ok = 0;
@@ -32,7 +36,9 @@ esc_deepcall(int e) {
     ok = esc_ndf(e) == 0;
   }
 } return int ok;
-given esc_ffix ((import eff_crows)):(1)
-given esc_ffix ((import eff_cleak)):(0)
-given esc_ffix ((import eff_cmk)):(0)
+given esc_ffix {
+  ((import eff_crows)):(1)
+  ((import eff_cleak)):(0)
+  ((import eff_cmk)):(0)
+}
 

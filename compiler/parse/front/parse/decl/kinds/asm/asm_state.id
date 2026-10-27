@@ -30,18 +30,22 @@ init_asm() {
   export string[] aftriple = [];
   export int[][] afparams = [];
 } return void;
-given env_init given asmfx_push ():() then len((import afname)):(0)
-given env_init given llasm_row_fixture ():() then len((import afparams)):(0)
-given env_init ():() then (import chkfail)[0]:(0)
-given env_init ():() then init_units:(0)
+given env_init {
+  given asmfx_push ():() then len((import afname)):(0)
+  given llasm_row_fixture ():() then len((import afparams)):(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 init_asm2() {
   export string[][] aflines = [];
   export string[] afret = [];
   export string[] afretn = [];
 } return void;
-given env_init given asmfx_push ():() then len((import afret)):(0)
-given env_init given llasm_row_fixture ():() then len((import aflines)):(0)
-given env_init ():() then (import chkfail)[0]:(0)
-given env_init ():() then init_units:(0)
+given env_init {
+  given asmfx_push ():() then len((import afret)):(0)
+  given llasm_row_fixture ():() then len((import aflines)):(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 

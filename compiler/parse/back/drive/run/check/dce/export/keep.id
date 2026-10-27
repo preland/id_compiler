@@ -35,8 +35,10 @@ seed_cfn_fixture_add(int[] args) {
   int caseid = newnode("case", 0, 0, "fixture.id", "", args, args);
   push((import casenode), caseid);
 } return void;
-given fn_fixture ([0]):() then (import chkfail)[0]:(0)
-given fn_fixture ([1]):() then (import chkfail)[0]:(0)
+given fn_fixture {
+  ([0]):() then (import chkfail)[0]:(0)
+  ([1]):() then (import chkfail)[0]:(0)
+}
 
 keep_export(int i) {
   int ok = 1;

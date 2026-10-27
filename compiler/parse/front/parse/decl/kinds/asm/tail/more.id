@@ -26,5 +26,7 @@ init_asm_rest() {
   export string[] aloc = [];
   int ret_i = init_consts();
 } return int ret_i;
-given env_init ():(0) then calls init_files:[1]
-given env_init ():(0) then init_units:(0)
+given env_init {
+  ():(0) then calls init_files:[1]
+  ():(0) then init_units:(0)
+}

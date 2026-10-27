@@ -9,8 +9,10 @@ st_show_stmts(string sd_nm) {
     sd_k = sd_k + 1;
   }
 } return string out;
-given sd_note_fixture ("Q"):("    fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[0]));\n")
-given sd_note_fixture ("P"):("    fprintf(stderr, \"%d\", (int)(a->data[0]));\n    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n")
+given sd_note_fixture {
+  ("Q"):("    fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[0]));\n")
+  ("P"):("    fprintf(stderr, \"%d\", (int)(a->data[0]));\n    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n")
+}
 
 st_show_at(string sd_nm, int sd_k) {
   string sd_ft = sd_cell((import sdftype), sd_nm, sd_k);
@@ -21,5 +23,7 @@ st_show_at(string sd_nm, int sd_k) {
     so = "    fputs(\", \", stderr);\n" + so;
   }
 } return string so;
-given sd_note_fixture ("P", 0):("    fprintf(stderr, \"%d\", (int)(a->data[0]));\n")
-given sd_note_fixture ("P", 1):("    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n")
+given sd_note_fixture {
+  ("P", 0):("    fprintf(stderr, \"%d\", (int)(a->data[0]));\n")
+  ("P", 1):("    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n")
+}

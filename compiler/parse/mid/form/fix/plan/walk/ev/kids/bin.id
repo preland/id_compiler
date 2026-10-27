@@ -10,16 +10,20 @@ fix_walk_bin(int e, int cd) {
   int c2 = fix_condop(e, cd);
   fix_walk(b, 0, c2, "", "");
 } return void;
-given fix_traps_setup ((import tr_safe), 0):() then calls fix_walk:(1, 0, 0, "", "")
-given fix_traps_setup ((import tr_unsafe), 1):() then calls fix_walk:(2, 0, 1, "", "")
-given fix_traps_setup ((import tr_safe), 0):() then calls fix_walk:[2]
-given fix_traps_setup ((import tr_unsafe), 1):() then calls fix_walk:[2]
+given fix_traps_setup {
+  ((import tr_safe), 0):() then calls fix_walk:(1, 0, 0, "", "")
+  ((import tr_unsafe), 1):() then calls fix_walk:(2, 0, 1, "", "")
+  ((import tr_safe), 0):() then calls fix_walk:[2]
+  ((import tr_unsafe), 1):() then calls fix_walk:[2]
+}
 
 fix_walk_arg2_fixture2(int e1, int e2) {
   export int wa2_e1 = e1;
   export int wa2_e2 = e2;
 } return void;
-given fix_walk_arg2_fixture (5, 6):() then (import wa2_e1):(5) then (import wa2_e2):(6)
-given fix_walk_arg2_fixture (9, 4):() then (import wa2_e1):(9) then (import wa2_e2):(4)
-given fix_walk_arg2_fixture (0, 0):() then (import chkfail)[0]:(0)
-given fix_walk_arg2_fixture (0, 0):() then init_units:(0)
+given fix_walk_arg2_fixture {
+  (5, 6):() then (import wa2_e1):(5) then (import wa2_e2):(6)
+  (9, 4):() then (import wa2_e1):(9) then (import wa2_e2):(4)
+  (0, 0):() then (import chkfail)[0]:(0)
+  (0, 0):() then init_units:(0)
+}

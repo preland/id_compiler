@@ -12,8 +12,10 @@ no_op_atom(int[] pos) {
     op_atom_diag(pos, cur_text_v);
   }
 } return void;
-given mk_two_toks ([0]):() then (import chkfail)[0]:(1) then prints:("<stdin>:1: error: unexpected token '=' [E0102]\n  at: =\n  why: an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type\n  help: write an operand where '=' is, or remove it; a missing operand just before it is the usual cause\n")
-given mk_two_toks ([1]):() then (import chkfail)[0]:(0)
+given mk_two_toks {
+  ([0]):() then (import chkfail)[0]:(1) then prints:("<stdin>:1: error: unexpected token '=' [E0102]\n  at: =\n  why: an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type\n  help: write an operand where '=' is, or remove it; a missing operand just before it is the usual cause\n")
+  ([1]):() then (import chkfail)[0]:(0)
+}
 
 // The lexer folds a whole `/* ... */` into one `/*` token precisely so this
 // can say what the mistake actually was.
@@ -41,5 +43,7 @@ syn_err_tail(string err_file, int err_line, string msg) {
   note_failure();
   integer_list_set((import synfail), 0, 1);
 } return void;
-given full_env ("f.id", 3, "bad"):() then prints:("f.id:3: error: bad\n") then (import chkfail)[0]:(1)
-given full_env ("g.id", 7, "oops"):() then prints:("g.id:7: error: oops\n") then (import chkfail)[0]:(1)
+given full_env {
+  ("f.id", 3, "bad"):() then prints:("f.id:3: error: bad\n") then (import chkfail)[0]:(1)
+  ("g.id", 7, "oops"):() then prints:("g.id:7: error: oops\n") then (import chkfail)[0]:(1)
+}

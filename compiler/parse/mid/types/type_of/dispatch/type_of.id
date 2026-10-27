@@ -17,8 +17,10 @@ type_of(int id) {
     t = type_of_miss(id);
   }
 } return string t;
-given leaves_fixture ((import lit_a)):("int")
-given leaves_fixture ((import lit_str)):("string")
+given leaves_fixture {
+  ((import lit_a)):("int")
+  ((import lit_str)):("string")
+}
 
 type_of2(int id) {
   string t = "string";
@@ -26,8 +28,10 @@ type_of2(int id) {
     t = type_of_float(id);
   }
 } return string t;
-given leaves_fixture ((import lit_str)):("string")
-given leaves_fixture ((import lit_float)):("float")
+given leaves_fixture {
+  ((import lit_str)):("string")
+  ((import lit_float)):("float")
+}
 
 type_of3(int id) {
   string s1_of_v = (import ns1)[id];

@@ -12,7 +12,9 @@ esc_nf_bits(int fn) {
     enc = enb - 2147483647 - 1;
   }
 } return int enc;
-given esc_ffix ((import eff_rows)):(0)
-given esc_ffix ((import eff_rleak)):(-2147483648)
-given esc_ffix ((import eff_pass)):(-1073741824)
-given esc_ffix ((import eff_make)):(0)
+given esc_ffix {
+  ((import eff_rows)):(0)
+  ((import eff_rleak)):(-2147483648)
+  ((import eff_pass)):(-1073741824)
+  ((import eff_make)):(0)
+}

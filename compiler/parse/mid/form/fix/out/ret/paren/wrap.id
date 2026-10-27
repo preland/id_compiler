@@ -7,9 +7,11 @@ fix_parens(int lo, int hi) {
     lo = lo + 1;
   }
 } return void;
-given lz_c (0, 2):() then calls fix_paren_node:[3] then calls fix_paren_node:(2)
-given lz_c (1, 1):() then calls fix_paren_node:(1)
-given lz_c (2, 0):() then calls fix_paren_node:[0]
+given lz_c {
+  (0, 2):() then calls fix_paren_node:[3] then calls fix_paren_node:(2)
+  (1, 1):() then calls fix_paren_node:(1)
+  (2, 0):() then calls fix_paren_node:[0]
+}
 
 fix_paren_node(int x) {
   if((import nkind)[x] == "bin") {

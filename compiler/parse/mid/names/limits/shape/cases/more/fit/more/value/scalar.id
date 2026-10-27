@@ -11,9 +11,11 @@ fit_scalar(int i, int e, string want) {
 } chain (int i, int e, string want) {
   case_bool_strict(i, e, want);
 } return void;
-given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
-given fn_fixture ((import fixture_ci), (import fixture_zero), "string"):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
-given fn_fixture ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
+given fn_fixture {
+  ((import fixture_ci), (import fixture_fn), "int"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+  ((import fixture_ci), (import fixture_zero), "string"):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
+  ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
+}
 
 // The second step of the dup-case fixture (more/dup/): casestart, two rows
 // (0 and 1) over mk_two_toks's two tokens. Continues dupeq_fixture
@@ -25,10 +27,12 @@ dupeq_starts() {
   push((import casestart), 1);
   dupeq_ends();
 } return void;
-given dupeq_fixture ():() then (import casestart)[2]:(0)
-given dupeq_fixture ():() then (import casestart)[3]:(1)
-given dupeq_fixture ():() then (import chkfail)[0]:(0)
-given dupeq_fixture ():() then init_units:(0)
+given dupeq_fixture {
+  ():() then (import casestart)[2]:(0)
+  ():() then (import casestart)[3]:(1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // idc.py's `compatible`: the same type, or two numeric ones.
 ty_fits(string want, string lt) {
@@ -37,5 +41,7 @@ ty_fits(string want, string lt) {
     r = 1;
   }
 } return int r;
-given case_fixture ("int", "int"):(1)
-given case_fixture ("int", "string"):(0)
+given case_fixture {
+  ("int", "int"):(1)
+  ("int", "string"):(0)
+}

@@ -19,14 +19,18 @@ emit_len_form(int arg, string len_list_type) {
     s = lp_hlen(s, emit_expr(arg));
   }
 } return string s;
-given call_int_fixture ((import call_e1), "string"):("id_len(5)")
-given call_int_fixture ((import call_e1), "bytes"):("id_bytes_len(5)")
-given call_int_fixture ((import call_e2), "int[]"):("id_list_len(4)")
+given call_int_fixture {
+  ((import call_e1), "string"):("id_len(5)")
+  ((import call_e1), "bytes"):("id_bytes_len(5)")
+  ((import call_e2), "int[]"):("id_list_len(4)")
+}
 
 emit_push(int id) {
   int[] args = (import nl1)[id];
   string type_of_v = type_of(args[0]);
   string ret_s = emit_push_tail(args, type_of_v);
 } return string ret_s;
-given call_names_fixture2 ((import call_e_push)):("id_list_push(5, (long long)(intptr_t)(4))")
-given call_names_fixture2 ((import call_e_pop)):("id_list_push(4, (long long)(intptr_t)(5))")
+given call_names_fixture2 {
+  ((import call_e_push)):("id_list_push(5, (long long)(intptr_t)(4))")
+  ((import call_e_pop)):("id_list_push(4, (long long)(intptr_t)(5))")
+}

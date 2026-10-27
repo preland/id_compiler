@@ -3,8 +3,10 @@ fix_take(string name, string t) {
   push((import fixd_ty), t);
   push((import fixd_used), name);
 } return void;
-given fix_fixture ("baz", "int"):() then last_fixd_nm:("baz")
-given fix_fixture ("qux", "string"):() then last_fixd_nm:("qux")
+given fix_fixture {
+  ("baz", "int"):() then last_fixd_nm:("baz")
+  ("qux", "string"):() then last_fixd_nm:("qux")
+}
 
 fix_prefixed(string stem) {
   string s = stem;
@@ -26,5 +28,7 @@ fix_free(string name, string t) {
     ok = fix_free_var(name, t);
   }
 } return int ok;
-given fix_fixture ("foo", "int"):(1)
-given fix_fixture ("print", "int"):(0)
+given fix_fixture {
+  ("foo", "int"):(1)
+  ("print", "int"):(0)
+}

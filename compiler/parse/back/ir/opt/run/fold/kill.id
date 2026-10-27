@@ -37,5 +37,7 @@ fold_cmp_fixture() {
 fc_op_check() {
   string ret_s = (import iop)[(import fcmp_row)];
 } return string ret_s;
-given fold_cmp_fixture ():("icmp")
-given fold_cmp_fixture ():("icmp") then (import chkfail)[0]:(0)
+given fold_cmp_fixture {
+  ():("icmp")
+  ():("icmp") then (import chkfail)[0]:(0)
+}

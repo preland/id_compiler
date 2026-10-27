@@ -13,10 +13,12 @@ esc_xscan(string nm) {
     i = i + 1;
   }
 } return int r;
-given esc_xfix ("xg"):(0)
-given esc_xfix ("xr"):(1)
-given esc_xfix ("xi"):(1)
-given esc_xfix ("xs"):(1000000)
+given esc_xfix {
+  ("xg"):(0)
+  ("xr"):(1)
+  ("xi"):(1)
+  ("xs"):(1000000)
+}
 
 esc_xmine(int e, string nm) {
   int ok = 0;
@@ -24,9 +26,11 @@ esc_xmine(int e, string nm) {
     ok = (import ns1)[e] == nm;
   }
 } return int ok;
-given esc_xfix ((import exa_imp), "xg"):(1)
-given esc_xfix ((import exa_imp), "xr"):(0)
-given esc_xfix ((import exa_zero), "xg"):(0)
+given esc_xfix {
+  ((import exa_imp), "xg"):(1)
+  ((import exa_imp), "xr"):(0)
+  ((import exa_zero), "xg"):(0)
+}
 
 esc_xsafe(int i, string nm) {
   int weight = 0;
@@ -36,7 +40,9 @@ esc_xsafe(int i, string nm) {
     weight = esc_xlen(i, nm);
   }
 } return int weight;
-given esc_xfix ((import exa_ix), "xg"):(1)
-given esc_xfix ((import exa_ixi), "xi"):(0)
-given esc_xfix ((import exa_len), "xg"):(1)
-given esc_xfix ((import exa_sink), "xr"):(0)
+given esc_xfix {
+  ((import exa_ix), "xg"):(1)
+  ((import exa_ixi), "xi"):(0)
+  ((import exa_len), "xg"):(1)
+  ((import exa_sink), "xr"):(0)
+}

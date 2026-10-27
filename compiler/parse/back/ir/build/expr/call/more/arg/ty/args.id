@@ -16,8 +16,10 @@ lw_pty(string name, int i, int node) {
     t = lw_pty2(f, i, t);
   }
 } return string t;
-given pcall_fixture ("gparam", 0, (import pcall_arg_n)):("word")
-given pcall_fixture ("nosuchfn", 0, (import pcall_arg_n)):("int")
+given pcall_fixture {
+  ("gparam", 0, (import pcall_arg_n)):("word")
+  ("nosuchfn", 0, (import pcall_arg_n)):("int")
+}
 
 // The two halves of the guard are functions rather than names, because `&&`
 // skips its right side: `f` is -1 when the callee has no AST node, and a name
@@ -28,5 +30,7 @@ lw_pty2(int f, int i, string t) {
     p = (import ns1)[(((import nl1)[f])[i])];
   }
 } return string p;
-given pcall_fixture ((import pcall_fn), 0, "fallback"):("word")
-given pcall_fixture ((import pcall_fn), 1, "fallback"):("fallback")
+given pcall_fixture {
+  ((import pcall_fn), 0, "fallback"):("word")
+  ((import pcall_fn), 1, "fallback"):("fallback")
+}

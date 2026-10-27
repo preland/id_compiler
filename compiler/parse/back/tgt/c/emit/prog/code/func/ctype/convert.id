@@ -37,6 +37,8 @@ c_scalar(string t) {
     ct = (import tyc)[r];
   }
 } return string ct;
-given lc_env2 ("string"):("char*")
-given lc_env2 ("float"):("double")
-given lc_env2 ("int"):("int")
+given lc_env2 {
+  ("string"):("char*")
+  ("float"):("double")
+  ("int"):("int")
+}

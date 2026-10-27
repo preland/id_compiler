@@ -10,22 +10,28 @@ at_pure(int[] pos) {
     pure_v = 1;
   }
 } return int pure_v;
-given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([0]):(1)
-given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([1]):(0)
+given full_env {
+  given push_toks(["kw", "ident"], ["pure", "f"]) ([0]):(1)
+  given push_toks(["kw", "ident"], ["pure", "f"]) ([1]):(0)
+}
 
 skip_pure(int[] pos) {
   if(at_pure(pos) == 1) {
     advance(pos);
   }
 } return void;
-given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([0]):([1])
-given full_env given push_toks(["kw", "kw", "ident"], ["pure", "pure", "f"]) ([0]):([1])
-given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([1]):([1])
+given full_env {
+  given push_toks(["kw", "ident"], ["pure", "f"]) ([0]):([1])
+  given push_toks(["kw", "kw", "ident"], ["pure", "pure", "f"]) ([0]):([1])
+  given push_toks(["kw", "ident"], ["pure", "f"]) ([1]):([1])
+}
 
 pure_mark_fn(int pflag, int node) {
   if(pflag == 1) {
     push((import purenode), node);
   }
 } return void;
-given env_init (1, 7):() then (import purenode)[0]:(7)
-given env_init (0, 7):() then len((import purenode)):(0)
+given env_init {
+  (1, 7):() then (import purenode)[0]:(7)
+  (0, 7):() then len((import purenode)):(0)
+}

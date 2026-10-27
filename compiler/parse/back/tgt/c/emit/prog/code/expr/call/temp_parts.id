@@ -10,8 +10,10 @@ tmp_decl(int id, int i) {
     tx_d = c_type(type_of(args[i])) + " idft" + i + " = " + emit_expr(args[i]) + "; ";
   }
 } return string tx_d;
-given esc_ffix ((import eff_ctp), 0):("IdList* idft0 = id_ff_make(n); ")
-given esc_ffix ((import eff_ctp), 1):("")
+given esc_ffix {
+  ((import eff_ctp), 0):("IdList* idft0 = id_ff_make(n); ")
+  ((import eff_ctp), 1):("")
+}
 
 tmp_arg(int id, int i) {
   int[] args = (import nl1)[id];
@@ -20,8 +22,10 @@ tmp_arg(int id, int i) {
     tx_a = emit_expr(args[i]);
   }
 } return string tx_a;
-given esc_ffix ((import eff_ctp), 0):("idft0")
-given esc_ffix ((import eff_cmk), 0):("n")
+given esc_ffix {
+  ((import eff_ctp), 0):("idft0")
+  ((import eff_cmk), 0):("n")
+}
 
 tmp_free(int id, int i) {
   string tx_f = "";
@@ -29,5 +33,7 @@ tmp_free(int id, int i) {
     tx_f = esc_tmp_fn(id, i) + "(idft" + i + "); ";
   }
 } return string tx_f;
-given esc_ffix ((import eff_ctp), 0):("id_list_free(idft0); ")
-given esc_ffix ((import eff_ctp), 1):("")
+given esc_ffix {
+  ((import eff_ctp), 0):("id_list_free(idft0); ")
+  ((import eff_ctp), 1):("")
+}

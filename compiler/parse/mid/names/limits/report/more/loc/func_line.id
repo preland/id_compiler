@@ -3,8 +3,10 @@ func_line(string fname) {
   int hit = fast_line(fname);
   int n = line_scan(hit, fname);
 } return int n;
-given fast_line_fixture ("fx_target"):(7)
-given fast_line_fixture ("nosuchfn"):(1)
+given fast_line_fixture {
+  ("fx_target"):(7)
+  ("nosuchfn"):(1)
+}
 
 func_line_at(int i, string fname, int n) {
   int r = n;
@@ -12,8 +14,10 @@ func_line_at(int i, string fname, int n) {
     r = (import pline)[i];
   }
 } return int r;
-given edge_fixture (0, "fx_target", 1):(7)
-given edge_fixture (0, "nosuchfn", 1):(1)
+given edge_fixture {
+  (0, "fx_target", 1):(7)
+  (0, "nosuchfn", 1):(1)
+}
 
 // One row of --calls' case-count section for an asm declaration:
 // `name|file:line|0`, case count fixed at 0 since an asm function has no
@@ -26,5 +30,7 @@ asm_case_row(int i) {
   string loc = (import aloc)[i];
   string ret_s = (import afname)[i] + "|" + loc + "|0";
 } return string ret_s;
-given asm_row_fixture (0):("foo|<stdin>:1|0")
-given asm_row_fixture (1):("bar|<stdin>:1|0")
+given asm_row_fixture {
+  (0):("foo|<stdin>:1|0")
+  (1):("bar|<stdin>:1|0")
+}

@@ -13,8 +13,10 @@ gblk_inner_diag(int gb_at, int gb_k, int gb_in) {
   syn_diag(gb_where, "E0520", "a 'given SETUP {' block cannot be opened inside another block", "{", "one block shares its setup among its own cases, and a second opener inside it would need its own nesting level that cases do not have", "give the one block both setups, as in 'given A given B {', or close the first block with '}' before opening the second");
   gblk_cut(gb_at, gblk_block_end(gb_k));
 } return void;
-given gblk_stream("nest") (0, 11, 3):() then (import synfail)[0]:(1) then len((import tkind)):(0)
-given gblk_stream("nest") (0, 6, 3):() then len((import tkind)):(5)
+given gblk_stream("nest") {
+  (0, 11, 3):() then (import synfail)[0]:(1) then len((import tkind)):(0)
+  (0, 6, 3):() then len((import tkind)):(5)
+}
 
 // Where to resume after a nested opener: the inner block's `}` ends the inner
 // block, and the outer block's own `}` follows it if the cases after the inner

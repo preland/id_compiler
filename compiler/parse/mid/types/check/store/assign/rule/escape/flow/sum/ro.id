@@ -3,5 +3,7 @@
 esc_ro(int fn, string nm) {
   int ok = (esc_func(fn, nm) & 621) == 0;
 } return int ok;
-given esc_fix ((import efe_fn), "q"):(1)
-given esc_fix ((import efb_fn), "v"):(0)
+given esc_fix {
+  ((import efe_fn), "q"):(1)
+  ((import efb_fn), "v"):(0)
+}

@@ -16,8 +16,10 @@ lw_castop(string t, string want) {
     op = lw_castop2(t, want);
   }
 } return string op;
-given env_init ("int", "float"):("sitofp")
-given env_init ("float", "int"):("fptosi")
+given env_init {
+  ("int", "float"):("sitofp")
+  ("float", "int"):("fptosi")
+}
 
 lw_castop2(string t, string want) {
   string op = "fptosi";
@@ -25,5 +27,7 @@ lw_castop2(string t, string want) {
     op = lw_narrow(t, want);
   }
 } return string op;
-given env_init ("int", "int"):("sext")
-given env_init ("float", "int"):("fptosi")
+given env_init {
+  ("int", "int"):("sext")
+  ("float", "int"):("fptosi")
+}

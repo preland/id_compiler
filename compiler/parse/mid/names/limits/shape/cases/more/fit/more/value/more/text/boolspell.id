@@ -9,8 +9,10 @@ bool_spell(int e) {
     lt = "true";
   }
 } return string lt;
-given bool_spell_fixture ((import bs_true)):("true")
-given bool_spell_fixture ((import bs_false)):("false")
+given bool_spell_fixture {
+  ((import bs_true)):("true")
+  ((import bs_false)):("false")
+}
 
 bool_spell_fixture() {
   env_init();

@@ -17,17 +17,21 @@ wrap_fixture_case() {
   int[] one = [(import fixture_zero)];
   wrap_fixture_push(ci, one);
 } return void;
-given fn_fixture ():() then calls wrap_fixture_push:((import fixture_ci), [(import fixture_zero)])
-given fn_fixture ():() then (import casefn)[0]:(3)
-given fn_fixture ():() then (import chkfail)[0]:(0)
-given fn_fixture ():() then init_units:(0)
+given fn_fixture {
+  ():() then calls wrap_fixture_push:((import fixture_ci), [(import fixture_zero)])
+  ():() then (import casefn)[0]:(3)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 wrap_fixture_push(int ci, int[] one) {
   int node = newnode("case", 0, 0, "", "", one, one);
   push((import casefn), (import fixture_fn));
   integer_list_set((import casenode), ci, node);
 } return void;
-given fn_fixture (0, [1]):() then calls newnode:("case", 0, 0, "", "", [1], [1])
-given fn_fixture (0, [2]):() then calls newnode:("case", 0, 0, "", "", [2], [2])
-given fn_fixture (0, [1]):() then (import chkfail)[0]:(0)
-given fn_fixture (0, [1]):() then init_units:(0)
+given fn_fixture {
+  (0, [1]):() then calls newnode:("case", 0, 0, "", "", [1], [1])
+  (0, [2]):() then calls newnode:("case", 0, 0, "", "", [2], [2])
+  (0, [1]):() then (import chkfail)[0]:(0)
+  (0, [1]):() then init_units:(0)
+}

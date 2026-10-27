@@ -18,8 +18,10 @@ rotl_fixture() {
   export int rot_int = node_call("rotl", [(import lit_a), (import lit_a)]);
   export int rot_wide = node_call("alloc", [(import lit_a)]);
 } return void;
-given shapes_fixture ():() then calls node_call:("rotl", [(import lit_a), (import lit_a)])
-given shapes_fixture ():() then calls node_call:("alloc", [(import lit_a)])
+given shapes_fixture {
+  ():() then calls node_call:("rotl", [(import lit_a), (import lit_a)])
+  ():() then calls node_call:("alloc", [(import lit_a)])
+}
 
 rotl_wide() {
   rotl_fixture();

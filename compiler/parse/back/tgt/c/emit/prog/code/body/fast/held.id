@@ -18,6 +18,8 @@ lp_steps(int lq_id, string lq_js, int lq_lo, int lq_hi) {
     lq_r = lq_id < lp_first(lq_lo, lq_hi, lq_js);
   }
 } return int lq_r;
-given lpf_more ((import lpf_xa), "laj", (import lpf_loa), (import lpf_hia)):(1)
-given lpf_more ((import lpf_xd), "ldj", (import lpf_lod), (import lpf_hid)):(0)
-given lpf_more ((import lpf_xe), "lej", (import lpf_loe), (import lpf_hie)):(0)
+given lpf_more {
+  ((import lpf_xa), "laj", (import lpf_loa), (import lpf_hia)):(1)
+  ((import lpf_xd), "ldj", (import lpf_lod), (import lpf_hid)):(0)
+  ((import lpf_xe), "lej", (import lpf_loe), (import lpf_hie)):(0)
+}

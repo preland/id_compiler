@@ -6,8 +6,10 @@ emit_else(int id, string ind) {
   int[] l2_of_v = (import nl2)[id];
   emit_body_close(l2_of_v, ind);
 } return void;
-given stmt_fix (4, ""):() then prints:("} else {\n}\n")
-given stmt_fix (3, "  "):() then prints:("  } else {\n  }\n")
+given stmt_fix {
+  (4, ""):() then prints:("} else {\n}\n")
+  (3, "  "):() then prints:("  } else {\n  }\n")
+}
 
 // The closing lines a block shares with a while loop: the body, then the
 // brace. Shared rather than duplicated, since the two are identical once
@@ -16,8 +18,10 @@ emit_body_close(int[] close_body_ids, string ind) {
   emit_block(close_body_ids, ind + "    ");
   print(ind + "}");
 } return void;
-given stmt_fix ([], ""):() then prints:("}\n")
-given stmt_fix ([], "  "):() then prints:("  }\n")
+given stmt_fix {
+  ([], ""):() then prints:("}\n")
+  ([], "  "):() then prints:("  }\n")
+}
 
 // The two flow statements, then on to if/while. id's `while` is a C `while`,
 // so a `break` is C's; an early return is C's `return` at the statement's own
@@ -32,5 +36,7 @@ es_flow(int id, string ind) {
     es4(id, ind);
   }
 } return void;
-given flow_emit_fixture ((import flow_brk), "  "):() then prints:("  break;\n")
-given flow_emit_fixture ((import flow_retn), "  "):() then prints:("  return 7;\n")
+given flow_emit_fixture {
+  ((import flow_brk), "  "):() then prints:("  break;\n")
+  ((import flow_retn), "  "):() then prints:("  return 7;\n")
+}

@@ -49,8 +49,10 @@ then_fn(int chk_node, string chk_nm) {
     then_sig(ci, chk_node, cfn, chk_nm2);
   }
 } return void;
-given then_node_fixture ((import fixture_then_node), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s), but this 'then' passes 0; a check is called with one literal per parameter, as in 'then fx_target(1, 2):(value)', and with none as 'then fx_target:(value)'\n")
-given then_node_fixture ((import fixture_then_bad), "nope"):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
+given then_node_fixture {
+  ((import fixture_then_node), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s), but this 'then' passes 0; a check is called with one literal per parameter, as in 'then fx_target(1, 2):(value)', and with none as 'then fx_target:(value)'\n")
+  ((import fixture_then_bad), "nope"):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
+}
 
 // `traps:(...)`: exactly one value, a string -- the message a trap's own
 // text is searched for (docs/TESTS.md). fit_traps (../../more/fit/case.id)
@@ -68,6 +70,8 @@ fit_then_traps(int chk_node) {
     fit_value(ci, items[0], "string");
   }
 } return void;
-given traps_node_fixture ((import fixture_traps_node)):() then prints:("fixture.id:4: error: a 'traps' check names exactly one message, not 2\n")
-given traps_node_fixture ((import fixture_traps_one)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
-given traps_node_fixture ((import fixture_traps_one)):() then calls fit_value:[1]
+given traps_node_fixture {
+  ((import fixture_traps_node)):() then prints:("fixture.id:4: error: a 'traps' check names exactly one message, not 2\n")
+  ((import fixture_traps_one)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
+  ((import fixture_traps_one)):() then calls fit_value:[1]
+}

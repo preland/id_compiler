@@ -11,9 +11,11 @@ esc_tdep(int b, string nm) {
     dz_dp = 2;
   }
 } return int dz_dp;
-given esc_dfix ((import efd_g), "g"):(1)
-given esc_dfix ((import efd_ix), "g"):(2)
-given esc_dfix ((import efd_ix), "h"):(0)
+given esc_dfix {
+  ((import efd_g), "g"):(1)
+  ((import efd_ix), "g"):(2)
+  ((import efd_ix), "h"):(0)
+}
 
 // 8 when storing `v` under the path `b`, at depth `dz_dp`, can leave `v` held
 // by something else.
@@ -21,8 +23,10 @@ esc_elbad2(int b, int v, int dz_dp) {
   string dz_t = type_of(imp_root(b));
   int r = 8 * esc_vbad(dz_t, v, dz_dp);
 } return int r;
-given esc_dfix ((import efd_g), (import efd_v), 1):(8)
-given esc_dfix ((import efd_g), (import efd_lit), 1):(0)
+given esc_dfix {
+  ((import efd_g), (import efd_v), 1):(8)
+  ((import efd_g), (import efd_lit), 1):(0)
+}
 
 // 1 when storing `v` under a root of type `t` at depth `dz_dp` can leave `v`
 // held by something else. A type with a stricter rule asks it of every store
@@ -36,6 +40,8 @@ esc_vbad(string t, int v, int dz_dp) {
     r = (import nkind)[v] != "arr";
   }
 } return int r;
-given esc_dfix ("int[][]", (import efd_v), 1):(1)
-given esc_dfix ("int[][]", (import efd_lit), 1):(0)
-given esc_dfix ("int[][]", (import efd_v), 2):(0)
+given esc_dfix {
+  ("int[][]", (import efd_v), 1):(1)
+  ("int[][]", (import efd_lit), 1):(0)
+  ("int[][]", (import efd_v), 2):(0)
+}

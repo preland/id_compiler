@@ -58,5 +58,7 @@ arr_mark_at(int i) {
     c = 0 - 1;
   }
 } return int c;
-given decltype_fixture ((import decl_list)):((import lit_a))
-given decltype_fixture ((import decl_scalar)):(-1)
+given decltype_fixture {
+  ((import decl_list)):((import lit_a))
+  ((import decl_scalar)):(-1)
+}

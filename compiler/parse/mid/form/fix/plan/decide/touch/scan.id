@@ -9,10 +9,12 @@ fix_touches(int last) {
     i = i + 1;
   }
 } return int ok;
-given fix_touch_fixture given integer_list_set((import fixe_n), 1, (import ft_bcall)) (1):(0)
-given fix_touch_fixture given integer_list_set((import fixe_mv), 0, 1) given integer_list_set((import fixe_n), 0, (import ft_call)) (0):(1)
-given fix_touch_fixture (1):(1)
-given fix_touch_fixture (0):(0)
+given fix_touch_fixture {
+  given integer_list_set((import fixe_n), 1, (import ft_bcall)) (1):(0)
+  given integer_list_set((import fixe_mv), 0, 1) given integer_list_set((import fixe_n), 0, (import ft_call)) (0):(1)
+  (1):(1)
+  (0):(0)
+}
 
 fix_touch_at(int i, int ok) {
   int r = ok;
@@ -20,8 +22,10 @@ fix_touch_at(int i, int ok) {
     r = r | fix_call_touch((import fixe_n)[i]);
   }
 } return int r;
-given fix_touch_fixture (1, 0):(1)
-given fix_touch_fixture (0, 0):(0)
+given fix_touch_fixture {
+  (1, 0):(1)
+  (0, 0):(0)
+}
 
 // A builtin runs no id code, but push, pop, lset and the pokes write memory
 // a read may have seen. A call through a function value, or to a name that is

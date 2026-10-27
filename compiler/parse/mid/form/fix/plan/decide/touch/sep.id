@@ -8,8 +8,10 @@ fix_mark_sep(int last) {
     i = i + 1;
   }
 } return void;
-given fix_sep_fixture (0):() then calls fix_sep_at:[1] then calls fix_sep_at:(0, 0)
-given fix_sep_fixture (1):() then calls fix_sep_at:[2] then calls fix_sep_at:(1, 1)
+given fix_sep_fixture {
+  (0):() then calls fix_sep_at:[1] then calls fix_sep_at:(0, 0)
+  (1):() then calls fix_sep_at:[2] then calls fix_sep_at:(1, 1)
+}
 
 fix_sep_at(int i, int last) {
   if((import fixe_mv)[i] == 1 && ((import fixe_cl)[i] == 3 || fix_anc((import fixe_mv), i, last) == 0 || fix_late(i, last) == 1)) {

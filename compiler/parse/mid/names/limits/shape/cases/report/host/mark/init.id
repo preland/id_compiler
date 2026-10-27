@@ -50,9 +50,11 @@ imp_root(int nd) {
     imp_rt = (import ni1)[imp_rt];
   }
 } return int imp_rt;
-given imp_use_fixture ((import imp_use_deep)):((import imp_use_rd))
-given imp_use_fixture given integer_list_set((import ni1), (import imp_use_deep), (import imp_use_rd)) ((import imp_use_deep)):((import imp_use_rd))
-given imp_use_fixture ((import imp_use_rd)):((import imp_use_rd))
+given imp_use_fixture {
+  ((import imp_use_deep)):((import imp_use_rd))
+  given integer_list_set((import ni1), (import imp_use_deep), (import imp_use_rd)) ((import imp_use_deep)):((import imp_use_rd))
+  ((import imp_use_rd)):((import imp_use_rd))
+}
 
 // Whether a declaration binds a name to a list or a struct reached from the
 // import NAME -- itself, or an element or field of it, however deep -- so that
@@ -64,6 +66,8 @@ decl_alias_use(int nd, string imp_nm) {
     hit = 1;
   }
 } return int hit;
-given imp_use_fixture ((import imp_use_alias), "gx"):(1)
-given imp_use_fixture given sd_note("P", ["x"], ["int"], "p.id", 1) ((import imp_use_sdecl), "gx"):(1)
-given imp_use_fixture ((import imp_use_alias), "gy"):(0)
+given imp_use_fixture {
+  ((import imp_use_alias), "gx"):(1)
+  given sd_note("P", ["x"], ["int"], "p.id", 1) ((import imp_use_sdecl), "gx"):(1)
+  ((import imp_use_alias), "gy"):(0)
+}

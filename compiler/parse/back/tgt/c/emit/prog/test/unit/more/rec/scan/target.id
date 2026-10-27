@@ -9,8 +9,10 @@ is_rec_target(string nm) {
   rec_target_loop(ti);
   int ret_i = find_str((import rectarget), nm) >= 0;
 } return int ret_i;
-given calls_node_fixture ("fx_target"):(1)
-given calls_node_fixture ("nope"):(0)
+given calls_node_fixture {
+  ("fx_target"):(1)
+  ("nope"):(0)
+}
 
 rec_target_loop(int ti) {
   while(ti < len((import thennode))) {

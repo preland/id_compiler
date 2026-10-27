@@ -20,17 +20,21 @@ then_node_build() {
   int[] none = [];
   export int fixture_then_node = newnode("then", ci, 0, "fx_target", "", none, none);
 } return void;
-given fn_fixture ():() then calls newnode:("then", 0, 0, "fx_target", "", [], [])
-given fn_fixture ():() then (import ns1)[4]:("fx_target")
-given fn_fixture ():() then (import chkfail)[0]:(0)
-given fn_fixture ():() then init_units:(0)
+given fn_fixture {
+  ():() then calls newnode:("then", 0, 0, "fx_target", "", [], [])
+  ():() then (import ns1)[4]:("fx_target")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 then_node_bad() {
   int ci = (import fixture_ci);
   int[] none = [];
   export int fixture_then_bad = newnode("then", ci, 0, "nope", "", none, none);
 } return void;
-given fn_fixture ():() then calls newnode:("then", 0, 0, "nope", "", [], [])
-given fn_fixture ():() then (import ns1)[4]:("nope")
-given fn_fixture ():() then (import chkfail)[0]:(0)
-given fn_fixture ():() then init_units:(0)
+given fn_fixture {
+  ():() then calls newnode:("then", 0, 0, "nope", "", [], [])
+  ():() then (import ns1)[4]:("nope")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

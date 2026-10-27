@@ -10,9 +10,11 @@ esc_xlen(int i, string nm) {
     weight = esc_xmine(args[0], nm);
   }
 } return int weight;
-given esc_xfix ((import exa_len), "xg"):(1)
-given esc_xfix ((import exa_len), "xr"):(0)
-given esc_xfix ((import exa_two), "xt"):(0)
+given esc_xfix {
+  ((import exa_len), "xg"):(1)
+  ((import exa_len), "xr"):(0)
+  ((import exa_two), "xt"):(0)
+}
 
 esc_xclean(int e) {
   int ok = (import nkind)[e] != "call" && (import nkind)[e] != "arr";
@@ -22,12 +24,14 @@ esc_xclean(int e) {
     ok = esc_xclean((import ni1)[e]);
   }
 } return int ok;
-given esc_xfix ((import exa_zero)):(1)
-given esc_xfix ((import exa_ix)):(1)
-given esc_xfix ((import exa_f)):(0)
-given esc_xfix ((import exa_ixi)):(0)
-given esc_xfix ((import exa_un)):(0)
-given esc_xfix ((import exa_bin)):(0)
+given esc_xfix {
+  ((import exa_zero)):(1)
+  ((import exa_ix)):(1)
+  ((import exa_f)):(0)
+  ((import exa_ixi)):(0)
+  ((import exa_un)):(0)
+  ((import exa_bin)):(0)
+}
 
 esc_xbad(int i, string nm) {
   int weight = 0;
@@ -35,6 +39,8 @@ esc_xbad(int i, string nm) {
     weight = 1000000;
   }
 } return int weight;
-given esc_xfix ((import exa_dg), "xg"):(0)
-given esc_xfix ((import exa_ds), "xs"):(1000000)
-given esc_xfix ((import exa_ds), "xg"):(0)
+given esc_xfix {
+  ((import exa_dg), "xg"):(0)
+  ((import exa_ds), "xs"):(1000000)
+  ((import exa_ds), "xg"):(0)
+}

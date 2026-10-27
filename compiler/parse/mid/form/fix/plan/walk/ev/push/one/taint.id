@@ -32,7 +32,9 @@ fix_rcache_taint_fixture2(int e1) {
   export int rt_e1 = e1;
   export int rt_e2 = e2;
 } return void;
-given fix_rcache_taint_fixture (7):() then calls node_call:("len", [-1])
-given fix_rcache_taint_fixture (7):() then (import rt_e1):(7)
-given fix_rcache_taint_fixture (0):() then (import chkfail)[0]:(0)
-given fix_rcache_taint_fixture (0):() then init_units:(0)
+given fix_rcache_taint_fixture {
+  (7):() then calls node_call:("len", [-1])
+  (7):() then (import rt_e1):(7)
+  (0):() then (import chkfail)[0]:(0)
+  (0):() then init_units:(0)
+}

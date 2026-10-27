@@ -6,8 +6,10 @@ arg_flags2(int argc, string[] argv) {
   integer_list_set((import reqc), 0, arg_reqtests_v);
   arg_flags3(argc, argv);
 } return void;
-given flags_setup (1, ["prog"]):() then (import reqc)[0]:(0)
-given flags_setup (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
+given flags_setup {
+  (1, ["prog"]):() then (import reqc)[0]:(0)
+  (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
+}
 
 arg_flags3(int argc, string[] argv) {
   int arg_flag_v = arg_flag(argc, argv, 1, "--runtime");
@@ -18,12 +20,14 @@ arg_flags3(int argc, string[] argv) {
   integer_list_set((import bsc), 0, arg_strict_v);
   integer_list_set((import bsc), 1, arg_flag(argc, argv, 1, "--given-blocks-strict"));
 } return void;
-given flags_setup (1, ["prog"]):() then (import rtc)[0]:(0)
-given flags_setup (2, ["prog", "--runtime"]):() then (import rtc)[0]:(1)
-given flags_setup (1, ["prog"]):() then (import bsc)[0]:(0)
-given flags_setup (2, ["prog", "--bool-strict"]):() then (import bsc)[0]:(1)
-given flags_setup (1, ["prog"]):() then (import bsc)[1]:(0)
-given flags_setup (2, ["prog", "--given-blocks-strict"]):() then (import bsc)[1]:(1)
+given flags_setup {
+  (1, ["prog"]):() then (import rtc)[0]:(0)
+  (2, ["prog", "--runtime"]):() then (import rtc)[0]:(1)
+  (1, ["prog"]):() then (import bsc)[0]:(0)
+  (2, ["prog", "--bool-strict"]):() then (import bsc)[0]:(1)
+  (1, ["prog"]):() then (import bsc)[1]:(0)
+  (2, ["prog", "--given-blocks-strict"]):() then (import bsc)[1]:(1)
+}
 
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
@@ -36,5 +40,7 @@ arg_flags4(int argc, string[] argv) {
   export string[] hostc = [host_t];
   nat_init(argc, argv);
 } return void;
-given flags_setup (1, ["prog"]):() then (import fsc)[0]:(0)
-given flags_setup (2, ["prog", "--freestanding"]):() then (import fsc)[0]:(1)
+given flags_setup {
+  (1, ["prog"]):() then (import fsc)[0]:(0)
+  (2, ["prog", "--freestanding"]):() then (import fsc)[0]:(1)
+}

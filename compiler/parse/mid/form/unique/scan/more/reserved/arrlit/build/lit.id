@@ -29,8 +29,10 @@ cw_arr_lit2(int[] els) {
     i = i + 1;
   }
 } return int ok;
-given cwv_els_fixture ((import cwv_els)):(1)
-given cwv_els_fixture ((import cwv_mixed_els)):(0)
+given cwv_els_fixture {
+  ((import cwv_els)):(1)
+  ((import cwv_mixed_els)):(0)
+}
 
 cw_arr_elem_lit(int e) {
   string k = (import nkind)[e];

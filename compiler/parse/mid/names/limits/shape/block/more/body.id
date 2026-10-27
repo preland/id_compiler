@@ -8,8 +8,10 @@ check_segs(int[] body, string fname, int ln) {
   seg_walk(body, fname, ln, acc);
   seg_close(fname, ln, acc, 0, 0);
 } return void;
-given full_env ([], "f", 1):() then (import chkfail)[0]:(0)
-given full_env ([], "g", 2):() then (import chkfail)[0]:(0)
+given full_env {
+  ([], "f", 1):() then (import chkfail)[0]:(0)
+  ([], "g", 2):() then (import chkfail)[0]:(0)
+}
 
 // The tail of elif_fixture (../../actions/else_chain.id), which had no room
 // left in that directory. Two statement lists as exports rather than as list
@@ -19,10 +21,12 @@ elif_lists() {
   export int[] else_stmts = [(import else_node)];
   export int[] no_stmts = [];
 } return void;
-given elif_fixture ():() then (import else_stmts):([5])
-given elif_fixture ():() then len((import no_stmts)):(0)
-given elif_fixture ():() then (import chkfail)[0]:(0)
-given elif_fixture ():() then init_units:(0)
+given elif_fixture {
+  ():() then (import else_stmts):([5])
+  ():() then len((import no_stmts)):(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 regrow_c() {
   regrow_b();

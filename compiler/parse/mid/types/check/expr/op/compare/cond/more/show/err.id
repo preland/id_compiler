@@ -7,8 +7,10 @@ mixed_err(int id, int c) {
   string want = mixed_fix(id);
   mixed_say(id, words, want);
 } return void;
-given cmp_fixture ((import bin_mixed), (import bin_bitand)):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '&' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2' [E0601]\n  at: 2 & 5 < 2\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 & 5 < 2\t(2 & 5) < 2\n")
-given cmp_fixture ((import bin_mixed), (import lit_a)):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '2' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2' [E0601]\n  at: 2 & 5 < 2\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 & 5 < 2\t(2 & 5) < 2\n")
+given cmp_fixture {
+  ((import bin_mixed), (import bin_bitand)):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '&' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2' [E0601]\n  at: 2 & 5 < 2\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 & 5 < 2\t(2 & 5) < 2\n")
+  ((import bin_mixed), (import lit_a)):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '2' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2' [E0601]\n  at: 2 & 5 < 2\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 & 5 < 2\t(2 & 5) < 2\n")
+}
 
 mixed_say(int id, string words, string want) {
   string was = show_bin(id);
@@ -17,13 +19,17 @@ mixed_say(int id, string words, string want) {
 } chain (int id, string words, string want) {
   diag_edit("machine", "replace", mixed_ln, was, want);
 } return void;
-given cmp_fixture ((import bin_mixed), "a bitwise '&' with a comparison '<'", "(2 & 5) < 2"):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '&' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2' [E0601]\n  at: 2 & 5 < 2\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 & 5 < 2\t(2 & 5) < 2\n")
-given cmp_fixture ((import bin_eq), "words", "want"):() then prints:("<stdin>:1: error: '2 == 5' mixes words; parenthesize it as the current precedence reads it: 'want' [E0601]\n  at: 2 == 5\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 == 5\twant\n")
+given cmp_fixture {
+  ((import bin_mixed), "a bitwise '&' with a comparison '<'", "(2 & 5) < 2"):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '&' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2' [E0601]\n  at: 2 & 5 < 2\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 & 5 < 2\t(2 & 5) < 2\n")
+  ((import bin_eq), "words", "want"):() then prints:("<stdin>:1: error: '2 == 5' mixes words; parenthesize it as the current precedence reads it: 'want' [E0601]\n  at: 2 == 5\n  why: the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down\n  help: write the parentheses the current precedence implies\n  edit: machine\treplace\t1\t2 == 5\twant\n")
+}
 
 mixed_fix(int id) {
   int i1_of_v = (import ni1)[id];
   int i2_of_v = (import ni2)[id];
   string ret_s = fix_side(id, i1_of_v) + " " + (import ns1)[id] + " " + fix_side(id, i2_of_v);
 } return string ret_s;
-given cmp_fixture ((import bin_mixed)):("(2 & 5) < 2")
-given cmp_fixture ((import bin_eq)):("2 == 5")
+given cmp_fixture {
+  ((import bin_mixed)):("(2 & 5) < 2")
+  ((import bin_eq)):("2 == 5")
+}

@@ -29,8 +29,10 @@ dg_exports(int dgi) {
     dgi = dgi + 1;
   }
 } return void;
-given dg_t_exp (0):() then dg_nexp:("exp 1")
-given dg_t_exp (1):() then dg_nexp:("exp 0")
+given dg_t_exp {
+  (0):() then dg_nexp:("exp 1")
+  (1):() then dg_nexp:("exp 0")
+}
 
 dg_export_one(int dgi) {
   int dgof = hash_map_get((import dg_fk), (import dg_fv), (import dg_fu), (import eowners)[dgi], 0 - 1);
@@ -38,5 +40,7 @@ dg_export_one(int dgi) {
     hash_map_put((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec), (import enames)[dgi], dgof);
   }
 } return void;
-given dg_t_exp (0):() then dg_nexp:("exp 1")
-given dg_t_exp (1):() then dg_nexp:("exp 0")
+given dg_t_exp {
+  (0):() then dg_nexp:("exp 1")
+  (1):() then dg_nexp:("exp 0")
+}

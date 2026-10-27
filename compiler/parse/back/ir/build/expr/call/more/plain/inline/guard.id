@@ -18,8 +18,10 @@ lw_guard(int gd_bad, string gd_msg) {
   lw_term("br", 0 - 1, [gd_ok]);
   lw_go(gd_ok);
 } return void;
-given lw_env_fixture (5, "boom"):() then (import lwcur)[0]:(3)
-given lw_env_fixture (6, "bang"):() then (import istr)[2]:("id_fail")
+given lw_env_fixture {
+  (5, "boom"):() then (import lwcur)[0]:(3)
+  (6, "bang"):() then (import istr)[2]:("id_fail")
+}
 
 // A logical shift right. A negative count traps, a count of the word's width
 // or more gives zero (the C helper's rule), and a count in range is the plain
@@ -41,6 +43,8 @@ lw_inline_ushr(int[] ih_args) {
 } chain (int[] ih_args) {
   int ret_i = lw_op("and", "word", ih_shr, ih_mask, "");
 } return int ret_i;
-given lw_env_fixture ([0, 1]):(12) then (import iop)[0]:("const")
-given lw_env_fixture ([2, 3]):(12) then (import lwcur)[0]:(3)
+given lw_env_fixture {
+  ([0, 1]):(12) then (import iop)[0]:("const")
+  ([2, 3]):(12) then (import lwcur)[0]:(3)
+}
 

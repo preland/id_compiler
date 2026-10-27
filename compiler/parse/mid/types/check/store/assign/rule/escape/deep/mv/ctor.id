@@ -18,8 +18,10 @@ esc_abads(int[] dz_as) {
     i = i + 1;
   }
 } return int r;
-given esc_ms_fix ([(import ems_lit)]):(0)
-given esc_ms_fix ([(import ems_lit), (import ems_sv)]):(1)
+given esc_ms_fix {
+  ([(import ems_lit)]):(0)
+  ([(import ems_lit), (import ems_sv)]):(1)
+}
 
 esc_abad(int a) {
   int r = 0;

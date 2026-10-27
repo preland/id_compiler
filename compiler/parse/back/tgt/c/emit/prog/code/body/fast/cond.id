@@ -12,8 +12,10 @@ lp_cond(int lq_c) {
     integer_list_set((import lpbad), 0, 1);
   }
 } return void;
-given lpf_more ((import lpf_andn)):() then len((import lpj)):(2)
-given lpf_more ((import lpf_q)):() then (import lpbad)[0]:(1)
+given lpf_more {
+  ((import lpf_andn)):() then len((import lpj)):(2)
+  ((import lpf_q)):() then (import lpbad)[0]:(1)
+}
 
 lp_bin(int lq_c) {
   string lq_op = (import ns1)[lq_c];
@@ -25,9 +27,11 @@ lp_bin(int lq_c) {
     lp_cmp(lq_c);
   }
 } return void;
-given lpf_more ((import lpf_andn)):() then len((import lpj)):(2)
-given lpf_more ((import lpf_ca)):() then (import lpj)[0]:("laj")
-given lpf_more ((import lpf_vvs)):() then (import lpbad)[0]:(1)
+given lpf_more {
+  ((import lpf_andn)):() then len((import lpj)):(2)
+  ((import lpf_ca)):() then (import lpj)[0]:("laj")
+  ((import lpf_vvs)):() then (import lpbad)[0]:(1)
+}
 
 lp_cmp(int lq_c) {
   if((import ns1)[lq_c] == "<") {
@@ -36,5 +40,7 @@ lp_cmp(int lq_c) {
     integer_list_set((import lpbad), 0, 1);
   }
 } return void;
-given lpf_more ((import lpf_ca)):() then (import lpbad)[0]:(0)
-given lpf_more ((import lpf_vvs)):() then (import lpbad)[0]:(1)
+given lpf_more {
+  ((import lpf_ca)):() then (import lpbad)[0]:(0)
+  ((import lpf_vvs)):() then (import lpbad)[0]:(1)
+}

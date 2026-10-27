@@ -18,8 +18,10 @@ es2(int id, string ind) {
     es3(id, ind);
   }
 } return void;
-given stmt_fix (2, ""):() then prints:("z = 5;\n")
-given stmt_fix (5, ""):() then prints:("5;\n")
+given stmt_fix {
+  (2, ""):() then prints:("z = 5;\n")
+  (5, ""):() then prints:("5;\n")
+}
 
 // A decl statement, and in the harness an exported one's flag right after
 // its value is stored (prog/head/decl/export/uninit.id). The export bit is

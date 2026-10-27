@@ -17,6 +17,8 @@ fn_sym(string name) {
     }
   }
 } return string s;
-given edge_fixture given init_rtc ("edge_caller"):("id_edge_caller")
-given edge_fixture given rt_fixture ("edge_caller"):("idr_edge_caller")
-given edge_fixture given rt_fixture ("not_a_function"):("id_not_a_function")
+given edge_fixture {
+  given init_rtc ("edge_caller"):("id_edge_caller")
+  given rt_fixture ("edge_caller"):("idr_edge_caller")
+  given rt_fixture ("not_a_function"):("id_not_a_function")
+}

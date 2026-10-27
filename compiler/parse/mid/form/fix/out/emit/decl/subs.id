@@ -6,8 +6,10 @@ fix_sub_at(int i, int j, string out) {
     rs = out + "|" + fix_span((import fixe_n)[j]) + "|" + (import fixe_nm)[j];
   }
 } return string rs;
-given fix_decl_fixture (1, 0, ""):("|3|2|3|5|myname")
-given fix_decl_fixture (1, 1, "X"):("X|7|1|7|4|othername")
+given fix_decl_fixture {
+  (1, 0, ""):("|3|2|3|5|myname")
+  (1, 1, "X"):("X|7|1|7|4|othername")
+}
 
 // A leaf node ("ident", not one of the kinds out/span/beg/start.id branches
 // on) at token 0 of fix_tokline_fixture2 -- fixd_gcl reused from
@@ -18,9 +20,11 @@ fix_tokline_node_fixture() {
   int e = newleaf("ident", 0, 0, "len", "");
   fix_span_fixture2(e);
 } return void;
-given fix_tokline_fixture2 ():() then calls newleaf:("ident", 0, 0, "len", "")
-given fix_tokline_fixture2 ():() then (import fixd_gcl)[0]:(-1)
-given fix_tokline_fixture2 ():() then init_units:(0)
+given fix_tokline_fixture2 {
+  ():() then calls newleaf:("ident", 0, 0, "len", "")
+  ():() then (import fixd_gcl)[0]:(-1)
+  ():() then init_units:(0)
+}
 
 // Two events for out/emit/decl/{decl,head}.id's own cases: event 0 at token
 // 0 (fix_tokline_node_fixture's own node -- its fix_span_fixture2 chain

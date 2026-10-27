@@ -10,10 +10,12 @@ esc_fx_e() {
   export int efe_fn = node_func("fa_ro", "void", (import efe_ps), [(import efe_dq), (import efe_dn)], 0 - 1);
   esc_fx_v();
 } return void;
-given esc_fix ():() then calls node_txt:("var", "q")
-given esc_fix ():() then calls node_call:("len", [(import efe_vq)])
-given esc_fix ():() then (import chkfail)[0]:(0)
-given esc_fix ():() then init_units:(0)
+given esc_fix {
+  ():() then calls node_txt:("var", "q")
+  ():() then calls node_call:("len", [(import efe_vq)])
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // The variables the cases read paths of, with the types the programs give them:
 // a path's type is asked of its variable (type_of), and only a string, a list
@@ -33,5 +35,7 @@ esc_fx_v() {
 } chain () {
   add_var("q", "int[]", 0);
 } return void;
-given esc_fix ():() then calls add_var:("q", "int[]", 0)
-given esc_fix ():() then (import chkfail)[0]:(0)
+given esc_fix {
+  ():() then calls add_var:("q", "int[]", 0)
+  ():() then (import chkfail)[0]:(0)
+}

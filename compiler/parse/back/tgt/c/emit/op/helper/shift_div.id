@@ -19,5 +19,7 @@ hop_div(int id) {
     h = hop_dw(s1_of_v, type_bin_v);
   }
 } return string h;
-given arith_fix (2):("id_idiv")
-given arith_fix (0):("")
+given arith_fix {
+  (2):("id_idiv")
+  (0):("")
+}

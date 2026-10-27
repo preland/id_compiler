@@ -53,5 +53,7 @@ case_owner(int node) {
   push((import casefn), (import prog)[len_v - 1]);
   string_list_set((import ns1), node, (import pfile)[len_v - 1]);
 } return void;
-given cases_fix (0):() then (import ns1)[0]:("fixture.id")
-given cases_fix (1):() then (import ns1)[1]:("fixture.id")
+given cases_fix {
+  (0):() then (import ns1)[0]:("fixture.id")
+  (1):() then (import ns1)[1]:("fixture.id")
+}

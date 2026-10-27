@@ -20,13 +20,17 @@ bfl_build() {
   export int bfl_d0 = node_decl("int", "fx_flag", (import fixture_zero), 0);
   export int bfl_a1 = node_txt1("assign", "fx_flag", (import bfl_one));
 } return void;
-given fn_fixture ():() then calls node_txt2:("int", "1", 1, 0)
-given fn_fixture ():() then calls node_decl:("int", "fx_flag", (import fixture_zero), 0)
+given fn_fixture {
+  ():() then calls node_txt2:("int", "1", 1, 0)
+  ():() then calls node_decl:("int", "fx_flag", (import fixture_zero), 0)
+}
 
 bfl_build2() {
   export int bfl_ret = node_txt("var", "fx_flag");
   export int bfl_fn = bfl_func("fx_flagfn", (import bfl_ret));
 } return void;
-given fn_fixture ():() then calls node_txt:("var", "fx_flag")
-given fn_fixture ():() then len((import prog)):(2)
+given fn_fixture {
+  ():() then calls node_txt:("var", "fx_flag")
+  ():() then len((import prog)):(2)
+}
 

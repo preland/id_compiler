@@ -7,8 +7,10 @@ init_ty_rows2() {
   ty_row("float", "float", 8, 1);
   init_ty_rows3();
 } return void;
-given init_tyreg ():() then len((import tyname)):(13)
-given init_tyreg ():() then reg_width_at6:(8)
+given init_tyreg {
+  ():() then len((import tyname)):(13)
+  ():() then reg_width_at6:(8)
+}
 
 // `string` is a reference, so its width is a pointer's, not a character
 // count. `void` is the unit type: no values, so no width and no sign.
@@ -19,13 +21,17 @@ init_ty_rows3() {
 } chain () {
   ty_row("bool", "int", 4, 1);
 } return void;
-given init_tyreg ():() then len((import tyname)):(11)
-given init_tyreg ():() then reg_width_at6:(8)
+given init_tyreg {
+  ():() then len((import tyname)):(11)
+  ():() then reg_width_at6:(8)
+}
 
 ty_row(string tn, string tk, int tw, int ts) {
   push((import tyname), tn);
   push((import tykind), tk);
   ty_row2(tw, ts);
 } return void;
-given init_tyreg ("bool", "int", 1, 1):() then len((import tyname)):(8)
-given init_tyreg ("byte", "int", 2, 0):() then reg_last_width:(2)
+given init_tyreg {
+  ("bool", "int", 1, 1):() then len((import tyname)):(8)
+  ("byte", "int", 2, 0):() then reg_last_width:(2)
+}

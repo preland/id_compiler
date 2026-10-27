@@ -34,7 +34,9 @@ bind_names() {
   export int bind_word = node_call("bind", [bind_fnname, bind_big]);
   export int bind_toomany = node_call("bind", [bind_fnname, bind_lit, bind_lit]);
 } return void;
-given fn_idx_fixture ():() then calls node_txt:("var", "fx_target")
-given fn_idx_fixture ():() then calls node_txt2:("int", "1", 1, 0)
-given fn_idx_fixture ():() then (import chkfail)[0]:(0)
-given fn_idx_fixture ():() then init_units:(0)
+given fn_idx_fixture {
+  ():() then calls node_txt:("var", "fx_target")
+  ():() then calls node_txt2:("int", "1", 1, 0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

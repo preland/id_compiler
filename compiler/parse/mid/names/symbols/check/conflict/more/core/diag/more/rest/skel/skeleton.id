@@ -15,9 +15,11 @@ case_skeleton_edit(int dgn_row, int dgn_have) {
     diag_edit("placeholder", "after-function", (import pline)[dgn_row], "", dgn_text);
   }
 } return void;
-given edge_fixture (0, 0):() then prints:("  edit: placeholder\tafter-function\t7\t\t(ARG1_1):(EXPECTED1)\\n(ARG2_1):(EXPECTED2)\\n\n")
-given edge_fixture (0, 1):() then prints:("  edit: placeholder\tafter-function\t7\t\t(ARG1_1):(EXPECTED1)\\n\n")
-given edge_fixture (0, 2):() then prints:("")
+given edge_fixture {
+  (0, 0):() then prints:("  edit: placeholder\tafter-function\t7\t\t(ARG1_1):(EXPECTED1)\\n(ARG2_1):(EXPECTED2)\\n\n")
+  (0, 1):() then prints:("  edit: placeholder\tafter-function\t7\t\t(ARG1_1):(EXPECTED1)\\n\n")
+  (0, 2):() then prints:("")
+}
 
 case_skeleton(int dgn_np, int dgn_need, string dgn_rt) {
   string dgn_all = "";

@@ -9,16 +9,20 @@ report_name(string name, string owner, int ln, string rcode, string rmsg, string
   string rn_where = diag_fn_loc(owner, ln);
   diag(rcode, rn_where, rmsg, name, rwhy, rhelp);
 } return void;
-given regrow_d ("g", "f", 10, "E0308", "m", "w", "h"):() then prints:("<stdin>:10: error: m [E0308]\n  at: g\n  why: w\n  help: h\n") then (import chkfail)[0]:(1)
-given regrow_d ("h", "g", 20, "E0306", "msg", "why", "help"):() then prints:("<stdin>:20: error: msg [E0306]\n  at: h\n  why: why\n  help: help\n") then (import chkfail)[0]:(1)
+given regrow_d {
+  ("g", "f", 10, "E0308", "m", "w", "h"):() then prints:("<stdin>:10: error: m [E0308]\n  at: g\n  why: w\n  help: h\n") then (import chkfail)[0]:(1)
+  ("h", "g", 20, "E0306", "msg", "why", "help"):() then prints:("<stdin>:20: error: msg [E0306]\n  at: h\n  why: why\n  help: help\n") then (import chkfail)[0]:(1)
+}
 
 report_var_twice(string name, string owner, int ln) {
   string twice_where = diag_fn_loc(owner, ln);
   string twice_msg = "variable '" + name + "' is declared twice in function '" + owner + "'";
   diag("E0302", twice_where, twice_msg, name, "a name inside a function means one variable, so declaring it twice would make every later use ambiguous", "rename one of the two, or drop the type from the second so that it assigns to the first, as in `" + name + " = ...;`");
 } return void;
-given regrow_d ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' is declared twice in function 'f' [E0302]\n  at: x\n  why: a name inside a function means one variable, so declaring it twice would make every later use ambiguous\n  help: rename one of the two, or drop the type from the second so that it assigns to the first, as in `x = ...;`\n") then (import chkfail)[0]:(1)
-given regrow_d ("y", "g", 20):() then prints:("<stdin>:20: error: variable 'y' is declared twice in function 'g' [E0302]\n  at: y\n  why: a name inside a function means one variable, so declaring it twice would make every later use ambiguous\n  help: rename one of the two, or drop the type from the second so that it assigns to the first, as in `y = ...;`\n") then (import chkfail)[0]:(1)
+given regrow_d {
+  ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' is declared twice in function 'f' [E0302]\n  at: x\n  why: a name inside a function means one variable, so declaring it twice would make every later use ambiguous\n  help: rename one of the two, or drop the type from the second so that it assigns to the first, as in `x = ...;`\n") then (import chkfail)[0]:(1)
+  ("y", "g", 20):() then prints:("<stdin>:20: error: variable 'y' is declared twice in function 'g' [E0302]\n  at: y\n  why: a name inside a function means one variable, so declaring it twice would make every later use ambiguous\n  help: rename one of the two, or drop the type from the second so that it assigns to the first, as in `y = ...;`\n") then (import chkfail)[0]:(1)
+}
 
 report_var_exported(string name, string owner, int ln) {
   string exp_where = diag_fn_loc(owner, ln);

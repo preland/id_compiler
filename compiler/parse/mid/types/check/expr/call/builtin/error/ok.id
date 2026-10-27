@@ -17,8 +17,10 @@ bi_ok3(string want, string t) {
     ok = 0;
   }
 } return int ok;
-given env_init ("word", "int"):(1)
-given env_init ("word", "string"):(0)
+given env_init {
+  ("word", "int"):(1)
+  ("word", "string"):(0)
+}
 
 // `len` is the one builtin that accepts two unrelated shapes, because a
 // string's length and a list's length are the same question to a reader even

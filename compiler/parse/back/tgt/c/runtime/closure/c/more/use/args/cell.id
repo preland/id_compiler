@@ -9,8 +9,10 @@ bind_cell(int fn, int i, string code) {
   string cp = bind_copy(code, pt);
   string s = box(cp, pt);
 } return string s;
-given clo_bind_fixture ((import fixture_fn), 0, "7"):("(long long)(7)")
-given clo_bind_fixture ((import fixture_fn), 0, "n"):("(long long)(n)")
+given clo_bind_fixture {
+  ((import fixture_fn), 0, "7"):("(long long)(7)")
+  ((import fixture_fn), 0, "n"):("(long long)(n)")
+}
 
 bind_copy(string code, string pt) {
   string s = code;
@@ -24,5 +26,7 @@ bind_copy(string code, string pt) {
 bind_pt(int fn, int i) {
   string pt = (import ns1)[(import nl1)[fn][i]];
 } return string pt;
-given clo_native_fixture ((import cn_fn), 0):("func(int) return int")
-given clo_native_fixture ((import cn_fn), 1):("int")
+given clo_native_fixture {
+  ((import cn_fn), 0):("func(int) return int")
+  ((import cn_fn), 1):("int")
+}

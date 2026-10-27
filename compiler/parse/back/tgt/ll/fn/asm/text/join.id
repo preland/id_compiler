@@ -9,8 +9,10 @@ ll_asm_text(int r) {
     i = i + 1;
   }
 } return string out;
-given llasm_row2_fixture (0):("mov $1, $$0\\0A\\09ret")
-given llasm_row2_fixture (1):("nop")
+given llasm_row2_fixture {
+  (0):("mov $1, $$0\\0A\\09ret")
+  (1):("nop")
+}
 
 // A line arrives with its quotes, so the scan runs between them.
 ll_asm_line(int r, string s) {
@@ -21,5 +23,7 @@ ll_asm_line(int r, string s) {
     i = ll_asm_step(s, i);
   }
 } return string out;
-given llasm_row_fixture (0, "\"mov %[x], $0\""):("mov $1, $$0")
-given llasm_row_fixture (0, "\"ret\""):("ret")
+given llasm_row_fixture {
+  (0, "\"mov %[x], $0\""):("mov $1, $$0")
+  (0, "\"ret\""):("ret")
+}

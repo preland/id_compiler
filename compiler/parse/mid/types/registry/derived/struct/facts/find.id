@@ -10,9 +10,11 @@ sd_nfields(string sd_s) {
     n = len((import sdfname)[sd_i]);
   }
 } return int n;
-given sd_pair ("P"):(2)
-given sd_pair ("Q"):(1)
-given sd_pair ("nope"):(0)
+given sd_pair {
+  ("P"):(2)
+  ("Q"):(1)
+  ("nope"):(0)
+}
 
 // A field's position, or -1 when the struct has no such field.
 sd_fpos(string sd_s, string sd_f) {
@@ -22,5 +24,7 @@ sd_fpos(string sd_s, string sd_f) {
     ret_i = find_str((import sdfname)[sd_i], sd_f);
   }
 } return int ret_i;
-given sd_pair ("P", "y"):(1)
-given sd_pair ("P", "z"):(-1)
+given sd_pair {
+  ("P", "y"):(1)
+  ("P", "z"):(-1)
+}

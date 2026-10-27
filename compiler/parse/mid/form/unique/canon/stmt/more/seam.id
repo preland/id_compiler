@@ -22,8 +22,10 @@ cst4(int id) {
     out = "";
   }
 } return string out;
-given blank_stmts_fixture ((import blank_node)):("")
-given blank_stmts_fixture ((import chain_node)):("|")
+given blank_stmts_fixture {
+  ((import blank_node)):("")
+  ((import chain_node)):("|")
+}
 
 // The statement list with every `blank` removed, which is what canon_body
 // hands to canon_join. A list is a reference, so `kept` can be filled in place
@@ -45,5 +47,7 @@ blank_push(int[] kept, int id) {
     push(kept, id);
   }
 } return void;
-given blank_push_fixture ([], (import bp_blank)):([])
-given blank_push_fixture ([], (import bp_lit)):((import bp_kept_after))
+given blank_push_fixture {
+  ([], (import bp_blank)):([])
+  ([], (import bp_lit)):((import bp_kept_after))
+}

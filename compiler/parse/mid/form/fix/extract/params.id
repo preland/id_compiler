@@ -8,8 +8,10 @@ fix_xparams(int xplo2, int xpf2) {
 } chain (int xplo2, int xpf2) {
   fix_xneed((import fixx_wr), xplo2, xpf2);
 } return void;
-given fix_xparamed (0, 12):() then (import fixx_par):(["a", "b"])
-given fix_xparamed (0, 12):() then (import fixx_pty):(["int", "string"])
+given fix_xparamed {
+  (0, 12):() then (import fixx_par):(["a", "b"])
+  (0, 12):() then (import fixx_pty):(["int", "string"])
+}
 
 fix_xneed(string[] xnlist, int xnlo, int xnf2) {
   int xnj = 0;
@@ -18,8 +20,10 @@ fix_xneed(string[] xnlist, int xnlo, int xnf2) {
     xnj = xnj + 1;
   }
 } return void;
-given fix_xparamed (["zed"], 0, 12):() then (import fixx_par):(["a", "b", "zed"])
-given fix_xparamed (["a", "b"], 0, 12):() then (import fixx_par):(["a", "b"])
+given fix_xparamed {
+  (["zed"], 0, 12):() then (import fixx_par):(["a", "b", "zed"])
+  (["a", "b"], 0, 12):() then (import fixx_par):(["a", "b"])
+}
 
 fix_xtake(string xkname, int xklo, int xkf) {
   if(find_str((import fixx_dc), xkname) < 0 && find_str((import fixx_par), xkname) < 0) {
@@ -27,5 +31,7 @@ fix_xtake(string xkname, int xklo, int xkf) {
     push((import fixx_pty), fix_xtype(xkname, xklo, xkf));
   }
 } return void;
-given fix_xparamed ("b", 0, 12):() then (import fixx_par):(["a", "b"])
-given fix_xparamed ("zed", 0, 12):() then (import fixx_pty):(["int", "string", ""])
+given fix_xparamed {
+  ("b", 0, 12):() then (import fixx_par):(["a", "b"])
+  ("zed", 0, 12):() then (import fixx_pty):(["int", "string", ""])
+}

@@ -10,8 +10,10 @@ lw_stmts(int[] stmts) {
     i = i + 1;
   }
 } return void;
-given bound_fixture ([1]):() then (import chkfail)[0]:(0)
-given bound_fixture ([]):() then (import chkfail)[0]:(0)
+given bound_fixture {
+  ([1]):() then (import chkfail)[0]:(0)
+  ([]):() then (import chkfail)[0]:(0)
+}
 
 lw_stmt(int node) {
   if((import nkind)[node] == "decl") {

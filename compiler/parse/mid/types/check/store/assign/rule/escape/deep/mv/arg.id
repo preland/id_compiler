@@ -9,9 +9,11 @@ esc_mvarg(int fn, int[] stmts, int i, int a) {
     ok = esc_movable(fn, stmts, i, (import ns1)[a]) & esc_mvstr(stmts, i, a) & esc_mvsd(fn, stmts, i, a) & esc_mvrow(fn, stmts, i, a);
   }
 } return int ok;
-given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_kv)):(1)
-given esc_fm_fix ((import efm_bad), (import efm_bbody), 1, (import efm_kv)):(0)
-given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_if)):(1)
+given esc_fm_fix {
+  ((import efm_fn), (import efm_body), 2, (import efm_kv)):(1)
+  ((import efm_bad), (import efm_bbody), 1, (import efm_kv)):(0)
+  ((import efm_fn), (import efm_body), 2, (import efm_if)):(1)
+}
 
 // The list `kn` may be taken over at statement `i` when: it is declared at an
 // earlier statement `j` of the same list; the statement mentions it once; it is
@@ -26,9 +28,11 @@ esc_movable(int fn, int[] stmts, int i, string kn) {
     ok = esc_cntr(stmts, dz_j, i, kn) == esc_cntf(fn, kn) && (esc_block((import nl2)[fn], kn) & esc_mvmask(stmts[i])) == 0;
   }
 } return int ok;
-given esc_fm_fix ((import efm_fn), (import efm_body), 2, "kids"):(1)
-given esc_fm_fix ((import efm_bad), (import efm_bbody), 1, "kids"):(0)
-given esc_fm_fix ((import efm_fn), (import efm_body), 0, "kids"):(0)
+given esc_fm_fix {
+  ((import efm_fn), (import efm_body), 2, "kids"):(1)
+  ((import efm_bad), (import efm_bbody), 1, "kids"):(0)
+  ((import efm_fn), (import efm_body), 0, "kids"):(0)
+}
 
 // The index of the first declaration of `kn` before statement `i`, or -1.
 esc_declat(int[] stmts, int i, string kn) {
@@ -41,6 +45,8 @@ esc_declat(int[] stmts, int i, string kn) {
     dz_k = dz_k + 1;
   }
 } return int dz_j;
-given esc_fm_fix ((import efm_body), 2, "kids"):(0)
-given esc_fm_fix ((import efm_body), 0, "kids"):(-1)
-given esc_fm_fix ((import efm_body), 2, "t"):(-1)
+given esc_fm_fix {
+  ((import efm_body), 2, "kids"):(0)
+  ((import efm_body), 0, "kids"):(-1)
+  ((import efm_body), 2, "t"):(-1)
+}

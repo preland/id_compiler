@@ -13,8 +13,10 @@ check_lit(int e) {
     integer_list_set((import synfail), 0, 1);
   }
 } return void;
-given lit_fix (0):() then prints:("") then (import synfail)[0]:(0)
-given lit_fix (1):() then prints:("<stdin>:0: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)) [E0506]\n  why: a case is checked before any variable or call exists, so each value in it must be written out in full\n  help: write the value itself, as in (3, \"a\"):(7), or build it in a function named by 'given'\n")
+given lit_fix {
+  (0):() then prints:("") then (import synfail)[0]:(0)
+  (1):() then prints:("<stdin>:0: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)) [E0506]\n  why: a case is checked before any variable or call exists, so each value in it must be written out in full\n  help: write the value itself, as in (3, \"a\"):(7), or build it in a function named by 'given'\n")
+}
 
 is_lit(int e) {
   int r = leaf_lit(e);
@@ -22,5 +24,7 @@ is_lit(int e) {
     r = neg_lit(e);
   }
 } return int r;
-given lit_fix (0):(1)
-given lit_fix (1):(0)
+given lit_fix {
+  (0):(1)
+  (1):(0)
+}

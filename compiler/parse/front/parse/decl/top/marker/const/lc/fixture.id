@@ -21,8 +21,10 @@ lc_reg(string type, string name, int expr) {
   add_export2(d, "conf.id");
   push((import cdecl), d);
 } return int d;
-given lc_reg_setup ("int", "zz", (import lc_reg_e1)):(2)
-given lc_reg_setup ("int[]", "yy", (import lc_reg_e2)):(2)
+given lc_reg_setup {
+  ("int", "zz", (import lc_reg_e1)):(2)
+  ("int[]", "yy", (import lc_reg_e2)):(2)
+}
 
 lc_reg_setup() {
   lc_env();

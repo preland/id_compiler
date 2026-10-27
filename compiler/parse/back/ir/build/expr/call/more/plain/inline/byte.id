@@ -12,8 +12,10 @@ lw_byte_at(int[] by_args) {
   int by_raw = lw_op("load", "byte", by_ptr, 0 - 1, "");
   int ret_i = lw_op("zext", "int", by_raw, 0 - 1, "");
 } return int ret_i;
-given lw_env_fixture ([0, 1]):(5) then (import iop)[2]:("add")
-given lw_env_fixture ([0, 1]):(5) then (import iop)[4]:("load")
+given lw_env_fixture {
+  ([0, 1]):(5) then (import iop)[2]:("add")
+  ([0, 1]):(5) then (import iop)[4]:("load")
+}
 
 lw_byte_hit(int by_node) {
   int by_r = 0;
@@ -21,8 +23,10 @@ lw_byte_hit(int by_node) {
     by_r = 1;
   }
 } return int by_r;
-given lw_env_fixture (0):(0)
-given lw_env_fixture given integer_list_set((import lpon), 0, 1) given list_extend((import lpset), [0]) (0):(0)
+given lw_env_fixture {
+  (0):(0)
+  given integer_list_set((import lpon), 0, 1) given list_extend((import lpset), [0]) (0):(0)
+}
 
 lw_expand_at(int by_node, string by_helper, string by_ret, int[] by_args) {
   int ret_i = 0 - 1;
@@ -32,5 +36,7 @@ lw_expand_at(int by_node, string by_helper, string by_ret, int[] by_args) {
     ret_i = lw_expand(by_helper, by_ret, by_args);
   }
 } return int ret_i;
-given lw_env_fixture (0, "id_ult", "word", [0, 1]):(1)
-given lw_env_fixture (0, "id_x", "word", [0, 1]):(0)
+given lw_env_fixture {
+  (0, "id_ult", "word", [0, 1]):(1)
+  (0, "id_x", "word", [0, 1]):(0)
+}

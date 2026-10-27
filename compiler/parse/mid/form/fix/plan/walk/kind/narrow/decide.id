@@ -5,8 +5,10 @@ fix_unsafe_rhs(int e) {
     ok = 0;
   }
 } return int ok;
-given fix_traps_setup ((import tr_safe)):(0)
-given fix_traps_setup ((import tr_unsafe)):(1)
+given fix_traps_setup {
+  ((import tr_safe)):(0)
+  ((import tr_unsafe)):(1)
+}
 
 // The parameter type an argument narrows to, or "". The test the call checks
 // make (mid/types/check/expr/call/args/err/typecheck.id, and callsite/fcall/
@@ -22,8 +24,10 @@ fix_narrow(int e, int i, int a) {
     t = pt;
   }
 } return string t;
-given fix_pparam_fixture ((import ppcall), 0, (import ppwide)):("int")
-given fix_pparam_fixture ((import ppcall), 1, (import ppwide)):("")
+given fix_pparam_fixture {
+  ((import ppcall), 0, (import ppwide)):("int")
+  ((import ppcall), 1, (import ppwide)):("")
+}
 
 fix_narrows(string pt, int a) {
   string type_of_v = type_of(a);

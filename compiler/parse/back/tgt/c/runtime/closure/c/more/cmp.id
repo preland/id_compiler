@@ -6,5 +6,7 @@ c_clo_ptr(string vt) {
   string[] pts = fn_params(vt);
   string s = c_type(fn_ret(vt)) + " (*)(IdFn*" + sep_at(", ", len(pts)) + c_type_list(pts) + ")";
 } return string s;
-given lc_env2 ("func(int) return int"):("int (*)(IdFn*, int)")
-given lc_env2 ("func() return void"):("void (*)(IdFn*)")
+given lc_env2 {
+  ("func(int) return int"):("int (*)(IdFn*, int)")
+  ("func() return void"):("void (*)(IdFn*)")
+}

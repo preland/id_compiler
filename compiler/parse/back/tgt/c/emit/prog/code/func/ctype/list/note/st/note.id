@@ -13,9 +13,11 @@ note_struct(string ty) {
     note_sfields(ty);
   }
 } return void;
-given sd_note_fixture ("P"):() then len((import tcsts)):(1)
-given sd_note_fixture ("int"):() then len((import tcsts)):(0)
-given sd_note_fixture ("W"):() then len((import tcsts)):(2)
+given sd_note_fixture {
+  ("P"):() then len((import tcsts)):(1)
+  ("int"):() then len((import tcsts)):(0)
+  ("W"):() then len((import tcsts)):(2)
+}
 
 note_sfields(string ty) {
   int sd_k = 0;
@@ -24,7 +26,9 @@ note_sfields(string ty) {
     sd_k = sd_k + 1;
   }
 } return void;
-given sd_note_fixture ("nope"):() then len((import tcsts)):(0)
-given sd_note_fixture ("W"):() then len((import tcsts)):(1)
-given sd_note_fixture ("P"):() then len((import tcsts)):(0)
+given sd_note_fixture {
+  ("nope"):() then len((import tcsts)):(0)
+  ("W"):() then len((import tcsts)):(1)
+  ("P"):() then len((import tcsts)):(0)
+}
 

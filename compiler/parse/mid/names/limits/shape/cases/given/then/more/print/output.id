@@ -8,8 +8,10 @@ fit_then_print(int chk_node) {
   int[] items = (import nl1)[chk_node];
   fit_one(ci, items, "a 'prints' or 'eprints' check compares exactly one value, not ", "string");
 } return void;
-given print_fixture ((import fixture_print_node)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
-given print_fixture ((import fixture_print_empty)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
+given print_fixture {
+  ((import fixture_print_node)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
+  ((import fixture_print_empty)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
+}
 
 // Exactly one value of a type, or the case is refused with `msg` and the count:
 // a prints/eprints check holds one string, a calls count one int.

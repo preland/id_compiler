@@ -7,8 +7,10 @@ fwd_decl_ok2(int retvar, int callid, int stmt) {
     ok = fwd_decl_ok3(retvar, callid, stmt);
   }
 } return int ok;
-given farm_d (3, 2, 4):(1)
-given farm_d (-1, 2, 4):(0)
+given farm_d {
+  (3, 2, 4):(1)
+  (-1, 2, 4):(0)
+}
 
 fwd_decl_ok3(int retvar, int callid, int stmt) {
   int ok = 0;
@@ -16,8 +18,10 @@ fwd_decl_ok3(int retvar, int callid, int stmt) {
     ok = 1;
   }
 } return int ok;
-given farm_d (3, 2, 4):(1)
-given farm_d (1, 2, 4):(0)
+given farm_d {
+  (3, 2, 4):(1)
+  (1, 2, 4):(0)
+}
 
 // A plain function named "plain", and one named "main" -- built with
 // fs_build (../tail.id).
@@ -25,7 +29,9 @@ fs_build2() {
   export int fwd_fid_plain = fs_build("plain");
   export int fwd_fid_main = fs_build("main");
 } return void;
-given env_init ():() then calls fs_build:("plain")
-given env_init ():() then calls fs_build:("main")
-given env_init ():() then (import chkfail)[0]:(0)
-given env_init ():() then init_units:(0)
+given env_init {
+  ():() then calls fs_build:("plain")
+  ():() then calls fs_build:("main")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

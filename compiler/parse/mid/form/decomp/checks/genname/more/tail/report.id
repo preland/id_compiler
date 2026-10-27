@@ -8,12 +8,16 @@ genname_report(int i, string name) {
   string gn_loc = diag_prog_loc(i);
   diag("E0310", gn_loc, gn_msg, name, (import gnd_why), (import gnd_help));
 } return void;
-given farm_i (0, "v2"):() then prints:("test.id:7: error: parameter 'v2' of 'fwd1' has a generated name [E0310]\n  at: v2\n  why: a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it\n  help: rename the parameter to what it holds, in the signature and at every use of it in the body\n") then (import chkfail)[0]:(1)
-given farm_i (0, "ret_i"):() then prints:("test.id:7: error: parameter 'ret_i' of 'fwd1' has a generated name [E0310]\n  at: ret_i\n  why: a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it\n  help: rename the parameter to what it holds, in the signature and at every use of it in the body\n") then (import chkfail)[0]:(1)
+given farm_i {
+  (0, "v2"):() then prints:("test.id:7: error: parameter 'v2' of 'fwd1' has a generated name [E0310]\n  at: v2\n  why: a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it\n  help: rename the parameter to what it holds, in the signature and at every use of it in the body\n") then (import chkfail)[0]:(1)
+  (0, "ret_i"):() then prints:("test.id:7: error: parameter 'ret_i' of 'fwd1' has a generated name [E0310]\n  at: ret_i\n  why: a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it\n  help: rename the parameter to what it holds, in the signature and at every use of it in the body\n") then (import chkfail)[0]:(1)
+}
 
 genname_msg(int i, string name) {
   string fname = (import ns1)[((import prog)[i])];
   string ret_s = "parameter '" + name + "' of '" + fname + "' has a generated name";
 } return string ret_s;
-given farm_i (0, "v2"):("parameter 'v2' of 'fwd1' has a generated name")
-given farm_i (0, "ret_i"):("parameter 'ret_i' of 'fwd1' has a generated name")
+given farm_i {
+  (0, "v2"):("parameter 'v2' of 'fwd1' has a generated name")
+  (0, "ret_i"):("parameter 'ret_i' of 'fwd1' has a generated name")
+}

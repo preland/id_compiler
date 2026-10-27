@@ -8,16 +8,20 @@ lw_clo_set(int o, int fn, int idx, int i, int a) {
   int cellv = lw_clo_cell(a, pt);
   lw_callf(clo_setter(pt), "string", [o, idx, cellv]);
 } return void;
-given lw_clo_fixture (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[0]:("7")
-given lw_clo_fixture (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[2]:("id_clo_set")
+given lw_clo_fixture {
+  (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[0]:("7")
+  (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[2]:("id_clo_set")
+}
 
 lw_clo_cell(int a, string pt) {
   int v = lw_as(a, pt);
   int cpy = lw_clo_copy(v, pt);
   int ret_i = lw_box(cpy, pt);
 } return int ret_i;
-given lw_clo_fixture ((import lb_lit), "int"):(1) then (import iop)[1]:("sext")
-given lw_clo_fixture ((import lb_lit), "float"):(2) then (import istr)[2]:("id_box_f")
+given lw_clo_fixture {
+  ((import lb_lit), "int"):(1) then (import iop)[1]:("sext")
+  ((import lb_lit), "float"):(2) then (import istr)[2]:("id_box_f")
+}
 
 lw_clo_copy(int v, string pt) {
   int ret_i = v;
@@ -25,5 +29,7 @@ lw_clo_copy(int v, string pt) {
     ret_i = lw_callf("id_clo_copy", pt, [v]);
   }
 } return int ret_i;
-given lw_clo_fixture (5, "int[]"):(0) then (import istr)[0]:("id_clo_copy")
-given lw_clo_fixture (5, "string"):(5)
+given lw_clo_fixture {
+  (5, "int[]"):(0) then (import istr)[0]:("id_clo_copy")
+  (5, "string"):(5)
+}

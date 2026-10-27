@@ -21,9 +21,11 @@ tc_dir_rows(int ci) {
     ci = ci + 1;
   }
 } return void;
-given ur_t (3):() then prints:("    idtc_dir[3] = \"/tmp/r0\";\n")
-given ur_t (0):() then calls emit_dir_row:(0) then calls emit_dir_row:(3) then calls emit_dir_row:[4]
-given ur_t (4):() then prints:("")
+given ur_t {
+  (3):() then prints:("    idtc_dir[3] = \"/tmp/r0\";\n")
+  (0):() then calls emit_dir_row:(0) then calls emit_dir_row:(3) then calls emit_dir_row:[4]
+  (4):() then prints:("")
+}
 
 emit_dir_row(int ci) {
   string cr = case_root(ci);

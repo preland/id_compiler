@@ -8,8 +8,10 @@ report_var_type(string name, string type, string prev, string owner, int ln) {
   int type_first_ln = decl_line(name, type_first);
   diag_related(diag_fn_loc(type_first, type_first_ln), "the other declaration, which is " + prev);
 } return void;
-given regrow_d ("x", "string", "int", "g", 20):() then prints:("<stdin>:20: error: variable 'x' is declared string here but int elsewhere [E0303]\n  at: x\n  why: a name must keep one type across the whole program, so that one name always means one kind of value wherever it appears\n  help: rename this variable so that it differs from the other one, or declare both with the same type\n  related: <stdin>:10: note: the other declaration, which is int\n") then (import chkfail)[0]:(1)
-given regrow_d ("x", "word", "float", "f", 10):() then prints:("<stdin>:10: error: variable 'x' is declared word here but float elsewhere [E0303]\n  at: x\n  why: a name must keep one type across the whole program, so that one name always means one kind of value wherever it appears\n  help: rename this variable so that it differs from the other one, or declare both with the same type\n  related: <stdin>:10: note: the other declaration, which is float\n") then (import chkfail)[0]:(1)
+given regrow_d {
+  ("x", "string", "int", "g", 20):() then prints:("<stdin>:20: error: variable 'x' is declared string here but int elsewhere [E0303]\n  at: x\n  why: a name must keep one type across the whole program, so that one name always means one kind of value wherever it appears\n  help: rename this variable so that it differs from the other one, or declare both with the same type\n  related: <stdin>:10: note: the other declaration, which is int\n") then (import chkfail)[0]:(1)
+  ("x", "word", "float", "f", 10):() then prints:("<stdin>:10: error: variable 'x' is declared word here but float elsewhere [E0303]\n  at: x\n  why: a name must keep one type across the whole program, so that one name always means one kind of value wherever it appears\n  help: rename this variable so that it differs from the other one, or declare both with the same type\n  related: <stdin>:10: note: the other declaration, which is float\n") then (import chkfail)[0]:(1)
+}
 
 // The function that exported `name`, from the table collect_exports built.
 export_owner(string name) {
@@ -28,5 +30,7 @@ owner_of(string name) {
     i = i + 1;
   }
 } return string s;
-given regrow_d ("x"):("f")
-given regrow_d ("y"):("")
+given regrow_d {
+  ("x"):("f")
+  ("y"):("")
+}

@@ -11,8 +11,10 @@ tk_meaning(string name, int tkf) {
   int tku = tk_units(tkf);
   string tkm = tkfs + "|" + lookup_var(name, tku / 65536) + "|" + lookup_var(name, tku % 65536);
 } return string tkm;
-given tk_t_prep ("fa", 1):("func(int) return int|int|||")
-given tk_t_prep ("b", 1):("|||int|int")
+given tk_t_prep {
+  ("fa", 1):("func(int) return int|int|||")
+  ("b", 1):("|||int|int")
+}
 
 // Where a function's run of tokens starts: just past the previous function's
 // return clause, or the start of the stream for the first.
@@ -22,9 +24,11 @@ tk_from(int tkf) {
     tkfrom = (import ptoke)[tkf - 1];
   }
 } return int tkfrom;
-given tk_t_prep (1):(18)
-given tk_t_prep (2):(51)
-given tk_t_prep (0):(0)
+given tk_t_prep {
+  (1):(18)
+  (2):(51)
+  (0):(0)
+}
 
 // The unit of the function before this one (the first's own) times 65536,
 // plus this function's unit.
@@ -37,6 +41,8 @@ tk_units(int tkf) {
 } chain (int tkf) {
   int tkuv = tkup * 65536 + tkun;
 } return int tkuv;
-given tk_t_prep given integer_list_set((import nunit), 6, 3) given integer_list_set((import nunit), 21, 2) (1):(196610)
-given tk_t_prep (1):(0)
-given tk_t_prep (0):(0)
+given tk_t_prep {
+  given integer_list_set((import nunit), 6, 3) given integer_list_set((import nunit), 21, 2) (1):(196610)
+  (1):(0)
+  (0):(0)
+}

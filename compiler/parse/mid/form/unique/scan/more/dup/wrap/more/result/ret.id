@@ -21,13 +21,17 @@ cw_get(string name) {
     i = i + 1;
   }
 } return string val;
-given cw_named_fixture ("x"):("I3")
-given cw_named_fixture ("q"):("")
+given cw_named_fixture {
+  ("x"):("I3")
+  ("q"):("")
+}
 
 cw_pick(int i, string name, string val) {
   if((import cw_names)[i] == name) {
     val = (import cw_vals)[i];
   }
 } return string val;
-given cw_named_fixture (0, "x", ""):("I3")
-given cw_named_fixture (0, "q", "prev"):("prev")
+given cw_named_fixture {
+  (0, "x", ""):("I3")
+  (0, "q", "prev"):("prev")
+}

@@ -25,6 +25,8 @@ fix_wedges(int f, int lo) {
     f = f + 1;
   }
 } return void;
-given fix_wbuild_fixture (0, 1):() then calls fix_wfunc:(0, 1)
-given fix_wbuild_fixture (0, 5):() then calls fix_wfunc:(0, 5)
-given fix_wbuild_fixture (1, 1):() then calls fix_wfunc:[0]
+given fix_wbuild_fixture {
+  (0, 1):() then calls fix_wfunc:(0, 1)
+  (0, 5):() then calls fix_wfunc:(0, 5)
+  (1, 1):() then calls fix_wfunc:[0]
+}

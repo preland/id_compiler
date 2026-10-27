@@ -13,8 +13,10 @@ esc_pflags(int fn, string nm) {
     r = r | esc_expr((import ni1)[fn], nm, 1);
   }
 } return int r;
-given esc_fix ((import efe_fn), "p"):(0)
-given esc_fix ((import efb_fn), "p"):(513)
+given esc_fix {
+  ((import efe_fn), "p"):(0)
+  ((import efb_fn), "p"):(513)
+}
 
 esc_pstmts(int fn, string nm) {
   int[] dz_st = (import nl2)[fn];
@@ -28,8 +30,10 @@ esc_pstmts(int fn, string nm) {
     i = i + 1;
   }
 } return int[] dz_out;
-given esc_fix ((import efe_fn), "p"):([(import efe_dn)])
-given esc_fix ((import efb_fn), "p"):((import efb_stmts))
+given esc_fix {
+  ((import efe_fn), "p"):([(import efe_dn)])
+  ((import efb_fn), "p"):((import efb_stmts))
+}
 
 esc_alias(int fn, int sn, string nm) {
   int ok = 0;
@@ -37,6 +41,8 @@ esc_alias(int fn, int sn, string nm) {
     ok = esc_isvar(imp_root((import ni1)[sn]), nm) && esc_ro(fn, (import ns2)[sn]);
   }
 } return int ok;
-given esc_fix ((import efb_fn), (import efb_dv), "p"):(0)
-given esc_fix ((import efe_fn), (import efe_dq), "p"):(1)
+given esc_fix {
+  ((import efb_fn), (import efb_dv), "p"):(0)
+  ((import efe_fn), (import efe_dq), "p"):(1)
+}
 

@@ -8,13 +8,17 @@ parse_atom3(int[] pos) {
     node = parse_ident_or_call(pos);
   }
 } return int node;
-given atom_tokens ([20]):(0)
-given atom_tokens ([0]):(3)
+given atom_tokens {
+  ([20]):(0)
+  ([0]):(3)
+}
 
 parse_import(int[] pos) {
   advance(pos);
   string name = read_name(pos);
   int ret_i = node_txt("import", name);
 } return int ret_i;
-given atom_tokens ([20]):(0)
-given atom_tokens ([2]):(0)
+given atom_tokens {
+  ([20]):(0)
+  ([2]):(0)
+}

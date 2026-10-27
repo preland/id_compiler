@@ -50,10 +50,12 @@ esc_ff_b() {
   export int eff_d0 = node_decl("int[]", "r", node_arr((import ef_none)), 0);
   export int eff_rec = node_func("ff_rec", "int[]", (import eff_np), [(import eff_d0), (import eff_if)], (import eff_vr));
 } return void;
-given esc_ffix ():() then calls node_func:("ff_glob", "int[]", (import eff_np), [(import eff_dr), (import eff_dx)], (import eff_vr)) then calls node_call:("ff_rec", [(import eff_sub)]) then calls node_txt1:("assign", "r", (import eff_crec))
-given esc_ffix ():() then calls node_txt2:("int", "0", 0, 0) then calls node_if:((import eff_cond), [(import eff_asr)], (import ef_none), 0)
-given esc_ffix ():() then (import chkfail)[0]:(0)
-given esc_ffix ():() then init_units:(0)
+given esc_ffix {
+  ():() then calls node_func:("ff_glob", "int[]", (import eff_np), [(import eff_dr), (import eff_dx)], (import eff_vr)) then calls node_call:("ff_rec", [(import eff_sub)]) then calls node_txt1:("assign", "r", (import eff_crec))
+  ():() then calls node_txt2:("int", "0", 0, 0) then calls node_if:((import eff_cond), [(import eff_asr)], (import ef_none), 0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_ff_c() {
   export int eff_cpo = node_call("ff_pong", [(import eff_sub)]);
@@ -67,7 +69,9 @@ esc_ff_c() {
   export int eff_ping = node_func("ff_ping", "int[]", (import eff_np), [(import eff_d0), (import eff_ifp)], (import eff_vr));
   export int eff_pong = node_func("ff_pong", "int[]", (import eff_np), [(import eff_d0), (import eff_ifo)], (import eff_vr));
 } return void;
-given esc_ffix ():() then calls node_call:("ff_pong", [(import eff_sub)]) then calls node_txt1:("assign", "r", (import eff_cpo)) then calls node_call:("ff_ping", [(import eff_sub)])
-given esc_ffix ():() then calls node_func:("ff_ping", "int[]", (import eff_np), [(import eff_d0), (import eff_ifp)], (import eff_vr)) then calls node_func:("ff_pong", "int[]", (import eff_np), [(import eff_d0), (import eff_ifo)], (import eff_vr))
-given esc_ffix ():() then (import chkfail)[0]:(0)
-given esc_ffix ():() then init_units:(0)
+given esc_ffix {
+  ():() then calls node_call:("ff_pong", [(import eff_sub)]) then calls node_txt1:("assign", "r", (import eff_cpo)) then calls node_call:("ff_ping", [(import eff_sub)])
+  ():() then calls node_func:("ff_ping", "int[]", (import eff_np), [(import eff_d0), (import eff_ifp)], (import eff_vr)) then calls node_func:("ff_pong", "int[]", (import eff_np), [(import eff_d0), (import eff_ifo)], (import eff_vr))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

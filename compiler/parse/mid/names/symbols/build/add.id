@@ -7,8 +7,10 @@ sym_func(int id) {
     add_func(s1_of_v, s2_of_v, id);
   }
 } return void;
-given fn_idx_fixture ((import fixture_fn)):() then len((import fnames)):(2)
-given fn_idx_fixture ((import fixture_zero)):() then len((import fnames)):(1)
+given fn_idx_fixture {
+  ((import fixture_fn)):() then len((import fnames)):(2)
+  ((import fixture_zero)):() then len((import fnames)):(1)
+}
 
 // The unit comes along because the table is keyed by it: a name may be an int
 // in the program and a string in an imported library, and a lookup has to know

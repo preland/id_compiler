@@ -8,8 +8,10 @@ acc_while_body(int id, string owner) {
   int[] l1_of_v = (import nl1)[id];
   acc_block(l1_of_v, owner);
 } return void;
-given loopfix ((import rgwhile_node), "f"):() then calls acc_block:((import rgdeclist), "f")
-given loopfix ((import rgwhile_node), "g"):() then calls acc_block:((import rgdeclist), "g")
+given loopfix {
+  ((import rgwhile_node), "f"):() then calls acc_block:((import rgdeclist), "f")
+  ((import rgwhile_node), "g"):() then calls acc_block:((import rgdeclist), "g")
+}
 
 acc_block(int[] stmts, string owner) {
   int keep = len((import scnames));
@@ -18,6 +20,8 @@ acc_block(int[] stmts, string owner) {
     pop((import scnames));
   }
 } return void;
-given scnames_fix ((import rgdeclist), "f"):() then calls acc_list:((import rgdeclist), "f")
-given scnames_fix ([], "f"):() then calls acc_list:([], "f")
+given scnames_fix {
+  ((import rgdeclist), "f"):() then calls acc_list:((import rgdeclist), "f")
+  ([], "f"):() then calls acc_list:([], "f")
+}
 

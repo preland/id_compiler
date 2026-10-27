@@ -32,5 +32,7 @@ vocab_export_loc(int vocab_row, string vocab_name) {
   int vocab_at = decl_line(vocab_name, vocab_owner);
   string vocab_where = diag_fn_loc(vocab_owner, vocab_at);
 } return string vocab_where;
-given vocab_world (0, "g"):("<stdin>:0")
-given vocab_world (0, "x"):("<stdin>:10")
+given vocab_world {
+  (0, "g"):("<stdin>:0")
+  (0, "x"):("<stdin>:10")
+}

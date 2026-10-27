@@ -14,8 +14,10 @@ cw_stmts(int[] stmts) {
     i = i + 1;
   }
 } return int ok;
-given cw_decl_fixture ((import cw_decl_list)):(1)
-given cw_decl_fixture ((import cw_func_list)):(0)
+given cw_decl_fixture {
+  ((import cw_decl_list)):(1)
+  ((import cw_func_list)):(0)
+}
 
 cw_stmt(int id) {
   int ok = 0;
@@ -27,8 +29,10 @@ cw_stmt(int id) {
     ok = cw_assign(id);
   }
 } return int ok;
-given cw_decl_fixture ((import cw_decl_x)):(1)
-given cw_decl_fixture ((import cwv_func)):(0)
+given cw_decl_fixture {
+  ((import cw_decl_x)):(1)
+  ((import cwv_func)):(0)
+}
 
 // "x = 4" once "x" is declared, and "y = 5" while it is not -- for
 // ../val.id's cw_assign.

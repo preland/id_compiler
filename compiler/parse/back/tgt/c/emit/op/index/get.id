@@ -37,5 +37,7 @@ emit_fpos(int id) {
   string sd_f = (import ns1)[((import ni2)[id])];
   string sd_c = "" + sd_fpos(sd_bt, sd_f);
 } return string sd_c;
-given sd_use_fixture ((import sd_ix)):("0")
-given sd_use_fixture ((import sd_iy)):("1")
+given sd_use_fixture {
+  ((import sd_ix)):("0")
+  ((import sd_iy)):("1")
+}

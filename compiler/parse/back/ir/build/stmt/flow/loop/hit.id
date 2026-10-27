@@ -27,5 +27,7 @@ lv_slots() {
   int lvf_b = lw_alloca("int", "lan");
   int lvf_c = lw_alloca("int", "laj");
 } return void;
-given lw_env_fixture ():() then (import lwvar):(["lav", "lan", "laj"])
-given lw_env_fixture ():() then len((import lwslot)):(3)
+given lw_env_fixture {
+  ():() then (import lwvar):(["lav", "lan", "laj"])
+  ():() then len((import lwslot)):(3)
+}

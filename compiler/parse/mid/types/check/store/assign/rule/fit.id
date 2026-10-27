@@ -11,9 +11,11 @@ minus_operand(int e) {
     operand_node = (import ni1)[e];
   }
 } return int operand_node;
-given wide_literal_fixture ((import negated_edge)):((import literal_edge))
-given wide_literal_fixture ((import negated_past)):((import literal_past))
-given wide_literal_fixture ((import literal_huge)):((import literal_huge))
+given wide_literal_fixture {
+  ((import negated_edge)):((import literal_edge))
+  ((import negated_past)):((import literal_past))
+  ((import literal_huge)):((import literal_huge))
+}
 
 int_too_wide(int e) {
   int operand_node = minus_operand(e);
@@ -26,11 +28,13 @@ int_too_wide(int e) {
     too_wide = 0;
   }
 } return int too_wide;
-given wide_literal_fixture ((import literal_huge)):(1)
-given wide_literal_fixture ((import negated_edge)):(0)
-given wide_literal_fixture ((import negated_past)):(1)
-given wide_literal_fixture ((import literal_edge)):(1)
-given wide_literal_fixture ((import lit_a)):(0)
+given wide_literal_fixture {
+  ((import literal_huge)):(1)
+  ((import negated_edge)):(0)
+  ((import negated_past)):(1)
+  ((import literal_edge)):(1)
+  ((import lit_a)):(0)
+}
 
 literal_spelling(int e) {
   int operand_node = minus_operand(e);
@@ -39,5 +43,7 @@ literal_spelling(int e) {
     spelling = "-" + spelling;
   }
 } return string spelling;
-given wide_literal_fixture ((import negated_edge)):("-2147483648")
-given wide_literal_fixture ((import literal_huge)):("3000000000")
+given wide_literal_fixture {
+  ((import negated_edge)):("-2147483648")
+  ((import literal_huge)):("3000000000")
+}

@@ -16,8 +16,10 @@ ixw_type_name(string ixw_kd, int ixw_id) {
     ixw_t = ixw_base((import ns2)[ixw_id]);
   }
 } return string ixw_t;
-given ixn_fx ("decl", (import ixn_decl)):("Point")
-given ixn_fx ("call", (import ixn_call)):("")
+given ixn_fx {
+  ("decl", (import ixn_decl)):("Point")
+  ("call", (import ixn_call)):("")
+}
 
 ixw_base(string ixw_t) {
   while(string_ends_with(ixw_t, "[]") == 1) {

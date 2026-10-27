@@ -7,13 +7,17 @@ esc_fresh_node(int e) {
     ok = 1;
   }
 } return int ok;
-given esc_ffix ((import eff_cmk)):(1)
-given esc_ffix ((import eff_cbad)):(0)
-given esc_ffix ((import eff_ctor)):(1)
+given esc_ffix {
+  ((import eff_cmk)):(1)
+  ((import eff_cbad)):(0)
+  ((import eff_ctor)):(1)
+}
 
 esc_ctor(int e) {
   int ok = (import nkind)[e] == "call" && find_str((import sdname), (import ns1)[e]) >= 0;
 } return int ok;
-given esc_ffix ((import eff_ctor)):(1)
-given esc_ffix ((import eff_cmk)):(0)
-given esc_ffix ((import eff_vn)):(0)
+given esc_ffix {
+  ((import eff_ctor)):(1)
+  ((import eff_cmk)):(0)
+  ((import eff_vn)):(0)
+}

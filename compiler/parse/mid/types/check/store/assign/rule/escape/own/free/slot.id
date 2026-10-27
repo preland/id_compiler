@@ -16,11 +16,13 @@ esc_slot_of(string slot_ty) {
     slot_f = "id_bytes_free";
   }
 } return string slot_f;
-given esc_ty_fix ("bytes[]"):("id_bytes_free")
-given esc_ty_fix ("int[][]"):("id_list_free")
-given esc_ty_fix ("string[]"):("id_str_free")
-given esc_ty_fix ("int[]"):("")
-given esc_ty_fix ("Tr"):("")
+given esc_ty_fix {
+  ("bytes[]"):("id_bytes_free")
+  ("int[][]"):("id_list_free")
+  ("string[]"):("id_str_free")
+  ("int[]"):("")
+  ("Tr"):("")
+}
 
 // The runtime call that frees what the index assignment `slot_n` replaces, or
 // "" when its list is not deep-owned and the old element stays unfreed.
@@ -31,10 +33,12 @@ esc_slot_fn(int slot_fn, int slot_n) {
     slot_f = esc_slot_deep(slot_fn, (import ns1)[slot_b]);
   }
 } return string slot_f;
-given esc_dfix (-1, (import efd_ia)):("")
-given esc_dfix ((import efd_good), (import efd_ia)):("id_list_free")
-given esc_dfix ((import efd_leak), (import efd_ia)):("")
-given esc_dfix ((import efd_good), (import efd_setl)):("")
+given esc_dfix {
+  (-1, (import efd_ia)):("")
+  ((import efd_good), (import efd_ia)):("id_list_free")
+  ((import efd_leak), (import efd_ia)):("")
+  ((import efd_good), (import efd_setl)):("")
+}
 
 esc_slot_deep(int slot_fn, string slot_nm) {
   string slot_f = "";
@@ -42,6 +46,8 @@ esc_slot_deep(int slot_fn, string slot_nm) {
     slot_f = esc_slot_of(esc_decl_type((import nl2)[slot_fn], slot_nm));
   }
 } return string slot_f;
-given esc_dfix ((import efd_good), "a"):("id_list_free")
-given esc_dfix ((import efd_leak), "b"):("")
-given esc_dfix ((import efd_good), "zz"):("")
+given esc_dfix {
+  ((import efd_good), "a"):("id_list_free")
+  ((import efd_leak), "b"):("")
+  ((import efd_good), "zz"):("")
+}

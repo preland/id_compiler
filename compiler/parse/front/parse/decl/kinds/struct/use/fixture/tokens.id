@@ -13,5 +13,7 @@ sd_last_nf() {
   int sd_i = len((import sdname)) - 1;
   int sd_k = len((import sdfname)[sd_i]);
 } return int sd_k;
-given sd_pair ():(1)
-given sd_pair given sd_note("T", ["a", "b"], ["int", "int"], "t.id", 7) ():(2)
+given sd_pair {
+  ():(1)
+  given sd_note("T", ["a", "b"], ["int", "int"], "t.id", 7) ():(2)
+}

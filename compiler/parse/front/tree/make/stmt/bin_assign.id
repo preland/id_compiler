@@ -1,5 +1,7 @@
 node_exprstmt(int expr) {
   int ret_i = newleaf("exprstmt", expr, 0, "", "");
 } return int ret_i;
-given full_env (5):(0) then calls newleaf:("exprstmt", 5, 0, "", "")
-given full_env (6):(0) then calls newleaf:("exprstmt", 6, 0, "", "")
+given full_env {
+  (5):(0) then calls newleaf:("exprstmt", 5, 0, "", "")
+  (6):(0) then calls newleaf:("exprstmt", 6, 0, "", "")
+}

@@ -12,11 +12,13 @@ lp_clean(int lq_lo, int lq_hi) {
     lq_i = lq_i + 1;
   }
 } return int lq_r;
-given lpf_more ((import lpf_loa), (import lpf_hia)):(1)
-given lpf_more ((import lpf_loc), (import lpf_hic)):(0)
-given lpf_more ((import lpf_lof), (import lpf_hif)):(0)
-given lpf_more ((import lpf_log), (import lpf_hig)):(1)
-given lpf_more ((import lpf_loy), (import lpf_hiy)):(0)
+given lpf_more {
+  ((import lpf_loa), (import lpf_hia)):(1)
+  ((import lpf_loc), (import lpf_hic)):(0)
+  ((import lpf_lof), (import lpf_hif)):(0)
+  ((import lpf_log), (import lpf_hig)):(1)
+  ((import lpf_loy), (import lpf_hiy)):(0)
+}
 
 lp_clear(int lq_id) {
   int lq_r = 1;
@@ -27,8 +29,10 @@ lp_clear(int lq_id) {
     lq_r = 1 - lp_cls((import ns1)[lq_id]);
   }
 } return int lq_r;
-given lpf_more ((import lpf_xa)):(1)
-given lpf_more ((import lpf_wi)):(0)
-given lpf_more ((import lpf_kc)):(0)
-given lpf_more ((import lpf_kg)):(1)
-given lpf_more ((import lpf_kh)):(0)
+given lpf_more {
+  ((import lpf_xa)):(1)
+  ((import lpf_wi)):(0)
+  ((import lpf_kc)):(0)
+  ((import lpf_kg)):(1)
+  ((import lpf_kh)):(0)
+}

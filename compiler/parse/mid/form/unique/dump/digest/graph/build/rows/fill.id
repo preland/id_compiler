@@ -32,8 +32,10 @@ dg_fill_one(int dgf) {
   int dgn = dg_nat_class(dgf, (import ns1)[((import prog)[dgf])]);
   dg_add(dgo, dgn);
 } return void;
-given dg_t_rows0 (0):() then dg_nfn:(1) then len((import dg_comp)):(1)
-given dg_t_rows0 (1):() then dg_nfn:(1) then (import dg_nat)[0]:(0)
+given dg_t_rows0 {
+  (0):() then dg_nfn:(1) then len((import dg_comp)):(1)
+  (1):() then dg_nfn:(1) then (import dg_nat)[0]:(0)
+}
 
 dg_add(word dgo, int dgn) {
   push((import dg_own), dgo);

@@ -30,5 +30,7 @@ arr_lit(int[] elems, string etyp) {
   string cells = arr_cells(elems, etyp);
   string ret_s = "id_list_lit(" + len(elems) + ", " + cells + ")";
 } return string ret_s;
-given lit_cells_fixture ((import lit_cells_xs), "int"):("id_list_lit(2, (long long)(5), (long long)(4))")
-given lit_cells_fixture ((import lit_cells_xs), "string"):("id_list_lit(2, (long long)(intptr_t)(5), (long long)(intptr_t)(4))")
+given lit_cells_fixture {
+  ((import lit_cells_xs), "int"):("id_list_lit(2, (long long)(5), (long long)(4))")
+  ((import lit_cells_xs), "string"):("id_list_lit(2, (long long)(intptr_t)(5), (long long)(intptr_t)(4))")
+}

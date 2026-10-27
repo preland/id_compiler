@@ -6,5 +6,7 @@ init_tyc_rows3() {
   push((import tyc), "IdBytes*");
   push((import tyc), "int");
 } return void;
-given lc_env2 ():() then len((import tyc)):(10) then (import tyc)[8]:("IdBytes*") then (import tyc)[9]:("int")
-given lc_env2 ():() then (import tyc)[7]:("void")
+given lc_env2 {
+  ():() then len((import tyc)):(10) then (import tyc)[8]:("IdBytes*") then (import tyc)[9]:("int")
+  ():() then (import tyc)[7]:("void")
+}

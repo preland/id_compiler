@@ -10,8 +10,10 @@ fv_adapter(int fn, string name, int nd) {
 } chain (int fn, string name, int nd) {
   string s = head + fv_retw + call + " }";
 } return string s;
-given clo_fixture ((import fixture_fn), "fx_target", 0):("int idfn_a_fx_target__0(IdFn* c, int a0) { return id_fx_target(a0); }")
-given clo_fixture ((import fixture_fn), "fx_target", 1):("int idfn_a_fx_target__1(IdFn* c) { return id_fx_target((int)(ID_FNC(c)[0])); }")
+given clo_fixture {
+  ((import fixture_fn), "fx_target", 0):("int idfn_a_fx_target__0(IdFn* c, int a0) { return id_fx_target(a0); }")
+  ((import fixture_fn), "fx_target", 1):("int idfn_a_fx_target__1(IdFn* c) { return id_fx_target((int)(ID_FNC(c)[0])); }")
+}
 
 fv_params(int fn, int nd) {
   string out = "";
@@ -21,8 +23,10 @@ fv_params(int fn, int nd) {
     i = i + 1;
   }
 } return string out;
-given clo_fixture ((import fixture_fn), 0):(", int a0")
-given clo_fixture ((import fixture_fn), 1):("")
+given clo_fixture {
+  ((import fixture_fn), 0):(", int a0")
+  ((import fixture_fn), 1):("")
+}
 
 fv_args(int fn, int nd) {
   string out = "";
@@ -32,5 +36,7 @@ fv_args(int fn, int nd) {
     i = i + 1;
   }
 } return string out;
-given clo_fixture ((import fixture_fn), 0):("a0")
-given clo_fixture ((import fixture_fn), 1):("(int)(ID_FNC(c)[0])")
+given clo_fixture {
+  ((import fixture_fn), 0):("a0")
+  ((import fixture_fn), 1):("(int)(ID_FNC(c)[0])")
+}

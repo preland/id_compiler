@@ -39,5 +39,7 @@ is_plain(int e) {
     ok = 1;
   }
 } return int ok;
-given elif_fixture ((import ev_node)):(1)
-given elif_fixture ((import if_node)):(0)
+given elif_fixture {
+  ((import ev_node)):(1)
+  ((import if_node)):(0)
+}

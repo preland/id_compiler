@@ -68,7 +68,9 @@ then_imp_clause(int[] pos) {
   }
   then_imp_store(kd, e, items, imp_ix);
 } return void;
-given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [1], [])
-given env_init given toks_push(["op", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "2", "]", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [2], [1])
-given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "(", "import", "kk", ")", "]", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [2], [1])
-given env_init given toks_push(["ident", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["len", "(", "(", "import", "zz", ")", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenlen", 0, [1], [])
+given env_init {
+  given toks_push(["op", "kw", "ident", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [1], [])
+  given toks_push(["op", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "2", "]", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [2], [1])
+  given toks_push(["op", "kw", "ident", "op", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "(", "import", "kk", ")", "]", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [2], [1])
+  given toks_push(["ident", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["len", "(", "(", "import", "zz", ")", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenlen", 0, [1], [])
+}

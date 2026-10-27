@@ -19,5 +19,7 @@ bfl_tail(int bfl_f, string bfl_nm) {
     bfl_text = ", and return bool";
   }
 } return string bfl_text;
-given bfl_fixture (1, "fx_flag"):(", and return bool")
-given bfl_fixture (1, "other"):("")
+given bfl_fixture {
+  (1, "fx_flag"):(", and return bool")
+  (1, "other"):("")
+}

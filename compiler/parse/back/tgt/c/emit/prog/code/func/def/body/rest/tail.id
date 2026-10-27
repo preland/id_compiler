@@ -3,16 +3,20 @@ emit_tail_end(int id) {
   emit_ret(id);
   print("}");
 } return void;
-given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
-given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")
+given nz_prog_fixture {
+  ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
+  ((import nz_plainfn)):() then prints:("    return;\n}\n")
+}
 
 emit_tail2(int id) {
   int[] l2_of_v = (import nl2)[id];
   emit_block(l2_of_v, "    ");
   emit_tail_end(id);
 } return void;
-given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
-given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")
+given nz_prog_fixture {
+  ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
+  ((import nz_plainfn)):() then prints:("    return;\n}\n")
+}
 
 // `c_rettype id_NAME(params)`
 sig(int id) {
@@ -20,5 +24,7 @@ sig(int id) {
   string sym_v = fn_sym((import ns1)[id]);
   string s = c_type(s2_of_v) + " " + sym_v + "(" + param_str(id) + ")";
 } return string s;
-given nz_prog_fixture ((import nz_mainfn)):("int id_main(int argc)")
-given nz_prog_fixture ((import nz_plainfn)):("void id_run(void)")
+given nz_prog_fixture {
+  ((import nz_mainfn)):("int id_main(int argc)")
+  ((import nz_plainfn)):("void id_run(void)")
+}

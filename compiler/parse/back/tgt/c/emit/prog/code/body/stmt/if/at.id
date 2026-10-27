@@ -7,8 +7,10 @@ cond_text_of(int if_id) {
   int cond_id = (import ni1)[if_id];
   string cond_text = emit_expr(cond_id);
 } return string cond_text;
-given stmt_fix (4):("5")
-given stmt_fix (3):("5")
+given stmt_fix {
+  (4):("5")
+  (3):("5")
+}
 
 // The state emit_def (func/def/body/def.id) leaves while it emits the body
 // of a function whose node is 20, for sq_name's own cases (body/hoist/

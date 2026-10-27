@@ -52,5 +52,7 @@ lp_reset() {
 } chain () {
   export int[] lphv = [];
 } return void export lpset;
-given lpf_on ():() then lpf_nset:(0)
-given lpf_on ():() then lpf_flag:(1)
+given lpf_on {
+  ():() then lpf_nset:(0)
+  ():() then lpf_flag:(1)
+}

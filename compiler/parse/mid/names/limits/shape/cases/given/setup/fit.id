@@ -31,8 +31,10 @@ given_prefix(int i, int si) {
     giv_k = giv_k + 1;
   }
 } return string giv_out;
-given impcase_given (0, 0):("")
-given impcase_given (0, 1):("fx_setup ")
+given impcase_given {
+  (0, 0):("")
+  (0, 1):("fx_setup ")
+}
 
 // Every `(import NAME)` a case writes -- an argument, an expected value, a
 // `then` check -- is held to the rule of chk_own_import (../../more/flag/

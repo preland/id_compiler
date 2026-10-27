@@ -23,8 +23,10 @@ nat_scan(string kind, int all) {
     f = f + 1;
   }
 } return void;
-given natcall_fixture ("program", 1):() then calls nat_func:("program", 1, 0, 0)
-given natcall_fixture ("program", 1):() then len((import natrow)):(0)
+given natcall_fixture {
+  ("program", 1):() then calls nat_func:("program", 1, 0, 0)
+  ("program", 1):() then len((import natrow)):(0)
+}
 
 // One function's nodes, the same range reach_func walks, when the build asked
 // for the list and the function is live.
@@ -35,8 +37,10 @@ nat_func(string kind, int all, int f, int lo) {
   }
   int ret_i = (import prog)[f] + 1;
 } return int ret_i;
-given natcall_fixture ("program", 1, 0, 0):(2) then calls nat_range:[1]
-given natcall_fixture ("program", 0, 0, 0):(2) then calls nat_range:[0]
+given natcall_fixture {
+  ("program", 1, 0, 0):(2) then calls nat_range:[1]
+  ("program", 0, 0, 0):(2) then calls nat_range:[0]
+}
 
 nat_range(string kind, int lo, int hi) {
   while(lo <= hi) {
@@ -44,5 +48,7 @@ nat_range(string kind, int lo, int hi) {
     lo = lo + 1;
   }
 } return void;
-given natcall_fixture ("harness", (import natcall_node), (import natcall_node)):() then len((import natrow)):(1)
-given natcall_fixture ("program", 1, 0):() then len((import natrow)):(0)
+given natcall_fixture {
+  ("harness", (import natcall_node), (import natcall_node)):() then len((import natrow)):(1)
+  ("program", 1, 0):() then len((import natrow)):(0)
+}

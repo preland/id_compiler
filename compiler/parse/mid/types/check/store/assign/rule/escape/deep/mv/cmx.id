@@ -9,9 +9,11 @@ esc_cmpick(int[] cmv_as, int cmv_j, int cmv_k, string nm) {
     cmv_r = cmv_as[cmv_k];
   }
 } return int cmv_r;
-given esc_cm_fix ((import ecm_as), 0, 1, "mrows"):(50)
-given esc_cm_fix ((import ecm_as), 0, 1, "mn"):(-1)
-given esc_cm_fix ((import ecm_as), 7, 1, "mrows"):(-1)
+given esc_cm_fix {
+  ((import ecm_as), 0, 1, "mrows"):(50)
+  ((import ecm_as), 0, 1, "mn"):(-1)
+  ((import ecm_as), 7, 1, "mrows"):(-1)
+}
 
 // The context of argument `cmv_i` of a call to `cname` when the summary said
 // `cmv_c`: 512 (a keeper that a list of lists may take over, as for push) when
@@ -26,10 +28,12 @@ esc_cmctx(int[] cmv_as, string cname, int cmv_i, int cmv_c) {
     cmv_r = 256;
   }
 } return int cmv_r;
-given esc_cm_fix ((import ecm_as), "cm_ok", 1, 1):(512)
-given esc_cm_fix ((import ecm_as), "cm_ok", 0, 8):(256)
-given esc_cm_fix ((import ecm_as), "cm_bad", 1, 1):(1)
-given esc_cm_fix ((import ecm_as), "cm_bad", 0, 8):(8)
+given esc_cm_fix {
+  ((import ecm_as), "cm_ok", 1, 1):(512)
+  ((import ecm_as), "cm_ok", 0, 8):(256)
+  ((import ecm_as), "cm_bad", 1, 1):(1)
+  ((import ecm_as), "cm_bad", 0, 8):(8)
+}
 
 // The index of an argument that the callee takes into argument `cmv_i`, or -1.
 esc_cmsrc(int[] cmv_as, string cname, int cmv_i) {
@@ -42,6 +46,8 @@ esc_cmsrc(int[] cmv_as, string cname, int cmv_i) {
     cmv_k = cmv_k + 1;
   }
 } return int cmv_r;
-given esc_cm_fix ((import ecm_as), "cm_ok", 0):(1)
-given esc_cm_fix ((import ecm_as), "cm_ok", 1):(-1)
-given esc_cm_fix ((import ecm_as), "cm_bad", 0):(-1)
+given esc_cm_fix {
+  ((import ecm_as), "cm_ok", 0):(1)
+  ((import ecm_as), "cm_ok", 1):(-1)
+  ((import ecm_as), "cm_bad", 0):(-1)
+}

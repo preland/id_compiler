@@ -18,5 +18,7 @@ bi_sys_msg2(int id, string name, string cw) {
   int argn_v = len(((import nl1)[id]));
   string msg = name + " takes exactly " + cw + ", got " + argn_v;
 } return string msg;
-given bi_mismatch_sys_setup ((import bi_mismatch_sys_call), "ult", "2 arguments"):("ult takes exactly 2 arguments, got 1")
-given bi_mismatch_sys_setup ((import bi_mismatch_sys_call), "alloc", "1 argument"):("alloc takes exactly 1 argument, got 1")
+given bi_mismatch_sys_setup {
+  ((import bi_mismatch_sys_call), "ult", "2 arguments"):("ult takes exactly 2 arguments, got 1")
+  ((import bi_mismatch_sys_call), "alloc", "1 argument"):("alloc takes exactly 1 argument, got 1")
+}

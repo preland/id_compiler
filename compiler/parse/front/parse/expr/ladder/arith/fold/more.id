@@ -7,8 +7,10 @@ fold_add_tail(int[] pos, int left, string op) {
   int right = parse_mul(pos);
   int ret_i = node_txt2("bin", op, left, right);
 } return int ret_i;
-given expr_tokens ([2], 100, "+"):(3)
-given expr_tokens ([6], 100, "+"):(1)
+given expr_tokens {
+  ([2], 100, "+"):(3)
+  ([6], 100, "+"):(1)
+}
 
 unary_or_postfix(int[] pos, string tok_text) {
   int node = 0;

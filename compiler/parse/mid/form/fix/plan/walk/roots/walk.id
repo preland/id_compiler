@@ -5,9 +5,11 @@ fix_walk_roots(int[] roots) {
     i = i + 1;
   }
 } return void;
-given fix_tokline_node_fixture ([0]):() then calls fix_walk:(0, 0, 0, "", "")
-given fix_tokline_node_fixture ([0, 0]):() then len((import fixe_n)):(3)
-given fix_tokline_node_fixture ([]):() then calls fix_walk:[0]
+given fix_tokline_node_fixture {
+  ([0]):() then calls fix_walk:(0, 0, 0, "", "")
+  ([0, 0]):() then len((import fixe_n)):(3)
+  ([]):() then calls fix_walk:[0]
+}
 
 // Post-order is evaluation order (docs/SPEC.md 7): an operator's operands left
 // to right and then the operator, a call's arguments left to right and then
@@ -34,8 +36,10 @@ fix_walk(int e, int ca, int cd, string nt, string an) {
   fix_push_rest(e, lo, cl, cd, nt, an);
   fix_rcache_taint(e);
 } return void;
-given fix_tokline_node_fixture (0, 0, 0, "", ""):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)
-given fix_tokline_node_fixture (0, 1, 0, "int", "x"):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)
+given fix_tokline_node_fixture {
+  (0, 0, 0, "", ""):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)
+  (0, 1, 0, "int", "x"):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)
+}
 
 fix_walk_kids(int e, int cd) {
   if((import nkind)[e] == "call") {
@@ -46,5 +50,7 @@ fix_walk_kids(int e, int cd) {
     fix_walk_more(e, cd);
   }
 } return void;
-given fix_tokline_node_fixture (0, 0):() then calls fix_walk_more:(0, 0)
-given fix_tokline_node_fixture (0, 1):() then calls fix_walk_more:(0, 1)
+given fix_tokline_node_fixture {
+  (0, 0):() then calls fix_walk_more:(0, 0)
+  (0, 1):() then calls fix_walk_more:(0, 1)
+}

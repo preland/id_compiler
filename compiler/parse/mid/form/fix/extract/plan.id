@@ -14,10 +14,12 @@ fix_extract(int xef, int xelo) {
     fix_xattempt(xef, xelo, xtry);
   }
 } return void;
-given fix_xplanned (7, 0):() then calls fix_xplan:(7, 0)
-given fix_xplanned (10, 0):() then calls fix_xattempt:(10, 0, 0)
-given fix_xplanned (10, 0):() then calls fix_xplan:[0]
-given fix_xplanned (7, 0):() then calls fix_xattempt:[1]
+given fix_xplanned {
+  (7, 0):() then calls fix_xplan:(7, 0)
+  (10, 0):() then calls fix_xattempt:(10, 0, 0)
+  (10, 0):() then calls fix_xplan:[0]
+  (7, 0):() then calls fix_xattempt:[1]
+}
 
 fix_xplan(int xpf, int xplo) {
   int xpa = (import nst)[(import fixx_hit)[0]];
@@ -27,8 +29,10 @@ fix_xplan(int xpf, int xplo) {
   string xpwhy = fix_xwhy(xpa, xpb);
   fix_xjudge(xpf, xplo, xpa, xpb, xpwhy);
 } return void;
-given fix_xplanned (7, 0):() then calls fix_xjudge:(7, 0, 1, 6, "")
-given fix_xplanned (8, 0):() then calls fix_xjudge:(8, 0, 1, 6, "")
+given fix_xplanned {
+  (7, 0):() then calls fix_xjudge:(7, 0, 1, 6, "")
+  (8, 0):() then calls fix_xjudge:(8, 0, 1, 6, "")
+}
 
 fix_xlast(int xls) {
   int xlend = (import ntok)[xls];
@@ -36,5 +40,7 @@ fix_xlast(int xls) {
     xlend = xlend + 1;
   }
 } return int xlend;
-given fix_xplanned (4):(6)
-given fix_xplanned (2):(6)
+given fix_xplanned {
+  (4):(6)
+  (2):(6)
+}

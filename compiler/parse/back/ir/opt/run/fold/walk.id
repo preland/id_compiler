@@ -39,6 +39,8 @@ fold_one(int f, int id) {
     fold_cmp(f, id);
   }
 } return void;
-given fold_cmp_fixture (0, (import fcmp_row)):() then calls fold_cmp:(0, (import fcmp_row))
-given fold_cmp_fixture (0, (import fmix_id)):() then calls fold_cmp:(0, (import fmix_id))
-given fold_cmp_fixture (0, (import fq_id)):() then calls fold_cmp:[0]
+given fold_cmp_fixture {
+  (0, (import fcmp_row)):() then calls fold_cmp:(0, (import fcmp_row))
+  (0, (import fmix_id)):() then calls fold_cmp:(0, (import fmix_id))
+  (0, (import fq_id)):() then calls fold_cmp:[0]
+}

@@ -10,8 +10,10 @@ sd_cycle(int sd_i) {
     sd_diag(sd_i, "E0627", "struct '" + sd_nm + "' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('" + sd_nm + "[] items')", sd_nm, "the value would have to exist before it could be made, and a list can be empty where a struct field cannot", "hold a list of it instead ('" + sd_nm + "[] items')");
   }
 } return void;
-given sd_reg (0):() then (import chkfail)[0]:(0)
-given sd_reg given sd_note("N", ["next"], ["N"], "n.id", 6) (2):() then prints:("n.id:6: error: struct 'N' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('N[] items') [E0627]\n  at: N\n  why: the value would have to exist before it could be made, and a list can be empty where a struct field cannot\n  help: hold a list of it instead ('N[] items')\n")
+given sd_reg {
+  (0):() then (import chkfail)[0]:(0)
+  given sd_note("N", ["next"], ["N"], "n.id", 6) (2):() then prints:("n.id:6: error: struct 'N' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('N[] items') [E0627]\n  at: N\n  why: the value would have to exist before it could be made, and a list can be empty where a struct field cannot\n  help: hold a list of it instead ('N[] items')\n")
+}
 
 // How many fields of a struct hold `sd_t`, directly or through the structs in
 // them, looking `sd_d` levels deep (as many as there are structs, so every
@@ -24,8 +26,10 @@ sd_contains(string sd_s, string sd_t, int sd_d) {
     sd_k = sd_k + 1;
   }
 } return int ok;
-given sd_reg ("P", "int", 2):(2)
-given sd_reg ("P", "string", 2):(0)
+given sd_reg {
+  ("P", "int", 2):(2)
+  ("P", "string", 2):(0)
+}
 
 sd_holds(string sd_ft, string sd_t, int sd_d) {
   int ok = 0;
@@ -35,5 +39,7 @@ sd_holds(string sd_ft, string sd_t, int sd_d) {
     ok = sd_contains(sd_ft, sd_t, sd_d - 1);
   }
 } return int ok;
-given sd_reg ("int", "int", 1):(1)
-given sd_reg given sd_note("W", ["p"], ["P"], "w.id", 6) ("P", "int", 3):(2)
+given sd_reg {
+  ("int", "int", 1):(1)
+  given sd_note("W", ["p"], ["P"], "w.id", 6) ("P", "int", 3):(2)
+}

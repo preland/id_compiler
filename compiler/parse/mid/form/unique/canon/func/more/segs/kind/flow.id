@@ -14,8 +14,10 @@ cst_flow(int id) {
     out = "ret(" + canon_ret(id) + ")";
   }
 } return string out;
-given flow_canon_fixture ((import canon_brk)):("brk")
-given flow_canon_fixture ((import canon_retv)):("ret(I4)")
+given flow_canon_fixture {
+  ((import canon_brk)):("brk")
+  ((import canon_retv)):("ret(I4)")
+}
 
 // A `break`, and a `return 4;` from an int function.
 flow_canon_fixture() {

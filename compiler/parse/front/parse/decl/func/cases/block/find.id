@@ -22,8 +22,10 @@ gblk_starts(int gb_from, int gb_to) {
     gb_cur = gblk_line_end(gb_cur);
   }
 } return int[] gb_out;
-given gblk_stream("open") (3, 13):([3, 8])
-given gblk_stream("open") (3, 3):([])
+given gblk_stream("open") {
+  (3, 13):([3, 8])
+  (3, 3):([])
+}
 
 gblk_ins_all(int gb_at, int gb_pre, int[] gb_starts) {
   int gb_j = len(gb_starts) - 1;
@@ -32,5 +34,7 @@ gblk_ins_all(int gb_at, int gb_pre, int[] gb_starts) {
     gb_j = gb_j - 1;
   }
 } return void;
-given gblk_stream("open") (0, 2, [3, 8]):() then len((import tkind)):(18) then (import ttext)[10]:("given")
-given gblk_stream("open") (0, 2, []):() then len((import tkind)):(14)
+given gblk_stream("open") {
+  (0, 2, [3, 8]):() then len((import tkind)):(18) then (import ttext)[10]:("given")
+  (0, 2, []):() then len((import tkind)):(14)
+}

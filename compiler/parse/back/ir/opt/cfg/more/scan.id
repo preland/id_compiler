@@ -25,5 +25,7 @@ pred_succ(int b, int v, int i) {
     i = i + 1;
   }
 } return void;
-given br_fixture (0, 1, 0):() then (import bpred)[1]:([0])
-given br_fixture (0, 1, 1):() then (import bpred)[1]:([])
+given br_fixture {
+  (0, 1, 0):() then (import bpred)[1]:([0])
+  (0, 1, 1):() then (import bpred)[1]:([])
+}

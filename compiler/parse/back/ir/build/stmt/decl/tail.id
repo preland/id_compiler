@@ -3,8 +3,10 @@ lw_decl_tail(int node, int a) {
   string s1_of_v = (import ns1)[node];
   lw_decl_tail2(node, a, i1_of_v, s1_of_v);
 } return void;
-given decl_fixture ((import decl_node), 0):() then (import chkfail)[0]:(0)
-given decl_fixture ((import decl_node), 1):() then (import chkfail)[0]:(0)
+given decl_fixture {
+  ((import decl_node), 0):() then (import chkfail)[0]:(0)
+  ((import decl_node), 1):() then (import chkfail)[0]:(0)
+}
 
 lw_decl_tail2(int node, int a, int decl_val_id, string decl_ty_name) {
   string lw_dn = (import ns2)[node];
@@ -13,8 +15,10 @@ lw_decl_tail2(int node, int a, int decl_val_id, string decl_ty_name) {
 } chain (int node, int a, int decl_val_id, string decl_ty_name) {
   lw_store_own(lw_dn, a, decl_val_id, lw_as_v);
 } return void;
-given decl_fixture ((import decl_node), 0, (import ev_node), "int"):() then (import chkfail)[0]:(0)
-given decl_fixture ((import decl_node), 2, (import ev_node), "word"):() then (import chkfail)[0]:(0)
+given decl_fixture {
+  ((import decl_node), 0, (import ev_node), "int"):() then (import chkfail)[0]:(0)
+  ((import decl_node), 2, (import ev_node), "word"):() then (import chkfail)[0]:(0)
+}
 
 // ir_rows plus one non-exported "decl" node (type int, name "y", init 7)
 // and its initializer, for a case on lw_stmt/lw_decl/lw_decl_tail/

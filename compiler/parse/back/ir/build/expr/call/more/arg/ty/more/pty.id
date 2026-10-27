@@ -12,8 +12,10 @@ lw_arg_conv(int node, int i, string pty) {
   int[] args = (import nl1)[node];
   int v = lw_as(args[i], pty);
 } return int v;
-given pcall_fixture ((import pcall_node), 0, "int"):(0)
-given pcall_fixture ((import pcall_node), 0, "word"):(1)
+given pcall_fixture {
+  ((import pcall_node), 0, "int"):(0)
+  ((import pcall_node), 0, "word"):(1)
+}
 
 lw_pty_base(string name, int i, int node) {
   string ety = lw_ety(node);

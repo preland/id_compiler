@@ -8,6 +8,8 @@ m2r_clean(int f) {
     n = m2r_sweep(f, 0, 0);
   }
 } return void;
-given ir_rows (0):() then calls m2r_sweep:(0, 0, 0)
-given ir_rows (1):() then calls m2r_sweep:(1, 0, 0)
-given ir_rows (0):() then calls m2r_sweep:[1]
+given ir_rows {
+  (0):() then calls m2r_sweep:(0, 0, 0)
+  (1):() then calls m2r_sweep:(1, 0, 0)
+  (0):() then calls m2r_sweep:[1]
+}

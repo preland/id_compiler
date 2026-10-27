@@ -12,9 +12,11 @@ esc_desc(string t) {
   int[] dz_sp = [];
   string dz_d = esc_dsc(t, "", dz_sn, dz_sp);
 } return string dz_d;
-given esc_ty_fix ("Tr"):("S1l@0;")
-given esc_ty_fix ("Pg"):("S3sl.S1l@5;")
-given esc_ty_fix ("string[]"):("ls")
+given esc_ty_fix {
+  ("Tr"):("S1l@0;")
+  ("Pg"):("S3sl.S1l@5;")
+  ("string[]"):("ls")
+}
 
 esc_dsc(string t, string dz_a, string[] dz_sn, int[] dz_sp) {
   string dz_r = esc_dsct2(t, dz_a, dz_sn, dz_sp);
@@ -24,10 +26,12 @@ esc_dsc(string t, string dz_a, string[] dz_sn, int[] dz_sp) {
     dz_r = esc_dsc(list_elem(t), dz_a + "l", dz_sn, dz_sp);
   }
 } return string dz_r;
-given esc_ty_fix ("int", "x", [], []):("x.")
-given esc_ty_fix ("string", "x", [], []):("xs")
-given esc_ty_fix ("int[]", "", [], []):("l.")
-given esc_ty_fix ("Tr[]", "", [], []):("lS1l@1;")
+given esc_ty_fix {
+  ("int", "x", [], []):("x.")
+  ("string", "x", [], []):("xs")
+  ("int[]", "", [], []):("l.")
+  ("Tr[]", "", [], []):("lS1l@1;")
+}
 
 // A type that is neither a string nor a list: a struct's node, or nothing to free.
 esc_dsct2(string t, string dz_a, string[] dz_sn, int[] dz_sp) {
@@ -36,5 +40,7 @@ esc_dsct2(string t, string dz_a, string[] dz_sn, int[] dz_sp) {
     dz_r = esc_dsct(t, dz_a, dz_sn, dz_sp);
   }
 } return string dz_r;
-given esc_ty_fix ("Tr", "", [], []):("S1l@0;")
-given esc_ty_fix ("float", "k", [], []):("k.")
+given esc_ty_fix {
+  ("Tr", "", [], []):("S1l@0;")
+  ("float", "k", [], []):("k.")
+}

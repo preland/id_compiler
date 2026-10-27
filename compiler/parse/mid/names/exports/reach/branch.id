@@ -29,5 +29,7 @@ wr_args(int nd, string wr_fname) {
     wr_j = wr_j + 1;
   }
 } return void;
-given imp_use_fixture given wr_build ((import imp_use_dcall), "f"):() then (import wrx):(["i:gx"])
-given imp_use_fixture given wr_build ((import imp_use_call), "g"):() then (import wrf):(["g"])
+given imp_use_fixture {
+  given wr_build ((import imp_use_dcall), "f"):() then (import wrx):(["i:gx"])
+  given wr_build ((import imp_use_call), "g"):() then (import wrf):(["g"])
+}

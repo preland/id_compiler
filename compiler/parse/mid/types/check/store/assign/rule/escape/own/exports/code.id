@@ -11,5 +11,7 @@ esc_xstore_code(string nm, string code) {
 } chain (string nm, string code) {
   s = s + esc_free_fn(esc_cur(), nm) + "(idfe_o); }";
 } return string s;
-given esc_xfix ("xg", "v"):("{ IdList* idfe_n = v; IdList* idfe_o = xg; xg = idfe_n; id_list_free(idfe_o); }")
-given esc_xfix ("xs", "f(1)"):("{ IdList* idfe_n = f(1); IdList* idfe_o = xs; xs = idfe_n; id_list_free(idfe_o); }")
+given esc_xfix {
+  ("xg", "v"):("{ IdList* idfe_n = v; IdList* idfe_o = xg; xg = idfe_n; id_list_free(idfe_o); }")
+  ("xs", "f(1)"):("{ IdList* idfe_n = f(1); IdList* idfe_o = xs; xs = idfe_n; id_list_free(idfe_o); }")
+}

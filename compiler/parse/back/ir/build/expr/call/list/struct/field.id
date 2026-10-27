@@ -9,5 +9,7 @@ lw_fpos(int node) {
 } chain (int node) {
   int ret_i = lw_const("int", sd_p);
 } return int ret_i;
-given sr_fixture ((import sr_iy)):(0)
-given sr_fixture ((import sr_ix)):(0)
+given sr_fixture {
+  ((import sr_iy)):(0)
+  ((import sr_ix)):(0)
+}

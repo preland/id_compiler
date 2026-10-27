@@ -18,10 +18,12 @@ keep_export_fixture_tail() {
   push((import eowners), "nat_target");
   push((import eowners), "main");
 } return void;
-given keep_export_fixture_reg ():() then len((import eowners)):(4)
-given keep_export_fixture_reg ():() then (import eowners)[2]:("nat_target") then (import eowners)[3]:("main")
-given keep_export_fixture_reg ():() then (import chkfail)[0]:(0)
-given keep_export_fixture_reg ():() then init_units:(0)
+given keep_export_fixture_reg {
+  ():() then len((import eowners)):(4)
+  ():() then (import eowners)[2]:("nat_target") then (import eowners)[3]:("main")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // The registration and the export owners together: the one setup that gives
 // both a function table and a non-empty eowners, which setups_miss

@@ -33,8 +33,10 @@ init_consts() {
   export int[] ctoks = [];
   export int[] ctoke = [];
 } return int 0;
-given env_init ():(0)
-given env_init ():(0) then (import chkfail)[0]:(0)
+given env_init {
+  ():(0)
+  ():(0) then (import chkfail)[0]:(0)
+}
 
 take_const(int[] pos) {
   advance(pos);
@@ -44,8 +46,10 @@ take_const(int[] pos) {
   int fold_v = fold_const(parse_decl_v);
   reg_const(fold_v, ctok_first, tok_end(pos[0]));
 } return void;
-given decl_tokens ([9]):([14]) then ctok_span:(4)
-given decl_tokens ([9]):([14]) then (import chkfail)[0]:(1)
+given decl_tokens {
+  ([9]):([14]) then ctok_span:(4)
+  ([9]):([14]) then (import chkfail)[0]:(1)
+}
 
 // Registered in the same export tables an in-function `export` fills, so the
 // name is reserved program-wide and a collision with a function's export is
@@ -60,5 +64,7 @@ reg_const(int d, int ctok_first, int ctok_last) {
 } chain (int d, int ctok_first, int ctok_last) {
   push((import ctoke), ctok_last);
 } return void;
-given lc_reg_setup (0, 3, 8):() then ctok_span:(5)
-given lc_reg_setup (1, 10, 10):() then ctok_span:(0)
+given lc_reg_setup {
+  (0, 3, 8):() then ctok_span:(5)
+  (1, 10, 10):() then ctok_span:(0)
+}

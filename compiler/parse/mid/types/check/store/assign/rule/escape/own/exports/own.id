@@ -30,9 +30,11 @@ esc_xmemo(int export_slot, string nm) {
   }
   int ok = (import esc_xm)[export_slot];
 } return int ok;
-given esc_xfix (0, "xg"):(1)
-given esc_xfix (1, "xr"):(0)
-given esc_xfix (3, "xs"):(0)
+given esc_xfix {
+  (0, "xg"):(1)
+  (1, "xr"):(0)
+  (3, "xs"):(0)
+}
 
 esc_xcheck(int export_slot, string nm) {
   string t = (import etypes)[export_slot];
@@ -41,6 +43,8 @@ esc_xcheck(int export_slot, string nm) {
     ok = esc_xscan(nm) == 0;
   }
 } return int ok;
-given esc_xfix (0, "xg"):(1)
-given esc_xfix (1, "xr"):(0)
-given esc_xfix (4, "xd"):(0)
+given esc_xfix {
+  (0, "xg"):(1)
+  (1, "xr"):(0)
+  (4, "xd"):(0)
+}

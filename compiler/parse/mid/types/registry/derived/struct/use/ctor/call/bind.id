@@ -14,8 +14,10 @@ fit_cbind(int i, int e, string want) {
     fit_cbvals(i, (import nl1)[e]);
   }
 } return void;
-given cbind_fixture ((import fixture_ci), (import cb_e), "func() return int"):() then (import chkfail)[0]:(0)
-given cbind_fixture ((import fixture_ci), (import cb_e), "func() return string"):() then prints:("fixture.id:4: error: this case builds a func() return int with bind(fx_target, ...) where a func() return string is required\n")
+given cbind_fixture {
+  ((import fixture_ci), (import cb_e), "func() return int"):() then (import chkfail)[0]:(0)
+  ((import fixture_ci), (import cb_e), "func() return string"):() then prints:("fixture.id:4: error: this case builds a func() return int with bind(fx_target, ...) where a func() return string is required\n")
+}
 
 cbind_type(int[] items) {
   string t = "";
@@ -23,8 +25,10 @@ cbind_type(int[] items) {
     t = bind_tail(fn_sig_of((import ns1)[items[0]]), len(items) - 1);
   }
 } return string t;
-given cbind_fixture ([(import cb_f), (import cb_a)]):("func() return int")
-given cbind_fixture ([(import cb_f)]):("")
+given cbind_fixture {
+  ([(import cb_f), (import cb_a)]):("func() return int")
+  ([(import cb_f)]):("")
+}
 
 cbind_why(int i, int[] items, string got, string want) {
   if(got == "") {
@@ -33,5 +37,7 @@ cbind_why(int i, int[] items, string got, string want) {
     case_err(i, "this case builds a " + got + " with bind(" + (import ns1)[items[0]] + ", ...) where a " + want + " is required");
   }
 } return void;
-given cbind_fixture ((import fixture_ci), [(import cb_f)], "", "func() return int"):() then prints:("fixture.id:4: error: a test case's bind takes the name of a function of this build and at least one value to capture, written bind(NAME, 1, [2, 3]); this one is not that\n")
-given cbind_fixture ((import fixture_ci), [(import cb_f), (import cb_a)], "func() return int", "func() return void"):() then prints:("fixture.id:4: error: this case builds a func() return int with bind(fx_target, ...) where a func() return void is required\n")
+given cbind_fixture {
+  ((import fixture_ci), [(import cb_f)], "", "func() return int"):() then prints:("fixture.id:4: error: a test case's bind takes the name of a function of this build and at least one value to capture, written bind(NAME, 1, [2, 3]); this one is not that\n")
+  ((import fixture_ci), [(import cb_f), (import cb_a)], "func() return int", "func() return void"):() then prints:("fixture.id:4: error: this case builds a func() return int with bind(fx_target, ...) where a func() return void is required\n")
+}

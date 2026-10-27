@@ -8,10 +8,12 @@ lp_w(int lq_id, string lq_nm, int lq_md) {
     lq_r = lp_pick(lq_md, lp_isinc(lq_id));
   }
 } return int lq_r;
-given lpf_more ((import lpf_ia), "laj", 0):(1)
-given lpf_more ((import lpf_ia), "laj", 2):(0)
-given lpf_more ((import lpf_sa), "las", 2):(1)
-given lpf_more ((import lpf_ia), "zzz", 0):(0)
+given lpf_more {
+  ((import lpf_ia), "laj", 0):(1)
+  ((import lpf_ia), "laj", 2):(0)
+  ((import lpf_sa), "las", 2):(1)
+  ((import lpf_ia), "zzz", 0):(0)
+}
 
 lp_pick(int lq_md, int lq_inc) {
   int lq_r = 1;
@@ -37,8 +39,10 @@ lp_cnt(int lq_lo, int lq_hi, string lq_nm, int lq_md) {
     lq_i = lq_i + 1;
   }
 } return int lq_n;
-given lpf_more ((import lpf_loa), (import lpf_hia), "laj", 0):(1)
-given lpf_more ((import lpf_loa), (import lpf_hia), "laj", 2):(0)
-given lpf_more ((import lpf_loe), (import lpf_hie), "lej", 0):(1)
-given lpf_more ((import lpf_loe), (import lpf_hie), "lej", 1):(0)
-given lpf_more ((import lpf_loa), (import lpf_hia), "zzz", 0):(0)
+given lpf_more {
+  ((import lpf_loa), (import lpf_hia), "laj", 0):(1)
+  ((import lpf_loa), (import lpf_hia), "laj", 2):(0)
+  ((import lpf_loe), (import lpf_hie), "lej", 0):(1)
+  ((import lpf_loe), (import lpf_hie), "lej", 1):(0)
+  ((import lpf_loa), (import lpf_hia), "zzz", 0):(0)
+}

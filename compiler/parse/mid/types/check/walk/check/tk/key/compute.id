@@ -19,9 +19,11 @@ tk_key(int tkf) {
     tkk = "" + tkacc[0];
   }
 } return string tkk;
-given tk_t_prep (0):("4208351378666089285")
-given tk_t_prep (1):("-8648083975898962277")
-given tk_t_prep given sd_note("P", ["x"], ["int"], "p.id", 1) (0):("-3241204359836069348")
+given tk_t_prep {
+  (0):("4208351378666089285")
+  (1):("-8648083975898962277")
+  given sd_note("P", ["x"], ["int"], "p.id", 1) (0):("-3241204359836069348")
+}
 
 tk_names(word[] tkacc, int tkf, int tkfrom, int tkto) {
   while(tkfrom < tkto) {
@@ -31,8 +33,10 @@ tk_names(word[] tkacc, int tkf, int tkfrom, int tkto) {
     tkfrom = tkfrom + 1;
   }
 } return void;
-given tk_t_prep ([0, 0], 0, 0, 0):([0, 0])
-given tk_t_prep ([0, 0], 1, 41, 42):([-2702843519264158902, 0])
+given tk_t_prep {
+  ([0, 0], 0, 0, 0):([0, 0])
+  ([0, 0], 1, 41, 42):([-2702843519264158902, 0])
+}
 
 tk_name(word[] tkacc, int tkf, string name) {
   string tkm = tk_meaning(name, tkf);

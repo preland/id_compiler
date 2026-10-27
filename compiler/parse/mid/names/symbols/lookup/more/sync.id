@@ -19,6 +19,8 @@ fidx_row_is(string name, int fn_row) {
     same = 1;
   }
 } return int same;
-given argfn_d ("g", 0):(1)
-given argfn_d ("g", 3):(0)
-given argfn_d ("nope", -1):(1)
+given argfn_d {
+  ("g", 0):(1)
+  ("g", 3):(0)
+  ("nope", -1):(1)
+}

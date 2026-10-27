@@ -12,8 +12,10 @@ call_fp(int id) {
     ret_s = canon_expr(l1_of_v[0]);
   }
 } return string ret_s;
-given call_fp_fixture ((import call_foo)):("c(foo:I3)")
-given call_fp_fixture ((import call_ushr)):("I7")
+given call_fp_fixture {
+  ((import call_foo)):("c(foo:I3)")
+  ((import call_ushr)):("I7")
+}
 
 // A plain call ("foo(3)") and a `ushr(x, 0)` -- the logical-shift-by-zero
 // spelling this function folds to its left operand alone.

@@ -12,12 +12,16 @@ given env_init (0):(-1)
 fix_col(int t0) {
   int c = fix_packed(t0) / 65536;
 } return int c;
-given fix_tokline_fixture2 (0):(2)
-given fix_tokline_fixture2 (7):(0)
-given fix_tokline_fixture2 (1):(1)
+given fix_tokline_fixture2 {
+  (0):(2)
+  (7):(0)
+  (1):(1)
+}
 
 fix_endc(int t0) {
   int c = fix_packed(t0) % 65536;
 } return int c;
-given fix_tokline_fixture2 (0):(5)
-given fix_tokline_fixture2 (1):(4)
+given fix_tokline_fixture2 {
+  (0):(5)
+  (1):(4)
+}

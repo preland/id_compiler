@@ -15,8 +15,10 @@ void_arr_pair(int id, string t1, string t2) {
   void_arr_type(id, t1);
   void_arr_type(id, t2);
 } return void;
-given cmp_fixture (0, "void[]", "int"):() then (import chkfail)[0]:(1)
-given cmp_fixture (0, "int", "int"):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  (0, "void[]", "int"):() then (import chkfail)[0]:(1)
+  (0, "int", "int"):() then (import chkfail)[0]:(0)
+}
 
 idxfix() {
   call2_setup();

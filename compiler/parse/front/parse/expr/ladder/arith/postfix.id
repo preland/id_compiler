@@ -9,8 +9,10 @@ parse_postfix(int[] pos) {
     node = fold_post(pos, node);
   }
 } return int node;
-given atom_tokens ([33]):(2)
-given atom_tokens ([25]):(0)
+given atom_tokens {
+  ([33]):(2)
+  ([25]):(0)
+}
 
 fold_index(int[] pos, int base) {
   int fi_ln = cur_ln(pos);
@@ -19,12 +21,16 @@ fold_index(int[] pos, int base) {
 } chain (int[] pos, int base) {
   int ret_i = fold_index_tail(pos, base, idx, fi_ln);
 } return int ret_i;
-given atom_tokens ([34], 50):(1)
-given atom_tokens ([34], 99):(1)
+given atom_tokens {
+  ([34], 50):(1)
+  ([34], 99):(1)
+}
 
 fold_index_tail(int[] pos, int base, int idx, int open_ln) {
   close_bracket(pos, "]", open_ln);
   int ret_i = node_index(base, idx);
 } return int ret_i;
-given atom_tokens ([36], 10, 20, 1):(0)
-given atom_tokens ([36], 1, 2, 1):(0)
+given atom_tokens {
+  ([36], 10, 20, 1):(0)
+  ([36], 1, 2, 1):(0)
+}

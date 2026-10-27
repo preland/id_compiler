@@ -7,11 +7,15 @@ frs_struct(string fz_t, string fz_e) {
     fz_r = "id_frs_push(s, " + frs_ptr(fz_e) + ", idfs_" + fz_t + ");";
   }
 } return string fz_r;
-given esc_ty_fix ("Pt", "e"):("id_list_free((void*)(intptr_t)e);")
-given esc_ty_fix ("Pg", "q"):("id_frs_push(s, (void*)(intptr_t)q, idfs_Pg);")
+given esc_ty_fix {
+  ("Pt", "e"):("id_list_free((void*)(intptr_t)e);")
+  ("Pg", "q"):("id_frs_push(s, (void*)(intptr_t)q, idfs_Pg);")
+}
 
 frs_ptr(string fz_e) {
   string fz_r = "(void*)(intptr_t)" + fz_e;
 } return string fz_r;
-given esc_ty_fix ("a"):("(void*)(intptr_t)a")
-given esc_ty_fix ("L->data[2]"):("(void*)(intptr_t)L->data[2]")
+given esc_ty_fix {
+  ("a"):("(void*)(intptr_t)a")
+  ("L->data[2]"):("(void*)(intptr_t)L->data[2]")
+}

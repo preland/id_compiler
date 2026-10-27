@@ -12,10 +12,12 @@ tmp_all(int id, int tx_kind) {
     i = i + 1;
   }
 } return string tx_all;
-given esc_ffix ((import eff_ctp), 0):("IdList* idft0 = id_ff_make(n); ")
-given esc_ffix ((import eff_ctp), 1):("idft0")
-given esc_ffix ((import eff_ctp), 2):("id_list_free(idft0); ")
-given esc_ffix ((import eff_cmk), 1):("n")
+given esc_ffix {
+  ((import eff_ctp), 0):("IdList* idft0 = id_ff_make(n); ")
+  ((import eff_ctp), 1):("idft0")
+  ((import eff_ctp), 2):("id_list_free(idft0); ")
+  ((import eff_cmk), 1):("n")
+}
 
 tmp_one(int id, int i, int tx_kind) {
   string tx_one = "";
@@ -25,9 +27,11 @@ tmp_one(int id, int i, int tx_kind) {
     tx_one = tmp_one2(id, i, tx_kind);
   }
 } return string tx_one;
-given esc_ffix ((import eff_ctp), 0, 0):("IdList* idft0 = id_ff_make(n); ")
-given esc_ffix ((import eff_ctp), 0, 2):("id_list_free(idft0); ")
-given esc_ffix ((import eff_cmk), 0, 1):("n")
+given esc_ffix {
+  ((import eff_ctp), 0, 0):("IdList* idft0 = id_ff_make(n); ")
+  ((import eff_ctp), 0, 2):("id_list_free(idft0); ")
+  ((import eff_cmk), 0, 1):("n")
+}
 
 tmp_one2(int id, int i, int tx_kind) {
   string tx_two = tmp_free(id, i);
@@ -35,6 +39,8 @@ tmp_one2(int id, int i, int tx_kind) {
     tx_two = sep_at(", ", i) + tmp_arg(id, i);
   }
 } return string tx_two;
-given esc_ffix ((import eff_ctp), 0, 1):("idft0")
-given esc_ffix ((import eff_cmk), 0, 1):("n")
-given esc_ffix ((import eff_cmk), 0, 2):("")
+given esc_ffix {
+  ((import eff_ctp), 0, 1):("idft0")
+  ((import eff_cmk), 0, 1):("n")
+  ((import eff_cmk), 0, 2):("")
+}

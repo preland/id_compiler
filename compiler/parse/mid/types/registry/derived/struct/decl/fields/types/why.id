@@ -7,8 +7,10 @@ sd_ftype_why(string sd_t) {
     sd_w = " is a function value (" + sd_t + "); a function value cannot be stored in a struct -- store it in an export, or pass it to the function that calls it";
   }
 } return string sd_w;
-given sd_reg ("int"):("")
-given sd_reg ("func(int) return void"):(" is a function value (func(int) return void); a function value cannot be stored in a struct -- store it in an export, or pass it to the function that calls it")
+given sd_reg {
+  ("int"):("")
+  ("func(int) return void"):(" is a function value (func(int) return void); a function value cannot be stored in a struct -- store it in an export, or pass it to the function that calls it")
+}
 
 sd_ftype_why2(string sd_t) {
   string sd_w = "";
@@ -18,5 +20,7 @@ sd_ftype_why2(string sd_t) {
     sd_w = " has type '" + sd_t + "', which is not a type; use int, word, float, string, a struct declared in the program, or a list of one of those, as in 'int[]'";
   }
 } return string sd_w;
-given sd_reg ("P[]"):("")
-given sd_reg ("Pnt"):(" has type 'Pnt', which is not a type; use int, word, float, string, a struct declared in the program, or a list of one of those, as in 'int[]'")
+given sd_reg {
+  ("P[]"):("")
+  ("Pnt"):(" has type 'Pnt', which is not a type; use int, word, float, string, a struct declared in the program, or a list of one of those, as in 'int[]'")
+}

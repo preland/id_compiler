@@ -11,10 +11,12 @@ fill_list(int[] pos, int[] items, string close) {
     skip_text(pos, ",");
   }
 } return void;
-given atom_tokens ([2], [], ")"):([5], [0, 1])
-given atom_tokens ([5], [], ")"):([5], [])
-given atom_tokens ([8], [], "]"):([13], [0, 1, 2])
-given atom_tokens ([35], [], "]"):([36], [0])
+given atom_tokens {
+  ([2], [], ")"):([5], [0, 1])
+  ([5], [], ")"):([5], [])
+  ([8], [], "]"):([13], [0, 1, 2])
+  ([35], [], "]"):([36], [0])
+}
 
 // Consumed only when present: a separator the grammar allows to be missing.
 skip_text(int[] pos, string sep) {
@@ -34,5 +36,7 @@ parse_int(int[] pos) {
 } chain (int[] pos) {
   int ret_i = finish_int(text);
 } return int ret_i;
-given atom_tokens ([2]):(0)
-given atom_tokens ([8]):(0)
+given atom_tokens {
+  ([2]):(0)
+  ([8]):(0)
+}

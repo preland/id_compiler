@@ -12,14 +12,18 @@ acc_func_body(int[] acc_body_ids, string acc_fn_name, int id) {
     acc_expr(i1_of_v, ret_owner, (import nline)[i1_of_v]);
   }
 } return void;
-given fnscope_fix ((import regrow_plist), "g2", (import regrow_fn_node)):() then calls scope_func:((import regrow_fn_node))
-given fnscope_fix ([], "g2", (import regrow_fn_node)):() then calls scope_func:((import regrow_fn_node))
+given fnscope_fix {
+  ((import regrow_plist), "g2", (import regrow_fn_node)):() then calls scope_func:((import regrow_fn_node))
+  ([], "g2", (import regrow_fn_node)):() then calls scope_func:((import regrow_fn_node))
+}
 
 acc_if_body(int id, string owner) {
   int[] l1_of_v = (import nl1)[id];
   acc_block(l1_of_v, owner);
   acc_block(((import nl2)[id]), owner);
 } return void;
-given scnames_fix ((import rgif_node), "f"):() then calls acc_block:((import rgdeclist), "f")
-given scnames_fix ((import rgif_node), "g"):() then calls acc_block:((import rgdeclist), "g")
+given scnames_fix {
+  ((import rgif_node), "f"):() then calls acc_block:((import rgdeclist), "f")
+  ((import rgif_node), "g"):() then calls acc_block:((import rgdeclist), "g")
+}
 

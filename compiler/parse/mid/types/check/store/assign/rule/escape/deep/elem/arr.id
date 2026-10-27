@@ -10,9 +10,11 @@ esc_arrbad(int e) {
     r = 8 * (1 - esc_okl((import nl1)[e]));
   }
 } return int r;
-given esc_dfix ((import efd_lits)):(0)
-given esc_dfix ((import efd_lbl)):(0)
-given esc_dfix ((import efd_blit)):(8)
+given esc_dfix {
+  ((import efd_lits)):(0)
+  ((import efd_lbl)):(0)
+  ((import efd_blit)):(8)
+}
 
 esc_litels(int[] els) {
   int r = 0;
@@ -24,6 +26,8 @@ esc_litels(int[] els) {
     i = i + 1;
   }
 } return int r;
-given esc_dfix ((import efd_elok)):(0)
-given esc_dfix ((import efd_elbad)):(8)
-given esc_dfix ((import ef_none)):(0)
+given esc_dfix {
+  ((import efd_elok)):(0)
+  ((import efd_elbad)):(8)
+  ((import ef_none)):(0)
+}

@@ -17,8 +17,10 @@ dg_const_rows() {
     dgi = dgi + 1;
   }
 } return void;
-given dg_t_crows ():() then len((import dg_comp)):(3)
-given dg_t_crows ():() then dg_nexp:("exp 3")
+given dg_t_crows {
+  ():() then len((import dg_comp)):(3)
+  ():() then dg_nexp:("exp 3")
+}
 
 dg_const_row(int dgi) {
   int dgr = len((import dg_own));

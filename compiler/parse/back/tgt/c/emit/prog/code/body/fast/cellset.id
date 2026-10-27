@@ -21,8 +21,10 @@ cell_value_fits(int cbx_node) {
     cbx_ok = cell_derived_fits(cbx_node);
   }
 } return int cbx_ok;
-given lpf_on ((import lpf_xa)):(0)
-given lpf_on ((import lpf_n0)):(1)
+given lpf_on {
+  ((import lpf_xa)):(0)
+  ((import lpf_n0)):(1)
+}
 
 cell_set_fit(string cbx_ns, int cbx_node) {
   int cbx_ok = 0;

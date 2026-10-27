@@ -7,16 +7,20 @@ fv_ref(string name, int nd) {
   fv_note(name, nd);
   string s = "ID_FNV(" + name + (import fv_sep) + nd + ")";
 } return string s;
-given fv_init ("tick", 0):("ID_FNV(tick__0)") then len((import fvname)):(1)
-given fv_init ("pick", 2):("ID_FNV(pick__2)") then (import fvk)[0]:(2)
+given fv_init {
+  ("tick", 0):("ID_FNV(tick__0)") then len((import fvname)):(1)
+  ("pick", 2):("ID_FNV(pick__2)") then (import fvk)[0]:(2)
+}
 
 fv_add(string key, string name, int nd) {
   push((import fvkey), key);
   push((import fvname), name);
   push((import fvk), nd);
 } return void;
-given fv_init ("a__1", "a", 1):() then (import fvk)[0]:(1)
-given fv_init ("b__0", "b", 0):() then (import fvkey)[0]:("b__0")
+given fv_init {
+  ("a__1", "a", 1):() then (import fvk)[0]:(1)
+  ("b__0", "b", 0):() then (import fvkey)[0]:("b__0")
+}
 
 fv_seeded() {
   fv_init();

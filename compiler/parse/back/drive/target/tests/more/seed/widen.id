@@ -3,8 +3,10 @@ test_widen(int[] pkeep, string[] rkeep) {
   keep_ints(pkeep, (import prog));
   test_widen2(rkeep);
 } return void;
-given rfnfx_setup ([7, 8], []):() then len((import prog)):(2)
-given rfnfx_setup ([], []):() then len((import prog)):(0)
+given rfnfx_setup {
+  ([7, 8], []):() then len((import prog)):(2)
+  ([], []):() then len((import prog)):(0)
+}
 
 // rfn is restored by hand, so its index is rebuilt with it (mid/names/
 // exports/reach/dead/more/add/).
@@ -15,5 +17,7 @@ test_widen2(string[] rkeep) {
 } chain (string[] rkeep) {
   rfn_reindex();
 } return void;
-given rfnfx_setup (["a"]):() then len((import rfn)):(1)
-given rfnfx_setup (["conf.id"]):() then conf_reached:(1) then (import dphase)[0]:(1)
+given rfnfx_setup {
+  (["a"]):() then len((import rfn)):(1)
+  (["conf.id"]):() then conf_reached:(1) then (import dphase)[0]:(1)
+}

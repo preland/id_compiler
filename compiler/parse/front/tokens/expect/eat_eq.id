@@ -18,10 +18,12 @@ init_lines3() {
   export int[] curtl = [0];
   init_lines4();
 } return void export chkfail;
-given full_env given integer_list_set((import chkfail), 0, 1) ():() then (import chkfail)[0]:(0)
-given full_env given integer_list_set((import curtl), 0, 7) ():() then (import curtl)[0]:(0)
-given full_env ():() then (import chkfail)[0]:(0)
-given full_env ():() then init_units:(0)
+given full_env {
+  given integer_list_set((import chkfail), 0, 1) ():() then (import chkfail)[0]:(0)
+  given integer_list_set((import curtl), 0, 7) ():() then (import curtl)[0]:(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 //   casefn     the function node each case was written under
 //   casestart  the case's first token index, and caseend one past its last.

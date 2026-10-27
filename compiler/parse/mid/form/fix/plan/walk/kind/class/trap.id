@@ -8,8 +8,10 @@ fix_traps(int e) {
     ok = fix_unsafe_rhs(e);
   }
 } return int ok;
-given fix_traps_setup ((import tr_safe)):(0)
-given fix_traps_setup ((import tr_unsafe)):(1)
+given fix_traps_setup {
+  ((import tr_safe)):(0)
+  ((import tr_unsafe)):(1)
+}
 
 fix_traps_setup() {
   fix_fixture();
@@ -27,5 +29,7 @@ tr_unsafe_rhs_val() {
   int b = (import ni2)[(import tr_unsafe)];
   int v = (import ni1)[b];
 } return int v;
-given fix_traps_setup ():(0)
-given fix_traps_setup ():(0) then (import chkfail)[0]:(0)
+given fix_traps_setup {
+  ():(0)
+  ():(0) then (import chkfail)[0]:(0)
+}

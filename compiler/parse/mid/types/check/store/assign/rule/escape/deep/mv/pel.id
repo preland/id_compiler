@@ -43,7 +43,9 @@ given esc_mp_fix ((import emp_wd)):(559)
 esc_mvsame(string lt, string vt) {
   int ok = lt == vt + "[]" && (vt == "string" || (is_list_ty(vt) == 0 && esc_sbear(vt) == 1));
 } return int ok;
-given esc_ty_fix ("string[]", "string"):(1)
-given esc_ty_fix ("Tr[]", "Tr"):(1)
-given esc_ty_fix ("int[]", "int"):(0)
-given esc_ty_fix ("Tr[][]", "Tr[]"):(0)
+given esc_ty_fix {
+  ("string[]", "string"):(1)
+  ("Tr[]", "Tr"):(1)
+  ("int[]", "int"):(0)
+  ("Tr[][]", "Tr[]"):(0)
+}

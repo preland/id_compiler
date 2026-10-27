@@ -9,5 +9,7 @@ fv_ll_arg(int fn, int nd, int i) {
     s = ll_ty(pt) + " " + fv_ll_val(i, pt);
   }
 } return string s;
-given clo_fixture ((import fixture_fn), 0, 0):("i32 %a0")
-given clo_fixture ((import fixture_fn), 1, 0):("i32 %u0")
+given clo_fixture {
+  ((import fixture_fn), 0, 0):("i32 %a0")
+  ((import fixture_fn), 1, 0):("i32 %u0")
+}

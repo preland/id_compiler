@@ -10,9 +10,11 @@ esc_exit(int fn, string nm) {
     ok = 0;
   }
 } return int ok;
-given esc_sfix ((import efs_acc), "s"):(1)
-given esc_sfix ((import efs_ret), "r"):(0)
-given esc_sfix ((import efs_alias), "a"):(0)
+given esc_sfix {
+  ((import efs_acc), "s"):(1)
+  ((import efs_ret), "r"):(0)
+  ((import efs_alias), "a"):(0)
+}
 
 // The name the return clause returns, "" when it returns anything else.
 esc_retvar(int fn) {
@@ -22,9 +24,11 @@ esc_retvar(int fn) {
     erv_nm = (import ns1)[e];
   }
 } return string erv_nm;
-given esc_sfix ((import efs_ret)):("r")
-given esc_sfix ((import efs_acc)):("n")
-given esc_sfix ((import efs_lit)):("l")
+given esc_sfix {
+  ((import efs_ret)):("r")
+  ((import efs_acc)):("n")
+  ((import efs_lit)):("l")
+}
 
 // Whether a store of `e` into the owned name `nm` must copy `e` to the heap
 // first: a literal is a static object, and the free the owner will one day
@@ -35,6 +39,8 @@ esc_dup(int fn, string nm, int e) {
     d = esc_own(fn, nm);
   }
 } return int d;
-given esc_sfix ((import efs_acc), "s", (import efs_lit0)):(1)
-given esc_sfix ((import efs_acc), "s", (import efs_sum)):(0)
-given esc_sfix ((import efs_lit), "l", (import efs_lit0)):(0)
+given esc_sfix {
+  ((import efs_acc), "s", (import efs_lit0)):(1)
+  ((import efs_acc), "s", (import efs_sum)):(0)
+  ((import efs_lit), "l", (import efs_lit0)):(0)
+}

@@ -29,10 +29,12 @@ esc_fd_g() {
   export int efd_pks = node_exprstmt((import efd_pkc));
   export int efd_via = node_func("fd_via", "void", (import efd_np), [(import efd_dd), (import efd_pks)], 0 - 1);
 } return void;
-given esc_dfix ():() then calls node_txt:("var", "c") then calls node_txt:("var", "w")
-given esc_dfix ():() then calls node_param:("param", "int[]", "w") then calls node_func:("fd_alias", "void", (import efd_wp), [(import efd_dc), (import efd_pws)], -1)
-given esc_dfix ():() then (import chkfail)[0]:(0)
-given esc_dfix ():() then init_units:(0)
+given esc_dfix {
+  ():() then calls node_txt:("var", "c") then calls node_txt:("var", "w")
+  ():() then calls node_param:("param", "int[]", "w") then calls node_func:("fd_alias", "void", (import efd_wp), [(import efd_dc), (import efd_pws)], -1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_fd_h() {
   add_func("fd_peek", "int[]", (import efd_peek));
@@ -41,10 +43,12 @@ esc_fd_h() {
 } chain () {
   integer_list_set((import sqbase), 0, (import efd_good));
 } return void;
-given esc_dfix ():() then calls add_func:("fd_peek", "int[]", (import efd_peek)) then calls add_func:("fd_look", "int", (import efd_look))
-given esc_dfix ():() then calls integer_list_set:((import sqbase), 0, (import efd_good))
-given esc_dfix ():() then (import chkfail)[0]:(0)
-given esc_dfix ():() then init_units:(0)
+given esc_dfix {
+  ():() then calls add_func:("fd_peek", "int[]", (import efd_peek)) then calls add_func:("fd_look", "int", (import efd_look))
+  ():() then calls integer_list_set:((import sqbase), 0, (import efd_good))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_dfix() {
   esc_fix();

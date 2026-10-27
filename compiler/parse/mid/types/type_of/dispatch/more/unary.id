@@ -12,8 +12,10 @@ type_of7(int id) {
     t = type_bin(id);
   }
 } return string t;
-given composite_fixture ((import un_float)):("float")
-given composite_fixture ((import bin_concat)):("string")
+given composite_fixture {
+  ((import un_float)):("float")
+  ((import bin_concat)):("string")
+}
 
 // `-x` and `~x` keep the operand's type; `!x` is a truth value, so bool.
 type_un(int id) {
@@ -23,8 +25,10 @@ type_un(int id) {
     t = "bool";
   }
 } return string t;
-given composite_fixture ((import un_float)):("float")
-given composite_fixture ((import un_not)):("bool")
+given composite_fixture {
+  ((import un_float)):("float")
+  ((import un_not)):("bool")
+}
 
 h_call_match() {
   fcall_reg_b();

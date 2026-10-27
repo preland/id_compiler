@@ -11,8 +11,10 @@ lp_hlens(string lq_ind, int lq_lo, int lq_hi) {
     lq_k = lq_k + 1;
   }
 } return void;
-given lpf_in(0) given lpf_planb ("", (import lpf_lob), (import lpf_hib)):() then (import lphn)[0]:("lbv")
-given lpf_in(0) given lpf_planned ("", (import lpf_loa), (import lpf_hia)):() then len((import lphn)):(0)
+given lpf_in(0) {
+  given lpf_planb ("", (import lpf_lob), (import lpf_hib)):() then (import lphn)[0]:("lbv")
+  given lpf_planned ("", (import lpf_loa), (import lpf_hia)):() then len((import lphn)):(0)
+}
 
 lp_hlen1(int lq_n, string lq_ind, int lq_lo, int lq_hi) {
   string lq_nm = lp_lname(lq_n);
@@ -21,8 +23,10 @@ lp_hlen1(int lq_n, string lq_ind, int lq_lo, int lq_hi) {
     push((import lphn), lq_nm);
   }
 } return void;
-given lpf_in(0) given lpf_planb ((import lpf_nb), "  ", (import lpf_lob), (import lpf_hib)):() then prints:("  int idh_n_lbv = id_list_len(lbv);\n")
-given lpf_in(0) given lpf_planned ((import lpf_na), "  ", (import lpf_loa), (import lpf_hia)):() then len((import lphn)):(0)
+given lpf_in(0) {
+  given lpf_planb ((import lpf_nb), "  ", (import lpf_lob), (import lpf_hib)):() then prints:("  int idh_n_lbv = id_list_len(lbv);\n")
+  given lpf_planned ((import lpf_na), "  ", (import lpf_loa), (import lpf_hia)):() then len((import lphn)):(0)
+}
 
 lp_hlen(string lq_s, string lq_nm) {
   string lq_ht = lq_s;

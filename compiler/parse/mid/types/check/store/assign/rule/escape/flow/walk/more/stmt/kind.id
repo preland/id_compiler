@@ -40,6 +40,8 @@ esc_fbad(int e) {
     r = 128 * esc_cbad(e);
   }
 } return int r;
-given esc_ffix ((import eff_cleak)):(8)
-given esc_ffix ((import eff_cmk)):(0)
-given esc_ffix ((import eff_ctor)):(0)
+given esc_ffix {
+  ((import eff_cleak)):(8)
+  ((import eff_cmk)):(0)
+  ((import eff_ctor)):(0)
+}

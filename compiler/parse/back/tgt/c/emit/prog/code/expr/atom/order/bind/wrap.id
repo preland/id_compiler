@@ -26,8 +26,10 @@ seq_binds(int[] sq_units, int id) {
     i = i + 1;
   }
 } return string sq_pre;
-given sq_fixture ([7, 9, 11], (import sq_two)):("idsq_7 = id_foo(7), ") then sq_foo_seqd:(1)
-given sq_fixture ([], (import sq_two)):("") then sq_foo_seqd:(0)
+given sq_fixture {
+  ([7, 9, 11], (import sq_two)):("idsq_7 = id_foo(7), ") then sq_foo_seqd:(1)
+  ([], (import sq_two)):("") then sq_foo_seqd:(0)
+}
 
 // The unit's own declaration is emitted here, as a side effect, before its
 // text is computed: the unit is emitted (and thereby every nested
@@ -42,5 +44,7 @@ seq_bind(int u) {
   seq_mark(u, 1);
   string ret_s = sq_name(u) + " = " + sq_code + ", ";
 } return string ret_s;
-given sq_fixture (7):("idsq_7 = id_foo(7), ") then sq_foo_seqd:(1)
-given sq_fixture (9):("idsq_9 = id_bar(3), ") then prints:("int idsq_9;\n")
+given sq_fixture {
+  (7):("idsq_7 = id_foo(7), ") then sq_foo_seqd:(1)
+  (9):("idsq_9 = id_bar(3), ") then prints:("int idsq_9;\n")
+}

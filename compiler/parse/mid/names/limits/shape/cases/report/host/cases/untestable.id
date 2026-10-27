@@ -27,8 +27,10 @@ ut_case(int ci) {
     j = j + 1;
   }
 } return void;
-given notes_base given void_call_fixture (0):() then calls ut_case_fn:(0, "fx_target") then calls ut_case_val:(0, (import fixture_zero))
-given notes_base given void_call_fixture (1):() then calls ut_case_fn:(1, "bare") then calls ut_case_val:[0]
+given notes_base {
+  given void_call_fixture (0):() then calls ut_case_fn:(0, "fx_target") then calls ut_case_val:(0, (import fixture_zero))
+  given void_call_fixture (1):() then calls ut_case_fn:(1, "bare") then calls ut_case_val:[0]
+}
 
 // ut_at (../../why/reason.id) traps unless a case's `given` also ran ut_mark
 // (../mark/), which case_fixture/wrap_fixture never do; notes_base (mid/

@@ -21,10 +21,12 @@ esc_ms_a() {
   export int ems_lit = node_txt("str", "k");
   export int ems_dn = node_decl("string[]", "mnames", node_arr((import ef_none)), 0);
 } return void;
-given esc_ms_fix ():() then calls add_var:("mnames", "string[]", 0) then calls add_var:("ms", "string", 0) then calls add_var:("mn", "int", 0)
-given esc_ms_fix ():() then calls node_txt:("var", "mnames") then calls node_txt:("var", "ms") then calls node_txt:("var", "mn")
-given esc_ms_fix ():() then (import chkfail)[0]:(0)
-given esc_ms_fix ():() then init_units:(0)
+given esc_ms_fix {
+  ():() then calls add_var:("mnames", "string[]", 0) then calls add_var:("ms", "string", 0) then calls add_var:("mn", "int", 0)
+  ():() then calls node_txt:("var", "mnames") then calls node_txt:("var", "ms") then calls node_txt:("var", "mn")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_ms_b() {
   export int ems_ds = node_decl("string", "ms", (import ems_cat), 0);
@@ -38,7 +40,9 @@ esc_ms_b() {
   export int[] ems_lbody = [(import ems_dn), (import ems_dl), (import ems_ps)];
   export int[] ems_abody = [(import ems_dn), (import ems_ds), (import ems_as), (import ems_ps)];
 } return void;
-given esc_ms_fix ():() then calls node_decl:("string", "ms", (import ems_lit), 0) then calls node_txt1:("assign", "ms", (import ems_cat))
-given esc_ms_fix ():() then calls node_call:("push", [(import ems_rv), (import ems_sv)]) then calls node_exprstmt:((import ems_pc))
-given esc_ms_fix ():() then (import chkfail)[0]:(0)
-given esc_ms_fix ():() then init_units:(0)
+given esc_ms_fix {
+  ():() then calls node_decl:("string", "ms", (import ems_lit), 0) then calls node_txt1:("assign", "ms", (import ems_cat))
+  ():() then calls node_call:("push", [(import ems_rv), (import ems_sv)]) then calls node_exprstmt:((import ems_pc))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

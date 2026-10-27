@@ -9,8 +9,10 @@ gblk_piece(int gb_at) {
     gb_word = gb_word + " ";
   }
 } return string gb_word;
-given gblk_stream("share") (0):("given ")
-given gblk_stream("share") (1):("vs")
+given gblk_stream("share") {
+  (0):("given ")
+  (1):("vs")
+}
 
 gblk_share_diag(int[] pos, int gb_first, int gb_gend, int gb_cnt) {
   string gb_setup = gblk_join(gb_first, gb_gend);

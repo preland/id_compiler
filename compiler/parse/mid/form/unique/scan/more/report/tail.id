@@ -10,8 +10,10 @@ dup_tail(int j) {
 } chain (int j) {
   string ret_s = def_at(name_j, func_file_v + ":" + func_line_v2);
 } return string ret_s;
-given lz_o (0):("'dup5' (defined at <stdin>:1)")
-given lz_o (1):("'dup9' (defined at <stdin>:1)")
+given lz_o {
+  (0):("'dup5' (defined at <stdin>:1)")
+  (1):("'dup9' (defined at <stdin>:1)")
+}
 
 // The same place as `FILE:LINE`, for the diagnostic's related line.
 dup_loc_of(int j) {
@@ -19,5 +21,7 @@ dup_loc_of(int j) {
   int line_j = func_line(name_j);
   string loc_j = diag_fn_loc(name_j, line_j);
 } return string loc_j;
-given lz_o (0):("<stdin>:1")
-given lz_o (1):("<stdin>:1")
+given lz_o {
+  (0):("<stdin>:1")
+  (1):("<stdin>:1")
+}

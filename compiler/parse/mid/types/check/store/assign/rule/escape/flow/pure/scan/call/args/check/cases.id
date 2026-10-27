@@ -11,8 +11,10 @@ pure_cases(int pq_k) {
     pq_k = pq_k + 1;
   }
 } return void;
-given pure_fix_cases (0):() then (import chkfail)[0]:(1)
-given pure_fix_cases (1):() then (import chkfail)[0]:(0)
+given pure_fix_cases {
+  (0):() then (import chkfail)[0]:(1)
+  (1):() then (import chkfail)[0]:(0)
+}
 
 pure_case(int pq_k) {
   int pq_owner = (import casefn)[pq_k];
@@ -22,8 +24,10 @@ pure_case(int pq_k) {
     pq_j = pq_j + 1;
   }
 } return void;
-given pure_fix_cases (0):() then (import chkfail)[0]:(1)
-given pure_fix_cases (1):() then (import chkfail)[0]:(0)
+given pure_fix_cases {
+  (0):() then (import chkfail)[0]:(1)
+  (1):() then (import chkfail)[0]:(0)
+}
 
 pure_case_arg(int pq_k, int pq_owner, int pq_j) {
   int pq_arg = (((import nl1)[((import casenode)[pq_k])])[pq_j]);
@@ -31,5 +35,7 @@ pure_case_arg(int pq_k, int pq_owner, int pq_j) {
     pure_err_case(pq_k, pq_owner, pq_j);
   }
 } return void;
-given pure_fix_cases (0, (import pfx_pm), 0):() then (import chkfail)[0]:(1)
-given pure_fix_cases (1, (import pfx_pm), 0):() then (import chkfail)[0]:(0)
+given pure_fix_cases {
+  (0, (import pfx_pm), 0):() then (import chkfail)[0]:(1)
+  (1, (import pfx_pm), 0):() then (import chkfail)[0]:(0)
+}

@@ -10,6 +10,8 @@ vocab_judge(string vocab_name, int vocab_kind, int vocab_row) {
     vocab_report(vocab_name, vocab_kind, vocab_row, vocab_failed);
   }
 } return void;
-given edge_fixture given vocab_words ("fb_w", 0, 0):() then (import vocab_totals)[1]:(1)
-given edge_fixture given vocab_words ("buffer_width", 0, 0):() then (import vocab_totals)[1]:(0)
-given edge_fixture given vocab_words ("buffer_width", 0, 0):() then prints:("")
+given edge_fixture {
+  given vocab_words ("fb_w", 0, 0):() then (import vocab_totals)[1]:(1)
+  given vocab_words ("buffer_width", 0, 0):() then (import vocab_totals)[1]:(0)
+  given vocab_words ("buffer_width", 0, 0):() then prints:("")
+}

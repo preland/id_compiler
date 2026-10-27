@@ -7,8 +7,10 @@ case_err(int i, string msg) {
   print(case_loc_v + ": error: " + msg);
   note_failure();
 } return void;
-given case_fixture (0, "oops"):() then prints:("fixture.id:4: error: oops\n")
-given case_fixture (0, "oops"):() then (import chkfail)[0]:(1)
+given case_fixture {
+  (0, "oops"):() then prints:("fixture.id:4: error: oops\n")
+  (0, "oops"):() then (import chkfail)[0]:(1)
+}
 
 case_loc(int i) {
   string s1_of_v = (import ns1)[((import casenode)[i])];

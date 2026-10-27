@@ -32,10 +32,12 @@ setup_writes(string nm, int ek, string imp_nm, int hit) {
     r = 1;
   }
 } return int r;
-given wrote_fixture () ("wr", 0, "gx", 0):(1)
-given wrote_fixture () ("wc", 0, "gx", 0):(0)
-given wrote_fixture () ("nosuchfn123", 0, "gx", 1):(1)
-given wrote_fixture () ("fx_target", 0, "gx", 0):(0)
+given wrote_fixture () {
+  ("wr", 0, "gx", 0):(1)
+  ("wc", 0, "gx", 0):(0)
+  ("nosuchfn123", 0, "gx", 1):(1)
+  ("fx_target", 0, "gx", 0):(0)
+}
 
 // The fixture of then_imp_fixture (rd reads gx, exporter mk) plus two more
 // functions registered where func_node looks: wr, which binds a list name to

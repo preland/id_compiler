@@ -10,15 +10,19 @@ cvl_case() {
   push((import casefn), (import cvf_main));
   push((import casenode), cvc_node);
 } return void;
-given cvl_setup ():() then calls newleaf:("cimport", 0, 0, "cc", "")
-given cvl_setup ():() then calls newnode:("case", 0, 0, "", "", [11], []) then len((import casenode)):(1) then (import casefn)[0]:(10)
-given cvl_setup ():() then (import chkfail)[0]:(0)
-given cvl_setup ():() then init_units:(0)
+given cvl_setup {
+  ():() then calls newleaf:("cimport", 0, 0, "cc", "")
+  ():() then calls newnode:("case", 0, 0, "", "", [11], []) then len((import casenode)):(1) then (import casefn)[0]:(10)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 cvl_std() {
   integer_list_set((import stdunit), 0, 0);
 } return void;
-given cvl_setup ():() then (import stdunit)[0]:(0)
-given cvl_setup given integer_list_set((import stdunit), 0, 5) ():() then (import stdunit)[0]:(0)
-given cvl_setup ():() then (import chkfail)[0]:(0)
-given cvl_setup ():() then init_units:(0)
+given cvl_setup {
+  ():() then (import stdunit)[0]:(0)
+  given integer_list_set((import stdunit), 0, 5) ():() then (import stdunit)[0]:(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

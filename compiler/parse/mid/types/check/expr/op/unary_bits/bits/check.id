@@ -13,8 +13,10 @@ chk_bits(int id) {
     chk_mod(id);
   }
 } return void;
-given cmp_fixture ((import bin_and)):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_bitand)):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  ((import bin_and)):() then (import chkfail)[0]:(0)
+  ((import bin_bitand)):() then (import chkfail)[0]:(0)
+}
 
 chk_bits2(int id) {
   int i1_of_v = (import ni1)[id];
@@ -36,5 +38,7 @@ bits_err(int id, string lt, string rt) {
     tc_err(id, "'" + s1_of_v3 + "' requires int or word operands, got " + lt + " and " + rt);
   }
 } return void;
-given cmp_fixture ((import bin_and), "int", "int"):() then prints:("<stdin>:1: error: '&&' requires int operands\n")
-given cmp_fixture ((import bin_bitand), "string", "int"):() then prints:("<stdin>:1: error: '&' requires int or word operands, got string and int\n")
+given cmp_fixture {
+  ((import bin_and), "int", "int"):() then prints:("<stdin>:1: error: '&&' requires int operands\n")
+  ((import bin_bitand), "string", "int"):() then prints:("<stdin>:1: error: '&' requires int or word operands, got string and int\n")
+}

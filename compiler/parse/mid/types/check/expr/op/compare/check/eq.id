@@ -15,8 +15,10 @@ eq_types(int id, int a, int b) {
   string rt = type_of(b);
   eq_report(id, lt, rt);
 } return void;
-given cmp_fixture ((import bin_eq), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_eq), (import lit_str), (import lit_a)):() then (import chkfail)[0]:(1)
+given cmp_fixture {
+  ((import bin_eq), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
+  ((import bin_eq), (import lit_str), (import lit_a)):() then (import chkfail)[0]:(1)
+}
 
 eq_report(int id, string lt, string rt) {
   int eq_ok_v = eq_ok(lt, rt);
@@ -24,5 +26,7 @@ eq_report(int id, string lt, string rt) {
     tc_diag(id, "E0604", "cannot compare " + lt + " with " + rt, "", "== and != compare two strings or two numbers, and < <= > >= compare two numbers; id has no ordering on strings and no silent conversion between a string and a number", "compare like with like: convert one side first (to_int(s) makes a number of a string, and \"\" + n makes a string of a number), or to order strings use idstd's str_cmp(a, b)");
   }
 } return void;
-given cmp_fixture ((import bin_eq), "int", "int"):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_eq), "string", "int"):() then prints:("<stdin>:1: error: cannot compare string with int [E0604]\n  why: == and != compare two strings or two numbers, and < <= > >= compare two numbers; id has no ordering on strings and no silent conversion between a string and a number\n  help: compare like with like: convert one side first (to_int(s) makes a number of a string, and \"\" + n makes a string of a number), or to order strings use idstd's str_cmp(a, b)\n") then (import chkfail)[0]:(1)
+given cmp_fixture {
+  ((import bin_eq), "int", "int"):() then (import chkfail)[0]:(0)
+  ((import bin_eq), "string", "int"):() then prints:("<stdin>:1: error: cannot compare string with int [E0604]\n  why: == and != compare two strings or two numbers, and < <= > >= compare two numbers; id has no ordering on strings and no silent conversion between a string and a number\n  help: compare like with like: convert one side first (to_int(s) makes a number of a string, and \"\" + n makes a string of a number), or to order strings use idstd's str_cmp(a, b)\n") then (import chkfail)[0]:(1)
+}

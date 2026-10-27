@@ -23,5 +23,7 @@ lw_arr_one(int node, int i, int a, string elem) {
   lw_arr_push(node, i, a, elem);
   int ret_i = i + 1;
 } return int ret_i;
-given lw_fix_arr ((import fix_arr_n), 0, 0, "int"):(1)
-given lw_fix_arr ((import fix_arr_n), 0, 5, "word"):(1)
+given lw_fix_arr {
+  ((import fix_arr_n), 0, 0, "int"):(1)
+  ((import fix_arr_n), 0, 5, "word"):(1)
+}

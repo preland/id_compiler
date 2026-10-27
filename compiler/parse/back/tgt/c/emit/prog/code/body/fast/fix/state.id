@@ -12,8 +12,10 @@ lpf_cs(int lfi_k) {
 lpf_push1() {
   push((import lpset), 1);
 } return void;
-given lpf_env ():() then (import lpset)[0]:(1)
-given lpf_env ():() then len((import lpset)):(1)
+given lpf_env {
+  ():() then (import lpset)[0]:(1)
+  ():() then len((import lpset)):(1)
+}
 
 lpf_on() {
   lpf_more();

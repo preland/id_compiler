@@ -31,9 +31,11 @@ sd_fields(int[] pos, string[] sd_fns, string[] sd_fts) {
     sd_field(pos, sd_fns, sd_fts);
   }
 } return void;
-given sd_toks ([3], [], []):([9], ["x", "y"], ["int", "string"])
-given sd_toks ([6], [], []):([9], ["y"], ["string"])
-given sd_toks ([9], [], []):([9], [], [])
+given sd_toks {
+  ([3], [], []):([9], ["x", "y"], ["int", "string"])
+  ([6], [], []):([9], ["y"], ["string"])
+  ([9], [], []):([9], [], [])
+}
 
 sd_field(int[] pos, string[] sd_fns, string[] sd_fts) {
   string sd_t = parse_type(pos);
@@ -44,5 +46,7 @@ sd_field(int[] pos, string[] sd_fns, string[] sd_fts) {
   expect_text(pos, ";");
   advance(pos);
 } return void;
-given sd_toks ([3], [], []):([6], ["x"], ["int"])
-given sd_toks ([6], [], []):([9], ["y"], ["string"])
+given sd_toks {
+  ([3], [], []):([6], ["x"], ["int"])
+  ([6], [], []):([9], ["y"], ["string"])
+}

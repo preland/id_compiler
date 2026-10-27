@@ -16,10 +16,12 @@ stmt_fix3(int e0) {
   int w0 = node_while(e0, none);
   stmt_fix4(e0, none);
 } return void;
-given stmt_fix (0):() then calls node_while:(0, [])
-given stmt_fix (5):() then calls node_if:(5, [], [], 0) then calls node_exprstmt:(5)
-given stmt_fix (0):() then (import chkfail)[0]:(0)
-given stmt_fix (0):() then init_units:(0)
+given stmt_fix {
+  (0):() then calls node_while:(0, [])
+  (5):() then calls node_if:(5, [], [], 0) then calls node_exprstmt:(5)
+  (0):() then (import chkfail)[0]:(0)
+  (0):() then init_units:(0)
+}
 
 // if0 = if(e0, then [], else []), x0 = exprstmt e0. Deterministic ids:
 // if0=4, x0=5.
@@ -28,7 +30,9 @@ stmt_fix4(int e0, int[] none) {
   int x0 = node_exprstmt(e0);
   stmt_fix5(e0);
 } return void;
-given stmt_fix (0, []):() then calls node_if:(0, [], [], 0)
-given stmt_fix (3, []):() then calls node_if:(3, [], [], 0) then calls node_exprstmt:(3)
-given stmt_fix (0, []):() then (import chkfail)[0]:(0)
-given stmt_fix (0, []):() then init_units:(0)
+given stmt_fix {
+  (0, []):() then calls node_if:(0, [], [], 0)
+  (3, []):() then calls node_if:(3, [], [], 0) then calls node_exprstmt:(3)
+  (0, []):() then (import chkfail)[0]:(0)
+  (0, []):() then init_units:(0)
+}

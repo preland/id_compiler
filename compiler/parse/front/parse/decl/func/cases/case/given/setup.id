@@ -30,8 +30,10 @@ parse_case_args(int[] pos) {
   int[] args = case_tuple(pos);
   int ret_i = parse_case_rhs(pos, args);
 } return int ret_i;
-given case_min_fix ([0]):(2)
-given case_min_fix ([0]):(2) then (import chkfail)[0]:(0)
+given case_min_fix {
+  ([0]):(2)
+  ([0]):(2) then (import chkfail)[0]:(0)
+}
 
 case_given(int[] pos) {
   string setup_nm = "";

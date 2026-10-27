@@ -8,6 +8,8 @@
 wsc_rtname(string wrn_name) {
   int wrn_r = find_str((import resv_names), wrn_name) >= 0 || wrn_name == "eprint";
 } return int wrn_r;
-given init_rtc ("poke8"):(1)
-given init_rtc ("eprint"):(1)
-given init_rtc ("wsput"):(0)
+given init_rtc {
+  ("poke8"):(1)
+  ("eprint"):(1)
+  ("wsput"):(0)
+}

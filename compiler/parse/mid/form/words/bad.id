@@ -14,15 +14,17 @@ vocab_bad(string vocab_name) {
     vocab_i = vocab_i + 1;
   }
 } return string vocab_acc;
-given full_env given vocab_words ("buffer_width"):("")
-given full_env given vocab_words ("fb_w"):("fb, w")
-given full_env given vocab_words ("fb_width"):("fb")
-given full_env given vocab_words ("UTF8_BUFFER"):("")
-given full_env given vocab_words ("buffer__width"):("(empty)")
-given full_env given vocab_words ("fb"):("fb")
-given full_env given vocab_words ("buffer_x"):("")
-given full_env given vocab_words ("BUFFER_Y"):("")
-given full_env given vocab_words ("z"):("z")
-given full_env given vocab_words ("BufferWidth"):("")
-given full_env given vocab_words ("FbWidth"):("Fb")
-given full_env given vocab_words ("BufferFbW"):("Fb, W")
+given full_env {
+  given vocab_words ("buffer_width"):("")
+  given vocab_words ("fb_w"):("fb, w")
+  given vocab_words ("fb_width"):("fb")
+  given vocab_words ("UTF8_BUFFER"):("")
+  given vocab_words ("buffer__width"):("(empty)")
+  given vocab_words ("fb"):("fb")
+  given vocab_words ("buffer_x"):("")
+  given vocab_words ("BUFFER_Y"):("")
+  given vocab_words ("z"):("z")
+  given vocab_words ("BufferWidth"):("")
+  given vocab_words ("FbWidth"):("Fb")
+  given vocab_words ("BufferFbW"):("Fb, W")
+}

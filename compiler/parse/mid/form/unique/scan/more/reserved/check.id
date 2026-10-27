@@ -6,6 +6,8 @@ is_reserved_name(int i) {
   string s1_of_v = (import ns1)[((import prog)[i])];
   int ok = find_str((import resv_names), s1_of_v) >= 0 || s1_of_v == "eprint";
 } return int ok;
-given dup_prog_fixture("eprint", "plain_name", 3, 9) (0):(1)
-given dup_prog_fixture("eprint", "plain_name", 3, 9) (1):(0)
+given dup_prog_fixture("eprint", "plain_name", 3, 9) {
+  (0):(1)
+  (1):(0)
+}
 

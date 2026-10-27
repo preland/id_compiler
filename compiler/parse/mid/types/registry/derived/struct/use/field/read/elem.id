@@ -11,6 +11,8 @@ idx_elem(string sd_bt, int id) {
     t = sd_cell((import sdftype), sd_bt, sd_k);
   }
 } return string t;
-given sd_use_fixture ("int[]", (import sd_ii)):("int")
-given sd_use_fixture ("P", (import sd_ix)):("int")
-given sd_use_fixture ("Q", (import sd_ix)):("")
+given sd_use_fixture {
+  ("int[]", (import sd_ii)):("int")
+  ("P", (import sd_ix)):("int")
+  ("Q", (import sd_ix)):("")
+}

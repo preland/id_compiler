@@ -3,20 +3,24 @@ ir_rows_fn1() {
   int b1 = ir_block(fn1id, "body");
   ir_rows_fn1_insn();
 } return void;
-given ir_rows ():() then calls ir_func:(7, "two", "string") then calls ir_block:(2, "body")
-given ir_rows ():() then (import fnnode)[2]:(7) then (import blabel)[2]:("body")
-given ir_rows ():() then (import chkfail)[0]:(0)
-given ir_rows ():() then init_units:(0)
+given ir_rows {
+  ():() then calls ir_func:(7, "two", "string") then calls ir_block:(2, "body")
+  ():() then (import fnnode)[2]:(7) then (import blabel)[2]:("body")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 ir_rows_fn1_insn() {
   int v1 = ir_leaf("const", "string", 0 - 1, 0 - 1, "hi");
   export int[] chk_id = [0];
   ir_rows_fn1_idx();
 } return void;
-given ir_rows ():() then calls ir_leaf:("const", "string", -1, -1, "hi")
-given ir_rows ():() then (import istr)[2]:("hi") then (import ihome)[2]:(-1)
-given ir_rows ():() then (import chkfail)[0]:(0)
-given ir_rows ():() then init_units:(0)
+given ir_rows {
+  ():() then calls ir_leaf:("const", "string", -1, -1, "hi")
+  ():() then (import istr)[2]:("hi") then (import ihome)[2]:(-1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // Symbol-index and build-flag tables a case can otherwise segfault reading:
 // init_idx (name lookups, e.g. type_of's name_type path on any node) and

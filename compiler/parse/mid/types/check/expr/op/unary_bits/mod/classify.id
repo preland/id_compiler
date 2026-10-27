@@ -9,6 +9,8 @@ chk_mod(int id) {
   int i2_of_v = (import ni2)[id];
   mod_types(id, i1_of_v, i2_of_v);
 } return void;
-given cmp_fixture ((import bin_bitand)):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  ((import bin_bitand)):() then (import chkfail)[0]:(0)
+  ((import bin_eq)):() then (import chkfail)[0]:(0)
+}
 

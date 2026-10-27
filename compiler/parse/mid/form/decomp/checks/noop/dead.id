@@ -33,12 +33,14 @@ noop_pure(int nzv_node) {
     nzv_ok = noop_pure((import ni1)[nzv_node]);
   }
 } return int nzv_ok;
-given noop_world ((import wx_va)):(1)
-given noop_world ((import wx_sum)):(1)
-given noop_world ((import wx_neg)):(1)
-given noop_world ((import wx_foo)):(0)
-given noop_world ((import nfx_afoo)):(0)
-given noop_world ((import wx_idx)):(0)
+given noop_world {
+  ((import wx_va)):(1)
+  ((import wx_sum)):(1)
+  ((import wx_neg)):(1)
+  ((import wx_foo)):(0)
+  ((import nfx_afoo)):(0)
+  ((import wx_idx)):(0)
+}
 
 noop_const(string nzh_name) {
   int nzh_i = 0;

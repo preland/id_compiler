@@ -9,8 +9,10 @@ emit_then_got(int ci, int ti, string chk_nm, int cfn) {
   string ct = c_type(rt);
   emit_then_want(ci, ti, chk_nm, rt, ct);
 } return void;
-given chk_fixture (0, 0, "chk", (import fixture_chk_fn)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
-given chk_fixture (2, 0, "chk", (import fixture_chk_fn)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+given chk_fixture {
+  (0, 0, "chk", (import fixture_chk_fn)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+  (2, 0, "chk", (import fixture_chk_fn)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+}
 
 emit_then_want(int ci, int ti, string chk_nm, string rt, string ct) {
   int[] targs = (import nl2)[((import thennode)[ti])];
@@ -20,13 +22,17 @@ emit_then_want(int ci, int ti, string chk_nm, string rt, string ct) {
   int[] items = (import nl1)[((import thennode)[ti])];
   emit_then_judge(ci, ti, then_label(chk_nm, targs), rt, items);
 } return void;
-given chk_fixture (0, 0, "chk", "int", "int"):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
-given chk_fixture (2, 0, "chk", "int", "int"):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+given chk_fixture {
+  (0, 0, "chk", "int", "int"):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+  (2, 0, "chk", "int", "int"):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+}
 
 emit_then_judge(int ci, int ti, string chk_lbl, string rt, int[] items) {
   string cv = tc_value(items[0], rt);
   emit_tc_decl(rt, "idtc_want" + ti, cv);
   emit_then_fail(ci, ti, chk_lbl, rt);
 } return void;
-given chk_fixture (0, 0, "chk()", "int", (import fixture_chk_one)):() then prints:("    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
-given chk_fixture (2, 0, "chk()", "int", (import fixture_chk_one)):() then prints:("    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+given chk_fixture {
+  (0, 0, "chk()", "int", (import fixture_chk_one)):() then prints:("    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+  (2, 0, "chk()", "int", (import fixture_chk_one)):() then prints:("    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+}

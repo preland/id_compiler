@@ -20,6 +20,8 @@ ll_free_one(string nm) {
     print("define void @idfr_" + nm + "(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_" + nm + ")\n  ret void\n}");
   }
 } return void;
-given esc_fm_fix ("Tr"):() then prints:("@idfrd_Tr = private unnamed_addr constant [7 x i8] c\"S1l@0;\\00\"\ndefine void @idfr_Tr(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_Tr)\n  ret void\n}\n")
-given esc_fm_fix ("Tr"):() then calls esc_desc:("Tr")
-given esc_fm_fix ("int"):() then prints:("")
+given esc_fm_fix {
+  ("Tr"):() then prints:("@idfrd_Tr = private unnamed_addr constant [7 x i8] c\"S1l@0;\\00\"\ndefine void @idfr_Tr(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_Tr)\n  ret void\n}\n")
+  ("Tr"):() then calls esc_desc:("Tr")
+  ("int"):() then prints:("")
+}

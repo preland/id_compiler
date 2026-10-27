@@ -32,5 +32,7 @@ raw_arg(int id, int i, int a) {
     s = "id_fn_raw(" + s + ")";
   }
 } return string s;
-given clo_native_fixture ((import cn_call), 0, (import cb_name)):("id_fn_raw(ID_FNV(fx_target__0))")
-given clo_native_fixture ((import cn_call), 1, (import cb_lit)):("7")
+given clo_native_fixture {
+  ((import cn_call), 0, (import cb_name)):("id_fn_raw(ID_FNV(fx_target__0))")
+  ((import cn_call), 1, (import cb_lit)):("7")
+}

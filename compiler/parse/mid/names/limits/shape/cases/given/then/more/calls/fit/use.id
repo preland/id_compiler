@@ -34,14 +34,16 @@ node_import_use(int nd, string imp_nm, int imu_cur) {
     r = call_imp_arg(nd, imp_nm, r);
   }
 } return int r;
-given imp_use_fixture ((import imp_use_rd), "gx", 0):(1)
-given imp_use_fixture ((import imp_use_alias), "gx", 1):(2)
-given imp_use_fixture ((import imp_use_call), "gx", 1):(2)
-given imp_use_fixture ((import imp_use_len), "gx", 1):(1)
-given imp_use_fixture ((import imp_use_row), "gx", 1):(2)
-given imp_use_fixture ((import imp_use_alias), "gy", 0):(0)
-given imp_use_fixture ((import imp_use_dcall), "gx", 1):(2)
-given imp_use_fixture given sd_note("P", ["x"], ["int"], "p.id", 1) ((import imp_use_sdecl), "gx", 1):(2)
+given imp_use_fixture {
+  ((import imp_use_rd), "gx", 0):(1)
+  ((import imp_use_alias), "gx", 1):(2)
+  ((import imp_use_call), "gx", 1):(2)
+  ((import imp_use_len), "gx", 1):(1)
+  ((import imp_use_row), "gx", 1):(2)
+  ((import imp_use_alias), "gy", 0):(0)
+  ((import imp_use_dcall), "gx", 1):(2)
+  given sd_note("P", ["x"], ["int"], "p.id", 1) ((import imp_use_sdecl), "gx", 1):(2)
+}
 
 call_imp_arg(int nd, string imp_nm, int imu_cur) {
   int[] args = (import nl1)[nd];
@@ -56,10 +58,12 @@ call_imp_arg(int nd, string imp_nm, int imu_cur) {
     j = j + 1;
   }
 } return int r;
-given imp_use_fixture ((import imp_use_call), "gx", 0):(2)
-given imp_use_fixture ((import imp_use_call), "gy", 0):(0)
-given imp_use_fixture ((import imp_use_elem), "gx", 0):(2)
-given imp_use_fixture ((import imp_use_dcall), "gx", 0):(2)
+given imp_use_fixture {
+  ((import imp_use_call), "gx", 0):(2)
+  ((import imp_use_call), "gy", 0):(0)
+  ((import imp_use_elem), "gx", 0):(2)
+  ((import imp_use_dcall), "gx", 0):(2)
+}
 
 // One expression node of each kind node_import_use tells apart, over an import
 // of gx: the bare read, `int[] al = gx`, `lset(gx)`, `len(gx)`, `int[] row = gx[0]`

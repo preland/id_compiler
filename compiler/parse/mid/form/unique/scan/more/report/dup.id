@@ -11,8 +11,10 @@ dup_probe(int i, int j) {
     found = j;
   }
 } return int found;
-given lz_o (0, 0):(0)
-given lz_o (1, 1):(1)
+given lz_o {
+  (0, 0):(0)
+  (1, 1):(1)
+}
 
 report_dup(int i, int j) {
   string name_i = fname_at(i);
@@ -23,8 +25,10 @@ report_dup(int i, int j) {
   diag("E0402", dup_where, "function '" + name_i + "' has the same signature and logic as " + tail_v, name_i, (import dupd_why), (import dupd_help));
   diag_related(dup_there, "the function this one repeats");
 } return void;
-given lz_o (1, 0):() then prints:("<stdin>:1: error: function 'dup9' has the same signature and logic as 'dup5' (defined at <stdin>:1) [E0402]\n  at: dup9\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: <stdin>:1: note: the function this one repeats\n") then (import chkfail)[0]:(1)
-given lz_o (0, 1):() then prints:("<stdin>:1: error: function 'dup5' has the same signature and logic as 'dup9' (defined at <stdin>:1) [E0402]\n  at: dup5\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: <stdin>:1: note: the function this one repeats\n") then (import chkfail)[0]:(1)
+given lz_o {
+  (1, 0):() then prints:("<stdin>:1: error: function 'dup9' has the same signature and logic as 'dup5' (defined at <stdin>:1) [E0402]\n  at: dup9\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: <stdin>:1: note: the function this one repeats\n") then (import chkfail)[0]:(1)
+  (0, 1):() then prints:("<stdin>:1: error: function 'dup5' has the same signature and logic as 'dup9' (defined at <stdin>:1) [E0402]\n  at: dup5\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: <stdin>:1: note: the function this one repeats\n") then (import chkfail)[0]:(1)
+}
 
 // The one place a fingerprint's index becomes a function. `cfpfn` (../../fill.id)
 // records the owner of every entry in `cfp`, so the two indexes stay distinct
@@ -35,5 +39,7 @@ fname_at(int i) {
   int fi = (import cfpfn)[i];
   string ret_s = (import ns1)[((import prog)[fi])];
 } return string ret_s;
-given lz_o (0):("dup5")
-given lz_o (1):("dup9")
+given lz_o {
+  (0):("dup5")
+  (1):("dup9")
+}

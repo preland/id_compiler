@@ -11,8 +11,10 @@ lw_adopt(string name, int v, string ety) {
     ret_i = lw_callf("id_list_adopt", ety, [v]);
   }
 } return int ret_i;
-given lw_nl_fixture ("t", 5, "int[]"):(5)
-given lw_nl_fixture ("nat", 5, "int[]"):(0)
+given lw_nl_fixture {
+  ("t", 5, "int[]"):(5)
+  ("nat", 5, "int[]"):(0)
+}
 
 // A lowering environment holding one native, "nat", that returns int[]: node 1,
 // registered as a callable beside the fixture function "t" (node 0).
@@ -30,5 +32,7 @@ lw_nl_fixture() {
 lw_native_list(int f, string ety) {
   int ok = f >= 0 && is_native(f) == 1 && (ty_is_list(ety) == 1 || ty_kind_is(ety, "struct") == 1);
 } return int ok;
-given mk_two_nodes (1, "int[]"):(1)
-given mk_two_nodes (0, "int[]"):(0)
+given mk_two_nodes {
+  (1, "int[]"):(1)
+  (0, "int[]"):(0)
+}

@@ -9,8 +9,10 @@ push_toks(string[] kinds, string[] texts) {
     i = i + 1;
   }
 } return void;
-given env_init (["ident", "op"], ["x", "("]):() then (import chkfail)[0]:(0)
-given env_init (["kw"], ["int"]):() then (import chkfail)[0]:(0)
+given env_init {
+  (["ident", "op"], ["x", "("]):() then (import chkfail)[0]:(0)
+  (["kw"], ["int"]):() then (import chkfail)[0]:(0)
+}
 
 // The second int field of the most recently created node, for a case whose
 // function under test returns a node id it cannot itself compare a field of

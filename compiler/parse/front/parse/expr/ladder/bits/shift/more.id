@@ -5,5 +5,7 @@ fold_shift_tail(int[] pos, int left, string op) {
   int right = parse_add(pos);
   int ret_i = node_txt2("bin", op, left, right);
 } return int ret_i;
-given expr_tokens ([6], 100, "<<"):(1)
-given expr_tokens ([2], 100, "<<"):(3)
+given expr_tokens {
+  ([6], 100, "<<"):(1)
+  ([2], 100, "<<"):(3)
+}

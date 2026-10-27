@@ -12,11 +12,13 @@ lp_limit(int lq_r) {
     lq_ok = lp_lenarg(lq_r);
   }
 } return int lq_ok;
-given lpf_more ((import lpf_na)):(1)
-given lpf_more ((import lpf_n0)):(1)
-given lpf_more ((import lpf_nb)):(1)
-given lpf_more ((import lpf_z1)):(0)
-given lpf_more ((import lpf_kc)):(0)
+given lpf_more {
+  ((import lpf_na)):(1)
+  ((import lpf_n0)):(1)
+  ((import lpf_nb)):(1)
+  ((import lpf_z1)):(0)
+  ((import lpf_kc)):(0)
+}
 
 lp_lenarg(int lq_r) {
   int[] lq_args = (import nl1)[lq_r];
@@ -25,8 +27,10 @@ lp_lenarg(int lq_r) {
     lq_ok = 1;
   }
 } return int lq_ok;
-given lpf_more ((import lpf_nb)):(1)
-given lpf_more ((import lpf_kc)):(0)
+given lpf_more {
+  ((import lpf_nb)):(1)
+  ((import lpf_kc)):(0)
+}
 
 lp_lname(int lq_r) {
   string lq_s = "";
@@ -37,6 +41,8 @@ lp_lname(int lq_r) {
     lq_s = (import ns1)[((import nl1)[lq_r][0])];
   }
 } return string lq_s;
-given lpf_more ((import lpf_na)):("lan")
-given lpf_more ((import lpf_nb)):("lbv")
-given lpf_more ((import lpf_n0)):("")
+given lpf_more {
+  ((import lpf_na)):("lan")
+  ((import lpf_nb)):("lbv")
+  ((import lpf_n0)):("")
+}

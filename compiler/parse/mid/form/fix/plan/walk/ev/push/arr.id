@@ -6,9 +6,11 @@ fix_walk_arr(int e, int cd) {
     i = i + 1;
   }
 } return void;
-given fix_walk_arg2_fixture ((import wa2_e1), 0):() then calls fix_walk:((import wa2_e2), 0, 0, "", "")
-given fix_walk_arg2_fixture ((import wa2_e1), 1):() then calls fix_walk:((import wa2_e2), 0, 1, "", "")
-given fix_walk_arg2_fixture ((import wa2_e2), 1):() then calls fix_walk:[0]
+given fix_walk_arg2_fixture {
+  ((import wa2_e1), 0):() then calls fix_walk:((import wa2_e2), 0, 0, "", "")
+  ((import wa2_e1), 1):() then calls fix_walk:((import wa2_e2), 0, 1, "", "")
+  ((import wa2_e2), 1):() then calls fix_walk:[0]
+}
 
 // Two more nodes on top of fix_fixture's own (run/state/grp/gcl.id's
 // fix_gcl_fill case): fixd_gcl is fix_gcl's alone to export, already used up

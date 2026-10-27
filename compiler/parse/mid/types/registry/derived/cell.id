@@ -10,5 +10,7 @@ sd_cell(string[][] sd_tab, string sd_s, int sd_k) {
     s = sd_tab[sd_i][sd_k];
   }
 } return string s;
-given sd_pair ((import sdfname), "P", 1):("y")
-given sd_pair ((import sdftype), "Q", 0):("string")
+given sd_pair {
+  ((import sdfname), "P", 1):("y")
+  ((import sdftype), "Q", 0):("string")
+}

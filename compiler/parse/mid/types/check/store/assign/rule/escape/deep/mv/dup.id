@@ -11,9 +11,11 @@ esc_cdup(string sd, int[] dz_as, int cdup_k) {
     d = esc_abads(dz_as) == 0;
   }
 } return int d;
-given esc_ms_fix ("Tr", [(import ems_lit)], 0):(1)
-given esc_ms_fix ("Pt", [(import ems_lit)], 0):(0)
-given esc_ms_fix ("Tr", [(import ems_lit), (import ems_sv)], 0):(0)
+given esc_ms_fix {
+  ("Tr", [(import ems_lit)], 0):(1)
+  ("Pt", [(import ems_lit)], 0):(0)
+  ("Tr", [(import ems_lit), (import ems_sv)], 0):(0)
+}
 
 // The code of argument `k` of a constructor of struct `sd`: `code` itself, or a
 // heap copy of it when the emitters copy it (esc_cdup).
@@ -23,5 +25,7 @@ esc_ctor_code(string sd, int[] dz_as, int cdup_k, string code) {
     s = "id_str_dup(" + code + ")";
   }
 } return string s;
-given esc_ms_fix ("Tr", [(import ems_lit)], 0, "ID_S(\"k\")"):("id_str_dup(ID_S(\"k\"))")
-given esc_ms_fix ("Pt", [(import ems_lit)], 0, "ID_S(\"k\")"):("ID_S(\"k\")")
+given esc_ms_fix {
+  ("Tr", [(import ems_lit)], 0, "ID_S(\"k\")"):("id_str_dup(ID_S(\"k\"))")
+  ("Pt", [(import ems_lit)], 0, "ID_S(\"k\")"):("ID_S(\"k\")")
+}

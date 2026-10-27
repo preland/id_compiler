@@ -30,5 +30,7 @@ type_bin(int id) {
     t = tb2(id);
   }
 } return string t;
-given composite_fixture ((import bin_concat)):("string")
-given composite_fixture ((import bin_plus)):("int")
+given composite_fixture {
+  ((import bin_concat)):("string")
+  ((import bin_plus)):("int")
+}

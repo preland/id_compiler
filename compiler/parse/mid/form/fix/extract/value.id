@@ -19,8 +19,10 @@ fix_xvname(int xnn) {
     xnname = fix_xvpair((import fixx_hit)[xnn - 2], (import fixx_hit)[xnn - 1]);
   }
 } return string xnname;
-given fix_xvalued (2):("a")
-given fix_xvalued (1):("")
+given fix_xvalued {
+  (2):("a")
+  (1):("")
+}
 
 fix_xvpair(int xpd, int xpr) {
   string xpname = fix_xtext((import nst)[xpr] + 1);
@@ -29,6 +31,8 @@ fix_xvpair(int xpd, int xpr) {
     xpok = xpname;
   }
 } return string xpok;
-given fix_xvalued (11, 14):("a")
-given fix_xvalued (12, 14):("")
-given fix_xvalued (1, 14):("")
+given fix_xvalued {
+  (11, 14):("a")
+  (12, 14):("")
+  (1, 14):("")
+}

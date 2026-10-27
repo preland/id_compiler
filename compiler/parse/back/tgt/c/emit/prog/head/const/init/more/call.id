@@ -6,10 +6,12 @@ emit_main_init(int id) {
     emit_init_call();
   }
 } return void;
-given nz_prog_fixture ((import nz_mainfn)):() then calls emit_init_call:()
-given nz_prog_fixture ((import nz_mainfn)):() then calls list_consts_cached:()
-given nz_prog_fixture ((import nz_mainfn)):() then calls emit_init_call:[1]
-given nz_prog_fixture ((import nz_plainfn)):() then calls emit_init_call:[0]
+given nz_prog_fixture {
+  ((import nz_mainfn)):() then calls emit_init_call:()
+  ((import nz_mainfn)):() then calls list_consts_cached:()
+  ((import nz_mainfn)):() then calls emit_init_call:[1]
+  ((import nz_plainfn)):() then calls emit_init_call:[0]
+}
 
 emit_init_call() {
   if(list_consts_cached() > 0) {

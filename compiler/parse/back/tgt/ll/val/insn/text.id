@@ -14,8 +14,10 @@ ll_text(int id) {
     s = "br label %b" + (import iblk)[id][0];
   }
 } return string s;
-given ir_fixture3 ((import ir_retvoid)):("ret void")
-given ir_fixture3 ((import ir_br)):("br label %b3")
+given ir_fixture3 {
+  ((import ir_retvoid)):("ret void")
+  ((import ir_br)):("br label %b3")
+}
 
 ll_ret(int id) {
   string s = "ret void";
@@ -37,5 +39,7 @@ ll_t2(int id) {
     s = "%v" + id + " = alloca " + ll_ty(ir_ty_v);
   }
 } return string s;
-given ir_fixture3 ((import ir_cbr)):("br i1 poison, label %b1, label %b2")
-given ir_fixture3 ((import ir_alloca)):("%v3 = alloca i32")
+given ir_fixture3 {
+  ((import ir_cbr)):("br i1 poison, label %b1, label %b2")
+  ((import ir_alloca)):("%v3 = alloca i32")
+}

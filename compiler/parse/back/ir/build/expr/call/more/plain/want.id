@@ -40,5 +40,7 @@ lw_barg_val(int i, int[] vals, int[] args, string name) {
   int lw_as_v = lw_as_arg(args[i], lw_bpty_v, name);
   int ret_i = lw_barg_push(i, vals, lw_as_v);
 } return int ret_i;
-given bicall_fixture (0, [], (import bicall_args), "fx_target"):(1)
-given bicall_fixture (0, [], (import bicall_args), "chr"):(1)
+given bicall_fixture {
+  (0, [], (import bicall_args), "fx_target"):(1)
+  (0, [], (import bicall_args), "chr"):(1)
+}

@@ -10,8 +10,10 @@ is_fld_idx(int id) {
     ok = 1;
   }
 } return int ok;
-given sd_use_fixture ((import sd_ix)):(1)
-given sd_use_fixture ((import sd_ii)):(0)
+given sd_use_fixture {
+  ((import sd_ix)):(1)
+  ((import sd_ii)):(0)
+}
 
 // A read of an index: a field when the index is a name, an element otherwise.
 chk_access(int id) {
@@ -22,8 +24,10 @@ chk_access(int id) {
     chk_index(id);
   }
 } return void;
-given sd_use_fixture ((import sd_ix)):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_iz)):() then (import chkfail)[0]:(1)
+given sd_use_fixture {
+  ((import sd_ix)):() then (import chkfail)[0]:(0)
+  ((import sd_iz)):() then (import chkfail)[0]:(1)
+}
 
 // A write through an index: the same split.
 chk_iasg(int id) {
@@ -34,5 +38,7 @@ chk_iasg(int id) {
     chk_iassign(id);
   }
 } return void;
-given sd_use_fixture ((import sd_wx)):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_wz)):() then (import chkfail)[0]:(1)
+given sd_use_fixture {
+  ((import sd_wx)):() then (import chkfail)[0]:(0)
+  ((import sd_wz)):() then (import chkfail)[0]:(1)
+}

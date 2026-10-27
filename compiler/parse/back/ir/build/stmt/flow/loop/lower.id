@@ -9,8 +9,10 @@ lw_loop(int lv_n) {
     lw_while(lv_n);
   }
 } return void;
-given lv_loop ((import while_node)):() then calls lw_while:((import while_node))
-given lv_loop given integer_list_set((import fsc), 0, 1) ((import while_node)):() then calls lv_plan:((import while_node))
+given lv_loop {
+  ((import while_node)):() then calls lw_while:((import while_node))
+  given integer_list_set((import fsc), 0, 1) ((import while_node)):() then calls lv_plan:((import while_node))
+}
 
 lw_versioned(int lv_n) {
   int lv_g = gd_guard();
@@ -25,7 +27,9 @@ lw_versioned(int lv_n) {
   lv_copy(lv_n, lv_slow, lv_jn, 0);
   lw_go(lv_jn);
 } return void;
-given lv_loop ((import while_node)):() then chk_last_blk_lbl:("exit")
-given lv_loop ((import while_node)):() then calls lw_term:("cbr", 15, [2, 3])
-given lv_loop ((import while_node)):() then calls lv_copy:[2]
-given lv_loop ((import while_node)):() then calls ir_block:[9]
+given lv_loop {
+  ((import while_node)):() then chk_last_blk_lbl:("exit")
+  ((import while_node)):() then calls lw_term:("cbr", 15, [2, 3])
+  ((import while_node)):() then calls lv_copy:[2]
+  ((import while_node)):() then calls ir_block:[9]
+}

@@ -27,8 +27,10 @@ chk_dead() {
   reach_funcs(0, 0);
   const_mark(0);
 } return void;
-given env_init ():() then calls init_reach:()
-given env_init ():() then calls reach_mark:()
+given env_init {
+  ():() then calls init_reach:()
+  ():() then calls reach_mark:()
+}
 
 // Seeded with "main" unconditionally. A project without one is a library, and
 // then no function is named main, so nothing ever matches and nothing is

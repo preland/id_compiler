@@ -33,5 +33,7 @@ fn_ret_export(int fnode) {
     re_nm = (import retexp)[((import ni2)[fnode] - 2)];
   }
 } return string re_nm;
-given fn_fixture given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):("gx")
-given fn_fixture ((import fixture_fn)):("")
+given fn_fixture {
+  given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):("gx")
+  ((import fixture_fn)):("")
+}

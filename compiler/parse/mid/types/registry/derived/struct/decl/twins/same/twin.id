@@ -9,8 +9,10 @@ sd_same(int sd_i) {
     sd_diag(sd_i, "E0626", "struct '" + (import sdname)[sd_i] + "' has the same fields as struct '" + (import sdname)[sd_j] + "' (declared at " + sd_where(sd_j) + "); two structs with the same field names and types are one struct -- use '" + (import sdname)[sd_j] + "', or give '" + (import sdname)[sd_i] + "' a field of another name or type", (import sdname)[sd_i], "two structs with the same field names and types are one struct declared twice, the same rule two functions with the same body obey", "use '" + (import sdname)[sd_j] + "', or give '" + (import sdname)[sd_i] + "' a field of another name or type");
   }
 } return void;
-given sd_pair (1):() then (import chkfail)[0]:(0)
-given sd_pair given sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 3) (2):() then prints:("pt.id:3: error: struct 'Pt' has the same fields as struct 'P' (declared at p.id:1); two structs with the same field names and types are one struct -- use 'P', or give 'Pt' a field of another name or type [E0626]\n  at: Pt\n  why: two structs with the same field names and types are one struct declared twice, the same rule two functions with the same body obey\n  help: use 'P', or give 'Pt' a field of another name or type\n")
+given sd_pair {
+  (1):() then (import chkfail)[0]:(0)
+  given sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 3) (2):() then prints:("pt.id:3: error: struct 'Pt' has the same fields as struct 'P' (declared at p.id:1); two structs with the same field names and types are one struct -- use 'P', or give 'Pt' a field of another name or type [E0626]\n  at: Pt\n  why: two structs with the same field names and types are one struct declared twice, the same rule two functions with the same body obey\n  help: use 'P', or give 'Pt' a field of another name or type\n")
+}
 
 // The first earlier row with the same fields as row `sd_i`, or -1.
 sd_twin(int sd_i) {
@@ -23,8 +25,10 @@ sd_twin(int sd_i) {
     sd_j = sd_j + 1;
   }
 } return int ret_i;
-given sd_pair (1):(-1)
-given sd_pair given sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 3) (2):(0)
+given sd_pair {
+  (1):(-1)
+  given sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 3) (2):(0)
+}
 
 sd_twin_at(int sd_j, string sd_ky) {
   int ret_i = 0 - 1;
@@ -32,5 +36,7 @@ sd_twin_at(int sd_j, string sd_ky) {
     ret_i = sd_j;
   }
 } return int ret_i;
-given sd_pair (0, "x:int,y:int"):(0)
-given sd_pair (1, "x:int,y:int"):(-1)
+given sd_pair {
+  (0, "x:int,y:int"):(0)
+  (1, "x:int,y:int"):(-1)
+}

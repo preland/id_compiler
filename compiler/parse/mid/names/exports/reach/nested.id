@@ -7,8 +7,10 @@ exp_nested(int id, string owner) {
     exp_loop(id, owner);
   }
 } return void;
-given ifwhilefix ((import rgif_node), "main"):() then calls exp_branches:[1] then calls exp_branches:((import rgif_node), "main")
-given ifwhilefix ((import rgdecl_node), "main"):() then calls exp_loop:[1] then calls exp_loop:((import rgdecl_node), "main")
+given ifwhilefix {
+  ((import rgif_node), "main"):() then calls exp_branches:[1] then calls exp_branches:((import rgif_node), "main")
+  ((import rgdecl_node), "main"):() then calls exp_loop:[1] then calls exp_loop:((import rgdecl_node), "main")
+}
 
 exp_branches(int id, string owner) {
   int[] l1_of_v = (import nl1)[id];
@@ -17,8 +19,10 @@ exp_branches(int id, string owner) {
 } chain (int id, string owner) {
   exp_list(l2_of_v, owner);
 } return void;
-given ifwhilefix ((import rgif_node), "main"):() then calls exp_list:[2] then calls exp_list:((import rgdeclist), "main")
-given ifwhilefix ((import rgif_node), "other"):() then calls exp_list:[2] then calls exp_list:((import rgdeclist), "other")
+given ifwhilefix {
+  ((import rgif_node), "main"):() then calls exp_list:[2] then calls exp_list:((import rgdeclist), "main")
+  ((import rgif_node), "other"):() then calls exp_list:[2] then calls exp_list:((import rgdeclist), "other")
+}
 
 exp_loop(int id, string owner) {
   if((import nkind)[id] == "while") {
@@ -26,6 +30,8 @@ exp_loop(int id, string owner) {
     exp_list(l1_of_v, owner);
   }
 } return void;
-given whilefix ((import rgwhile_node), "main"):() then calls exp_list:[1] then calls exp_list:((import rgdeclist), "main")
-given whilefix ((import rgwhile_node), "other"):() then calls exp_list:((import rgdeclist), "other")
-given whilefix ((import rgdecl_node), "main"):() then calls exp_list:[0]
+given whilefix {
+  ((import rgwhile_node), "main"):() then calls exp_list:[1] then calls exp_list:((import rgdeclist), "main")
+  ((import rgwhile_node), "other"):() then calls exp_list:((import rgdeclist), "other")
+  ((import rgdecl_node), "main"):() then calls exp_list:[0]
+}

@@ -10,9 +10,11 @@ ctor_fit(int sd_a, string sd_nm, int sd_k, string sd_ft) {
     tc_diag(sd_a, "E0623", "argument '" + sd_cell((import sdfname), sd_nm, sd_k) + "' of '" + sd_nm + "' narrows " + sd_at + " to " + sd_ft + "; declare a " + sd_ft + " local and pass that", sd_nm, "a constructor stores each argument in the field of that position, and a wider value is not squeezed into a narrower field without a line that does it", "declare a " + sd_ft + " local with the narrowed value and pass that");
   }
 } return void;
-given sd_ctor_fixture ((import sd_one), "P", 0, "int"):() then (import chkfail)[0]:(0)
-given sd_ctor_fixture ((import sd_str), "P", 1, "int"):() then prints:("<stdin>:1: error: argument 'y' of 'P' expects int, got string [E0623]\n  at: P\n  why: a constructor stores each argument in the field of that position, and a field holds only values of its own type\n  help: pass a int for this field, or change the field's type in the struct\n")
-given sd_ctor_fixture ((import sd_big), "P", 0, "int"):() then prints:("<stdin>:1: error: argument 'x' of 'P' narrows word to int; declare a int local and pass that [E0623]\n  at: P\n  why: a constructor stores each argument in the field of that position, and a wider value is not squeezed into a narrower field without a line that does it\n  help: declare a int local with the narrowed value and pass that\n")
+given sd_ctor_fixture {
+  ((import sd_one), "P", 0, "int"):() then (import chkfail)[0]:(0)
+  ((import sd_str), "P", 1, "int"):() then prints:("<stdin>:1: error: argument 'y' of 'P' expects int, got string [E0623]\n  at: P\n  why: a constructor stores each argument in the field of that position, and a field holds only values of its own type\n  help: pass a int for this field, or change the field's type in the struct\n")
+  ((import sd_big), "P", 0, "int"):() then prints:("<stdin>:1: error: argument 'x' of 'P' narrows word to int; declare a int local and pass that [E0623]\n  at: P\n  why: a constructor stores each argument in the field of that position, and a wider value is not squeezed into a narrower field without a line that does it\n  help: declare a int local with the narrowed value and pass that\n")
+}
 
 // The values of a bind in a test case (../call/bind.id), each against the
 // parameter it fixes: it must be something a closure can capture, and then it
@@ -25,8 +27,10 @@ fit_cbvals(int i, int[] items) {
     j = j + 1;
   }
 } return void;
-given cbind_fixture ((import fixture_ci), [(import cb_f), (import cb_a)]):() then (import chkfail)[0]:(0)
-given cbind_fixture ((import fixture_ci), [(import cb_f), (import cb_s)]):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given cbind_fixture {
+  ((import fixture_ci), [(import cb_f), (import cb_a)]):() then (import chkfail)[0]:(0)
+  ((import fixture_ci), [(import cb_f), (import cb_s)]):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+}
 
 fit_cbval(int i, int v, string pt) {
   string msg = bind_cap_msg("a value of this case's bind", pt);
@@ -36,5 +40,7 @@ fit_cbval(int i, int v, string pt) {
     fit_value(i, v, pt);
   }
 } return void;
-given cbind_fixture ((import fixture_ci), (import cb_a), "int"):() then (import chkfail)[0]:(0)
-given cbind_fixture ((import fixture_ci), (import cb_a), "int[][]"):() then prints:("fixture.id:4: error: a value of this case's bind cannot be captured: it is a int[][], a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)\n")
+given cbind_fixture {
+  ((import fixture_ci), (import cb_a), "int"):() then (import chkfail)[0]:(0)
+  ((import fixture_ci), (import cb_a), "int[][]"):() then prints:("fixture.id:4: error: a value of this case's bind cannot be captured: it is a int[][], a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)\n")
+}

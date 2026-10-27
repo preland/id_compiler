@@ -9,5 +9,7 @@ lp_bnode(int lq_id) {
     lq_b = (import nl1)[lq_id][0];
   }
 } return int lq_b;
-given lpf_lsc ((import lpf_xa)):((import lpf_ba))
-given lpf_lsc ((import lpf_hx)):((import lpf_hb))
+given lpf_lsc {
+  ((import lpf_xa)):((import lpf_ba))
+  ((import lpf_hx)):((import lpf_hb))
+}

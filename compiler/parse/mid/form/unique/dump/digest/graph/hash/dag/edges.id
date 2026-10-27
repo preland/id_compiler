@@ -23,8 +23,10 @@ dg_comp_edges_of(int[] dgce, int dgf, int dgi) {
     dgi = dgi + 1;
   }
 } return void;
-given dg_t_built ([], 1, 0):([1, 0, 1, 0])
-given dg_t_built ([], 1, 1):([1, 0])
+given dg_t_built {
+  ([], 1, 0):([1, 0, 1, 0])
+  ([], 1, 1):([1, 0])
+}
 
 dg_comp_edge(int[] dgce, int dgca, int dgcb) {
   if(dgca != dgcb) {

@@ -18,10 +18,12 @@ init_tcache() {
   export int[] arrmark = [];
   export int[] bytesmark = [];
 } return void;
-given env_init given tcache_set(0, "int") ():() then len((import tcache)):(0)
-given env_init given tcache_set(1, "string") ():() then len((import tcache_ok)):(0)
-given env_init ():() then (import chkfail)[0]:(0)
-given env_init ():() then init_units:(0)
+given env_init {
+  given tcache_set(0, "int") ():() then len((import tcache)):(0)
+  given tcache_set(1, "string") ():() then len((import tcache_ok)):(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 tcache_set(int id, string t) {
   while(len((import tcache)) <= id) {
@@ -31,5 +33,7 @@ tcache_set(int id, string t) {
   string_list_set((import tcache), id, t);
   integer_list_set((import tcache_ok), id, 1);
 } return void;
-given env_init (0, "int"):() then (import tcache)[0]:("int")
-given env_init (0, "string"):() then (import tcache)[0]:("string")
+given env_init {
+  (0, "int"):() then (import tcache)[0]:("int")
+  (0, "string"):() then (import tcache)[0]:("string")
+}

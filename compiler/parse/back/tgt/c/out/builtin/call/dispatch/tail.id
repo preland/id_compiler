@@ -21,5 +21,7 @@ emit_gcall_named(int id) {
   string sym_v = fn_sym((import ns1)[id]);
   string s = sym_v + "(" + emit_gcall_args(id, l1_of_v) + ")";
 } return string s;
-given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
-given call_names_fixture ((import call_e_len)):("id_len(5, 4)")
+given call_names_fixture {
+  ((import call_e_foo)):("id_foo(5, 4)")
+  ((import call_e_len)):("id_len(5, 4)")
+}

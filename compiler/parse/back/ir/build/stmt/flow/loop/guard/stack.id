@@ -7,15 +7,19 @@ gd_two() {
   push((import gdstk), (import gdx)[0]);
   push((import gdstk), (import gdx)[0]);
 } return void;
-given gd_vals ():() then len((import gdstk)):(2)
-given gd_vals ():() then (import gdstk)[1]:(3)
+given gd_vals {
+  ():() then len((import gdstk)):(2)
+  ():() then (import gdstk)[1]:(3)
+}
 
 gd_one_on() {
   gd_stk_new();
   push((import gdstk), (import gdx)[1]);
 } return void;
-given gd_vals ():() then len((import gdstk)):(1)
-given gd_vals ():() then (import gdstk)[0]:(4)
+given gd_vals {
+  ():() then len((import gdstk)):(1)
+  ():() then (import gdstk)[0]:(4)
+}
 
 gd_trio() {
   gd_stk_new();
@@ -24,5 +28,7 @@ gd_trio() {
 } chain () {
   push((import gdstk), (import gdw)[0]);
 } return void;
-given gd_words ():() then len((import gdstk)):(3)
-given gd_words ():() then (import gdstk)[1]:(6)
+given gd_words {
+  ():() then len((import gdstk)):(3)
+  ():() then (import gdstk)[1]:(6)
+}

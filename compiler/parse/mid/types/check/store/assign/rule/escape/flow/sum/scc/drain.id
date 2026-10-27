@@ -7,7 +7,9 @@ esc_drain(int emk, int edv) {
     integer_list_set((import esc_st), pop((import esc_mem)), edv);
   }
 } return void;
-given esc_scy (1000000, 0, 2) (1, 3):() then (import esc_st)[1]:(3)
-given esc_scy (1000000, 0, 2) (1, 3):() then (import esc_st)[0]:(0)
-given esc_scy (1000000, 0, 2) (0, 1):() then (import esc_st)[0]:(1)
-given esc_scy (1000000, 0, 2) (1, 3):() then len((import esc_mem)):(1)
+given esc_scy (1000000, 0, 2) {
+  (1, 3):() then (import esc_st)[1]:(3)
+  (1, 3):() then (import esc_st)[0]:(0)
+  (0, 1):() then (import esc_st)[0]:(1)
+  (1, 3):() then len((import esc_mem)):(1)
+}

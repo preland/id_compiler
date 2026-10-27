@@ -7,8 +7,10 @@ ps2(int id) {
     s = ps3(id);
   }
 } return string s;
-given stmt_fix (2):("(assign z 5)")
-given stmt_fix (5):("(expr 5)")
+given stmt_fix {
+  (2):("(assign z 5)")
+  (5):("(expr 5)")
+}
 
 ps3(int id) {
   int i1_of_v = (import ni1)[id];
@@ -17,8 +19,10 @@ ps3(int id) {
     s = ps4(id);
   }
 } return string s;
-given stmt_fix (5):("(expr 5)")
-given stmt_fix (3):("(while 5 (body))")
+given stmt_fix {
+  (5):("(expr 5)")
+  (3):("(while 5 (body))")
+}
 
 ps4(int id) {
   string s = ps4_while(id);
@@ -28,5 +32,7 @@ ps4(int id) {
     s = ps4_if(id, i1_of_v2, l1_of_v2);
   }
 } return string s;
-given stmt_fix (3):("(while 5 (body))")
-given stmt_fix (4):("(if 5 (then) (else))")
+given stmt_fix {
+  (3):("(while 5 (body))")
+  (4):("(if 5 (then) (else))")
+}

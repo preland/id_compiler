@@ -18,9 +18,11 @@ then_at(int ci, int ti) {
     emit_then(ci, ti);
   }
 } return void;
-given print_fixture ((import fixture_ci), 0):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
-given print_fixture ((import fixture_ci), 0):() then calls emit_then:((import fixture_ci), 0)
-given print_fixture (99, 0):() then prints:("")
+given print_fixture {
+  ((import fixture_ci), 0):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+  ((import fixture_ci), 0):() then calls emit_then:((import fixture_ci), 0)
+  (99, 0):() then prints:("")
+}
 
 emit_then(int ci, int ti) {
   int node = (import thennode)[ti];

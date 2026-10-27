@@ -18,5 +18,7 @@ lw_slot_free(int slot_n, int slot_o) {
     lw_callf(slot_f, "", [slot_o]);
   }
 } return void;
-given lwd_fixture ((import efd_ia), 7):() then calls lw_callf:("id_list_free", "", [7])
-given lwd_fixture ((import efd_ia), -1):() then calls lw_callf:[0]
+given lwd_fixture {
+  ((import efd_ia), 7):() then calls lw_callf:("id_list_free", "", [7])
+  ((import efd_ia), -1):() then calls lw_callf:[0]
+}

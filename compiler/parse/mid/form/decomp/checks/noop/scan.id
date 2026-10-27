@@ -50,6 +50,8 @@ noop_at(int nza_node) {
     noop_unread(nza_node);
   }
 } return void;
-given noop_world ((import nfx_plus_zero)):() then calls noop_op:((import nfx_plus_zero)) then calls noop_op:[1]
-given noop_world ((import nfx_dpad)):() then calls noop_unread:((import nfx_dpad)) then calls noop_unread:[1]
-given noop_world ((import wx_va)):() then calls noop_op:[0]
+given noop_world {
+  ((import nfx_plus_zero)):() then calls noop_op:((import nfx_plus_zero)) then calls noop_op:[1]
+  ((import nfx_dpad)):() then calls noop_unread:((import nfx_dpad)) then calls noop_unread:[1]
+  ((import wx_va)):() then calls noop_op:[0]
+}

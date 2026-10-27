@@ -33,5 +33,7 @@ retexp_err(int id, string nm) {
 } chain (int id, string nm) {
   note_failure();
 } return void;
-given fn_fixture ((import fixture_fn), "gx"):() then calls note_failure:[1] then prints:("<stdin>:1: error: 'gx' is named by the return clause of 'fx_target' (return void export gx), but 'fx_target' does not export it in its own body; add 'export TYPE gx = VALUE;' to 'fx_target', or drop 'export gx' from its return clause\n")
-given fn_fixture ((import fixture_fn), "gx"):() then (import chkfail)[0]:(1)
+given fn_fixture {
+  ((import fixture_fn), "gx"):() then calls note_failure:[1] then prints:("<stdin>:1: error: 'gx' is named by the return clause of 'fx_target' (return void export gx), but 'fx_target' does not export it in its own body; add 'export TYPE gx = VALUE;' to 'fx_target', or drop 'export gx' from its return clause\n")
+  ((import fixture_fn), "gx"):() then (import chkfail)[0]:(1)
+}

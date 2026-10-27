@@ -11,8 +11,10 @@ canon_pair(int a, int b) {
   string val = canon_expr(b);
   string ret_s = "(" + out + "," + val + ")";
 } return string ret_s;
-given un_fixture ((import ev_node), (import ev_node)):("(I7,I7)")
-given un_fixture ((import neg_node), (import ev_node)):("(u-(I7),I7)")
+given un_fixture {
+  ((import ev_node), (import ev_node)):("(I7,I7)")
+  ((import neg_node), (import ev_node)):("(u-(I7),I7)")
+}
 
 canon_args(int[] args) {
   string out = "";

@@ -20,13 +20,17 @@ parse_case_rhs(int[] pos, int[] args) {
   int[] expd = case_tuple(pos);
   int ret_i = case_tail(pos, args, expd);
 } return int ret_i;
-given toks_env(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], []):(1)
-given toks_env(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], [9]):(1)
+given toks_env(["op", "op", "int", "op"], [":", "(", "6", ")"]) {
+  ([0], []):(1)
+  ([0], [9]):(1)
+}
 
 case_tail(int[] pos, int[] args, int[] expd) {
   case_rest(pos);
   push((import caseend), pos[0]);
   int ret_i = newnode("case", 0, 0, "", "", args, expd);
 } return int ret_i;
-given env_init ([0], [], []):(0)
-given env_init ([0], [1], [2]):(0)
+given env_init {
+  ([0], [], []):(0)
+  ([0], [1], [2]):(0)
+}

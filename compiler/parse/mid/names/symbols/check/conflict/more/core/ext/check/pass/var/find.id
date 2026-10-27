@@ -17,8 +17,10 @@ sv_std_row(string sv_nm) {
   int[] sv_bk = (import didx)[name_bucket(sv_nm)];
   int sv_hit = sv_scan(sv_bk, sv_nm, 0, 0 - 1);
 } return int sv_hit;
-given sv_fx("int") ("x"):(1)
-given sv_fx("int") ("zz"):(-1)
+given sv_fx("int") {
+  ("x"):(1)
+  ("zz"):(-1)
+}
 
 sv_scan(int[] sv_bk, string sv_nm, int sv_k, int sv_hit) {
   while(sv_k < len(sv_bk)) {
@@ -26,5 +28,7 @@ sv_scan(int[] sv_bk, string sv_nm, int sv_k, int sv_hit) {
     sv_k = sv_k + 1;
   }
 } return int sv_hit;
-given sv_fx("int") ([0, 1], "x", 0, -1):(1)
-given sv_fx("int") ([0], "x", 0, -1):(-1)
+given sv_fx("int") {
+  ([0, 1], "x", 0, -1):(1)
+  ([0], "x", 0, -1):(-1)
+}

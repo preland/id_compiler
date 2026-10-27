@@ -13,8 +13,10 @@ lit_put(string raw, int i, word ad, int j) {
     next = lit_emit(raw, i, ad, j);
   }
 } return int next;
-given lit_buf ("ab", 0, (import lit_ad), 0):(1)
-given lit_buf ("a\\x41", 1, (import lit_ad), 0):(6)
+given lit_buf {
+  ("ab", 0, (import lit_ad), 0):(1)
+  ("a\\x41", 1, (import lit_ad), 0):(6)
+}
 
 lit_copy(string raw, int i, word ad, int j) {
   int copy_index = 0;
@@ -24,8 +26,10 @@ lit_copy(string raw, int i, word ad, int j) {
   }
   j = j + 6;
 } return int j;
-given lit_buf ("\\x41", 0, (import lit_ad), 2):(8)
-given lit_buf ("\\x41", 0, (import lit_ad), 0):(6)
+given lit_buf {
+  ("\\x41", 0, (import lit_ad), 2):(8)
+  ("\\x41", 0, (import lit_ad), 0):(6)
+}
 
 lit_hex_char(string raw, int i, int copy_index) {
   int hex_char = 34;

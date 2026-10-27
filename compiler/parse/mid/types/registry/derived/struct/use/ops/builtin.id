@@ -12,8 +12,10 @@ sd_bi_args(int id) {
     sd_i = sd_i + 1;
   }
 } return void;
-given sd_bi_fixture ((import sd_pc)):() then (import chkfail)[0]:(1)
-given sd_bi_fixture ((import sd_pushc)):() then (import chkfail)[0]:(0)
+given sd_bi_fixture {
+  ((import sd_pc)):() then (import chkfail)[0]:(1)
+  ((import sd_pushc)):() then (import chkfail)[0]:(0)
+}
 
 sd_bi_arg(int id, int sd_i) {
   int sd_a = (import nl1)[id][sd_i];
@@ -22,5 +24,7 @@ sd_bi_arg(int id, int sd_i) {
     tc_diag(sd_a, "E0630", "'" + (import ns1)[id] + "' cannot take a struct: argument " + sd_i + " is " + sd_t + "; use its fields, as in " + (import ns1)[id] + "(p." + sd_cell((import sdfname), sd_t, 0) + ")", (import ns1)[id], "a builtin works on text, numbers and lists, and a struct is none of them", "pass the struct's fields, as in " + (import ns1)[id] + "(p." + sd_cell((import sdfname), sd_t, 0) + ")");
   }
 } return void;
-given sd_bi_fixture ((import sd_pc), 0):() then prints:("<stdin>:1: error: 'print' cannot take a struct: argument 0 is P; use its fields, as in print(p.x) [E0630]\n  at: print\n  why: a builtin works on text, numbers and lists, and a struct is none of them\n  help: pass the struct's fields, as in print(p.x)\n")
-given sd_bi_fixture ((import sd_pushc), 1):() then (import chkfail)[0]:(0)
+given sd_bi_fixture {
+  ((import sd_pc), 0):() then prints:("<stdin>:1: error: 'print' cannot take a struct: argument 0 is P; use its fields, as in print(p.x) [E0630]\n  at: print\n  why: a builtin works on text, numbers and lists, and a struct is none of them\n  help: pass the struct's fields, as in print(p.x)\n")
+  ((import sd_pushc), 1):() then (import chkfail)[0]:(0)
+}

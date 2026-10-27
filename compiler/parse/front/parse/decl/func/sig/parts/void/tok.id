@@ -7,8 +7,10 @@ tok_at(int at) {
     k = (import tkind)[at];
   }
 } return string k;
-given expr_tokens (0):("int")
-given expr_tokens (20):("eof")
+given expr_tokens {
+  (0):("int")
+  (20):("eof")
+}
 
 tok_str(int at) {
   string s = "";
@@ -16,8 +18,10 @@ tok_str(int at) {
     s = (import ttext)[at];
   }
 } return string s;
-given expr_tokens (0):("1")
-given expr_tokens (19):(";")
+given expr_tokens {
+  (0):("1")
+  (19):(";")
+}
 
 // A token index no later than the end of the store. A function that runs into
 // the end of the file has consumed past it, and a span ending there would be
@@ -28,6 +32,8 @@ tok_end(int at) {
     e = at;
   }
 } return int e;
-given expr_tokens (99):(21)
-given expr_tokens (22):(21)
-given expr_tokens (0):(0)
+given expr_tokens {
+  (99):(21)
+  (22):(21)
+  (0):(0)
+}

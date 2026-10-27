@@ -25,9 +25,11 @@ lp_rfeed(string[] lr_st, int lr_i, string lr_out) {
     lp_rstep(lr_st, (import lpg)[lr_i], lp_rprev(lr_i));
   }
 } return string lr_o;
-given lpf_conds (["(x) != NULL"], 3, ""):("(x) != NULL")
-given lpf_conds (["(y) >= 0"], 7, "(x) != NULL"):("(x) != NULL && (y) >= 0")
-given lpf_conds ([], 0, "kept"):("kept")
+given lpf_conds {
+  (["(x) != NULL"], 3, ""):("(x) != NULL")
+  (["(y) >= 0"], 7, "(x) != NULL"):("(x) != NULL && (y) >= 0")
+  ([], 0, "kept"):("kept")
+}
 
 lp_rjoin(string lr_out, string lr_clause) {
   string lr_s = lr_clause;

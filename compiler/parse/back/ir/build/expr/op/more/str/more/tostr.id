@@ -17,6 +17,8 @@ lw_tostr_at(int v, string t) {
     r = lw_callf(lw_strfn_v, "string", [v]);
   }
 } return int r;
-given bound_fixture (3, "string"):(3)
-given bound_fixture (3, "int"):(3)
-given bound_fixture (3, "bool"):(8)
+given bound_fixture {
+  (3, "string"):(3)
+  (3, "int"):(3)
+  (3, "bool"):(8)
+}

@@ -25,5 +25,7 @@ unit_plain(int id) {
   string unit_sigtext = unit_sig(id);
   string unit_fp = unit_walk(id, unit_sigtext);
 } return string unit_fp;
-given lz_o (22):("|()->int=>v0{d:int 0=I5}")
-given lz_o (23):("|()->int=>v0{d:int 0=I9}")
+given lz_o {
+  (22):("|()->int=>v0{d:int 0=I5}")
+  (23):("|()->int=>v0{d:int 0=I9}")
+}

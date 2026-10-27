@@ -22,13 +22,17 @@ rc_flags(string src) {
   rc_visit(rcfl, rctodo, rcst);
   rc_walk(rcfl, rctodo);
 } return int[] rcfl;
-given rc_t_ready ("fb"):([1, 1, 0])
-given rc_t_ready ("fa"):([1, 0, 0])
+given rc_t_ready {
+  ("fb"):([1, 1, 0])
+  ("fa"):([1, 0, 0])
+}
 
 rc_has(string src, string dst) {
   int ri = rc_of(src);
   int dw = dg_fn_named(dst);
   int ok = dw >= 0 && (import rcsets)[ri][dw] == 1;
 } return int ok;
-given rc_t_one ("fb", "fa"):(1) then rcsets_state:("1:110")
-given rc_t_one ("fa", "fb"):(0) then rcsets_state:("2:110100")
+given rc_t_one {
+  ("fb", "fa"):(1) then rcsets_state:("1:110")
+  ("fa", "fb"):(0) then rcsets_state:("2:110100")
+}

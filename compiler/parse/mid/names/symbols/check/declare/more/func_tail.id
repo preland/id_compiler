@@ -9,8 +9,10 @@ reg_func_params(int id, int[] rfp_param_ids, string rfp_fn_name) {
   reg_params(rfp_param_ids, rfp_fn_name, func_line_v);
   reg_l2_decls(id, rfp_fn_name);
 } return void;
-given regrow_param ((import regrow_p), (import regrow_plist), "f"):() then len((import dvname)):(2)
-given regrow_param ((import regrow_p), [], "z"):() then len((import dvname)):(1)
+given regrow_param {
+  ((import regrow_p), (import regrow_plist), "f"):() then len((import dvname)):(2)
+  ((import regrow_p), [], "z"):() then len((import dvname)):(1)
+}
 
 // Split from reg_params so the while's own block stays within the limit.
 reg_param_at(int[] params, int i, string owner, int ln) {
@@ -18,8 +20,10 @@ reg_param_at(int[] params, int i, string owner, int ln) {
   string s1_of_v = (import ns1)[(params[i])];
   reg_var(s2_of_v, s1_of_v, owner, 0, ln, (import nunit)[params[i]]);
 } return void;
-given regrow_param ((import regrow_plist), 0, "f", 10):() then len((import dvname)):(2)
-given regrow_param ((import regrow_plist), 0, "z", 20):() then len((import dvname)):(2)
+given regrow_param {
+  ((import regrow_plist), 0, "f", 10):() then len((import dvname)):(2)
+  ((import regrow_plist), 0, "z", 20):() then len((import dvname)):(2)
+}
 
 // Test check: the whole declared-variable name table -- how many names and
 // which, joined by "|" (see vnames_state, ../../../lookup/more/std_unit.id).

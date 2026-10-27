@@ -19,10 +19,12 @@ fnreg_index() {
   int last_row = len((import fnames)) - 1;
   push((import fidx)[b], last_row);
 } return void;
-given fn_fixture_init_idx ():() then calls name_bucket:("fx_target")
-given fn_fixture_init_idx ():() then (import fidx)[39]:([0])
-given fn_fixture_init_idx ():() then (import chkfail)[0]:(0)
-given fn_fixture_init_idx ():() then init_units:(0)
+given fn_fixture_init_idx {
+  ():() then calls name_bucket:("fx_target")
+  ():() then (import fidx)[39]:([0])
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // init_idx before the registration fnreg_index's own cases need, without the
 // index entry itself -- so its two cases exercise the push on a fresh bucket.

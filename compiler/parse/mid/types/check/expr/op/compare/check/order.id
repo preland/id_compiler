@@ -6,8 +6,10 @@ chk_ord(int id) {
     chk_ord2(id);
   }
 } return void;
-given cmp_fixture ((import bin_lt)):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_plus)):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  ((import bin_lt)):() then (import chkfail)[0]:(0)
+  ((import bin_plus)):() then (import chkfail)[0]:(0)
+}
 
 chk_ord2(int id) {
   int i1_of_v = (import ni1)[id];
@@ -22,5 +24,7 @@ ord_types(int id, int a, int b) {
   string rt = type_of(b);
   ord_report(id, lt, rt);
 } return void;
-given cmp_fixture ((import bin_lt), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_lt), (import lit_str), (import lit_a)):() then (import chkfail)[0]:(1)
+given cmp_fixture {
+  ((import bin_lt), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
+  ((import bin_lt), (import lit_str), (import lit_a)):() then (import chkfail)[0]:(1)
+}

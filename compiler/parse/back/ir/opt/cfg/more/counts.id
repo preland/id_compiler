@@ -4,12 +4,16 @@
 chk_blk_count() {
   int ret_i = blk_count(0);
 } return int ret_i;
-given cfg_fixture ():(2)
-given cfg_fixture ():(2) then chk_ins0_count:(1)
+given cfg_fixture {
+  ():(2)
+  ():(2) then chk_ins0_count:(1)
+}
 
 chk_ins0_count() {
   int ret_i = len(((import binsn)[0]));
 } return int ret_i;
-given cfg_fixture ():(1)
-given cfg_fixture ():(1) then chk_blk_count:(2)
+given cfg_fixture {
+  ():(1)
+  ():(1) then chk_blk_count:(2)
+}
 

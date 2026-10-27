@@ -45,5 +45,7 @@ seed_thens() {
     ti = ti + 1;
   }
 } return void;
-given then_node_fixture given init_reach given list_extend((import thennode), [(import fixture_then_bad)]) ():() then len((import rfn)):(2)
-given then_node_fixture given init_reach given list_extend((import thennode), [(import fixture_then_node)]) ():() then len((import rfn)):(3)
+given then_node_fixture {
+  given init_reach given list_extend((import thennode), [(import fixture_then_bad)]) ():() then len((import rfn)):(2)
+  given init_reach given list_extend((import thennode), [(import fixture_then_node)]) ():() then len((import rfn)):(3)
+}

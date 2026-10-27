@@ -7,5 +7,7 @@ no_struct_word(int[] pos) {
   }
   no_keyword_word(pos);
 } return void;
-given sd_toks ([0]):() then (import chkfail)[0]:(1)
-given sd_toks ([1]):() then (import chkfail)[0]:(0)
+given sd_toks {
+  ([0]):() then (import chkfail)[0]:(1)
+  ([1]):() then (import chkfail)[0]:(0)
+}

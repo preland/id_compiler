@@ -4,8 +4,10 @@ report_var_import(string name, string owner, int ln) {
   string owner_of_v = owner_of(name);
   diag("E0305", imp_where, "variable '" + name + "' belongs to function '" + owner_of_v + "'", name, "a variable is private to the function that declares it, and a function that exports one is how another reads it", "read it with `(import " + name + ")`");
 } return void;
-given regrow_d ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' belongs to function 'f' [E0305]\n  at: x\n  why: a variable is private to the function that declares it, and a function that exports one is how another reads it\n  help: read it with `(import x)`\n") then (import chkfail)[0]:(1)
-given regrow_d ("x", "g", 20):() then prints:("<stdin>:20: error: variable 'x' belongs to function 'f' [E0305]\n  at: x\n  why: a variable is private to the function that declares it, and a function that exports one is how another reads it\n  help: read it with `(import x)`\n") then (import chkfail)[0]:(1)
+given regrow_d {
+  ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' belongs to function 'f' [E0305]\n  at: x\n  why: a variable is private to the function that declares it, and a function that exports one is how another reads it\n  help: read it with `(import x)`\n") then (import chkfail)[0]:(1)
+  ("x", "g", 20):() then prints:("<stdin>:20: error: variable 'x' belongs to function 'f' [E0305]\n  at: x\n  why: a variable is private to the function that declares it, and a function that exports one is how another reads it\n  help: read it with `(import x)`\n") then (import chkfail)[0]:(1)
+}
 
 // Nothing to import: the owner has to export it first.
 report_var_private(string name, string owner, int ln) {
@@ -13,8 +15,10 @@ report_var_private(string name, string owner, int ln) {
   string owner_of_v = owner_of(name);
   diag("E0305", priv_where, "variable '" + name + "' belongs to function '" + owner_of_v + "' and is not exported", name, "a variable is private to the function that declares it; variables are only globally accessible if export/import is used", "declare it in '" + owner_of_v + "' as `export TYPE " + name + " = ...;` and read it here with `(import " + name + ")`, or pass the value in as an argument");
 } return void;
-given regrow_d ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' belongs to function 'f' and is not exported [E0305]\n  at: x\n  why: a variable is private to the function that declares it; variables are only globally accessible if export/import is used\n  help: declare it in 'f' as `export TYPE x = ...;` and read it here with `(import x)`, or pass the value in as an argument\n") then (import chkfail)[0]:(1)
-given regrow_d ("x", "g", 20):() then prints:("<stdin>:20: error: variable 'x' belongs to function 'f' and is not exported [E0305]\n  at: x\n  why: a variable is private to the function that declares it; variables are only globally accessible if export/import is used\n  help: declare it in 'f' as `export TYPE x = ...;` and read it here with `(import x)`, or pass the value in as an argument\n") then (import chkfail)[0]:(1)
+given regrow_d {
+  ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' belongs to function 'f' and is not exported [E0305]\n  at: x\n  why: a variable is private to the function that declares it; variables are only globally accessible if export/import is used\n  help: declare it in 'f' as `export TYPE x = ...;` and read it here with `(import x)`, or pass the value in as an argument\n") then (import chkfail)[0]:(1)
+  ("x", "g", 20):() then prints:("<stdin>:20: error: variable 'x' belongs to function 'f' and is not exported [E0305]\n  at: x\n  why: a variable is private to the function that declares it; variables are only globally accessible if export/import is used\n  help: declare it in 'f' as `export TYPE x = ...;` and read it here with `(import x)`, or pass the value in as an argument\n") then (import chkfail)[0]:(1)
+}
 
 report_bad_import(string name, string owner, int ln) {
   if(find_str((import dvname), name) < 0) {
@@ -23,5 +27,7 @@ report_bad_import(string name, string owner, int ln) {
     report_not_exported(name, owner, ln);
   }
 } return void;
-given regrow_d ("z", "f", 10):() then calls report_no_export:("z", "f", 10)
-given regrow_d ("x", "f", 10):() then calls report_not_exported:("x", "f", 10)
+given regrow_d {
+  ("z", "f", 10):() then calls report_no_export:("z", "f", 10)
+  ("x", "f", 10):() then calls report_not_exported:("x", "f", 10)
+}

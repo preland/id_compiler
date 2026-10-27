@@ -9,8 +9,10 @@ chain_elses(int id, int[] els) {
     n = count_elses(els[0]);
   }
 } return int n;
-given elif_fixture ((import elif_node), (import else_stmts)):(1)
-given elif_fixture ((import if_node), (import no_stmts)):(0)
+given elif_fixture {
+  ((import elif_node), (import else_stmts)):(1)
+  ((import if_node), (import no_stmts)):(0)
+}
 
 // nest_fixture (back/ir/build/func/lower/loc/loop.id) plus the two if nodes
 // its own `if_node` cannot be: at_elif (front/parse/stmt/form/branch/
@@ -37,5 +39,7 @@ check_stmt(int id, int depth, string fname) {
     check_loop(id, depth, fname);
   }
 } return void;
-given elif_fixture ((import if_node), 2, "f"):() then (import chkfail)[0]:(1)
-given elif_fixture ((import decl_node), 2, "f"):() then (import chkfail)[0]:(0)
+given elif_fixture {
+  ((import if_node), 2, "f"):() then (import chkfail)[0]:(1)
+  ((import decl_node), 2, "f"):() then (import chkfail)[0]:(0)
+}

@@ -5,8 +5,10 @@ fix_simple(int sn) {
     fix_cond(sn, 0);
   }
 } return void;
-given fix_simple_fixture ((import sim_ia)):() then calls fix_iassign:((import sim_ia))
-given fix_simple_fixture ((import sim_decl)):() then calls fix_cond:((import sim_decl), 0)
+given fix_simple_fixture {
+  ((import sim_ia)):() then calls fix_iassign:((import sim_ia))
+  ((import sim_decl)):() then calls fix_cond:((import sim_decl), 0)
+}
 
 // `xs[i] = v` evaluates the list, then the index, then the value (docs/SPEC.md 7).
 fix_iassign(int sn) {
@@ -14,8 +16,10 @@ fix_iassign(int sn) {
   int[] fixp_roots = [(import ni1)[sn], (import ni2)[sn], vl[0]];
   fix_plan(sn, fixp_roots, 0);
 } return void;
-given fix_simple_fixture ((import sim_ia)):() then calls fix_plan:((import sim_ia), (import sim_roots), 0)
-given fix_simple_fixture ((import sim_ia2)):() then calls fix_plan:((import sim_ia2), (import sim_roots2), 0)
+given fix_simple_fixture {
+  ((import sim_ia)):() then calls fix_plan:((import sim_ia), (import sim_roots), 0)
+  ((import sim_ia2)):() then calls fix_plan:((import sim_ia2), (import sim_roots2), 0)
+}
 
 // One statement: its events in evaluation order, then what moves.
 fix_plan(int sn, int[] roots, int md) {

@@ -30,10 +30,12 @@ esc_ms_c() {
   export int ems_sp = node_exprstmt((import ems_sc));
   export int ems_dm = node_decl("int", "mm", node_call("len", [(import ems_kv)]), 0);
 } return void;
-given esc_ms_fix ():() then calls sd_note:("Tr", ["kids"], ["Tr[]"], "tr.id", 1) then calls add_var:("mts", "Tr[]", 0) then calls add_var:("mm", "int", 0)
-given esc_ms_fix ():() then calls node_call:("Tr", [(import ems_kv)]) then calls node_call:("push", [(import ems_tsv), (import ems_tv)])
-given esc_ms_fix ():() then (import chkfail)[0]:(0)
-given esc_ms_fix ():() then init_units:(0)
+given esc_ms_fix {
+  ():() then calls sd_note:("Tr", ["kids"], ["Tr[]"], "tr.id", 1) then calls add_var:("mts", "Tr[]", 0) then calls add_var:("mm", "int", 0)
+  ():() then calls node_call:("Tr", [(import ems_kv)]) then calls node_call:("push", [(import ems_tsv), (import ems_tv)])
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_ms_d() {
   export int[] ems_sbody = [(import ems_dts), (import ems_dk), (import ems_dt), (import ems_sp)];
@@ -43,10 +45,12 @@ esc_ms_d() {
   export int ems_sfn = node_func("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv));
   export int ems_sbfn = node_func("ms_sdbad", "int", (import ems_pd), (import ems_sbbody), (import ems_nv));
 } return void;
-given esc_ms_fix ():() then calls node_param:("param", "int", "mn") then calls node_func:("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv))
-given esc_ms_fix ():() then calls node_func:("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv)) then calls node_func:("ms_sdbad", "int", (import ems_pd), (import ems_sbbody), (import ems_nv))
-given esc_ms_fix ():() then (import chkfail)[0]:(0)
-given esc_ms_fix ():() then init_units:(0)
+given esc_ms_fix {
+  ():() then calls node_param:("param", "int", "mn") then calls node_func:("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv))
+  ():() then calls node_func:("ms_sd", "int", (import ems_pd), (import ems_sbody), (import ems_nv)) then calls node_func:("ms_sdbad", "int", (import ems_pd), (import ems_sbbody), (import ems_nv))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_ms_fix() {
   esc_fix();

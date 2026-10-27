@@ -26,9 +26,11 @@ unit_mark_at(string uf) {
     print("/* idc unit: " + uf + " */");
   }
 } return void;
-given unit_t_two ("a.id"):() then prints:("/* idc unit: a.id */\n")
-given unit_t_two ("b.id"):() then prints:("/* idc unit: b.id */\n")
-given unit_t_two (""):() then prints:("")
+given unit_t_two {
+  ("a.id"):() then prints:("/* idc unit: a.id */\n")
+  ("b.id"):() then prints:("/* idc unit: b.id */\n")
+  (""):() then prints:("")
+}
 
 // The file of function node id, by walking pnodes forward from where the last
 // lookup stopped: `prog` is only ever narrowed or pruned, never reordered, so
@@ -45,5 +47,7 @@ unit_file(int id) {
     uf = (import pfile)[uc];
   }
 } return string uf;
-given unit_t_two ((import unit_t_fb)):("b.id")
-given unit_t_two (99):("")
+given unit_t_two {
+  ((import unit_t_fb)):("b.id")
+  (99):("")
+}

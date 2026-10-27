@@ -7,8 +7,10 @@ fix_push_rest(int e, int lo, int cl, int cd, string nt, string an) {
 } chain (int e, int lo, int cl, int cd, string nt, string an) {
   push((import fixe_ru), 0);
 } return void;
-given fix_fixture (0, 5, 3, 1, "int", "myname"):() then (import fixe_an)[0]:("myname") then (import fixe_cl)[0]:(3)
-given fix_fixture (7, 2, 0, 0, "", ""):() then (import fixe_an)[0]:("") then (import fixe_cl)[0]:(0)
+given fix_fixture {
+  (0, 5, 3, 1, "int", "myname"):() then (import fixe_an)[0]:("myname") then (import fixe_cl)[0]:(3)
+  (7, 2, 0, 0, "", ""):() then (import fixe_an)[0]:("") then (import fixe_cl)[0]:(0)
+}
 
 // One real event with a known token (curtk stays 0, so ntok[e] is 0) and a
 // known line for it (tline[0]), class 3 (must be named wherever it sits) and

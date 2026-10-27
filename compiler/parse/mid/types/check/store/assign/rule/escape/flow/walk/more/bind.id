@@ -8,11 +8,13 @@ esc_bindc(string cname, int i, int a) {
     c = 1;
   }
 } return int c;
-given esc_sfix ("bind", 1, (import efs_lit0)):(1)
-given esc_sfix given tcache_set((import efs_bn), "func(int) return int") ("bind", 1, (import efs_bn)):(1)
-given esc_sfix ("bind", 0, (import efs_lit0)):(0)
-given esc_sfix ("len", 1, (import efs_lit0)):(0)
-given esc_sfix ("bind", 1, (import efs_one)):(0)
+given esc_sfix {
+  ("bind", 1, (import efs_lit0)):(1)
+  given tcache_set((import efs_bn), "func(int) return int") ("bind", 1, (import efs_bn)):(1)
+  ("bind", 0, (import efs_lit0)):(0)
+  ("len", 1, (import efs_lit0)):(0)
+  ("bind", 1, (import efs_one)):(0)
+}
 
 // Where argument `i` of a call flows: what the callee's summary says, with
 // `bind`'s captured strings (above). A bare name handed to a struct's
@@ -37,6 +39,8 @@ given esc_sd_fix ("push", 0, (import esd_xs)):(0)
 esc_mvbit(string cname, int i) {
   int c = 64 * (find_str((import sdname), cname) >= 0) + 512 * (cname == "push" && i == 1);
 } return int c;
-given esc_sd_fix ("Box", 0):(64)
-given esc_sd_fix ("push", 1):(512)
-given esc_sd_fix ("push", 0):(0)
+given esc_sd_fix {
+  ("Box", 0):(64)
+  ("push", 1):(512)
+  ("push", 0):(0)
+}

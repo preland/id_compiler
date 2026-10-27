@@ -10,10 +10,12 @@ esc_pick(int fn, string nm, int e) {
     pk = leaf;
   }
 } return int pk;
-given esc_sfix ((import efs_acc), "s", (import efs_sum)):((import efs_vs))
-given esc_sfix ((import efs_dbl), "d", (import efs_dt)):(-1)
-given esc_sfix ((import efs_ret), "r", (import efs_sum)):(-1)
-given esc_sfix ((import efs_acc), "s", (import efs_vn)):(-1)
+given esc_sfix {
+  ((import efs_acc), "s", (import efs_sum)):((import efs_vs))
+  ((import efs_dbl), "d", (import efs_dt)):(-1)
+  ((import efs_ret), "r", (import efs_sum)):(-1)
+  ((import efs_acc), "s", (import efs_vn)):(-1)
+}
 
 esc_pickok(int fn, string nm, int e, int leaf) {
   int ok = 0;
@@ -21,10 +23,12 @@ esc_pickok(int fn, string nm, int e, int leaf) {
     ok = esc_own(fn, nm) == 1 && esc_cnt(e, nm) == 1;
   }
 } return int ok;
-given esc_sfix ((import efs_acc), "s", (import efs_sum), (import efs_vs)):(1)
-given esc_sfix ((import efs_dbl), "d", (import efs_dt), (import efs_vd)):(0)
-given esc_sfix ((import efs_acc), "s", (import efs_vs), (import efs_vs)):(0)
-given esc_sfix ((import efs_acc), "t", (import efs_sum), (import efs_vs)):(0)
+given esc_sfix {
+  ((import efs_acc), "s", (import efs_sum), (import efs_vs)):(1)
+  ((import efs_dbl), "d", (import efs_dt), (import efs_vd)):(0)
+  ((import efs_acc), "s", (import efs_vs), (import efs_vs)):(0)
+  ((import efs_acc), "t", (import efs_sum), (import efs_vs)):(0)
+}
 
 // The cell is set before the right-hand side is emitted.
 esc_pick_set(string nm, int e) {
@@ -32,5 +36,7 @@ esc_pick_set(string nm, int e) {
   int pk = esc_pick(cf, nm, e);
   esc_cons_set(pk);
 } return void;
-given esc_sfix ("s", (import efs_sum)):() then esc_inplace:(1)
-given esc_sfix ("s", (import efs_vn)):() then esc_inplace:(0)
+given esc_sfix {
+  ("s", (import efs_sum)):() then esc_inplace:(1)
+  ("s", (import efs_vn)):() then esc_inplace:(0)
+}

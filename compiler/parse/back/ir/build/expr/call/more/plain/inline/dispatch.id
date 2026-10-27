@@ -11,8 +11,10 @@ lw_expand(string helper, string ret_ty, int[] ih_args) {
     ret_i = lw_expand_word(helper, ret_ty, ih_args);
   }
 } return int ret_i;
-given lw_env_fixture ("id_ult", "word", [0, 1]):(1)
-given lw_env_fixture ("id_x", "word", [0, 1]):(0)
+given lw_env_fixture {
+  ("id_ult", "word", [0, 1]):(1)
+  ("id_x", "word", [0, 1]):(0)
+}
 
 lw_expand_word(string helper, string ret_ty, int[] ih_args) {
   int ret_i = 0 - 1;
@@ -22,8 +24,10 @@ lw_expand_word(string helper, string ret_ty, int[] ih_args) {
     ret_i = lw_expand_turn(helper, ret_ty, ih_args);
   }
 } return int ret_i;
-given lw_env_fixture ("id_uword_of_int", "word", [0]):(1)
-given lw_env_fixture ("id_x", "word", [0]):(0)
+given lw_env_fixture {
+  ("id_uword_of_int", "word", [0]):(1)
+  ("id_x", "word", [0]):(0)
+}
 
 lw_expand_turn(string helper, string ret_ty, int[] ih_args) {
   int ret_i = 0 - 1;
@@ -33,5 +37,7 @@ lw_expand_turn(string helper, string ret_ty, int[] ih_args) {
     ret_i = lw_expand_turn32(helper, ret_ty, ih_args);
   }
 } return int ret_i;
-given lw_env_fixture ("id_rotl", "word", [0, 1]):(0)
-given lw_env_fixture ("id_x", "word", [0, 1]):(0)
+given lw_env_fixture {
+  ("id_rotl", "word", [0, 1]):(0)
+  ("id_x", "word", [0, 1]):(0)
+}

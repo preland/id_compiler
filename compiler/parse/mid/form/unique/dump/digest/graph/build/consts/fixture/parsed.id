@@ -46,9 +46,11 @@ dg_cflip(int dgtok, int dgc) {
     dgdiff = 1;
   }
 } return int dgdiff;
-given dg_t_cbuilt (4, 0):(1)
-given dg_t_cbuilt (4, 2):(0)
-given dg_t_cbuilt (18, 0):(1)
-given dg_t_cbuilt (25, 0):(0)
-given dg_t_cbuilt (18, 2):(0)
-given dg_t_cbuilt (25, 2):(0)
+given dg_t_cbuilt {
+  (4, 0):(1)
+  (4, 2):(0)
+  (18, 0):(1)
+  (25, 0):(0)
+  (18, 2):(0)
+  (25, 2):(0)
+}

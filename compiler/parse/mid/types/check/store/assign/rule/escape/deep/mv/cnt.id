@@ -12,9 +12,11 @@ esc_cnt1(int sn, string nm) {
     r = esc_cnt((import ni1)[sn], nm) + ((import ns1)[sn] == nm);
   }
 } return int r;
-given esc_fm_fix ((import efm_ds), "kids"):(1)
-given esc_fm_fix ((import efm_ct), "kids"):(1)
-given esc_fm_fix ((import efm_ct), "t"):(1)
+given esc_fm_fix {
+  ((import efm_ds), "kids"):(1)
+  ((import efm_ct), "kids"):(1)
+  ((import efm_ct), "t"):(1)
+}
 
 esc_cnt2s(int sn, string nm) {
   int r = esc_cnt3s(sn, nm);
@@ -24,9 +26,11 @@ esc_cnt2s(int sn, string nm) {
     r = esc_cnt((import ni1)[sn], nm) + esc_cnt((import ni2)[sn], nm) + esc_cntl((import nl1)[sn], nm);
   }
 } return int r;
-given esc_fm_fix ((import efm_ps), "kids"):(1)
-given esc_fm_fix ((import efm_ps), "d"):(1)
-given esc_fm_fix ((import efm_ds), "kids"):(0)
+given esc_fm_fix {
+  ((import efm_ps), "kids"):(1)
+  ((import efm_ps), "d"):(1)
+  ((import efm_ds), "kids"):(0)
+}
 
 esc_cnt3s(int sn, string nm) {
   int r = 0;
@@ -36,6 +40,8 @@ esc_cnt3s(int sn, string nm) {
     r = esc_cnt((import ni1)[sn], nm) + esc_cnts((import nl1)[sn], nm);
   }
 } return int r;
-given esc_fm_fix ((import efm_if), "d"):(2)
-given esc_fm_fix ((import efm_if), "kids"):(1)
-given esc_fm_fix ((import efm_ds), "d"):(0)
+given esc_fm_fix {
+  ((import efm_if), "d"):(2)
+  ((import efm_if), "kids"):(1)
+  ((import efm_ds), "d"):(0)
+}

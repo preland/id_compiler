@@ -10,9 +10,11 @@ fit_calls_body(string kind, int ci, string nm, int cfn, int chk_node) {
     fit_one(ci, items, "a 'calls NAME:[N]' check takes exactly one count, not ", "int");
   }
 } return void;
-given calls_node_fixture ("thencallsn", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
-given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: this case's 'calls fx_target' passes 0 argument(s), which takes 1 [E0519]\n  why: 'calls NAME:(ARGS)' matches the arguments of one call to NAME, so it lists one literal for each of NAME's parameters\n  help: write one literal per parameter: fx_target(int x)\n")
-given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_node)):() then prints:("")
+given calls_node_fixture {
+  ("thencallsn", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
+  ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: this case's 'calls fx_target' passes 0 argument(s), which takes 1 [E0519]\n  why: 'calls NAME:(ARGS)' matches the arguments of one call to NAME, so it lists one literal for each of NAME's parameters\n  help: write one literal per parameter: fx_target(int x)\n")
+  ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_node)):() then prints:("")
+}
 
 fit_calls_args(int ci, string nm, int cfn, int[] items) {
   if(len(items) != len(((import nl1)[cfn]))) {
@@ -23,7 +25,9 @@ fit_calls_args(int ci, string nm, int cfn, int[] items) {
     fit_items(ci, cfn, items);
   }
 } return void;
-given calls_items_fixture ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_none)):() then prints:("fixture.id:4: error: this case's 'calls fx_target' passes 0 argument(s), which takes 1 [E0519]\n  why: 'calls NAME:(ARGS)' matches the arguments of one call to NAME, so it lists one literal for each of NAME's parameters\n  help: write one literal per parameter: fx_target(int x)\n")
-given calls_items_fixture given integer_list_set((import fixture_calls_one), 0, (import fixture_fn)) ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_one)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
-given calls_items_fixture ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_one)):() then prints:("")
+given calls_items_fixture {
+  ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_none)):() then prints:("fixture.id:4: error: this case's 'calls fx_target' passes 0 argument(s), which takes 1 [E0519]\n  why: 'calls NAME:(ARGS)' matches the arguments of one call to NAME, so it lists one literal for each of NAME's parameters\n  help: write one literal per parameter: fx_target(int x)\n")
+  given integer_list_set((import fixture_calls_one), 0, (import fixture_fn)) ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_one)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+  ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_one)):() then prints:("")
+}
 

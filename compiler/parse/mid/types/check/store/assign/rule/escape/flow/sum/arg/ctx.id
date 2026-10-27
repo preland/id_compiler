@@ -16,9 +16,11 @@ arg_ctx(string cname, int i) {
     c = arg_ctx_u(cname, i);
   }
 } return int c;
-given esc_fix ("push", 1):(1)
-given esc_fix ("len", 0):(0)
-given esc_fix ("fa_sink", 0):(8)
+given esc_fix {
+  ("push", 1):(1)
+  ("len", 0):(0)
+  ("fa_sink", 0):(8)
+}
 
 arg_ctx_b(string cname, int i) {
   int c = 0;
@@ -26,14 +28,18 @@ arg_ctx_b(string cname, int i) {
     c = 1;
   }
 } return int c;
-given esc_fix ("push", 1):(1)
-given esc_fix ("push", 0):(0)
-given esc_fix ("print", 1):(0)
+given esc_fix {
+  ("push", 1):(1)
+  ("push", 0):(0)
+  ("print", 1):(0)
+}
 
 arg_ctx_u(string cname, int i) {
   int m = esc_mask(cname);
   int c = esc_bit(m, i) | (esc_dbit(m, i) << 3);
 } return int c;
-given esc_fix ("fa_sink", 1):(1)
-given esc_fix ("fa_sink", 0):(8)
-given esc_fix ("nosuch", 0):(9)
+given esc_fix {
+  ("fa_sink", 1):(1)
+  ("fa_sink", 0):(8)
+  ("nosuch", 0):(9)
+}

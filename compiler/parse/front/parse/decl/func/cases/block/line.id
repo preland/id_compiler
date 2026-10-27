@@ -13,9 +13,11 @@ gblk_line_end(int gb_at) {
     gb_end = gb_end + 1;
   }
 } return int gb_end;
-given gblk_stream("open") (0):(3)
-given gblk_stream("open") (3):(8)
-given gblk_stream("open") (13):(14)
+given gblk_stream("open") {
+  (0):(3)
+  (3):(8)
+  (13):(14)
+}
 
 gblk_ends_brace(int gb_at) {
   int gb_end = gblk_line_end(gb_at);
@@ -24,8 +26,10 @@ gblk_ends_brace(int gb_at) {
     gb_yes = 1;
   }
 } return int gb_yes;
-given gblk_stream("open") (0):(1)
-given gblk_stream("open") (3):(0)
+given gblk_stream("open") {
+  (0):(1)
+  (3):(0)
+}
 
 gblk_is_open(int gb_at) {
   int gb_yes = 0;
@@ -33,6 +37,8 @@ gblk_is_open(int gb_at) {
     gb_yes = gblk_ends_brace(gb_at);
   }
 } return int gb_yes;
-given gblk_stream("open") (0):(1)
-given gblk_stream("open") (3):(0)
-given gblk_stream("open") (13):(0)
+given gblk_stream("open") {
+  (0):(1)
+  (3):(0)
+  (13):(0)
+}

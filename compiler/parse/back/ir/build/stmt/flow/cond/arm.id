@@ -6,8 +6,10 @@ lw_arm(int b, int[] stmts, int jn) {
   lw_stmts(stmts);
   lw_term("br", 0 - 1, [jn]);
 } return void;
-given bound_fixture (0, [1], 5):() then (import lwcur)[0]:(0)
-given bound_fixture (0, [], 5):() then (import lwcur)[0]:(0)
+given bound_fixture {
+  (0, [1], 5):() then (import lwcur)[0]:(0)
+  (0, [], 5):() then (import lwcur)[0]:(0)
+}
 
 // The loop test. Written out rather than folded into the cbr call because the
 // condition's own instructions have to land in the head block before the

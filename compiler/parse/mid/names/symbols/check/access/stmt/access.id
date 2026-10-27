@@ -20,8 +20,10 @@ acc_func(int id) {
   string s1_of_v = (import ns1)[id];
   acc_func_body(l2_of_v, s1_of_v, id);
 } return void;
-given fnscope_fix ((import regrow_fn_node)):() then calls acc_func_body:((import regrow_plist), "g2", (import regrow_fn_node))
-given fnscope_fix ((import regrow_fn_node)):() then (import chkfail)[0]:(0)
+given fnscope_fix {
+  ((import regrow_fn_node)):() then calls acc_func_body:((import regrow_plist), "g2", (import regrow_fn_node))
+  ((import regrow_fn_node)):() then (import chkfail)[0]:(0)
+}
 
 // The return clause is not a statement of the body, so the body walk never
 // reaches it -- but it is an expression the function evaluates, and idc.py

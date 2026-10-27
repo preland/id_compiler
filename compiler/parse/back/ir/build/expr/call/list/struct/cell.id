@@ -11,5 +11,7 @@ lw_ctor_cell(int node, int i, string elem) {
 } chain (int node, int i, string elem) {
   int boxed = lw_box(v, elem);
 } return int boxed;
-given sr_fixture ((import sr_ic2), 0, "int"):(1)
-given sr_fixture ((import sr_ic2), 1, "word"):(1)
+given sr_fixture {
+  ((import sr_ic2), 0, "int"):(1)
+  ((import sr_ic2), 1, "word"):(1)
+}

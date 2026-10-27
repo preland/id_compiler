@@ -19,8 +19,10 @@ ixw_struct(int ixw_k) {
 } chain (int ixw_k) {
   ixw_tag("D", ixw_fields);
 } return void;
-given sd_pair (0):() then prints:("@\tp.id\nF\tP\ts\t1\t0\nD\tint int\n")
-given sd_pair (1):() then prints:("@\tq.id\nF\tQ\ts\t5\t0\nD\tstring\n")
+given sd_pair {
+  (0):() then prints:("@\tp.id\nF\tP\ts\t1\t0\nD\tint int\n")
+  (1):() then prints:("@\tq.id\nF\tQ\ts\t5\t0\nD\tstring\n")
+}
 
 ixw_field_types(int ixw_k) {
   string[] ixw_ts = [];
@@ -33,5 +35,7 @@ ixw_field_types(int ixw_k) {
   }
   string ixw_joined = string_join(ixw_ts, " ");
 } return string ixw_joined;
-given sd_pair (0):("int int")
-given sd_pair given sd_note("R", ["a"], ["Pt[]"], "r.id", 9) (2):("Pt")
+given sd_pair {
+  (0):("int int")
+  given sd_note("R", ["a"], ["Pt[]"], "r.id", 9) (2):("Pt")
+}

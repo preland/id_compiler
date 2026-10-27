@@ -20,8 +20,10 @@ leaf_type(int e) {
     lt = "float";
   }
 } return string lt;
-given fn_fixture ((import fixture_zero)):("int")
-given fn_fixture ((import fixture_fn)):("string")
+given fn_fixture {
+  ((import fixture_zero)):("int")
+  ((import fixture_fn)):("string")
+}
 
 // The dup-case fixture's root (more/dup/scan.id, more/dup/eq.id): two token
 // slots ("=" then "return", from mk_two_toks -- front/tokens/load/

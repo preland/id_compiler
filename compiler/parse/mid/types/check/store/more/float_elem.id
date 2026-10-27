@@ -9,10 +9,12 @@ chk_float_elem(int id, string lt, int v, string verb) {
     tc_diag(id, "E0645", "cannot " + verb + " " + lt + ": a float would drop its fraction", lt, "a float stored in an int element silently drops its fraction, and id converts nothing silently", "declare an int local first, as in `int n = f;`, and store that");
   }
 } return void;
-given float_list_fixture ((import push_float), "int[]", (import lit_float), "push a float onto a"):() then (import chkfail)[0]:(1)
-given float_list_fixture ((import push_float), "float[]", (import lit_float), "push a float onto a"):() then (import chkfail)[0]:(0)
-given float_list_fixture ((import push_float), "bytes", (import lit_float), "store a float into a"):() then (import chkfail)[0]:(1)
-given float_list_fixture ((import push_float), "int[]", (import lit_a), "push a float onto a"):() then (import chkfail)[0]:(0)
+given float_list_fixture {
+  ((import push_float), "int[]", (import lit_float), "push a float onto a"):() then (import chkfail)[0]:(1)
+  ((import push_float), "float[]", (import lit_float), "push a float onto a"):() then (import chkfail)[0]:(0)
+  ((import push_float), "bytes", (import lit_float), "store a float into a"):() then (import chkfail)[0]:(1)
+  ((import push_float), "int[]", (import lit_a), "push a float onto a"):() then (import chkfail)[0]:(0)
+}
 
 chk_push_float(int id) {
   int[] args = (import nl1)[id];

@@ -25,8 +25,10 @@ op_mem2reg(int f) {
     j = j + 1;
   }
 } return void;
-given m2r_alloca_fixture (0):() then calls m2r_init:(0) then calls m2r_phis:(0) then calls m2r_walk:(0, 0)
-given m2r_alloca_fixture (1):() then calls m2r_init:(1) then calls m2r_phis:(1) then calls m2r_walk:(1, 0)
+given m2r_alloca_fixture {
+  (0):() then calls m2r_init:(0) then calls m2r_phis:(0) then calls m2r_walk:(0, 0)
+  (1):() then calls m2r_init:(1) then calls m2r_phis:(1) then calls m2r_walk:(1, 0)
+}
 
 m2r_init(int f) {
   m2r_reset();
@@ -38,8 +40,10 @@ m2r_init(int f) {
     i = i + 1;
   }
 } return void;
-given m2r_alloca_fixture (0):() then calls m2r_reset:() then calls m2r_collect:(0) then calls m2r_row:[1]
-given m2r_alloca_fixture (1):() then calls m2r_reset:() then calls m2r_collect:(1) then calls m2r_row:[1]
+given m2r_alloca_fixture {
+  (0):() then calls m2r_reset:() then calls m2r_collect:(0) then calls m2r_row:[1]
+  (1):() then calls m2r_reset:() then calls m2r_collect:(1) then calls m2r_row:[1]
+}
 
 m2r_reset() {
   pred_wipe((import pra));

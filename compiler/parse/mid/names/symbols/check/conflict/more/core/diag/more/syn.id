@@ -11,8 +11,10 @@ syn_diag(int[] pos, string dgn_code, string dgn_msg, string dgn_at, string dgn_w
   diag(dgn_code, dgn_sloc, dgn_msg, dgn_at, dgn_why, dgn_help);
   integer_list_set((import synfail), 0, 1);
 } return void;
-given mk_two_toks ([0], "E0099", "bad", "x", "because", "do this"):() then prints:("<stdin>:1: error: bad [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import synfail)[0]:(1)
-given mk_two_toks ([1], "E0098", "worse", "", "", ""):() then prints:("<stdin>:1: error: worse [E0098]\n") then (import chkfail)[0]:(1)
+given mk_two_toks {
+  ([0], "E0099", "bad", "x", "because", "do this"):() then prints:("<stdin>:1: error: bad [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import synfail)[0]:(1)
+  ([1], "E0098", "worse", "", "", ""):() then prints:("<stdin>:1: error: worse [E0098]\n") then (import chkfail)[0]:(1)
+}
 
 // `expected 'X', found 'Y'`: the parser needed one token and met another.
 // What is wrong is almost never at the token it names -- an unclosed bracket or
@@ -23,8 +25,10 @@ syn_expected(int[] pos, string dgn_want, string dgn_found) {
   string dgn_ehelp = "put '" + dgn_want + "' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late";
   syn_diag(pos, "E0101", "expected '" + dgn_want + "', found '" + dgn_found + "'", dgn_found, dgn_ewhy, dgn_ehelp);
 } return void;
-given mk_two_toks ([1], "=", "return"):() then prints:("<stdin>:1: error: expected '=', found 'return' [E0101]\n  at: return\n  why: the grammar needs '=' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '=' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
-given mk_two_toks ([0], ";", ""):() then prints:("<stdin>:1: error: expected ';', found '' [E0101]\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+given mk_two_toks {
+  ([1], "=", "return"):() then prints:("<stdin>:1: error: expected '=', found 'return' [E0101]\n  at: return\n  why: the grammar needs '=' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '=' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+  ([0], ";", ""):() then prints:("<stdin>:1: error: expected ';', found '' [E0101]\n  why: the grammar needs ';' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put ';' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+}
 
 // An operator where an expression belongs, and the block comment the lexer folds
 // into one `/*` token so that the mistake can be named.
@@ -46,7 +50,9 @@ syn_unexpected(int[] pos, string dgn_tok, string dgn_umsg) {
   }
   syn_diag(pos, "E0102", dgn_umsg, dgn_tok, dgn_uwhy, dgn_uhelp);
 } return void;
-given mk_two_toks ([0], "=", "unexpected token '='"):() then prints:("<stdin>:1: error: unexpected token '=' [E0102]\n  at: =\n  why: an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type\n  help: write an operand where '=' is, or remove it; a missing operand just before it is the usual cause\n")
-given mk_two_toks ([0], "/*", "block comments are not supported; use // for a line comment"):() then prints:("<stdin>:1: error: block comments are not supported; use // for a line comment [E0102]\n  at: /*\n  why: id has line comments only, so a comment always ends where its line ends and can never swallow code\n  help: write // at the start of each commented line\n")
-given mk_two_toks ([0], ".", "unexpected token '.'; a float literal cannot start with the point"):() then prints:("<stdin>:1: error: unexpected token '.'; a float literal cannot start with the point [E0102]\n  at: .\n  why: a float literal is digits, a point and digits, so it never starts with the point and an exponent cannot stand alone\n  help: write the digit before the point, as in 0.5 for .5, and put an exponent after digits, as in 0.5e3 or 1e-9\n")
-given mk_two_toks ([0], "#!", "'#!' is only allowed as the first line of a file"):() then prints:("<stdin>:1: error: '#!' is only allowed as the first line of a file [E0102]\n  at: #!\n  why: a '#!' line is only a shebang, and only on line 1, so that ./script.id can run; anywhere else nothing in id starts with '#'\n  help: move the line to the top of the file, or turn it into a // comment\n")
+given mk_two_toks {
+  ([0], "=", "unexpected token '='"):() then prints:("<stdin>:1: error: unexpected token '=' [E0102]\n  at: =\n  why: an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type\n  help: write an operand where '=' is, or remove it; a missing operand just before it is the usual cause\n")
+  ([0], "/*", "block comments are not supported; use // for a line comment"):() then prints:("<stdin>:1: error: block comments are not supported; use // for a line comment [E0102]\n  at: /*\n  why: id has line comments only, so a comment always ends where its line ends and can never swallow code\n  help: write // at the start of each commented line\n")
+  ([0], ".", "unexpected token '.'; a float literal cannot start with the point"):() then prints:("<stdin>:1: error: unexpected token '.'; a float literal cannot start with the point [E0102]\n  at: .\n  why: a float literal is digits, a point and digits, so it never starts with the point and an exponent cannot stand alone\n  help: write the digit before the point, as in 0.5 for .5, and put an exponent after digits, as in 0.5e3 or 1e-9\n")
+  ([0], "#!", "'#!' is only allowed as the first line of a file"):() then prints:("<stdin>:1: error: '#!' is only allowed as the first line of a file [E0102]\n  at: #!\n  why: a '#!' line is only a shebang, and only on line 1, so that ./script.id can run; anywhere else nothing in id starts with '#'\n  help: move the line to the top of the file, or turn it into a // comment\n")
+}

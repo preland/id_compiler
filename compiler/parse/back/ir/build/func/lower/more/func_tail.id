@@ -4,8 +4,10 @@ lw_func_mid(int node, string ty, string name) {
   lw_open(ir_func_v);
   lw_func_tail(node);
 } return void;
-given lw_func_fixture ((import g_fnnode), "int", "g"):() then (import chkfail)[0]:(0)
-given lw_func_fixture ((import g_fnnode), "word", "h"):() then (import chkfail)[0]:(0)
+given lw_func_fixture {
+  ((import g_fnnode), "int", "g"):() then (import chkfail)[0]:(0)
+  ((import g_fnnode), "word", "h"):() then (import chkfail)[0]:(0)
+}
 
 lw_func_tail(int node) {
   esc_enter(node);
@@ -14,10 +16,12 @@ lw_func_tail(int node) {
 } chain (int node) {
   lw_fin(node);
 } return void;
-given lw_func_fixture ((import g_fnnode)):() then calls esc_enter:(3)
-given lw_func_fixture ((import g_fnnode)):() then calls lw_fin:(3)
-given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
-given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
+given lw_func_fixture {
+  ((import g_fnnode)):() then calls esc_enter:(3)
+  ((import g_fnnode)):() then calls lw_fin:(3)
+  ((import g_fnnode)):() then (import chkfail)[0]:(0)
+  ((import g_fnnode)):() then init_units:(0)
+}
 
 // id_main's first instruction builds the list constants
 // (dce/export/consts.id), on every LLVM build: hosted, where the C-ABI main

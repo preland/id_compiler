@@ -11,17 +11,21 @@ esc_fresh_call(int e) {
     ok = esc_fresh_name(e);
   }
 } return int ok;
-given esc_ffix ((import eff_cmk)):(1)
-given esc_ffix ((import eff_cl)):(0)
-given esc_ffix ((import eff_cbad)):(0)
-given esc_ffix ((import eff_dy)):(0)
+given esc_ffix {
+  ((import eff_cmk)):(1)
+  ((import eff_cl)):(0)
+  ((import eff_cbad)):(0)
+  ((import eff_dy)):(0)
+}
 
 esc_fresh_name(int e) {
   int m = esc_mask((import ns1)[e]);
   string eft = type_of(e);
   int ok = ((m >> 30) & 1) == 0 && esc_heap_ty(eft) == 1;
 } return int ok;
-given esc_ffix ((import eff_cmk)):(1)
-given esc_ffix ((import eff_cbad)):(0)
-given esc_ffix ((import eff_ctp)):(0)
-given esc_ffix ((import eff_crec)):(1)
+given esc_ffix {
+  ((import eff_cmk)):(1)
+  ((import eff_cbad)):(0)
+  ((import eff_ctp)):(0)
+  ((import eff_crec)):(1)
+}

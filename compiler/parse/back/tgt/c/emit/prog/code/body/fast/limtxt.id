@@ -9,8 +9,10 @@ lp_leaf(string[] lq_tk, int lq_nn) {
   }
   push(lq_tk, lq_kd + emit_expr(lq_nn));
 } return void;
-given lpf_more ([], (import lpf_na)):(["v:lan"])
-given lpf_more (["x"], (import lpf_n0)):(["x", "i:1"])
+given lpf_more {
+  ([], (import lpf_na)):(["v:lan"])
+  (["x"], (import lpf_n0)):(["x", "i:1"])
+}
 
 lp_ntok(string[] lq_tk, int lq_nn) {
   if((import nkind)[lq_nn] == "call") {
@@ -19,13 +21,17 @@ lp_ntok(string[] lq_tk, int lq_nn) {
     lp_leaf(lq_tk, lq_nn);
   }
 } return void;
-given lpf_more ([], (import lpf_na)):(["v:lan"])
-given lpf_more ([], (import lpf_nb)):(["v:lbv", "len", "wide"])
+given lpf_more {
+  ([], (import lpf_na)):(["v:lan"])
+  ([], (import lpf_nb)):(["v:lbv", "len", "wide"])
+}
 
 lp_nul(int lq_nn) {
   if((import nkind)[lq_nn] == "call") {
     lp_rel((import nl1)[lq_nn][0], "null", "!=");
   }
 } return void;
-given lpf_more ((import lpf_nb)):() then (import lpcond)[0]:("v:lbv null !=")
-given lpf_more ((import lpf_na)):() then len((import lpcond)):(0)
+given lpf_more {
+  ((import lpf_nb)):() then (import lpcond)[0]:("v:lbv null !=")
+  ((import lpf_na)):() then len((import lpcond)):(0)
+}

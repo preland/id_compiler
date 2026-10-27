@@ -35,11 +35,13 @@ esc_sflags(int fn, string nm) {
   int f = esc_block((import nl2)[fn], nm);
   int ok = (f & 579) == 0 && (f & 16) != 0;
 } return int ok;
-given esc_sfix ((import efs_acc), "s"):(1)
-given esc_sfix ((import efs_dbl), "d"):(1)
-given esc_sfix ((import efs_lit), "l"):(0)
-given esc_sfix ((import efs_call), "c"):(0)
-given esc_sfix ((import efs_alias), "a"):(0)
+given esc_sfix {
+  ((import efs_acc), "s"):(1)
+  ((import efs_dbl), "d"):(1)
+  ((import efs_lit), "l"):(0)
+  ((import efs_call), "c"):(0)
+  ((import efs_alias), "a"):(0)
+}
 
 esc_hosted() {
   int ok = (import fsc)[0] == 0;

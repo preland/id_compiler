@@ -31,8 +31,10 @@ bin_op(int id) {
     op = "==";
   }
 } return string op;
-given lz_c ((import lz_binid)):("+")
-given lz_c ((import lz_i1)):("3")
+given lz_c {
+  ((import lz_binid)):("+")
+  ((import lz_i1)):("3")
+}
 
 bin_pair(int id) {
   int i1_of_v = (import ni1)[id];

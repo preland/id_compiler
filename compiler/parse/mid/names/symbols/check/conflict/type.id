@@ -11,8 +11,10 @@ reg_report4(string name, string type, string owner, int exported, int ln, int un
     report_var_type(name, type, prev, owner, ln);
   }
 } return void;
-given regrow_d ("x", "string", "f", 0, 10, 0):() then calls report_var_type:("x", "string", "int", "f", 10)
-given regrow_d ("x", "int", "f", 0, 10, 0):() then (import chkfail)[0]:(0)
+given regrow_d {
+  ("x", "string", "f", 0, 10, 0):() then calls report_var_type:("x", "string", "int", "f", 10)
+  ("x", "int", "f", 0, 10, 0):() then (import chkfail)[0]:(0)
+}
 
 reg_push(string name, string type, string owner, int exported, int unit) {
   didx_add(name);

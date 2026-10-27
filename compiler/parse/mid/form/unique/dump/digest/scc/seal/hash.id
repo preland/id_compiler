@@ -19,8 +19,10 @@ dg_seal(int dgp) {
   push((import dg_deep), dgd);
   push((import dg_dirty), dgbad[0]);
 } return void;
-given dg_t_marked (0):() then dg_deep_last:(3498779809326236161) then dg_dirty_last:("dirty 0")
-given dg_t_marked (1):() then dg_deep_last:(5848896990758076257) then dg_dirty_last:("dirty 0")
+given dg_t_marked {
+  (0):() then dg_deep_last:(3498779809326236161) then dg_dirty_last:("dirty 0")
+  (1):() then dg_deep_last:(5848896990758076257) then dg_dirty_last:("dirty 0")
+}
 
 dg_seal_run(word[] dgacc, int[] dgbad, int dgp) {
   while(dgp < len((import dg_stk))) {
@@ -28,13 +30,17 @@ dg_seal_run(word[] dgacc, int[] dgbad, int dgp) {
     dgp = dgp + 1;
   }
 } return void;
-given dg_t_marked ([0, 0], [0], 1):([-7803968205175433727, 3433123315665011780], [0])
-given dg_t_marked ([0, 0], [0], 2):([0, 0], [0])
+given dg_t_marked {
+  ([0, 0], [0], 1):([-7803968205175433727, 3433123315665011780], [0])
+  ([0, 0], [0], 2):([0, 0], [0])
+}
 
 dg_seal_one(word[] dgacc, int[] dgbad, int dgm) {
   dgacc[0] = dgacc[0] + dg_mix((import dg_own)[dgm], 7);
   dgbad[0] = dgbad[0] | (import dg_nat)[dgm];
   dg_seal_out(dgacc, dgbad, dgm, 0);
 } return void;
-given dg_t_scc ([0, 0], [0], 3):([2838813856701515513, 0], [1])
-given dg_t_scc ([0, 0], [0], 4):([4124083197287731522, 2586336722068730772], [1])
+given dg_t_scc {
+  ([0, 0], [0], 3):([2838813856701515513, 0], [1])
+  ([0, 0], [0], 4):([4124083197287731522, 2586336722068730772], [1])
+}

@@ -5,8 +5,10 @@ fold_mul(int[] pos, int left) {
   advance(pos);
   int ret_i = fold_mul_tail(pos, left, op);
 } return int ret_i;
-given expr_tokens ([3], 100):(1)
-given expr_tokens ([5], 100):(1)
+given expr_tokens {
+  ([3], 100):(1)
+  ([5], 100):(1)
+}
 
 // primary: '(' expr ')' | '[' array literal | INT | STR | ident (var or call)
 parse_primary(int[] pos) {

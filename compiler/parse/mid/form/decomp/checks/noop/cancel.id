@@ -15,11 +15,13 @@ noop_cancel(int nzc_node) {
     nzc_text = "a term added and subtracted again cancels out";
   }
 } return string nzc_text;
-given noop_world ((import nfx_cancel)):("a term added and subtracted again cancels out")
-given noop_world ((import nfx_ab_b)):("a term added and subtracted again cancels out")
-given noop_world ((import wx_sum)):("")
-given noop_world ((import nfx_impure)):("")
-given noop_world ((import nfx_times_one)):("")
+given noop_world {
+  ((import nfx_cancel)):("a term added and subtracted again cancels out")
+  ((import nfx_ab_b)):("a term added and subtracted again cancels out")
+  ((import wx_sum)):("")
+  ((import nfx_impure)):("")
+  ((import nfx_times_one)):("")
+}
 
 noop_terms(int nzm_node, int nzm_sign, int[] nzm_terms, int[] nzm_signs) {
   string nzm_op = (import ns1)[nzm_node];
@@ -33,9 +35,11 @@ noop_terms(int nzm_node, int nzm_sign, int[] nzm_terms, int[] nzm_signs) {
     noop_split(nzm_node, nzm_sign, nzm_terms, nzm_signs);
   }
 } return void;
-given noop_world ((import wx_va), 1, [], []):((import wx_va), 1, [(import wx_va)], [1])
-given noop_world ((import wx_sum), -1, [], []):((import wx_sum), -1, [(import wx_va), (import wx_vb)], [-1, -1])
-given noop_world ((import nfx_ab_b), 1, [], []):((import nfx_ab_b), 1, [(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1])
+given noop_world {
+  ((import wx_va), 1, [], []):((import wx_va), 1, [(import wx_va)], [1])
+  ((import wx_sum), -1, [], []):((import wx_sum), -1, [(import wx_va), (import wx_vb)], [-1, -1])
+  ((import nfx_ab_b), 1, [], []):((import nfx_ab_b), 1, [(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1])
+}
 
 noop_split(int nzs_node, int nzs_sign, int[] nzs_terms, int[] nzs_signs) {
   int nzs_right = nzs_sign;
@@ -46,5 +50,7 @@ noop_split(int nzs_node, int nzs_sign, int[] nzs_terms, int[] nzs_signs) {
 } chain (int nzs_node, int nzs_sign, int[] nzs_terms, int[] nzs_signs) {
   noop_terms((import ni2)[nzs_node], nzs_right, nzs_terms, nzs_signs);
 } return void;
-given noop_world ((import nfx_ab_b), 1, [], []):((import nfx_ab_b), 1, [(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1])
-given noop_world ((import wx_sum), 1, [], []):((import wx_sum), 1, [(import wx_va), (import wx_vb)], [1, 1])
+given noop_world {
+  ((import nfx_ab_b), 1, [], []):((import nfx_ab_b), 1, [(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1])
+  ((import wx_sum), 1, [], []):((import wx_sum), 1, [(import wx_va), (import wx_vb)], [1, 1])
+}

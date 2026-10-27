@@ -7,8 +7,10 @@ lw_as(int node, string want) {
   int lw_expr_v = lw_expr(node);
   int ret_i = lw_conv(lw_expr_v, t, want);
 } return int ret_i;
-given lw_fix_int ((import fix_int_n), "int"):(0)
-given lw_fix_int ((import fix_int_n), "word"):(1)
+given lw_fix_int {
+  ((import fix_int_n), "int"):(0)
+  ((import fix_int_n), "word"):(1)
+}
 
 lw_conv(int v, string t, string want) {
   int r = v;
@@ -31,5 +33,7 @@ lw_cast(int v, string t, string want) {
     r = lw_cast2(v, t, want);
   }
 } return int r;
-given lw_env_fixture (42, "i1", "int"):(0) then ir_last_b:(0)
-given lw_env_fixture (42, "string", "int"):(42)
+given lw_env_fixture {
+  (42, "i1", "int"):(0) then ir_last_b:(0)
+  (42, "string", "int"):(42)
+}

@@ -9,9 +9,11 @@ lp_wide(int lq_fn) {
     lq_r = lp_range(lq_lo, lq_fn, 0);
   }
 } return int lq_r;
-given lpf_more ((import lpf_leaf)):(0)
-given lpf_more ((import lpf_grow)):(1)
-given lpf_more ((import lpf_f1)):(1)
+given lpf_more {
+  ((import lpf_leaf)):(0)
+  ((import lpf_grow)):(1)
+  ((import lpf_f1)):(1)
+}
 
 lp_lo(int lq_fn) {
   int lq_k = list_index_of((import prog), lq_fn);
@@ -20,9 +22,11 @@ lp_lo(int lq_fn) {
     lq_lo = (import prog)[lq_k - 1] + 1;
   }
 } return int lq_lo;
-given lpf_more ((import lpf_leaf)):(0)
-given lpf_more ((import lpf_grow)):((import lpf_gl))
-given lpf_more ((import lpf_f1)):((import lpf_l1))
+given lpf_more {
+  ((import lpf_leaf)):(0)
+  ((import lpf_grow)):((import lpf_gl))
+  ((import lpf_f1)):((import lpf_l1))
+}
 
 lp_range(int lq_lo, int lq_hi, int lq_md) {
   int lq_r = 0;
@@ -32,7 +36,9 @@ lp_range(int lq_lo, int lq_hi, int lq_md) {
     lq_i = lq_i + 1;
   }
 } return int lq_r;
-given lpf_more ((import lpf_loa), (import lpf_hia), 0):(0)
-given lpf_more ((import lpf_log), (import lpf_hig), 0):(1)
-given lpf_more ((import lpf_log), (import lpf_hig), 1):(0)
-given lpf_more ((import lpf_loc), (import lpf_hic), 1):(1)
+given lpf_more {
+  ((import lpf_loa), (import lpf_hia), 0):(0)
+  ((import lpf_log), (import lpf_hig), 0):(1)
+  ((import lpf_log), (import lpf_hig), 1):(0)
+  ((import lpf_loc), (import lpf_hic), 1):(1)
+}

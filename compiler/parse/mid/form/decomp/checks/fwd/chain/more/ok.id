@@ -8,8 +8,10 @@ fwd_ok(int fid, int callid, string callee_name) {
   int[] argsl = (import nl1)[callid];
   int ok = fwd_ok2(fid, callee_name, paramsl, argsl);
 } return int ok;
-given farm_k (6, 2, "target"):(1)
-given farm_k (6, 2, "fwd1"):(0)
+given farm_k {
+  (6, 2, "target"):(1)
+  (6, 2, "fwd1"):(0)
+}
 
 fwd_ok2(int fid, string callee_name, int[] paramsl, int[] argsl) {
   string fname = (import ns1)[fid];
@@ -18,8 +20,10 @@ fwd_ok2(int fid, string callee_name, int[] paramsl, int[] argsl) {
     ok = 1;
   }
 } return int ok;
-given farm_k (6, "target", [0], [1]):(1)
-given farm_k (6, "fwd1", [0], [1]):(0)
+given farm_k {
+  (6, "target", [0], [1]):(1)
+  (6, "fwd1", [0], [1]):(0)
+}
 
 fwd_args_match(int[] paramsl, int[] argsl) {
   int idx = 0;

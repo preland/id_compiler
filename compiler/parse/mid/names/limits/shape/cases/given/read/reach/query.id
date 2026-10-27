@@ -13,8 +13,10 @@ reaches(string src_fn, string dst_fn) {
     r = 1;
   }
 } return int r;
-given case_fixture ("myfn", "myfn"):(1)
-given case_fixture ("myfn", "other"):(0)
+given case_fixture {
+  ("myfn", "myfn"):(1)
+  ("myfn", "other"):(0)
+}
 
 // The dead-export check's set seeded with one function, for the fixtures that
 // still want that state (back/drive/run/check/dce/emit/fixture.id). rfn was
@@ -27,8 +29,10 @@ reach_seed(string src_fn) {
 } chain (string src_fn) {
   rfn_reindex();
 } return void;
-given case_fixture ("myfn"):() then (import chkfail)[0]:(0)
-given case_fixture ("other"):() then (import chkfail)[0]:(0)
+given case_fixture {
+  ("myfn"):() then (import chkfail)[0]:(0)
+  ("other"):() then (import chkfail)[0]:(0)
+}
 
 // One setup of a multi-setup `given` (../read.id's setups_miss): raises `hit`
 // when this name is a function in the build that reaches `owner`.
@@ -38,5 +42,7 @@ miss_hit(string nm, int ek, int hit) {
     r = 1;
   }
 } return int r;
-given fn_fixture ("nosuchfn123", 0, 0):(0)
-given fn_fixture ("", 0, 1):(1)
+given fn_fixture {
+  ("nosuchfn123", 0, 0):(0)
+  ("", 0, 1):(1)
+}

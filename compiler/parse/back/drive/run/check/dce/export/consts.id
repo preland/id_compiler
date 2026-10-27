@@ -13,8 +13,10 @@ is_list_const(int i) {
     ok = keep_export(i);
   }
 } return int ok;
-given lc_dce_setup (0):(1)
-given lc_dce_setup (1):(0)
+given lc_dce_setup {
+  (0):(1)
+  (1):(0)
+}
 
 // seed_cfn_fixture's cfn leaf (fns.id, tests/more/clear.id), wrapped as a
 // single-argument "case" node the way tuple.id's own parser builds one, so
@@ -26,10 +28,12 @@ seed_cfn_fixture_node() {
   int[] args = [cfnid];
   seed_cfn_fixture_add(args);
 } return void;
-given fn_fixture ():() then calls newleaf:("cfn", 0, 0, "fx_target", "")
-given fn_fixture ():() then calls seed_cfn_fixture_add:([4]) then len((import casenode)):(2)
-given fn_fixture ():() then (import chkfail)[0]:(0)
-given fn_fixture ():() then init_units:(0)
+given fn_fixture {
+  ():() then calls newleaf:("cfn", 0, 0, "fx_target", "")
+  ():() then calls seed_cfn_fixture_add:([4]) then len((import casenode)):(2)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 list_consts_kept() {
   int n = 0;

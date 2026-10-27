@@ -35,5 +35,7 @@ reg_params(int[] params, string owner, int ln) {
     i = i + 1;
   }
 } return void;
-given regrow_param ((import regrow_plist), "f", 10):() then len((import dvname)):(2)
-given regrow_param ([], "f", 10):() then len((import dvname)):(1)
+given regrow_param {
+  ((import regrow_plist), "f", 10):() then len((import dvname)):(2)
+  ([], "f", 10):() then len((import dvname)):(1)
+}

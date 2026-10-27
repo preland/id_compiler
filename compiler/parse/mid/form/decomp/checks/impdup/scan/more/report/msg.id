@@ -3,8 +3,10 @@
 imd_name(int imd_x) {
   string ret_s = (import ns1)[((import prog)[imd_x])];
 } return string ret_s;
-given lz_o (0):("dup5")
-given lz_o (1):("dup9")
+given lz_o {
+  (0):("dup5")
+  (1):("dup9")
+}
 
 imd_msg(string imd_nx, string imd_ny, string imd_vs) {
   string imd_def_y = imd_def(imd_ny);

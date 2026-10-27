@@ -14,8 +14,10 @@ fix_toktext(int tok0, int tok1) {
     toki = toki + 1;
   }
 } return string s;
-given fix_toktext_fixture (0, 1):("|a|b")
-given fix_toktext_fixture (0, 0):("|a")
+given fix_toktext_fixture {
+  (0, 1):("|a|b")
+  (0, 0):("|a")
+}
 
 fix_toktext_fixture() {
   env_init();

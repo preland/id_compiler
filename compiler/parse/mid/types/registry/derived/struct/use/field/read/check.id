@@ -9,8 +9,10 @@ chk_field(int id, string sd_bt) {
     chk_field_at(id, sd_bt, sd_f);
   }
 } return void;
-given sd_use_fixture ((import sd_ix), "P"):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_in), "int"):() then (import chkfail)[0]:(1)
+given sd_use_fixture {
+  ((import sd_ix), "P"):() then (import chkfail)[0]:(0)
+  ((import sd_in), "int"):() then (import chkfail)[0]:(1)
+}
 
 chk_field_at(int id, string sd_bt, string sd_f) {
   if(ty_kind_is(sd_bt, "struct") == 0) {
@@ -19,11 +21,15 @@ chk_field_at(int id, string sd_bt, string sd_f) {
     sd_nofield_read(id, sd_bt, sd_f);
   }
 } return void;
-given sd_use_fixture ((import sd_in), "int", "x"):() then prints:("<stdin>:1: error: cannot read field 'x' of a int [E0615]\n  at: x\n  why: only a struct has fields\n  help: read a struct's field, or use len(list) for a list's length\n")
-given sd_use_fixture ((import sd_iz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y [E0629]\n  at: z\n  why: a struct is read and written only through the fields its declaration gives it\n  help: use one of its fields (x, y), or add 'z' to the struct\n")
+given sd_use_fixture {
+  ((import sd_in), "int", "x"):() then prints:("<stdin>:1: error: cannot read field 'x' of a int [E0615]\n  at: x\n  why: only a struct has fields\n  help: read a struct's field, or use len(list) for a list's length\n")
+  ((import sd_iz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y [E0629]\n  at: z\n  why: a struct is read and written only through the fields its declaration gives it\n  help: use one of its fields (x, y), or add 'z' to the struct\n")
+}
 
 sd_nofield(string sd_bt, string sd_f) {
   string sd_m = "struct '" + sd_bt + "' has no field '" + sd_f + "'; its fields are " + sd_fields_text(sd_bt);
 } return string sd_m;
-given sd_use_fixture ("P", "z"):("struct 'P' has no field 'z'; its fields are x, y")
-given sd_use_fixture ("Q", "x"):("struct 'Q' has no field 'x'; its fields are s")
+given sd_use_fixture {
+  ("P", "z"):("struct 'P' has no field 'z'; its fields are x, y")
+  ("Q", "x"):("struct 'Q' has no field 'x'; its fields are s")
+}

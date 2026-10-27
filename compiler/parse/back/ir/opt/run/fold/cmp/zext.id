@@ -7,9 +7,11 @@ fold_cmp(int f, int id) {
     fold_kill(f, id, ir_a_v3);
   }
 } return void;
-given fold_cmp_fixture (0, (import fcmp_row)):() then fc_op_check:("nop")
-given fold_cmp_fixture (0, (import fq_id)):() then fc_op_check:("icmp")
-given fold_cmp_fixture (0, (import fmix_id)):() then calls fold_kill:[0]
+given fold_cmp_fixture {
+  (0, (import fcmp_row)):() then fc_op_check:("nop")
+  (0, (import fq_id)):() then fc_op_check:("icmp")
+  (0, (import fmix_id)):() then calls fold_kill:[0]
+}
 
 fold_iszext(int v) {
   int r = 0;

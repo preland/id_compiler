@@ -25,12 +25,16 @@ init_calls() {
   export int[] cline = [];
   fv_init();
 } return void export cnode;
-given env_init ():() then (import chkfail)[0]:(0)
-given env_init ():() then len((import cnode)):(0)
+given env_init {
+  ():() then (import chkfail)[0]:(0)
+  ():() then len((import cnode)):(0)
+}
 
 call_at(int node, int ln) {
   push((import cnode), node);
   push((import cline), ln);
 } return void;
-given init_calls (5, 10):() then len((import cnode)):(1)
-given init_calls (7, 20):() then len((import cnode)):(1)
+given init_calls {
+  (5, 10):() then len((import cnode)):(1)
+  (7, 20):() then len((import cnode)):(1)
+}

@@ -9,8 +9,10 @@ native_fn_param(int id, int i) {
     ok = param_is_func(fn, i);
   }
 } return int ok;
-given clo_native_fixture ((import cn_call), 0):(1)
-given clo_native_fixture ((import cn_call), 1):(0)
+given clo_native_fixture {
+  ((import cn_call), 0):(1)
+  ((import cn_call), 1):(0)
+}
 
 param_is_func(int fn, int i) {
   int ok = 0;
@@ -18,8 +20,10 @@ param_is_func(int fn, int i) {
     ok = ty_is_func((import ns1)[(import nl1)[fn][i]]);
   }
 } return int ok;
-given clo_native_fixture ((import cn_fn), 0):(1)
-given clo_native_fixture ((import cn_fn), 2):(0)
+given clo_native_fixture {
+  ((import cn_fn), 0):(1)
+  ((import cn_fn), 2):(0)
+}
 
 clo_native_fixture() {
   clo_bind_fixture();

@@ -17,5 +17,7 @@ flt_exp_has(string text, int flj) {
 flt_bad(int[] pos, string text, string flcode, string fltail, string flwhy, string flhelp) {
   syn_diag(pos, flcode, "float literal '" + text + "'" + fltail, text, flwhy, flhelp);
 } return void;
-given mk_two_toks ([0], "x", "E0103", " is odd", "w", "h"):() then prints:("<stdin>:1: error: float literal 'x' is odd [E0103]\n  at: x\n  why: w\n  help: h\n")
-given mk_two_toks ([0], "yy", "E0104", " is huge", "why2", "help2"):() then prints:("<stdin>:1: error: float literal 'yy' is huge [E0104]\n  at: yy\n  why: why2\n  help: help2\n")
+given mk_two_toks {
+  ([0], "x", "E0103", " is odd", "w", "h"):() then prints:("<stdin>:1: error: float literal 'x' is odd [E0103]\n  at: x\n  why: w\n  help: h\n")
+  ([0], "yy", "E0104", " is huge", "why2", "help2"):() then prints:("<stdin>:1: error: float literal 'yy' is huge [E0104]\n  at: yy\n  why: why2\n  help: help2\n")
+}

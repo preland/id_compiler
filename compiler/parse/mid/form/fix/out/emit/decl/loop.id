@@ -5,10 +5,12 @@ fix_decls(int sn, int last) {
     i = i + 1;
   }
 } return void;
-given fix_decl_fixture (0, 0):() then prints:("@D||3|2|1|3|int myname = |3|2|3|5\n")
-given fix_decl_fixture (0, 1):() then prints:("@D||3|2|1|3|int myname = |3|2|3|5\n")
-given fix_decl_fixture (0, 1):() then calls fix_decl_at:[2]
-given fix_decl_fixture (0, 0):() then calls fix_decl_at:[1]
+given fix_decl_fixture {
+  (0, 0):() then prints:("@D||3|2|1|3|int myname = |3|2|3|5\n")
+  (0, 1):() then prints:("@D||3|2|1|3|int myname = |3|2|3|5\n")
+  (0, 1):() then calls fix_decl_at:[2]
+  (0, 0):() then calls fix_decl_at:[1]
+}
 
 // A reused event (fixe_ru, out/emit/name/pick/reuse/) is still sep -- its
 // text is still replaced by the name (fix_resid, out/emit/resid/replace.id) --
@@ -18,14 +20,18 @@ fix_decl_at(int sn, int i) {
     fix_decl(sn, i);
   }
 } return void;
-given fix_decl_fixture (0, 0):() then calls fix_decl:(0, 0)
-given fix_decl_fixture (1, 0):() then prints:("@D||7|1|1|7|int myname = |3|2|3|5\n")
-given fix_decl_fixture (1, 1):() then calls fix_decl:[0]
+given fix_decl_fixture {
+  (0, 0):() then calls fix_decl:(0, 0)
+  (1, 0):() then prints:("@D||7|1|1|7|int myname = |3|2|3|5\n")
+  (1, 1):() then calls fix_decl:[0]
+}
 
 fix_decl(int sn, int i) {
   string head = fix_decl_head(sn, i);
   string subs = fix_subs(i);
   print(head + subs);
 } return void;
-given fix_decl_fixture (0, 0):() then prints:("@D||3|2|1|3|int myname = |3|2|3|5\n")
-given fix_decl_fixture (1, 1):() then prints:("@D||7|1|1|7|string othername = |7|1|7|4|3|2|3|5|myname\n")
+given fix_decl_fixture {
+  (0, 0):() then prints:("@D||3|2|1|3|int myname = |3|2|3|5\n")
+  (1, 1):() then prints:("@D||7|1|1|7|string othername = |7|1|7|4|3|2|3|5|myname\n")
+}

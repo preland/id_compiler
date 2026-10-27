@@ -11,8 +11,10 @@ pure_err_value(int id, int fn) {
 } chain (int id, int fn) {
   diag("E0805", tc_at(id), "'" + pq_fn + "' is pure but calls the function value '" + pq_callee + "', which is not a pure parameter", pq_callee, "a call through a function value runs a function the compiler cannot see from here, so it can only be proved pure if the value is a parameter declared pure", pq_help);
 } return void;
-given pure_fix_prog ((import pfx_cuv), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls the function value 'uv', which is not a pure parameter [E0805]\n  at: uv\n  why: a call through a function value runs a function the compiler cannot see from here, so it can only be proved pure if the value is a parameter declared pure\n  help: declare the parameter 'pure func(...) return ... uv', so that every caller has to pass a pure function; or remove 'pure' from 'pfa'\n")
-given pure_fix_prog ((import pfx_cuv), (import pfx_fb)):() then (import chkfail)[0]:(1)
+given pure_fix_prog {
+  ((import pfx_cuv), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls the function value 'uv', which is not a pure parameter [E0805]\n  at: uv\n  why: a call through a function value runs a function the compiler cannot see from here, so it can only be proved pure if the value is a parameter declared pure\n  help: declare the parameter 'pure func(...) return ... uv', so that every caller has to pass a pure function; or remove 'pure' from 'pfa'\n")
+  ((import pfx_cuv), (import pfx_fb)):() then (import chkfail)[0]:(1)
+}
 
 // What an argument is, for the message: its name when it is one, and what it is
 // not otherwise.
@@ -38,5 +40,7 @@ pure_err_arg(int id, int pq_cn, int j) {
   string pq_help = "pass the name of a function declared pure -- write 'pure' before its definition and fix what that then reports -- or a parameter of your own declared 'pure func(...)'";
   diag("E0806", tc_at(id), "parameter '" + pq_param + "' of '" + pq_callee + "' is declared pure, but the argument is " + pq_text + ", which is not known to be a pure function", pq_callee, "'pure' on a parameter is a promise to the callee that whatever it calls through the parameter writes no export and does no I/O, and the compiler can check it only where the function value is a name", pq_help);
 } return void;
-given pure_fix_prog ((import pfx_mg), (import pfx_pm), 0):() then prints:("<stdin>:1: error: parameter 'pf' of 'pfm' is declared pure, but the argument is 'pfg', which is not known to be a pure function [E0806]\n  at: pfm\n  why: 'pure' on a parameter is a promise to the callee that whatever it calls through the parameter writes no export and does no I/O, and the compiler can check it only where the function value is a name\n  help: pass the name of a function declared pure -- write 'pure' before its definition and fix what that then reports -- or a parameter of your own declared 'pure func(...)'\n")
-given pure_fix_prog ((import pfx_mi), (import pfx_pm), 0):() then (import chkfail)[0]:(1)
+given pure_fix_prog {
+  ((import pfx_mg), (import pfx_pm), 0):() then prints:("<stdin>:1: error: parameter 'pf' of 'pfm' is declared pure, but the argument is 'pfg', which is not known to be a pure function [E0806]\n  at: pfm\n  why: 'pure' on a parameter is a promise to the callee that whatever it calls through the parameter writes no export and does no I/O, and the compiler can check it only where the function value is a name\n  help: pass the name of a function declared pure -- write 'pure' before its definition and fix what that then reports -- or a parameter of your own declared 'pure func(...)'\n")
+  ((import pfx_mi), (import pfx_pm), 0):() then (import chkfail)[0]:(1)
+}

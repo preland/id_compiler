@@ -17,8 +17,10 @@ lw_len(int node) {
   string t = lw_ety(l1_of_v[0]);
   int ret_i = lh_len(l1_of_v, t);
 } return int ret_i;
-given lencall_fixture ((import lencall_node)):(1)
-given lencall_fixture ((import lencall_node)):(1) then (import chkfail)[0]:(0)
+given lencall_fixture {
+  ((import lencall_node)):(1)
+  ((import lencall_node)):(1) then (import chkfail)[0]:(0)
+}
 
 // Inside a versioned loop's guarded copy, the length of a list whose limit was
 // read in the entry block (stmt/flow/loop/hoist.id) is that value.
@@ -31,5 +33,7 @@ lh_len(int[] lh_args, string lh_t) {
     lh_r = lw_len_tail(lh_args, lh_t);
   }
 } return int lh_r;
-given lencall_fixture ((import lencall_args), "int"):(1)
-given lencall_fixture ((import lencall_args), "string"):(1)
+given lencall_fixture {
+  ((import lencall_args), "int"):(1)
+  ((import lencall_args), "string"):(1)
+}

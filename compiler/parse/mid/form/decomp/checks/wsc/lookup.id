@@ -12,8 +12,10 @@ wsc_local(int wlc_f, string wlc_n) {
     wlc_i = wlc_i + 1;
   }
 } return int wlc_r;
-given wsc_world ((import wx_fadd), "t"):(14)
-given wsc_world ((import wx_fadd), "a"):(-1)
+given wsc_world {
+  ((import wx_fadd), "t"):(14)
+  ((import wx_fadd), "a"):(-1)
+}
 
 wsc_pick(int wpk_s, string wpk_n, int wpk_prev) {
   int wpk_r = wpk_prev;
@@ -21,8 +23,10 @@ wsc_pick(int wpk_s, string wpk_n, int wpk_prev) {
     wpk_r = (import ni1)[wpk_s];
   }
 } return int wpk_r;
-given wsc_world ((import wx_dv), "v", -1):(7)
-given wsc_world ((import wx_dv), "w", -1):(-1)
+given wsc_world {
+  ((import wx_dv), "v", -1):(7)
+  ((import wx_dv), "w", -1):(-1)
+}
 
 wsc_name(int wnm_f, string wnm_s) {
   int wnm_i = wsc_local(wnm_f, wnm_s);
@@ -31,5 +35,7 @@ wsc_name(int wnm_f, string wnm_s) {
     wnm_out = wsc_show(wnm_f, wnm_i);
   }
 } return string wnm_out;
-given wsc_world ((import wx_fget), "v"):("st[a]")
-given wsc_world ((import wx_fget), "st"):("st")
+given wsc_world {
+  ((import wx_fget), "v"):("st[a]")
+  ((import wx_fget), "st"):("st")
+}

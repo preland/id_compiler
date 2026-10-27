@@ -18,8 +18,10 @@ end_or_brackets(string t, int[] pos) {
     s = add_brackets(t, pos);
   }
 } return string s;
-given decl_tokens ("int", [3]):("int")
-given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ("sender", [38]):("sender(int)")
+given decl_tokens {
+  ("int", [3]):("int")
+  given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ("sender", [38]):("sender(int)")
+}
 
 parse_end_type(int[] pos, string t) {
   expect_text(pos, "(");
@@ -30,12 +32,16 @@ parse_end_type(int[] pos, string t) {
   close_end(pos);
   string s = t + "(" + mtype + ")";
 } return string s;
-given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([38], "receiver"):("receiver(int)")
-given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "string", ")", ""]) ([38], "sender"):("sender(string)")
+given decl_tokens {
+  given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([38], "receiver"):("receiver(int)")
+  given push_toks(["op", "kw", "op", "eof"], ["(", "string", ")", ""]) ([38], "sender"):("sender(string)")
+}
 
 close_end(int[] pos) {
   expect_text(pos, ")");
   advance(pos);
 } return void;
-given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([40]):() then (import synfail)[0]:(0)
-given decl_tokens given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([39]):() then (import synfail)[0]:(1)
+given decl_tokens {
+  given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([40]):() then (import synfail)[0]:(0)
+  given push_toks(["op", "kw", "op", "eof"], ["(", "int", ")", ""]) ([39]):() then (import synfail)[0]:(1)
+}

@@ -7,8 +7,10 @@ pure_range(int lo, int hi, int fn) {
     lo = lo + 1;
   }
 } return void;
-given pure_fix_prog (0, 1, (import pfx_fa)):() then (import chkfail)[0]:(0)
-given pure_fix_prog (6, 28, (import pfx_fa)):() then (import chkfail)[0]:(1)
+given pure_fix_prog {
+  (0, 1, (import pfx_fa)):() then (import chkfail)[0]:(0)
+  (6, 28, (import pfx_fa)):() then (import chkfail)[0]:(1)
+}
 
 pure_node(int id, int fn) {
   if((import nkind)[id] == "call") {
@@ -21,7 +23,9 @@ pure_node(int id, int fn) {
     pure_decl(id, fn);
   }
 } return void;
-given pure_fix_prog ((import pfx_cio), (import pfx_fa)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_one), (import pfx_fa)):() then (import chkfail)[0]:(0)
-given pure_fix_prog ((import pfx_imp), (import pfx_fa)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_dcl), (import pfx_fa)):() then (import chkfail)[0]:(1)
+given pure_fix_prog {
+  ((import pfx_cio), (import pfx_fa)):() then (import chkfail)[0]:(1)
+  ((import pfx_one), (import pfx_fa)):() then (import chkfail)[0]:(0)
+  ((import pfx_imp), (import pfx_fa)):() then (import chkfail)[0]:(1)
+  ((import pfx_dcl), (import pfx_fa)):() then (import chkfail)[0]:(1)
+}

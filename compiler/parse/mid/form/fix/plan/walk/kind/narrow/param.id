@@ -9,8 +9,10 @@ fix_ptype(int e, int i) {
     pt = fix_fparam(e, i);
   }
 } return string pt;
-given fix_pparam_fixture ((import ppcall), 0):("int")
-given fix_pparam_fixture ((import ppvarcall), 0):("int")
+given fix_pparam_fixture {
+  ((import ppcall), 0):("int")
+  ((import ppvarcall), 0):("int")
+}
 
 // Only when the count matches: otherwise the checks report that instead and
 // judge no argument.
@@ -21,8 +23,10 @@ fix_pparam(int e, int fn, int i) {
     pt = (import ns1)[(ps[i])];
   }
 } return string pt;
-given fix_pparam_fixture ((import ppcall), (import ppfn), 0):("int")
-given fix_pparam_fixture ((import ppcall), (import ppfn), 1):("")
+given fix_pparam_fixture {
+  ((import ppcall), (import ppfn), 0):("int")
+  ((import ppcall), (import ppfn), 1):("")
+}
 
 fix_pparam_fixture() {
   fix_fixture();

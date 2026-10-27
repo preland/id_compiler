@@ -5,15 +5,19 @@ fix_xcutat(int xcai) {
     fix_xcutmark(xcai);
   }
 } return void;
-given fix_xacctwo (3):() then (import fixx_acc):([3])
-given fix_xacctwo (2):() then calls fix_xcutmark:(2)
-given fix_xacctwo (3):() then calls fix_xcutmark:[0]
+given fix_xacctwo {
+  (3):() then (import fixx_acc):([3])
+  (2):() then calls fix_xcutmark:(2)
+  (3):() then calls fix_xcutmark:[0]
+}
 
 fix_xcutmark(int xcmi) {
   string xcmat = fix_after(fix_xlast((import fixx_hit)[xcmi]));
   push((import fixx_cuts), xcmat);
   integer_list_set((import fixx_acc), 0, 0);
 } return void;
-given fix_xplanned (2):() then (import fixx_cuts):(["7|7"])
-given fix_xplanned (3):() then (import fixx_cuts):(["7|7"])
+given fix_xplanned {
+  (2):() then (import fixx_cuts):(["7|7"])
+  (3):() then (import fixx_cuts):(["7|7"])
+}
 

@@ -4,8 +4,10 @@ param_str(int id) {
   int[] l1_of_v = (import nl1)[id];
   string ret_s = pstr(l1_of_v);
 } return string ret_s;
-given nz_prog_fixture ((import nz_mainfn)):("int argc")
-given nz_prog_fixture ((import nz_plainfn)):("void")
+given nz_prog_fixture {
+  ((import nz_mainfn)):("int argc")
+  ((import nz_plainfn)):("void")
+}
 
 pstr(int[] params) {
   string s = "void";

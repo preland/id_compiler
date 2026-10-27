@@ -33,8 +33,10 @@ wr_closure(string wc_src, string wc_nm, string wc_owner) {
     wc_k = wc_k + 1;
   }
 } return int wc_hit;
-given then_imp_fixture ("int[]", 2, 0) ("rd", "gx", "mk"):(1)
-given then_imp_fixture ("int[]", 2, 0) ("rd", "gy", "mk"):(0)
+given then_imp_fixture ("int[]", 2, 0) {
+  ("rd", "gx", "mk"):(1)
+  ("rd", "gy", "mk"):(0)
+}
 
 // A case may not compare one import against another in a function's two core
 // cases when the function under test declares the export: `(import NAME)` is

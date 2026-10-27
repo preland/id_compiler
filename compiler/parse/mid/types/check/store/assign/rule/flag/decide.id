@@ -11,10 +11,12 @@ decl_flag(int bfl_id, string bfl_want, int bfl_e) {
     decl_flag_scan(bfl_id);
   }
 } return void;
-given bfl_fixture given integer_list_set((import bsc), 0, 1) ((import bfl_d0), "int", (import fixture_zero)):() then (import chkfail)[0]:(1)
-given bfl_fixture given integer_list_set((import bsc), 0, 1) ((import bfl_c0), "int", (import fixture_zero)):() then (import chkfail)[0]:(0)
-given bfl_fixture ((import bfl_d0), "int", (import fixture_zero)):() then (import chkfail)[0]:(0)
-given bfl_fixture given integer_list_set((import bsc), 0, 1) ((import bfl_d0), "string", (import fixture_zero)):() then (import chkfail)[0]:(0)
+given bfl_fixture {
+  given integer_list_set((import bsc), 0, 1) ((import bfl_d0), "int", (import fixture_zero)):() then (import chkfail)[0]:(1)
+  given integer_list_set((import bsc), 0, 1) ((import bfl_c0), "int", (import fixture_zero)):() then (import chkfail)[0]:(0)
+  ((import bfl_d0), "int", (import fixture_zero)):() then (import chkfail)[0]:(0)
+  given integer_list_set((import bsc), 0, 1) ((import bfl_d0), "string", (import fixture_zero)):() then (import chkfail)[0]:(0)
+}
 
 decl_flag_scan(int bfl_id) {
   string bfl_nm = (import ns2)[bfl_id];
@@ -27,8 +29,10 @@ decl_flag_scan(int bfl_id) {
     decl_flag_say(bfl_id, bfl_tail(bfl_f, bfl_nm));
   }
 } return void;
-given bfl_fixture ((import bfl_d0)):() then (import chkfail)[0]:(1)
-given bfl_fixture ((import bfl_c0)):() then (import chkfail)[0]:(0)
+given bfl_fixture {
+  ((import bfl_d0)):() then (import chkfail)[0]:(1)
+  ((import bfl_c0)):() then (import chkfail)[0]:(0)
+}
 
 decl_flag_say(int bfl_id, string bfl_tail_text) {
   string bfl_nm = (import ns2)[bfl_id];
@@ -38,6 +42,8 @@ decl_flag_say(int bfl_id, string bfl_tail_text) {
   tc_diag(bfl_id, "E0650", "'" + bfl_nm + "' only ever holds 0 or 1 but is declared int", bfl_nm, "an int that behaves like a boolean is not allowed under --bool-strict: a variable stored only 0 and 1 is a flag, and a flag is a bool", bfl_help);
   diag_edit("machine", "replace", bfl_ln, "int " + bfl_nm, "bool " + bfl_nm);
 } return void;
-given decltype_fixture ((import decl_scalar), ""):() then (import chkfail)[0]:(1)
-given decltype_fixture ((import decl_scalar), ", and return bool"):() then (import tcerrs)[0]:(1)
-given decltype_fixture ((import decl_scalar), ""):() then prints:("<stdin>:1: error: 'x' only ever holds 0 or 1 but is declared int [E0650]\n  at: x\n  why: an int that behaves like a boolean is not allowed under --bool-strict: a variable stored only 0 and 1 is a flag, and a flag is a bool\n  help: declare it 'bool x', store true and false instead of 1 and 0 (--fix rewrites only the declaration for now; the stores and the return are a later rule)\n  edit: machine\treplace\t1\tint x\tbool x\n")
+given decltype_fixture {
+  ((import decl_scalar), ""):() then (import chkfail)[0]:(1)
+  ((import decl_scalar), ", and return bool"):() then (import tcerrs)[0]:(1)
+  ((import decl_scalar), ""):() then prints:("<stdin>:1: error: 'x' only ever holds 0 or 1 but is declared int [E0650]\n  at: x\n  why: an int that behaves like a boolean is not allowed under --bool-strict: a variable stored only 0 and 1 is a flag, and a flag is a bool\n  help: declare it 'bool x', store true and false instead of 1 and 0 (--fix rewrites only the declaration for now; the stores and the return are a later rule)\n  edit: machine\treplace\t1\tint x\tbool x\n")
+}

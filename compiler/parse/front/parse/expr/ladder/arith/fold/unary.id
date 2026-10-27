@@ -15,6 +15,8 @@ fold_unary(int[] pos) {
   advance(pos);
   int ret_i = fold_unary_tail(pos, op);
 } return int ret_i;
-given atom_tokens ([24]):(1)
-given atom_tokens ([27]):(1)
+given atom_tokens {
+  ([24]):(1)
+  ([27]):(1)
+}
 

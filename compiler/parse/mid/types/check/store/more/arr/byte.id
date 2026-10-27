@@ -10,7 +10,9 @@ chk_byte_fit(int el, string want) {
     tc_diag(el, "E0642", "the byte literal " + spelling + " is outside 0 to 255", spelling, "a bytes buffer holds one byte per element, from 0 to 255", "write each element as a number from 0 to 255");
   }
 } return void;
-given wide_literal_fixture ((import literal_huge), "bytes"):() then (import chkfail)[0]:(1)
-given wide_literal_fixture ((import negated_edge), "bytes"):() then (import chkfail)[0]:(1)
-given wide_literal_fixture ((import lit_a), "bytes"):() then (import chkfail)[0]:(0)
-given wide_literal_fixture ((import literal_huge), "word"):() then (import chkfail)[0]:(0)
+given wide_literal_fixture {
+  ((import literal_huge), "bytes"):() then (import chkfail)[0]:(1)
+  ((import negated_edge), "bytes"):() then (import chkfail)[0]:(1)
+  ((import lit_a), "bytes"):() then (import chkfail)[0]:(0)
+  ((import literal_huge), "word"):() then (import chkfail)[0]:(0)
+}

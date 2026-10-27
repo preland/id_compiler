@@ -32,7 +32,9 @@ fix_span_fixture5(int e) {
   push((import ttext), ")");
   fix_span_fixture6(e);
 } return void;
-given fix_span_fixture (0):() then calls fix_span_fixture6:(0)
-given fix_span_fixture (0):() then len((import ttext)):(5)
-given fix_span_fixture (0):() then (import chkfail)[0]:(0)
-given fix_span_fixture (0):() then init_units:(0)
+given fix_span_fixture {
+  (0):() then calls fix_span_fixture6:(0)
+  (0):() then len((import ttext)):(5)
+  (0):() then (import chkfail)[0]:(0)
+  (0):() then init_units:(0)
+}

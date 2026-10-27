@@ -11,13 +11,17 @@ esc_chain(int e, string nm) {
     ok = esc_isvar(imp_root(e), nm);
   }
 } return int ok;
-given esc_dfix ((import efd_ix), "g"):(1)
-given esc_dfix ((import efd_ix), "h"):(0)
-given esc_dfix ((import efd_g), "g"):(0)
+given esc_dfix {
+  ((import efd_ix), "g"):(1)
+  ((import efd_ix), "h"):(0)
+  ((import efd_g), "g"):(0)
+}
 
 esc_isvar(int e, string nm) {
   int ok = (import nkind)[e] == "var" && (import ns1)[e] == nm;
 } return int ok;
-given esc_dfix ((import efd_g), "g"):(1)
-given esc_dfix ((import efd_g), "h"):(0)
-given esc_dfix ((import efd_lit), "g"):(0)
+given esc_dfix {
+  ((import efd_g), "g"):(1)
+  ((import efd_g), "h"):(0)
+  ((import efd_lit), "g"):(0)
+}

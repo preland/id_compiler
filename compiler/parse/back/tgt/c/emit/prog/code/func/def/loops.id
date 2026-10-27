@@ -33,5 +33,7 @@ emit_def_nl(int id) {
     print("");
   }
 } return void;
-given nz_prog_fixture ((import nz_mainfn)):() then prints:("int id_main(int argc) {\n    return 7;\n}\n\n")
-given nz_prog_fixture ((import nz_plainfn)):() then prints:("void id_run(void) {\n    return;\n}\n\n")
+given nz_prog_fixture {
+  ((import nz_mainfn)):() then prints:("int id_main(int argc) {\n    return 7;\n}\n\n")
+  ((import nz_plainfn)):() then prints:("void id_run(void) {\n    return;\n}\n\n")
+}

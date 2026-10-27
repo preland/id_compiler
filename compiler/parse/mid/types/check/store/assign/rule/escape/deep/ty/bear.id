@@ -13,10 +13,12 @@ esc_sbear(string t) {
   }
   int ok = find_str((import sdname), dz_b) >= 0;
 } return int ok;
-given esc_ty_fix ("Tr"):(1)
-given esc_ty_fix ("Tr[][]"):(1)
-given esc_ty_fix ("int[]"):(0)
-given esc_ty_fix ("string"):(0)
+given esc_ty_fix {
+  ("Tr"):(1)
+  ("Tr[][]"):(1)
+  ("int[]"):(0)
+  ("string"):(0)
+}
 
 esc_sheap(string t) {
   int dz_s = find_str((import sdname), t);
@@ -25,10 +27,12 @@ esc_sheap(string t) {
     ok = esc_hfields((import sdftype)[dz_s]);
   }
 } return int ok;
-given esc_ty_fix ("Tr"):(1)
-given esc_ty_fix ("Pt"):(0)
-given esc_ty_fix ("Pg"):(1)
-given esc_ty_fix ("int"):(0)
+given esc_ty_fix {
+  ("Tr"):(1)
+  ("Pt"):(0)
+  ("Pg"):(1)
+  ("int"):(0)
+}
 
 esc_hfields(string[] dz_fts) {
   int ok = 0;
@@ -38,7 +42,9 @@ esc_hfields(string[] dz_fts) {
     i = i + 1;
   }
 } return int ok;
-given esc_ty_fix (["int", "string"]):(1)
-given esc_ty_fix (["int", "float"]):(0)
-given esc_ty_fix (["Tr[]"]):(1)
-given esc_ty_fix ([]):(0)
+given esc_ty_fix {
+  (["int", "string"]):(1)
+  (["int", "float"]):(0)
+  (["Tr[]"]):(1)
+  ([]):(0)
+}

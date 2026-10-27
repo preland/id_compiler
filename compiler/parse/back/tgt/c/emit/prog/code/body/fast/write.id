@@ -11,9 +11,11 @@ lp_wname(int lq_id) {
     lq_s = (import ns2)[lq_id];
   }
 } return string lq_s;
-given lpf_more ((import lpf_sa)):("las")
-given lpf_more ((import lpf_dz)):("lpfz")
-given lpf_more ((import lpf_q)):("")
+given lpf_more {
+  ((import lpf_sa)):("las")
+  ((import lpf_dz)):("lpfz")
+  ((import lpf_q)):("")
+}
 
 lp_isinc(int lq_id) {
   int lq_r = 0;
@@ -21,10 +23,12 @@ lp_isinc(int lq_id) {
     lq_r = lp_step(lq_id, (import ni1)[lq_id]);
   }
 } return int lq_r;
-given lpf_more ((import lpf_ia)):(1)
-given lpf_more ((import lpf_ie)):(0)
-given lpf_more ((import lpf_sa)):(0)
-given lpf_more ((import lpf_q)):(0)
+given lpf_more {
+  ((import lpf_ia)):(1)
+  ((import lpf_ie)):(0)
+  ((import lpf_sa)):(0)
+  ((import lpf_q)):(0)
+}
 
 lp_step(int lq_id, int lq_e) {
   int lq_a = (import ni1)[lq_e];
@@ -33,6 +37,8 @@ lp_step(int lq_id, int lq_e) {
     lq_r = lp_one((import ni2)[lq_e]);
   }
 } return int lq_r;
-given lpf_more ((import lpf_ia), (import lpf_ea)):(1)
-given lpf_more ((import lpf_ie), (import lpf_ee)):(0)
-given lpf_more ((import lpf_sa), (import lpf_ea)):(0)
+given lpf_more {
+  ((import lpf_ia), (import lpf_ea)):(1)
+  ((import lpf_ie), (import lpf_ee)):(0)
+  ((import lpf_sa), (import lpf_ea)):(0)
+}

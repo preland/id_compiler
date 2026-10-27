@@ -13,8 +13,10 @@ esc_stmt(int sn, string nm) {
     r = esc_stmt2(sn, nm);
   }
 } return int r;
-given esc_fix ((import efb_dv), "p"):(1)
-given esc_fix ((import efb_dv), "v"):(2)
+given esc_fix {
+  ((import efb_dv), "p"):(1)
+  ((import efb_dv), "v"):(2)
+}
 
 esc_stmt2(int sn, string nm) {
   int r = 0;
@@ -24,8 +26,10 @@ esc_stmt2(int sn, string nm) {
     r = esc_stmt3(sn, nm);
   }
 } return int r;
-given esc_fix ((import efa_es), "b"):(512)
-given esc_fix ((import efa_es), "a"):(256)
+given esc_fix {
+  ((import efa_es), "b"):(512)
+  ((import efa_es), "a"):(256)
+}
 
 esc_stmt3(int sn, string nm) {
   int r = 0;
@@ -35,5 +39,7 @@ esc_stmt3(int sn, string nm) {
     r = esc_stmt4(sn, nm);
   }
 } return int r;
-given esc_fix ((import efa_ia), "b"):(1)
-given esc_fix ((import efa_ia), "a"):(8)
+given esc_fix {
+  ((import efa_ia), "b"):(1)
+  ((import efa_ia), "a"):(8)
+}

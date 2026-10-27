@@ -6,17 +6,21 @@ pure_call(int id, int fn) {
   pure_args(id, fn);
   pure_callee(id, fn);
 } return void;
-given pure_fix_prog ((import pfx_mg), (import pfx_fb)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_cg), (import pfx_fa)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_ch), (import pfx_fa)):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_mg), (import pfx_fb)):() then (import chkfail)[0]:(1)
+  ((import pfx_cg), (import pfx_fa)):() then (import chkfail)[0]:(1)
+  ((import pfx_ch), (import pfx_fa)):() then (import chkfail)[0]:(0)
+}
 
 pure_callee(int id, int fn) {
   if(list_find((import purenode), fn) == 1) {
     pure_report(id, fn, pure_kind((import ns1)[id], fn));
   }
 } return void;
-given pure_fix_prog ((import pfx_cg), (import pfx_fa)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_cg), (import pfx_fb)):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_cg), (import pfx_fa)):() then (import chkfail)[0]:(1)
+  ((import pfx_cg), (import pfx_fb)):() then (import chkfail)[0]:(0)
+}
 
 pure_report(int id, int fn, string kind) {
   if(kind == "builtin") {
@@ -29,7 +33,9 @@ pure_report(int id, int fn, string kind) {
     pure_err_value(id, fn);
   }
 } return void;
-given pure_fix_prog ((import pfx_cio), (import pfx_fa), "builtin"):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_cg), (import pfx_fa), "fn"):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_cuv), (import pfx_fa), "value"):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_ch), (import pfx_fa), "ok"):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_cio), (import pfx_fa), "builtin"):() then (import chkfail)[0]:(1)
+  ((import pfx_cg), (import pfx_fa), "fn"):() then (import chkfail)[0]:(1)
+  ((import pfx_cuv), (import pfx_fa), "value"):() then (import chkfail)[0]:(1)
+  ((import pfx_ch), (import pfx_fa), "ok"):() then (import chkfail)[0]:(0)
+}

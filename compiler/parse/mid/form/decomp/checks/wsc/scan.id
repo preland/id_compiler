@@ -45,7 +45,9 @@ wsc_at(int wat_i) {
     wsc_judge(wat_fid);
   }
 } return void;
-given wsc_pair (0):() then (import chkfail)[0]:(0)
-given wsc_pair (4):() then (import chkfail)[0]:(1)
-given wsc_pair (1):() then (import chkfail)[0]:(0)
-given wsc_pair (6):() then (import chkfail)[0]:(0)
+given wsc_pair {
+  (0):() then (import chkfail)[0]:(0)
+  (4):() then (import chkfail)[0]:(1)
+  (1):() then (import chkfail)[0]:(0)
+  (6):() then (import chkfail)[0]:(0)
+}

@@ -12,16 +12,20 @@ one_param(int[] pos, string kind) {
   pure_mark_param(pos, pure_v, ret_i);
   borrow_mark(pos, kind, bflag, type, ret_i);
 } return int ret_i;
-given decl_tokens ([2], "param"):(0)
-given decl_tokens ([5], "nparam"):(0)
+given decl_tokens {
+  ([2], "param"):(0)
+  ([5], "nparam"):(0)
+}
 
 func_ret(int[] pos, string name, int[] params, int[] body) {
   advance(pos);
   string rt = parse_type(pos);
   int ret_i = func_done(pos, name, params, body, rt);
 } return int ret_i;
-given decl_tokens ([33], "f", [9], [8]):(1)
-given decl_tokens ([33], "g", [1], [2]):(1)
+given decl_tokens {
+  ([33], "f", [9], [8]):(1)
+  ([33], "g", [1], [2]):(1)
+}
 
 func_done(int[] pos, string name, int[] params, int[] body, string rt) {
   int rexpr = ret_expr(pos, rt);
@@ -32,5 +36,7 @@ func_done(int[] pos, string name, int[] params, int[] body, string rt) {
   non_void_export(pos, rt);
   retexp_bind(ret_i);
 } return int ret_i;
-given decl_tokens ([35], "f", [9], [8], "int"):(1)
-given decl_tokens ([35], "g", [1], [2], "int"):(1)
+given decl_tokens {
+  ([35], "f", [9], [8], "int"):(1)
+  ([35], "g", [1], [2], "int"):(1)
+}

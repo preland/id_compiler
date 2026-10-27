@@ -7,9 +7,11 @@ decl_bool(int id, string want, int e) {
     decl_bool_say(id);
   }
 } return void;
-given cmp_fixture given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int", (import bin_eq)):() then (import chkfail)[0]:(1)
-given cmp_fixture given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int", (import lit_a)):() then (import chkfail)[0]:(0)
-given cmp_fixture given integer_list_set((import bsc), 0, 0) ((import bin_eq), "int", (import bin_eq)):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int", (import bin_eq)):() then (import chkfail)[0]:(1)
+  given integer_list_set((import bsc), 0, 1) ((import bin_eq), "int", (import lit_a)):() then (import chkfail)[0]:(0)
+  given integer_list_set((import bsc), 0, 0) ((import bin_eq), "int", (import bin_eq)):() then (import chkfail)[0]:(0)
+}
 
 decl_bool_say(int id) {
   string dbool_nm = (import ns2)[id];
@@ -18,5 +20,7 @@ decl_bool_say(int id) {
 } chain (int id) {
   diag_edit("machine", "replace", dbool_ln, "int " + dbool_nm, "bool " + dbool_nm);
 } return void;
-given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(1)
-given cmp_fixture ((import bin_lt)):() then (import tcerrs)[0]:(1)
+given cmp_fixture {
+  ((import bin_eq)):() then (import chkfail)[0]:(1)
+  ((import bin_lt)):() then (import tcerrs)[0]:(1)
+}

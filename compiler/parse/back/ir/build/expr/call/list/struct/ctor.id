@@ -9,8 +9,10 @@ lw_ctor(int node) {
   int[] lw_lit_cells = lw_ctor_cells(node);
   int a = lw_callf("id_list_lit", ty, lw_lit_cells);
 } return int a;
-given sr_fixture ((import sr_ic2)):(5)
-given sr_fixture ((import sr_ic1)):(3)
+given sr_fixture {
+  ((import sr_ic2)):(5)
+  ((import sr_ic1)):(3)
+}
 
 lw_ctor_cells(int node) {
   int[] lw_lit_cells = lw_arr_head(node);
@@ -20,12 +22,16 @@ lw_ctor_cells(int node) {
     i = i + 1;
   }
 } return int[] lw_lit_cells;
-given sr_fixture ((import sr_ic2)):([0, 2, 4])
-given sr_fixture ((import sr_ic1)):([0, 2])
+given sr_fixture {
+  ((import sr_ic2)):([0, 2, 4])
+  ((import sr_ic1)):([0, 2])
+}
 
 lw_ctor_one(int node, int i) {
   string sd_ft = sd_cell((import sdftype), ((import ns1)[node]), i);
   int boxed = lw_ctor_cell(node, i, sd_ft);
 } return int boxed;
-given sr_fixture ((import sr_ic2), 0):(1)
-given sr_fixture ((import sr_ic2), 1):(1)
+given sr_fixture {
+  ((import sr_ic2), 0):(1)
+  ((import sr_ic2), 1):(1)
+}

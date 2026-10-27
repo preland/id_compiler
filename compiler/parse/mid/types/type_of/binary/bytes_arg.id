@@ -8,8 +8,10 @@ bytes_mark_args(int i) {
     bm_k = bm_k + 1;
   }
 } return void;
-given bm_sized ((import bm_call_fn)):() then calls bytes_mark_arg:((import bm_call_fn), 0)
-given bm_sized ((import bm_call_fn)):() then calls bytes_mark_arg:[1]
+given bm_sized {
+  ((import bm_call_fn)):() then calls bytes_mark_arg:((import bm_call_fn), 0)
+  ((import bm_call_fn)):() then calls bytes_mark_arg:[1]
+}
 
 bytes_mark_arg(int i, int bm_k) {
   int bm_a = (import nl1)[i][bm_k];

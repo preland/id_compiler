@@ -7,7 +7,9 @@
 esc_strong(string t) {
   int ok = t == "string[]" || esc_sbear(t) == 1;
 } return int ok;
-given esc_ty_fix ("string[]"):(1)
-given esc_ty_fix ("Tr[]"):(1)
-given esc_ty_fix ("int[][]"):(0)
-given esc_ty_fix ("string"):(0)
+given esc_ty_fix {
+  ("string[]"):(1)
+  ("Tr[]"):(1)
+  ("int[][]"):(0)
+  ("string"):(0)
+}

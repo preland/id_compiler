@@ -24,8 +24,10 @@ decl_name(int id) {
     out = cn(out);
   }
 } return string out;
-given lz_j ((import lz_edecl)):("z")
-given lz_j (16):("z")
+given lz_j {
+  ((import lz_edecl)):("z")
+  (16):("z")
+}
 
 // `base[index] = value`. The parser folds the parsed index target into the
 // node's two int fields and puts the value in a one-element list.

@@ -13,10 +13,12 @@ imp_side(int is_s) {
     integer_list_set((import reqc), 1, 0);
   }
 } return void;
-given reqtests_init (0):() then (import reqc)[2]:(0)
-given reqtests_init (1):() then (import reqc)[2]:(1)
-given reqtests_init given integer_list_set((import reqc), 1, 1) (0):() then (import reqc)[1]:(0)
-given reqtests_init given integer_list_set((import reqc), 1, 1) (1):() then (import reqc)[1]:(1)
+given reqtests_init {
+  (0):() then (import reqc)[2]:(0)
+  (1):() then (import reqc)[2]:(1)
+  given integer_list_set((import reqc), 1, 1) (0):() then (import reqc)[1]:(0)
+  given integer_list_set((import reqc), 1, 1) (1):() then (import reqc)[1]:(1)
+}
 
 // How many cases of the function that case `i` is written under come before it:
 // 0 and 1 are the function's two core cases (docs/TESTS.md).
@@ -30,8 +32,10 @@ case_rank(int i) {
     cr_j = cr_j + 1;
   }
 } return int cr_n;
-given rank_fixture (2):(1)
-given rank_fixture (3):(2)
+given rank_fixture {
+  (2):(1)
+  (3):(2)
+}
 
 // Four cases written under two functions, in the order f g f f, so the ranks
 // of cases 0 to 3 are 0 0 1 2.

@@ -10,8 +10,10 @@ pure_err_builtin(int id, int fn) {
 } chain (int id, int fn) {
   diag("E0802", tc_at(id), "'" + pq_fn + "' is pure but calls the builtin '" + pq_callee + "', which does I/O or reads state outside its arguments", pq_callee, "print, input, the clock and the flat store are effects: two calls with the same arguments can give different results, or leave the world different", pq_help);
 } return void;
-given pure_fix_prog ((import pfx_cio), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls the builtin 'print', which does I/O or reads state outside its arguments [E0802]\n  at: print\n  why: print, input, the clock and the flat store are effects: two calls with the same arguments can give different results, or leave the world different\n  help: do the call in the caller of 'pfa' and pass the result in, or remove 'pure' from 'pfa'; the builtins a pure function may call are listed in docs/SPEC.md, section 1.3\n")
-given pure_fix_prog ((import pfx_cio), (import pfx_fb)):() then (import chkfail)[0]:(1)
+given pure_fix_prog {
+  ((import pfx_cio), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls the builtin 'print', which does I/O or reads state outside its arguments [E0802]\n  at: print\n  why: print, input, the clock and the flat store are effects: two calls with the same arguments can give different results, or leave the world different\n  help: do the call in the caller of 'pfa' and pass the result in, or remove 'pure' from 'pfa'; the builtins a pure function may call are listed in docs/SPEC.md, section 1.3\n")
+  ((import pfx_cio), (import pfx_fb)):() then (import chkfail)[0]:(1)
+}
 
 pure_err_fn(int id, int fn) {
   string pq_fn = (import ns1)[fn];
@@ -21,8 +23,10 @@ pure_err_fn(int id, int fn) {
   string pq_help = pure_callee_pick(pq_callee, "write 'pure' before '", "' and fix what it then reports", "declare it 'pure native ", "(...)' if the C it links writes no global state and does no I/O") + ", or stop calling it from '" + pq_fn + "', or remove 'pure' from '" + pq_fn + "'";
   diag("E0803", tc_at(id), "'" + pq_fn + "' is pure but calls " + pq_what, pq_callee, "a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller", pq_help);
 } return void;
-given pure_fix_prog ((import pfx_cg), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls 'pfg', which is not pure [E0803]\n  at: pfg\n  why: a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller\n  help: write 'pure' before 'pfg' and fix what it then reports, or stop calling it from 'pfa', or remove 'pure' from 'pfa'\n")
-given pure_fix_prog ((import pfx_cn), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls the native 'pfn', which is not declared pure [E0803]\n  at: pfn\n  why: a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller\n  help: declare it 'pure native pfn(...)' if the C it links writes no global state and does no I/O, or stop calling it from 'pfa', or remove 'pure' from 'pfa'\n")
+given pure_fix_prog {
+  ((import pfx_cg), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls 'pfg', which is not pure [E0803]\n  at: pfg\n  why: a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller\n  help: write 'pure' before 'pfg' and fix what it then reports, or stop calling it from 'pfa', or remove 'pure' from 'pfa'\n")
+  ((import pfx_cn), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but calls the native 'pfn', which is not declared pure [E0803]\n  at: pfn\n  why: a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller\n  help: declare it 'pure native pfn(...)' if the C it links writes no global state and does no I/O, or stop calling it from 'pfa', or remove 'pure' from 'pfa'\n")
+}
 
 // How a message names the callee: a native is not pure until its declaration
 // says so (`pure native`), which is a different thing to write than a function's
@@ -35,7 +39,9 @@ pure_callee_pick(string pq_cname, string pq_pa, string pq_pb, string pq_na, stri
     pq_out = pq_na + pq_cname + pq_nb;
   }
 } return string pq_out;
-given pure_fix_prog ("pfg", "'", "', which is not pure", "the native '", "', which is not declared pure"):("'pfg', which is not pure")
-given pure_fix_prog ("pfn", "'", "', which is not pure", "the native '", "', which is not declared pure"):("the native 'pfn', which is not declared pure")
-given pure_fix_prog ("pfg", "write 'pure' before '", "' and fix what it then reports", "declare it 'pure native ", "(...)' if the C it links writes no global state and does no I/O"):("write 'pure' before 'pfg' and fix what it then reports")
-given pure_fix_prog ("pfn", "write 'pure' before '", "' and fix what it then reports", "declare it 'pure native ", "(...)' if the C it links writes no global state and does no I/O"):("declare it 'pure native pfn(...)' if the C it links writes no global state and does no I/O")
+given pure_fix_prog {
+  ("pfg", "'", "', which is not pure", "the native '", "', which is not declared pure"):("'pfg', which is not pure")
+  ("pfn", "'", "', which is not pure", "the native '", "', which is not declared pure"):("the native 'pfn', which is not declared pure")
+  ("pfg", "write 'pure' before '", "' and fix what it then reports", "declare it 'pure native ", "(...)' if the C it links writes no global state and does no I/O"):("write 'pure' before 'pfg' and fix what it then reports")
+  ("pfn", "write 'pure' before '", "' and fix what it then reports", "declare it 'pure native ", "(...)' if the C it links writes no global state and does no I/O"):("declare it 'pure native pfn(...)' if the C it links writes no global state and does no I/O")
+}

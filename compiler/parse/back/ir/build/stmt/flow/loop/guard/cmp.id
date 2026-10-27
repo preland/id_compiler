@@ -8,5 +8,7 @@ gd_cmp(string gdb_op) {
 } chain (string gdb_op) {
   push((import gdstk), gdb_out);
 } return void;
-given gd_vals given gd_two ("<"):() then (import gdstk)[0]:(7)
-given gd_vals given gd_two ("<="):() then len((import gdstk)):(1)
+given gd_vals {
+  given gd_two ("<"):() then (import gdstk)[0]:(7)
+  given gd_two ("<="):() then len((import gdstk)):(1)
+}

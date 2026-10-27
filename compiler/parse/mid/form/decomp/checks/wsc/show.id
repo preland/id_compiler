@@ -33,14 +33,16 @@ wsc_show(int wsh_f, int wsh_e) {
     wsh_out = "[" + wsc_args(wsh_f, (import nl1)[wsh_e]) + "]";
   }
 } return string wsh_out;
-given wsc_world ((import wx_fget), (import wx_rv)):("st[a]")
-given wsc_world ((import wx_fadd), (import wx_vt)):("((a + b) * 2)")
-given wsc_world ((import wx_fget), (import wx_neg)):("-a")
-given wsc_world ((import wx_fget), (import wx_foo2)):("foo(bar(a))")
-given wsc_world ((import wx_fget), (import wx_arr)):("[a, 2]")
-given wsc_world ((import wx_fget), (import wx_str)):("\"hi\"")
-given wsc_world ((import wx_fget), (import wx_imp)):("(import g)")
-given wsc_world ((import wx_fget), (import wx_fld)):("st.len")
+given wsc_world {
+  ((import wx_fget), (import wx_rv)):("st[a]")
+  ((import wx_fadd), (import wx_vt)):("((a + b) * 2)")
+  ((import wx_fget), (import wx_neg)):("-a")
+  ((import wx_fget), (import wx_foo2)):("foo(bar(a))")
+  ((import wx_fget), (import wx_arr)):("[a, 2]")
+  ((import wx_fget), (import wx_str)):("\"hi\"")
+  ((import wx_fget), (import wx_imp)):("(import g)")
+  ((import wx_fget), (import wx_fld)):("st.len")
+}
 
 wsc_index(int wix_f, int wix_e) {
   int wix_b = (import ni1)[wix_e];
@@ -51,8 +53,10 @@ wsc_index(int wix_f, int wix_e) {
     wix_out = wsc_show(wix_f, wix_b) + "." + (import ns1)[wix_x];
   }
 } return string wix_out;
-given wsc_world ((import wx_fget), (import wx_idx)):("st[a]")
-given wsc_world ((import wx_fget), (import wx_fld)):("st.len")
+given wsc_world {
+  ((import wx_fget), (import wx_idx)):("st[a]")
+  ((import wx_fget), (import wx_fld)):("st.len")
+}
 
 wsc_args(int wag_f, int[] wag_l) {
   string wag_out = "";
@@ -62,5 +66,7 @@ wsc_args(int wag_f, int[] wag_l) {
     wag_i = wag_i + 1;
   }
 } return string wag_out;
-given wsc_world ((import wx_fadd), (import wx_l1)):("(a + b), ((a + b) * 2)")
-given wsc_world ((import wx_fget), (import wx_l0)):("")
+given wsc_world {
+  ((import wx_fadd), (import wx_l1)):("(a + b), ((a + b) * 2)")
+  ((import wx_fget), (import wx_l0)):("")
+}

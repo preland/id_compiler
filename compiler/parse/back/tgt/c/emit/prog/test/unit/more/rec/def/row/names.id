@@ -6,8 +6,10 @@ rec_param_names(int[] params) {
   int i = 0;
   string ret_s = rec_name_scan(params, out, i);
 } return string ret_s;
-given fn_fixture ((import fixture_params)):("x")
-given fn_fixture ([]):("")
+given fn_fixture {
+  ((import fixture_params)):("x")
+  ([]):("")
+}
 
 rec_name_scan(int[] params, string out, int i) {
   while(i < len(params)) {
@@ -15,5 +17,7 @@ rec_name_scan(int[] params, string out, int i) {
     i = i + 1;
   }
 } return string out;
-given fn_fixture ((import fixture_params), "", 0):("x")
-given fn_fixture ((import fixture_params), "", 1):("")
+given fn_fixture {
+  ((import fixture_params), "", 0):("x")
+  ((import fixture_params), "", 1):("")
+}

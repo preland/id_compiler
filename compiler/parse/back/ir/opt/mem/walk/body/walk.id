@@ -20,5 +20,7 @@ m2r_blk(int f, int i) {
     n = n + 1;
   }
 } return void;
-given m2r_outv_fixture (0, 0):() then calls m2r_seed:(0, 0) then calls m2r_step:(0, 0, 0) then calls m2r_step:(0, 2, 0)
-given m2r_outv_fixture (1, 0):() then calls m2r_seed:(0, 0) then calls m2r_step:[0]
+given m2r_outv_fixture {
+  (0, 0):() then calls m2r_seed:(0, 0) then calls m2r_step:(0, 0, 0) then calls m2r_step:(0, 2, 0)
+  (1, 0):() then calls m2r_seed:(0, 0) then calls m2r_step:[0]
+}

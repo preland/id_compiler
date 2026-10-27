@@ -17,8 +17,10 @@ check_asm_targets(int argc, string[] argv) {
     i = i + 1;
   }
 } return void;
-given asmfx_setup (1, ["prog"]):() then calls asm_check:(0, "x86_64-unknown-linux-gnu")
-given asmfx_setup (3, ["prog", "--triple", "wasm32"]):() then calls asm_check:(0, "wasm32")
+given asmfx_setup {
+  (1, ["prog"]):() then calls asm_check:(0, "x86_64-unknown-linux-gnu")
+  (3, ["prog", "--triple", "wasm32"]):() then calls asm_check:(0, "wasm32")
+}
 
 // emit_all's own fixtures (guarded_emit.id): natives_then_prune reads fsc
 // through is_freestanding, which notes_base's own init_rtc() call sets up --

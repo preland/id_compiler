@@ -21,12 +21,14 @@ noop_same(int nzq_a, int nzq_b) {
     nzq_hit = noop_same((import ni1)[nzq_a], (import ni1)[nzq_b]);
   }
 } return int nzq_hit;
-given noop_world ((import wx_va), (import wx_va)):(1)
-given noop_world ((import wx_va), (import wx_vb)):(0)
-given noop_world ((import wx_sum), (import wx_sum)):(1)
-given noop_world ((import wx_sum), (import nfx_ba)):(0)
-given noop_world ((import wx_foo), (import wx_foo)):(0)
-given noop_world ((import wx_neg), (import wx_neg)):(1)
+given noop_world {
+  ((import wx_va), (import wx_va)):(1)
+  ((import wx_va), (import wx_vb)):(0)
+  ((import wx_sum), (import wx_sum)):(1)
+  ((import wx_sum), (import nfx_ba)):(0)
+  ((import wx_foo), (import wx_foo)):(0)
+  ((import wx_neg), (import wx_neg)):(1)
+}
 
 noop_concat(int nzj_node) {
   int nzj_hit = 0;
@@ -37,8 +39,10 @@ noop_concat(int nzj_node) {
     nzj_hit = 1;
   }
 } return int nzj_hit;
-given noop_world ((import wx_str)):(1)
-given noop_world ((import wx_va)):(0)
-given noop_world ((import nfx_strcat)):(1)
-given noop_world ((import nfx_cat_zero)):(1)
-given noop_world ((import nfx_plus_zero)):(0)
+given noop_world {
+  ((import wx_str)):(1)
+  ((import wx_va)):(0)
+  ((import nfx_strcat)):(1)
+  ((import nfx_cat_zero)):(1)
+  ((import nfx_plus_zero)):(0)
+}

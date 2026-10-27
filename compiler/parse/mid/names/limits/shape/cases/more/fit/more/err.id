@@ -7,8 +7,10 @@ case_arity_err(int i, int fn, int na) {
 } chain (int i, int fn, int na) {
   case_diag(i, "E0503", "this case passes " + na + " argument(s) to '" + f1 + "', which takes " + np, "a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares", "write one literal per parameter in the case's first tuple: " + arity_case_sig);
 } return void;
-given fn_fixture (0, (import fixture_fn), 3):() then prints:("fixture.id:4: error: this case passes 3 argument(s) to 'fx_target', which takes 1 [E0503]\n  why: a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares\n  help: write one literal per parameter in the case's first tuple: fx_target(int x)\n")
-given fn_fixture (0, (import fixture_fn), 0):() then prints:("fixture.id:4: error: this case passes 0 argument(s) to 'fx_target', which takes 1 [E0503]\n  why: a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares\n  help: write one literal per parameter in the case's first tuple: fx_target(int x)\n")
+given fn_fixture {
+  (0, (import fixture_fn), 3):() then prints:("fixture.id:4: error: this case passes 3 argument(s) to 'fx_target', which takes 1 [E0503]\n  why: a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares\n  help: write one literal per parameter in the case's first tuple: fx_target(int x)\n")
+  (0, (import fixture_fn), 0):() then prints:("fixture.id:4: error: this case passes 0 argument(s) to 'fx_target', which takes 1 [E0503]\n  why: a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares\n  help: write one literal per parameter in the case's first tuple: fx_target(int x)\n")
+}
 
 case_void_err(int i, int fn, int ne) {
   string void_case_sig = diag_sig(fn);
@@ -17,13 +19,17 @@ case_void_err(int i, int fn, int ne) {
 } chain (int i, int fn, int ne) {
   case_diag(i, "E0504", "this case expects " + ne + " argument(s) after the call, but '" + f1 + "' takes " + np, "the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has", "list at most the parameters of " + void_case_sig + " in the expected tuple, or none at all");
 } return void;
-given fn_fixture (0, (import fixture_fn), 2):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
-given fn_fixture (0, (import fixture_fn), 0):() then prints:("fixture.id:4: error: this case expects 0 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
+given fn_fixture {
+  (0, (import fixture_fn), 2):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
+  (0, (import fixture_fn), 0):() then prints:("fixture.id:4: error: this case expects 0 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
+}
 
 case_ret_err(int i, int fn, int ne) {
   string f1 = (import ns1)[fn];
   string rt = (import ns2)[fn];
   case_diag(i, "E0505", "'" + f1 + "' returns " + rt + ", so its case expects exactly one value, not " + ne, "a function that returns a value is checked against that one value, so the expected tuple holds exactly one", "write the expected tuple as (VALUE), one " + rt + " literal");
 } return void;
-given fn_fixture (0, (import fixture_fn), 2):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 2 [E0505]\n  why: a function that returns a value is checked against that one value, so the expected tuple holds exactly one\n  help: write the expected tuple as (VALUE), one int literal\n")
-given fn_fixture (0, (import fixture_fn), 0):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 0 [E0505]\n  why: a function that returns a value is checked against that one value, so the expected tuple holds exactly one\n  help: write the expected tuple as (VALUE), one int literal\n")
+given fn_fixture {
+  (0, (import fixture_fn), 2):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 2 [E0505]\n  why: a function that returns a value is checked against that one value, so the expected tuple holds exactly one\n  help: write the expected tuple as (VALUE), one int literal\n")
+  (0, (import fixture_fn), 0):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 0 [E0505]\n  why: a function that returns a value is checked against that one value, so the expected tuple holds exactly one\n  help: write the expected tuple as (VALUE), one int literal\n")
+}

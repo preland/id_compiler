@@ -18,8 +18,10 @@ fix_wedge(int ci, int ow) {
   int[] row = (import fixd_wadj)[ci];
   push(row, ow);
 } return void;
-given fix_wprop_fixture (1, 7):() then (import fixd_wadj):([[-1, -2], [7]])
-given fix_wprop_fixture (0, 9):() then (import fixd_wadj):([[-1, -2, 9], []])
+given fix_wprop_fixture {
+  (1, 7):() then (import fixd_wadj):([[-1, -2], [7]])
+  (0, 9):() then (import fixd_wadj):([[-1, -2, 9], []])
+}
 
 // fnames+fidx with "foo" registered as the only entry, for fix_fnix's own
 // cases (build/func.id is at the three-function cap) -- neg1_setup reaches

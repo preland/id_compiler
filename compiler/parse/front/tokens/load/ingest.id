@@ -11,21 +11,27 @@ load() {
   string src = read_all();
   load_at(src, 0);
 } return void;
-given full_env stdin "op =\nkw return\n" ():() then last_tkind:("tkind kw")
-given full_env stdin "ident x\n" ():() then last_tkind:("tkind ident")
+given full_env {
+  stdin "op =\nkw return\n" ():() then last_tkind:("tkind kw")
+  stdin "ident x\n" ():() then last_tkind:("tkind ident")
+}
 
 load_at(string src, int i) {
   while(i < len(src)) {
     i = take_line(src, i);
   }
 } return void;
-given full_env ("op =\nkw return\n", 0):() then last_tkind:("tkind kw")
-given full_env ("ident x\n", 0):() then last_tkind:("tkind ident")
+given full_env {
+  ("op =\nkw return\n", 0):() then last_tkind:("tkind kw")
+  ("ident x\n", 0):() then last_tkind:("tkind ident")
+}
 
 take_line(string src, int i) {
   int e = string_end_of_line(src, i);
   proc_line(src, i, e);
   int ret_i = e + 1;
 } return int ret_i;
-given full_env ("op =\n", 0):(5) then calls proc_line:("op =\n", 0, 4)
-given full_env ("kw return\n", 0):(10) then calls proc_line:("kw return\n", 0, 9)
+given full_env {
+  ("op =\n", 0):(5) then calls proc_line:("op =\n", 0, 4)
+  ("kw return\n", 0):(10) then calls proc_line:("kw return\n", 0, 9)
+}

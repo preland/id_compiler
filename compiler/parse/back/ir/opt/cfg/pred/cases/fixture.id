@@ -17,13 +17,17 @@ cfg_fixture2(int f) {
   int b1 = ir_block(f, "next");
   cfg_fixture3(b0);
 } return void;
-given cfg_fixture (0):() then chk_blk_count:(4)
-given cfg_fixture (0):() then chk_ins0_count:(1)
+given cfg_fixture {
+  (0):() then chk_blk_count:(4)
+  (0):() then chk_ins0_count:(1)
+}
 
 cfg_fixture3(int b0) {
   int[] none = [];
   int id0 = ir_insn("add", "int", 0, 0, "", none, none);
   ir_add(b0, id0);
 } return void;
-given cfg_fixture (0):() then chk_ins0_count:(2)
-given cfg_fixture (0):() then chk_blk_count:(2)
+given cfg_fixture {
+  (0):() then chk_ins0_count:(2)
+  (0):() then chk_blk_count:(2)
+}

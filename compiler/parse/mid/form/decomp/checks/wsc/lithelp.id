@@ -10,8 +10,10 @@ wsc_lit_help(int wlh_i, int wlh_j, string wlh_dflt) {
     wlh_out = wsc_lit_text(wlh_i, wlh_j);
   }
 } return string wlh_out;
-given wsc_pair (1, 2, "dflt"):("dflt")
-given wsc_pair (7, 8, "dflt"):("'wsa' and 'wsb' are each one operation on their inputs: write `(a + 9)` at each call site of 'wsa' and `(a + 5)` at each call site of 'wsb' and delete both; if a literal needs a name, make it a conf.id constant rather than a parameter")
+given wsc_pair {
+  (1, 2, "dflt"):("dflt")
+  (7, 8, "dflt"):("'wsa' and 'wsb' are each one operation on their inputs: write `(a + 9)` at each call site of 'wsa' and `(a + 5)` at each call site of 'wsb' and delete both; if a literal needs a name, make it a conf.id constant rather than a parameter")
+}
 
 wsc_lit_text(int wlt_i, int wlt_j) {
   int wlt_fi = (import prog)[((import cfpfn)[wlt_i])];
@@ -24,5 +26,7 @@ wsc_lit_text(int wlt_i, int wlt_j) {
 } chain (int wlt_i, int wlt_j) {
   string wlt_out = "'" + wlt_a + "' and '" + wlt_b + "' are each one operation on their inputs: write `" + wlt_ea + "` at each call site of '" + wlt_a + "' and `" + wlt_eb + "` at each call site of '" + wlt_b + "' and delete both; if a literal needs a name, make it a conf.id constant rather than a parameter";
 } return string wlt_out;
-given wsc_pair (7, 8):("'wsa' and 'wsb' are each one operation on their inputs: write `(a + 9)` at each call site of 'wsa' and `(a + 5)` at each call site of 'wsb' and delete both; if a literal needs a name, make it a conf.id constant rather than a parameter")
-given wsc_pair (8, 7):("'wsb' and 'wsa' are each one operation on their inputs: write `(a + 5)` at each call site of 'wsb' and `(a + 9)` at each call site of 'wsa' and delete both; if a literal needs a name, make it a conf.id constant rather than a parameter")
+given wsc_pair {
+  (7, 8):("'wsa' and 'wsb' are each one operation on their inputs: write `(a + 9)` at each call site of 'wsa' and `(a + 5)` at each call site of 'wsb' and delete both; if a literal needs a name, make it a conf.id constant rather than a parameter")
+  (8, 7):("'wsb' and 'wsa' are each one operation on their inputs: write `(a + 5)` at each call site of 'wsb' and `(a + 9)` at each call site of 'wsa' and delete both; if a literal needs a name, make it a conf.id constant rather than a parameter")
+}

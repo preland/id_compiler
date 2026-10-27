@@ -5,8 +5,10 @@ fix_used_at(int x) {
     push((import fixd_used), s2_of_v);
   }
 } return void;
-given fix_ret_fixture (7):() then (import fixd_used):(["myvar"])
-given fix_ret_fixture (0):() then len((import fixd_used)):(0)
+given fix_ret_fixture {
+  (7):() then (import fixd_used):(["myvar"])
+  (0):() then len((import fixd_used)):(0)
+}
 
 fix_block(int[] stmts) {
   int i = 0;
@@ -15,6 +17,8 @@ fix_block(int[] stmts) {
     i = i + 1;
   }
 } return void;
-given fix_if_fixture ([0]):() then calls fix_stmt:(0, 0)
-given fix_if_fixture ([2]):() then calls fix_while:(2)
-given fix_if_fixture ([]):() then calls fix_stmt:[0]
+given fix_if_fixture {
+  ([0]):() then calls fix_stmt:(0, 0)
+  ([2]):() then calls fix_while:(2)
+  ([]):() then calls fix_stmt:[0]
+}

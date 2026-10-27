@@ -32,6 +32,8 @@ emit_pop_tail(int arg, string pop_list_type) {
   string emit_expr_v = emit_expr(arg);
   string ret_s = unbox(cell_ns(pop_list_type) + "pop(" + emit_expr_v + ")", elem);
 } return string ret_s;
-given call_int_fixture ((import call_e1), "bytes"):("(int)(id_bytes_pop(5))")
-given call_int_fixture ((import call_e1), "int[]"):("(int)(id_list_pop(5))")
-given call_int_fixture ((import call_e1), "word[]"):("(long long)(id_list_pop(5))")
+given call_int_fixture {
+  ((import call_e1), "bytes"):("(int)(id_bytes_pop(5))")
+  ((import call_e1), "int[]"):("(int)(id_list_pop(5))")
+  ((import call_e1), "word[]"):("(long long)(id_list_pop(5))")
+}

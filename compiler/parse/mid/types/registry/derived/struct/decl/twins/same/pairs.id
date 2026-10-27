@@ -12,13 +12,17 @@ sd_key(int sd_i) {
     sd_k = sd_k + 1;
   }
 } return string s;
-given sd_pair (0):("x:int,y:int")
-given sd_pair (1):("s:string")
+given sd_pair {
+  (0):("x:int,y:int")
+  (1):("s:string")
+}
 
 sd_sharepair(int sd_i, int sd_j) {
   if((import sdfile)[sd_j] == (import sdfile)[sd_i]) {
     sd_diag(sd_i, "E0625", "struct '" + (import sdname)[sd_i] + "' shares its file with struct '" + (import sdname)[sd_j] + "'; a struct is declared in a file of its own -- move one of them to another file", (import sdname)[sd_i], "a struct is a thing and a function is what the program does with it, and id files each in a file of its own", "move one of the structs to another file");
   }
 } return void;
-given sd_pair (1, 0):() then (import chkfail)[0]:(0)
-given sd_pair given sd_note("R", ["a"], ["int"], "p.id", 9) (2, 0):() then prints:("p.id:9: error: struct 'R' shares its file with struct 'P'; a struct is declared in a file of its own -- move one of them to another file [E0625]\n  at: R\n  why: a struct is a thing and a function is what the program does with it, and id files each in a file of its own\n  help: move one of the structs to another file\n")
+given sd_pair {
+  (1, 0):() then (import chkfail)[0]:(0)
+  given sd_note("R", ["a"], ["int"], "p.id", 9) (2, 0):() then prints:("p.id:9: error: struct 'R' shares its file with struct 'P'; a struct is declared in a file of its own -- move one of them to another file [E0625]\n  at: R\n  why: a struct is a thing and a function is what the program does with it, and id files each in a file of its own\n  help: move one of the structs to another file\n")
+}

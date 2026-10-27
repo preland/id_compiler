@@ -12,8 +12,10 @@ fit_void(int i, int fn, int[] expd) {
     fit_items(i, fn, expd);
   }
 } return void;
-given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
-given print_fixture (0, (import fixture_fn), (import fixture_print_none)):() then calls fit_items:(0, (import fixture_fn), (import fixture_print_none))
+given print_fixture {
+  (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
+  (0, (import fixture_fn), (import fixture_print_none)):() then calls fit_items:(0, (import fixture_fn), (import fixture_print_none))
+}
 
 fit_ret(int i, int fn, int[] expd) {
   imp_side(1);

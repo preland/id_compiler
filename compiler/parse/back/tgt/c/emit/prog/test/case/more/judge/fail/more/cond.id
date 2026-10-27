@@ -7,8 +7,10 @@ case_cond(int fn, int[] expd) {
     cnd = cond_parts(fn, expd);
   }
 } return string cnd;
-given fn_fixture ((import fixture_fn), []):("1")
-given fn_fixture ((import fixture_fn), [0]):("(idtc_got == idtc_e0)")
+given fn_fixture {
+  ((import fixture_fn), []):("1")
+  ((import fixture_fn), [0]):("(idtc_got == idtc_e0)")
+}
 
 cond_parts(int fn, int[] expd) {
   string out = "";
@@ -18,8 +20,10 @@ cond_parts(int fn, int[] expd) {
     j = j + 1;
   }
 } return string out;
-given fn_fixture ((import fixture_fn), []):("")
-given fn_fixture ((import fixture_fn), [0]):("(idtc_got == idtc_e0)")
+given fn_fixture {
+  ((import fixture_fn), []):("")
+  ((import fixture_fn), [0]):("(idtc_got == idtc_e0)")
+}
 
 cond_part(int fn, int j) {
   string nm = chk_name(fn, j);

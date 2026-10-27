@@ -9,8 +9,10 @@ pure_args(int id, int fn) {
     pure_arg_loop(id, fn, pq_cn);
   }
 } return void;
-given pure_fix_prog ((import pfx_mg), (import pfx_fb)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_cio), (import pfx_fb)):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_mg), (import pfx_fb)):() then (import chkfail)[0]:(1)
+  ((import pfx_cio), (import pfx_fb)):() then (import chkfail)[0]:(0)
+}
 
 pure_arg_loop(int id, int fn, int pq_cn) {
   int pq_j = 0;
@@ -19,13 +21,17 @@ pure_arg_loop(int id, int fn, int pq_cn) {
     pq_j = pq_j + 1;
   }
 } return void;
-given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_pm)):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_mh), (import pfx_fb), (import pfx_pm)):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_mg), (import pfx_fb), (import pfx_pm)):() then (import chkfail)[0]:(1)
+  ((import pfx_mh), (import pfx_fb), (import pfx_pm)):() then (import chkfail)[0]:(0)
+}
 
 pure_arg(int id, int fn, int pq_cn, int j) {
   if(list_find((import purenode), (((import nl1)[pq_cn])[j])) == 1) {
     pure_arg_check(id, fn, pq_cn, j);
   }
 } return void;
-given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_pm), 0):() then (import chkfail)[0]:(1)
-given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_fa), 1):() then (import chkfail)[0]:(0)
+given pure_fix_prog {
+  ((import pfx_mg), (import pfx_fb), (import pfx_pm), 0):() then (import chkfail)[0]:(1)
+  ((import pfx_mg), (import pfx_fb), (import pfx_fa), 1):() then (import chkfail)[0]:(0)
+}

@@ -12,8 +12,10 @@ bi_want_for(int id, int i) {
   string name = (import ns1)[id];
   string s = bi_wants(name, i);
 } return string s;
-given call2_setup ((import cm_push_call), 0):("list")
-given call2_setup ((import cm_push_call), 1):("")
+given call2_setup {
+  ((import cm_push_call), 0):("list")
+  ((import cm_push_call), 1):("")
+}
 
 fv_fixture() {
   call2_setup();

@@ -28,5 +28,7 @@ gd_op_d(string gdi_item) {
     gd_bin(gdi_item);
   }
 } return void;
-given gd_vals given gd_two ("+:2"):() then (import gdstk)[0]:(7)
-given gd_vals given gd_one_on ("len"):() then (import gdstk)[0]:(6)
+given gd_vals {
+  given gd_two ("+:2"):() then (import gdstk)[0]:(7)
+  given gd_one_on ("len"):() then (import gdstk)[0]:(6)
+}

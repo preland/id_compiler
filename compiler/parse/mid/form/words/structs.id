@@ -8,8 +8,10 @@ vocab_scan_structs(int vocab_i) {
     vocab_i = vocab_i + 1;
   }
 } return void;
-given sd_pair given vocab_words (0):() then (import vocab_totals)[0]:(5)
-given sd_pair given vocab_words (2):() then (import vocab_totals)[0]:(0)
+given sd_pair {
+  given vocab_words (0):() then (import vocab_totals)[0]:(5)
+  given vocab_words (2):() then (import vocab_totals)[0]:(0)
+}
 
 vocab_scan_fields(int vocab_row, int vocab_k) {
   string[] vocab_fields = (import sdfname)[vocab_row];
@@ -18,12 +20,16 @@ vocab_scan_fields(int vocab_row, int vocab_k) {
     vocab_k = vocab_k + 1;
   }
 } return void;
-given sd_pair given vocab_words (0, 0):() then (import vocab_totals)[0]:(2)
-given sd_pair given vocab_words (1, 1):() then (import vocab_totals)[0]:(0)
+given sd_pair {
+  given vocab_words (0, 0):() then (import vocab_totals)[0]:(2)
+  given vocab_words (1, 1):() then (import vocab_totals)[0]:(0)
+}
 
 vocab_summary() {
   string vocab_head = "word-scan: " + (import vocab_totals)[0] + " distinct names, ";
   print(vocab_head + (import vocab_totals)[1] + " not spelled in words");
 } return void;
-given full_env given vocab_words ():() then prints:("word-scan: 0 distinct names, 0 not spelled in words\n")
-given full_env given vocab_words given integer_list_set((import vocab_totals), 0, 7) ():() then prints:("word-scan: 7 distinct names, 0 not spelled in words\n")
+given full_env {
+  given vocab_words ():() then prints:("word-scan: 0 distinct names, 0 not spelled in words\n")
+  given vocab_words given integer_list_set((import vocab_totals), 0, 7) ():() then prints:("word-scan: 7 distinct names, 0 not spelled in words\n")
+}

@@ -9,8 +9,10 @@ proc_line(string src, int i, int e) {
     push_tok(slice_v, slice_v2);
   }
 } return void;
-given full_env ("op =", 0, 4):() then last_tkind:("tkind op")
-given full_env ("kw return", 0, 9):() then last_tkind:("tkind kw")
+given full_env {
+  ("op =", 0, 4):() then last_tkind:("tkind op")
+  ("kw return", 0, 9):() then last_tkind:("tkind kw")
+}
 
 find_space(string src, int i, int e) {
   while(i < e && character_code_at(src, i) != 32) {

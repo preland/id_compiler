@@ -10,11 +10,13 @@ pure_kind(string name, int fn) {
   pq_kind = pure_kind_f(name, pq_kind);
   pq_kind = pure_kind_v(name, fn, pq_kind);
 } return string pq_kind;
-given pure_fix_prog ("print", (import pfx_fa)):("builtin")
-given pure_fix_prog ("pfh", (import pfx_fa)):("ok")
-given pure_fix_prog ("pfg", (import pfx_fa)):("fn")
-given pure_fix_prog ("uv", (import pfx_fa)):("value")
-given pure_fix_prog ("pv", (import pfx_fa)):("ok")
+given pure_fix_prog {
+  ("print", (import pfx_fa)):("builtin")
+  ("pfh", (import pfx_fa)):("ok")
+  ("pfg", (import pfx_fa)):("fn")
+  ("uv", (import pfx_fa)):("value")
+  ("pv", (import pfx_fa)):("ok")
+}
 
 pure_kind_b(string name) {
   string pq_kb = "";
@@ -28,9 +30,11 @@ pure_kind_b(string name) {
     pq_kb = "ok";
   }
 } return string pq_kb;
-given pure_fix_prog ("print"):("builtin")
-given pure_fix_prog ("len"):("ok")
-given pure_fix_prog ("zzz"):("")
+given pure_fix_prog {
+  ("print"):("builtin")
+  ("len"):("ok")
+  ("zzz"):("")
+}
 
 pure_kind_f(string name, string pq_kind) {
   if(pq_kind == "" && find_str((import fnames), name) >= 0) {
@@ -40,6 +44,8 @@ pure_kind_f(string name, string pq_kind) {
     }
   }
 } return string pq_kind;
-given pure_fix_prog ("pfh", ""):("ok")
-given pure_fix_prog ("pfg", ""):("fn")
-given pure_fix_prog ("pfg", "ok"):("ok")
+given pure_fix_prog {
+  ("pfh", ""):("ok")
+  ("pfg", ""):("fn")
+  ("pfg", "ok"):("ok")
+}

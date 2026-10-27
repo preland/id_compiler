@@ -3,8 +3,10 @@
 ext_where(int xe_k) {
   string xe_whr = (import ext_f)[xe_k] + ":" + (import ext_l)[xe_k];
 } return string xe_whr;
-given env_init given ext_line("Z\ta.id") given ext_line("F\tfoo\tf\t3") (0):("a.id:3")
-given env_init given ext_line("Z\tb.id") given ext_line("F\tfoo\tf\t3") given ext_line("F\tbar\tf\t9") (1):("b.id:9")
+given env_init {
+  given ext_line("Z\ta.id") given ext_line("F\tfoo\tf\t3") (0):("a.id:3")
+  given ext_line("Z\tb.id") given ext_line("F\tfoo\tf\t3") given ext_line("F\tbar\tf\t9") (1):("b.id:9")
+}
 
 // Whether unloaded row xe_k is ahead of the position (xe_file, xe_line) in the
 // order a build reads files in: the order of their paths, then of their lines.
@@ -17,8 +19,10 @@ ext_before(int xe_k, string xe_file, int xe_line) {
     xe_pre = 1;
   }
 } return int xe_pre;
-given env_init given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "z.id", 1):(1)
-given env_init given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "a.id", 9):(0)
-given env_init given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "m.id", 9):(1)
-given env_init given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "m.id", 2):(0)
+given env_init {
+  given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "z.id", 1):(1)
+  given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "a.id", 9):(0)
+  given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "m.id", 9):(1)
+  given ext_line("Z\tm.id") given ext_line("F\tfoo\tf\t5") (0, "m.id", 2):(0)
+}
 

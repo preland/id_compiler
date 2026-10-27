@@ -7,8 +7,10 @@ sd_join(string sd_s, int sd_i) {
     sd_r = sd_s + ", " + (import sdname)[sd_i];
   }
 } return string sd_r;
-given sd_pair ("P", 1):("P, Q")
-given sd_pair ("none", 0):("P")
+given sd_pair {
+  ("P", 1):("P, Q")
+  ("none", 0):("P")
+}
 
 // `P q = ...` and `Pnt q = ...` over the structs P and Q.
 sd_decl_fixture() {

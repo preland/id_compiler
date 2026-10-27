@@ -26,16 +26,20 @@ pcall_fixture_reg() {
   int pn = node_param("param", "word", "p");
   pcall_fixture_func(pn, none);
 } return void;
-given pcall_fixture ():() then (import pcall_fn):(6)
-given pcall_fixture ():() then calls node_param:("param", "word", "p")
-given pcall_fixture ():() then (import chkfail)[0]:(0)
-given pcall_fixture ():() then init_units:(0)
+given pcall_fixture {
+  ():() then (import pcall_fn):(6)
+  ():() then calls node_param:("param", "word", "p")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 pcall_fixture_func(int pn, int[] none) {
   export int pcall_fn = node_func("t2", "int", [pn], none, 0 - 1);
   pcall_fixture_tail((import pcall_fn));
 } return void;
-given pcall_fixture (0, []):() then calls node_func:("t2", "int", [0], [], -1)
-given pcall_fixture (0, []):() then (import pcall_fn):(5)
-given pcall_fixture (0, []):() then (import chkfail)[0]:(0)
-given pcall_fixture (0, []):() then init_units:(0)
+given pcall_fixture {
+  (0, []):() then calls node_func:("t2", "int", [0], [], -1)
+  (0, []):() then (import pcall_fn):(5)
+  (0, []):() then (import chkfail)[0]:(0)
+  (0, []):() then init_units:(0)
+}

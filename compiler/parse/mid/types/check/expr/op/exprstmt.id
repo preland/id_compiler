@@ -20,8 +20,10 @@ chk_exprstmt(int id) {
     tc_err(id, "this statement compares instead of assigning: '=' in an expression is equality, so the statement has no effect" + disc_hint_v);
   }
 } return void;
-given cmp_fixture ((import exprstmt_bin)):() then (import chkfail)[0]:(1)
-given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(0)
+given cmp_fixture {
+  ((import exprstmt_bin)):() then (import chkfail)[0]:(1)
+  ((import bin_mixed)):() then (import chkfail)[0]:(0)
+}
 
 // Both spellings. idc.py's parser folds `=` into `==` on the way in, so by the
 // time either compiler has an AST there is one operator; catching both here

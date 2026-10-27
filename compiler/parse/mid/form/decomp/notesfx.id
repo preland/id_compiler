@@ -26,7 +26,9 @@ notes_setup() {
 notes_push() {
   push((import utnote), "x.id:1: note: exempt");
 } return void;
-given notes_base ():() then (import utnote):(["x.id:1: note: exempt"])
-given notes_base ():() then len((import utnote)):(1)
-given notes_base ():() then (import chkfail)[0]:(0)
-given notes_base ():() then init_units:(0)
+given notes_base {
+  ():() then (import utnote):(["x.id:1: note: exempt"])
+  ():() then len((import utnote)):(1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

@@ -20,5 +20,7 @@ lw_barg_push(int i, int[] vals, int v) {
   push(vals, v);
   int ret_i = i + 1;
 } return int ret_i;
-given lw_env_fixture (0, [], 5):(1)
-given lw_env_fixture (2, [], 7):(3)
+given lw_env_fixture {
+  (0, [], 5):(1)
+  (2, [], 7):(3)
+}

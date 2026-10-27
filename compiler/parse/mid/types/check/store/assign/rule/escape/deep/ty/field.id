@@ -8,5 +8,7 @@ esc_dscf(int dz_s, string dz_a, string[] dz_sn, int[] dz_sp) {
     i = i + 1;
   }
 } return string dz_r;
-given esc_ty_fix (1, "x", [], []):("x..")
-given esc_ty_fix (0, "", ["Tr"], [0]):("l@0;")
+given esc_ty_fix {
+  (1, "x", [], []):("x..")
+  (0, "", ["Tr"], [0]):("l@0;")
+}

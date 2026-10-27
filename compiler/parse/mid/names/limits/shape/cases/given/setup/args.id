@@ -32,8 +32,10 @@ given_args(int i, int si, int sfn) {
     given_fit(i, si, sfn, items);
   }
 } return void;
-given gsetup_fixture (0, 1, (import fixture_set1)):() then (import chkfail)[0]:(0)
-given gsetup_fixture (0, 0, (import fixture_set1)):() then (import chkfail)[0]:(1)
+given gsetup_fixture {
+  (0, 1, (import fixture_set1)):() then (import chkfail)[0]:(0)
+  (0, 0, (import fixture_set1)):() then (import chkfail)[0]:(1)
+}
 
 given_arg(int i, int sfn, int[] items, int j) {
   string pt = (import ns1)[((import nl1)[sfn][j])];

@@ -8,8 +8,10 @@ gblk_lone(int gb_at) {
     gb_yes = 1;
   }
 } return int gb_yes;
-given gblk_stream("open") (13):(1)
-given gblk_stream("open") (2):(0)
+given gblk_stream("open") {
+  (13):(1)
+  (2):(0)
+}
 
 gblk_caseish(int gb_at) {
   int gb_yes = 0;
@@ -17,9 +19,11 @@ gblk_caseish(int gb_at) {
     gb_yes = 1;
   }
 } return int gb_yes;
-given gblk_stream("open") (3):(1)
-given gblk_stream("open") (13):(1)
-given gblk_stream("open") (1):(0)
+given gblk_stream("open") {
+  (3):(1)
+  (13):(1)
+  (1):(0)
+}
 
 gblk_close(int gb_from) {
   int gb_cur = gb_from;

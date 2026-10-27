@@ -14,11 +14,13 @@ wsc_hit(int wht_f, int wht_n, int wht_lit) {
     wht_ok = wsc_fit(wht_f, wht_root, wht_n, wht_lit);
   }
 } return int wht_ok;
-given wsc_world ((import wx_fget), 1, 0):(1)
-given wsc_world ((import wx_fadd), 1, 1):(0)
-given wsc_world ((import wx_fadd), 2, 1):(1)
-given wsc_world ((import wx_fadd), 2, 0):(0)
-given wsc_world ((import wx_fif), 2, 0):(0)
+given wsc_world {
+  ((import wx_fget), 1, 0):(1)
+  ((import wx_fadd), 1, 1):(0)
+  ((import wx_fadd), 2, 1):(1)
+  ((import wx_fadd), 2, 0):(0)
+  ((import wx_fif), 2, 0):(0)
+}
 
 wsc_fit(int wft_f, int wft_root, int wft_n, int wft_lit) {
   int wft_w = wsc_ops(wft_f, wft_root);
@@ -42,5 +44,7 @@ wsc_want(int wwn_f) {
     wwn_n = len((import nl2)[wwn_f]);
   }
 } return int wwn_n;
-given wsc_world ((import wx_fadd)):(2)
-given wsc_world ((import wx_fput)):(0)
+given wsc_world {
+  ((import wx_fadd)):(2)
+  ((import wx_fput)):(0)
+}

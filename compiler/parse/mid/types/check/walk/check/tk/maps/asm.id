@@ -9,8 +9,10 @@ tk_fill_asm(int tki) {
     tki = tki + 1;
   }
 } return void;
-given tk_t_asm_late (0):() then tk_asm_foo:(1)
-given tk_t_asm_late (1):() then tk_asm_foo:(0)
+given tk_t_asm_late {
+  (0):() then tk_asm_foo:(1)
+  (1):() then tk_asm_foo:(0)
+}
 
 tk_is_asm(string name) {
   int tka = 0;
@@ -18,8 +20,10 @@ tk_is_asm(string name) {
     tka = 1;
   }
 } return int tka;
-given tk_t_asm ("foo"):(1)
-given tk_t_asm ("fa"):(0)
+given tk_t_asm {
+  ("foo"):(1)
+  ("fa"):(0)
+}
 
 // The type an export by this name has, or "".
 tk_etype(string name) {
@@ -29,5 +33,7 @@ tk_etype(string name) {
     tkt = (import etypes)[tke];
   }
 } return string tkt;
-given tk_t_exp ("gx"):("int")
-given tk_t_exp ("fa"):("")
+given tk_t_exp {
+  ("gx"):("int")
+  ("fa"):("")
+}

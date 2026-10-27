@@ -12,8 +12,10 @@ noop_report(int nzb_node, string nzb_reason) {
     noop_say(nzb_node, nzb_owner, nzb_reason);
   }
 } return void;
-given noop_world ((import nfx_plus_zero), "r"):() then (import chkfail)[0]:(1)
-given noop_world (100000, "r"):() then (import chkfail)[0]:(0)
+given noop_world {
+  ((import nfx_plus_zero), "r"):() then (import chkfail)[0]:(1)
+  (100000, "r"):() then (import chkfail)[0]:(0)
+}
 
 noop_say(int nzg_node, int nzg_owner, string nzg_reason) {
   string nzg_name = (import ns1)[nzg_owner];
@@ -23,8 +25,10 @@ noop_say(int nzg_node, int nzg_owner, string nzg_reason) {
   string nzg_msg = "`" + nzg_shown + "` is an operation that cannot change its value: " + nzg_reason;
   diag("E0409", nzg_loc, nzg_msg, nzg_name, (import noop_why), (import noop_help));
 } return void;
-given noop_world ((import nfx_plus_zero), (import nfx_fpad), "`e + 0` is just `e`"):() then prints:("<stdin>:1: error: `(a + 0)` is an operation that cannot change its value: `e + 0` is just `e` [E0409]\n  at: nxpad\n  why: an operation that cannot change its value is padding: it looks like work, hides the real expression from the reader, and leaves the code doing exactly what it did without it\n  help: remove it; if a rule made you add it, that rule needs a different fix -- report it\n") then (import chkfail)[0]:(1)
-given noop_world ((import nfx_cancel), (import nfx_fpad), "x"):() then (import chkfail)[0]:(1)
+given noop_world {
+  ((import nfx_plus_zero), (import nfx_fpad), "`e + 0` is just `e`"):() then prints:("<stdin>:1: error: `(a + 0)` is an operation that cannot change its value: `e + 0` is just `e` [E0409]\n  at: nxpad\n  why: an operation that cannot change its value is padding: it looks like work, hides the real expression from the reader, and leaves the code doing exactly what it did without it\n  help: remove it; if a rule made you add it, that rule needs a different fix -- report it\n") then (import chkfail)[0]:(1)
+  ((import nfx_cancel), (import nfx_fpad), "x"):() then (import chkfail)[0]:(1)
+}
 
 noop_unread_report(int nzk_decl, int nzk_owner) {
   string nzk_name = (import ns1)[nzk_owner];
@@ -34,5 +38,7 @@ noop_unread_report(int nzk_decl, int nzk_owner) {
   string nzk_msg = "local '" + nzk_local + "' of '" + nzk_name + "' is declared and never read";
   diag("E0410", nzk_loc, nzk_msg, nzk_name, (import unread_why), (import unread_help));
 } return void;
-given noop_world ((import nfx_dpad), (import nfx_fpad)):() then prints:("<stdin>:1: error: local 'pad' of 'nxpad' is declared and never read [E0410]\n  at: nxpad\n  why: a local that is declared and never read is dead weight: every reader has to find out that nothing uses it, and it can be added only to satisfy a rule on paper\n  help: remove the declaration; if a rule made you add it, that rule needs a different fix -- report it\n") then (import chkfail)[0]:(1)
-given noop_world ((import nfx_dused), (import nfx_fused)):() then (import chkfail)[0]:(1)
+given noop_world {
+  ((import nfx_dpad), (import nfx_fpad)):() then prints:("<stdin>:1: error: local 'pad' of 'nxpad' is declared and never read [E0410]\n  at: nxpad\n  why: a local that is declared and never read is dead weight: every reader has to find out that nothing uses it, and it can be added only to satisfy a rule on paper\n  help: remove the declaration; if a rule made you add it, that rule needs a different fix -- report it\n") then (import chkfail)[0]:(1)
+  ((import nfx_dused), (import nfx_fused)):() then (import chkfail)[0]:(1)
+}

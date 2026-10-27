@@ -7,8 +7,10 @@ fix_stem(int e) {
     s = fix_stem(a);
   }
 } return string s;
-given fix_stem_fixture (0):("list")
-given fix_stem_fixture (2):("len")
+given fix_stem_fixture {
+  (0):("list")
+  (2):("len")
+}
 
 fix_stem2(int e) {
   string s = (import ns1)[e];
@@ -18,8 +20,10 @@ fix_stem2(int e) {
     s = "lit";
   }
 } return string s;
-given fix_stem_fixture (0):("list")
-given fix_stem_fixture (1):("len")
+given fix_stem_fixture {
+  (0):("list")
+  (1):("len")
+}
 
 // e0 an "arr" node (fix_stem2's own override), e1 an "ident" leaf "len", e2 a
 // "-" unary wrapping e1 -- fix_stem(2) recurses through e2 into e1's stem.

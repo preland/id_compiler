@@ -10,6 +10,8 @@ is_unknown_fn(string name) {
     ok = 1;
   }
 } return int ok;
-given env_init ("nope"):(1)
-given env_init ("push"):(0)
+given env_init {
+  ("nope"):(1)
+  ("push"):(0)
+}
 

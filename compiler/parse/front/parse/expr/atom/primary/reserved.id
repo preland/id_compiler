@@ -12,8 +12,10 @@ no_case_word(int[] pos) {
   }
   no_func_word(pos);
 } return void;
-given reserved_word_tokens ([2]):() then (import chkfail)[0]:(1)
-given reserved_word_tokens ([1]):() then (import chkfail)[0]:(0)
+given reserved_word_tokens {
+  ([2]):() then (import chkfail)[0]:(1)
+  ([1]):() then (import chkfail)[0]:(0)
+}
 
 // `func` begins a function type (docs/SPEC.md), which stands wherever a type
 // does: a statement that began with a name spelled `func` would read as a
@@ -24,8 +26,10 @@ no_func_word(int[] pos) {
   }
   no_struct_word(pos);
 } return void;
-given reserved_word_tokens ([0]):() then (import chkfail)[0]:(1)
-given reserved_word_tokens ([1]):() then (import chkfail)[0]:(0)
+given reserved_word_tokens {
+  ([0]):() then (import chkfail)[0]:(1)
+  ([1]):() then (import chkfail)[0]:(0)
+}
 
 // `func;` then `given;`, for the reserved-word checks above.
 reserved_word_tokens() {

@@ -7,8 +7,10 @@ call_loc(string name) {
   int line_v = func_line(name);
   string ret_s = file_v + ":" + line_v;
 } return string ret_s;
-given edge_fixture ("fx_target"):("fixture.id:7")
-given edge_fixture ("edge_caller"):("fixture.id:20")
+given edge_fixture {
+  ("fx_target"):("fixture.id:7")
+  ("edge_caller"):("fixture.id:20")
+}
 
 // A callee's location, empty for a builtin: a name this program does not
 // define (the same membership test reach_add uses to tell a builtin from a
@@ -20,8 +22,10 @@ call_callee_loc(string callee_name) {
     ret_s = call_loc(callee_name);
   }
 } return string ret_s;
-given edge_fixture ("fx_target"):("fixture.id:7")
-given edge_fixture ("print"):("")
+given edge_fixture {
+  ("fx_target"):("fixture.id:7")
+  ("print"):("")
+}
 
 // One edge row: caller|caller_loc|callee|callee_loc|kind. callee_loc is empty
 // for kind=builtin, which is how a 5-field row still parses with one field
@@ -31,5 +35,7 @@ call_edge_line(string caller, string callee_name, string kind) {
   string callee_loc = call_callee_loc(callee_name);
   string ret_s = caller + "|" + caller_loc + "|" + callee_name + "|" + callee_loc + "|" + kind;
 } return string ret_s;
-given edge_fixture ("edge_caller", "fx_target", "call"):("edge_caller|fixture.id:20|fx_target|fixture.id:7|call")
-given edge_fixture ("edge_caller", "print", "builtin"):("edge_caller|fixture.id:20|print||builtin")
+given edge_fixture {
+  ("edge_caller", "fx_target", "call"):("edge_caller|fixture.id:20|fx_target|fixture.id:7|call")
+  ("edge_caller", "print", "builtin"):("edge_caller|fixture.id:20|print||builtin")
+}

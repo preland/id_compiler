@@ -15,8 +15,10 @@ op_rauw(int f, int old, int fresh) {
     i = i + 1;
   }
 } return void;
-given ir_rows (0, 3, 55):() then chk_a:("a 55")
-given ir_rows (0, 4, 66):() then chk_b:("b 66")
+given ir_rows {
+  (0, 3, 55):() then chk_a:("a 55")
+  (0, 4, 66):() then chk_b:("b 66")
+}
 
 op_rauw_b(int b, int old, int fresh) {
   int i = 0;
@@ -26,8 +28,10 @@ op_rauw_b(int b, int old, int fresh) {
     i = i + 1;
   }
 } return void;
-given ir_rows (0, 3, 77):() then chk_a:("a 77")
-given ir_rows (0, 4, 88):() then chk_b:("b 88")
+given ir_rows {
+  (0, 3, 77):() then chk_a:("a 77")
+  (0, 4, 88):() then chk_b:("b 88")
+}
 
 ir_rauw_at(int i, int old, int fresh) {
   if((import ia)[i] == old) {
@@ -38,5 +42,7 @@ ir_rauw_at(int i, int old, int fresh) {
   }
   ir_rauw_l(i, old, fresh);
 } return void;
-given ir_rows (0, 3, 99):() then chk_a:("a 99")
-given ir_rows (0, 4, 44):() then chk_b:("b 44")
+given ir_rows {
+  (0, 3, 99):() then chk_a:("a 99")
+  (0, 4, 44):() then chk_b:("b 44")
+}

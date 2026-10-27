@@ -16,18 +16,22 @@ esc_pushel(int[] args, string cname, string nm) {
     r = 256;
   }
 } return int r;
-given esc_dfix ((import efd_pa), "push", "g"):(256)
-given esc_dfix ((import efd_pb), "push", "g"):(0)
-given esc_dfix ((import efd_pa), "push", "v"):(0)
-given esc_dfix ((import efd_pa), "len", "g"):(0)
+given esc_dfix {
+  ((import efd_pa), "push", "g"):(256)
+  ((import efd_pb), "push", "g"):(0)
+  ((import efd_pa), "push", "v"):(0)
+  ((import efd_pa), "len", "g"):(0)
+}
 
 esc_setel(int sn, string nm) {
   int[] vs = (import nl1)[sn];
   int r = esc_elbad((import ni1)[sn], vs[0], nm);
 } return int r;
-given esc_dfix ((import efd_setb), "g"):(8)
-given esc_dfix ((import efd_setl), "g"):(0)
-given esc_dfix ((import efd_setb), "h"):(0)
+given esc_dfix {
+  ((import efd_setb), "g"):(8)
+  ((import efd_setl), "g"):(0)
+  ((import efd_setb), "h"):(0)
+}
 
 // The flag for the value `v` stored into `b`, a path that starts at `nm`: 8
 // when it may be held by something else too, 0 when it is not stored under
@@ -39,6 +43,8 @@ esc_elbad(int b, int v, string nm) {
     r = esc_elbad2(b, v, dz_dp);
   }
 } return int r;
-given esc_dfix ((import efd_g), (import efd_v), "g"):(8)
-given esc_dfix ((import efd_g), (import efd_lit), "g"):(0)
-given esc_dfix ((import efd_g), (import efd_v), "h"):(0)
+given esc_dfix {
+  ((import efd_g), (import efd_v), "g"):(8)
+  ((import efd_g), (import efd_lit), "g"):(0)
+  ((import efd_g), (import efd_v), "h"):(0)
+}

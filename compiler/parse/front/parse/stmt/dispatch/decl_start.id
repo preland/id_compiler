@@ -9,8 +9,10 @@ parse_stmt4(int[] pos) {
     node = parse_stmt5(pos);
   }
 } return int node;
-given stmt_tokens ([16]):(1)
-given stmt_tokens ([42]):(1)
+given stmt_tokens {
+  ([16]):(1)
+  ([42]):(1)
+}
 
 // a declaration starts with `export`, a type keyword, or a struct name
 // (written as an identifier followed by another, or by `[]`)

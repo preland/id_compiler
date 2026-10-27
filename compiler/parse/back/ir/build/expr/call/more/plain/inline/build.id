@@ -5,13 +5,17 @@ lw_inline_ult(int[] ih_args) {
   int ih_flag = lw_op("icmp", "i1", ih_args[0], ih_args[1], "u<");
   int ret_i = lw_op("zext", "word", ih_flag, 0 - 1, "");
 } return int ret_i;
-given lw_env_fixture ([0, 1]):(1) then (import istr)[0]:("u<")
-given lw_env_fixture ([2, 3]):(1) then (import iop)[1]:("zext")
+given lw_env_fixture {
+  ([0, 1]):(1) then (import istr)[0]:("u<")
+  ([2, 3]):(1) then (import iop)[1]:("zext")
+}
 
 // The low 32 bits as an unsigned value: narrow, then widen without the sign.
 lw_inline_uword(int[] ih_args) {
   int ih_low = lw_op("trunc", "int", ih_args[0], 0 - 1, "");
   int ret_i = lw_op("zext", "word", ih_low, 0 - 1, "");
 } return int ret_i;
-given lw_env_fixture ([0]):(1) then (import iop)[0]:("trunc")
-given lw_env_fixture ([4]):(1) then (import iop)[1]:("zext")
+given lw_env_fixture {
+  ([0]):(1) then (import iop)[0]:("trunc")
+  ([4]):(1) then (import iop)[1]:("zext")
+}

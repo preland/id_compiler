@@ -8,8 +8,10 @@ fv_ll_call(int fn, string name, int nd) {
   string call = "call " + ll_ty(rt) + " @id_" + name + "(" + fv_ll_args(fn, nd) + ")";
   string s = fv_ll_ret(rt, call);
 } return string s;
-given clo_fixture ((import fixture_fn), "fx_target", 0):("  %r = call i32 @id_fx_target(i32 %a0)\n  ret i32 %r")
-given clo_fixture ((import fixture_fn), "fx_target", 1):("  %r = call i32 @id_fx_target(i32 %u0)\n  ret i32 %r")
+given clo_fixture {
+  ((import fixture_fn), "fx_target", 0):("  %r = call i32 @id_fx_target(i32 %a0)\n  ret i32 %r")
+  ((import fixture_fn), "fx_target", 1):("  %r = call i32 @id_fx_target(i32 %u0)\n  ret i32 %r")
+}
 
 fv_ll_args(int fn, int nd) {
   string out = "";
@@ -19,8 +21,10 @@ fv_ll_args(int fn, int nd) {
     i = i + 1;
   }
 } return string out;
-given clo_fixture ((import fixture_fn), 0):("i32 %a0")
-given clo_fixture ((import fixture_fn), 1):("i32 %u0")
+given clo_fixture {
+  ((import fixture_fn), 0):("i32 %a0")
+  ((import fixture_fn), 1):("i32 %u0")
+}
 
 fv_ll_ret(string rt, string call) {
   string s = "  %r = " + call + "\n  ret " + ll_ty(rt) + " %r";

@@ -7,9 +7,11 @@ sv_pick(int sv_r, string sv_nm, int sv_cur) {
     sv_h = sv_r;
   }
 } return int sv_h;
-given sv_fx("int") (1, "x", -1):(1)
-given sv_fx("int") (0, "x", -1):(-1)
-given sv_fx("int") (1, "x", 0):(0)
+given sv_fx("int") {
+  (1, "x", -1):(1)
+  (0, "x", -1):(-1)
+  (1, "x", 0):(0)
+}
 
 sv_loaded(int sv_r, int sv_j) {
   if((import dvtype)[sv_r] != (import dvtype)[sv_j]) {

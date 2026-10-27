@@ -17,8 +17,10 @@ parse_segments(int[] pos, int[] params) {
   int[] body = parse_block(pos);
   chain_loop(pos, params, body);
 } return int[] body;
-given decl_tokens ([8], []):([5, 13])
-given decl_tokens ([8], [0]):([5, 13])
+given decl_tokens {
+  ([8], []):([5, 13])
+  ([8], [0]):([5, 13])
+}
 
 // `chain` is a keyword (lex/chars/classify/ident_kw.id), so this reads the
 // token text rather than a kind: the cursor sits just past the closing brace
@@ -28,8 +30,10 @@ chain_loop(int[] pos, int[] params, int[] body) {
     take_chain(pos, params, body);
   }
 } return void;
-given decl_tokens ([33], [], []):() then (import chkfail)[0]:(0)
-given decl_tokens ([35], [], []):() then (import chkfail)[0]:(0)
+given decl_tokens {
+  ([33], [], []):() then (import chkfail)[0]:(0)
+  ([35], [], []):() then (import chkfail)[0]:(0)
+}
 
 // The parameters are restated for the reader, and must match exactly -- they
 // name the same values, so a restatement that disagrees is a mistake about
@@ -39,5 +43,7 @@ take_chain(int[] pos, int[] params, int[] body) {
   int[] restated = parse_params(pos, "param");
   chain_tail(pos, params, restated, body);
 } return void;
-given decl_tokens ([33], [], []):() then (import chkfail)[0]:(1)
-given decl_tokens ([35], [], []):() then (import chkfail)[0]:(1)
+given decl_tokens {
+  ([33], [], []):() then (import chkfail)[0]:(1)
+  ([35], [], []):() then (import chkfail)[0]:(1)
+}

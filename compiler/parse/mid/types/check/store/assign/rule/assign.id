@@ -13,8 +13,10 @@ chk_decl(int id) {
   decl_bool(id, s1_of_v, i1_of_v);
   decl_flag(id, s1_of_v, i1_of_v);
 } return void;
-given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
-given decltype_fixture ((import decl_scalar)):() then (import chkfail)[0]:(0)
+given decltype_fixture {
+  ((import decl_list)):() then (import chkfail)[0]:(1)
+  ((import decl_scalar)):() then (import chkfail)[0]:(0)
+}
 
 chk_assign(int id) {
   string vt = var_type_at(id);

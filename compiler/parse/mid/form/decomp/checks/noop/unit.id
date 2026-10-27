@@ -24,11 +24,13 @@ noop_lit(int nzt_node, int nzt_value) {
     nzt_hit = 1;
   }
 } return int nzt_hit;
-given noop_world ((import nfx_zero), 0):(1)
-given noop_world ((import nfx_zero), 1):(0)
-given noop_world ((import nfx_one), 1):(1)
-given noop_world ((import wx_va), 0):(0)
-given noop_world ((import nfx_zero), -1):(0)
+given noop_world {
+  ((import nfx_zero), 0):(1)
+  ((import nfx_zero), 1):(0)
+  ((import nfx_one), 1):(1)
+  ((import wx_va), 0):(0)
+  ((import nfx_zero), -1):(0)
+}
 
 // `- (- e)`: a unary minus whose operand is a unary minus.
 noop_negneg(int nzn_node) {
@@ -38,5 +40,7 @@ noop_negneg(int nzn_node) {
     nzn_text = "`- (- e)` is just `e`";
   }
 } return string nzn_text;
-given noop_world ((import nfx_negneg)):("`- (- e)` is just `e`")
-given noop_world ((import wx_neg)):("")
+given noop_world {
+  ((import nfx_negneg)):("`- (- e)` is just `e`")
+  ((import wx_neg)):("")
+}

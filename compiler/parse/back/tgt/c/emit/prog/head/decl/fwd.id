@@ -37,6 +37,8 @@ fwd_adopt_one(int id) {
     print("#define " + fwd_sym + "(...) id_list_adopt(" + fwd_sym + "(__VA_ARGS__))");
   }
 } return void;
-given lw_nl_fixture (1):() then prints:("#define id_nat(...) id_list_adopt(id_nat(__VA_ARGS__))\n")
-given lw_nl_fixture (1):() then calls is_native:(1)
-given lw_nl_fixture (0):() then prints:("")
+given lw_nl_fixture {
+  (1):() then prints:("#define id_nat(...) id_list_adopt(id_nat(__VA_ARGS__))\n")
+  (1):() then calls is_native:(1)
+  (0):() then prints:("")
+}

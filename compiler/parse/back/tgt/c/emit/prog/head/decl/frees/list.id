@@ -10,20 +10,26 @@ frs_list(string fz_u, string fz_e, int fz_d) {
     fz_r = frs_loop(fz_e, fz_inner, fz_d);
   }
 } return string fz_r;
-given esc_ty_fix ("int", "e", 1):("id_list_free((void*)(intptr_t)e);")
-given esc_ty_fix ("string", "e", 2):("{ IdList* L2 = (void*)(intptr_t)e; if (L2) { if (L2->cap != INT_MIN) { for (int i2 = 0; i2 < L2->len; i2++) { id_str_free((void*)(intptr_t)L2->data[i2]); } } id_list_free(L2); } }")
+given esc_ty_fix {
+  ("int", "e", 1):("id_list_free((void*)(intptr_t)e);")
+  ("string", "e", 2):("{ IdList* L2 = (void*)(intptr_t)e; if (L2) { if (L2->cap != INT_MIN) { for (int i2 = 0; i2 < L2->len; i2++) { id_str_free((void*)(intptr_t)L2->data[i2]); } } id_list_free(L2); } }")
+}
 
 frs_loop(string fz_e, string fz_inner, int fz_d) {
   string fz_lv = "L" + fz_d;
   string fz_i = "i" + fz_d;
   string fz_r = frs_lhd(fz_e, fz_lv) + frs_lfor(fz_lv, fz_i, fz_inner);
 } return string fz_r;
-given esc_ty_fix ("e", "x;", 1):("{ IdList* L1 = (void*)(intptr_t)e; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { x; } } id_list_free(L1); } }")
-given esc_ty_fix ("a", "y;", 3):("{ IdList* L3 = (void*)(intptr_t)a; if (L3) { if (L3->cap != INT_MIN) { for (int i3 = 0; i3 < L3->len; i3++) { y; } } id_list_free(L3); } }")
+given esc_ty_fix {
+  ("e", "x;", 1):("{ IdList* L1 = (void*)(intptr_t)e; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { x; } } id_list_free(L1); } }")
+  ("a", "y;", 3):("{ IdList* L3 = (void*)(intptr_t)a; if (L3) { if (L3->cap != INT_MIN) { for (int i3 = 0; i3 < L3->len; i3++) { y; } } id_list_free(L3); } }")
+}
 
 frs_lhd(string fz_e, string fz_lv) {
   string fz_a = "{ IdList* " + fz_lv + " = " + frs_ptr(fz_e) + "; ";
   string fz_r = fz_a + "if (" + fz_lv + ") { if (" + fz_lv + "->cap != INT_MIN) { ";
 } return string fz_r;
-given esc_ty_fix ("e", "V"):("{ IdList* V = (void*)(intptr_t)e; if (V) { if (V->cap != INT_MIN) { ")
-given esc_ty_fix ("a", "W"):("{ IdList* W = (void*)(intptr_t)a; if (W) { if (W->cap != INT_MIN) { ")
+given esc_ty_fix {
+  ("e", "V"):("{ IdList* V = (void*)(intptr_t)e; if (V) { if (V->cap != INT_MIN) { ")
+  ("a", "W"):("{ IdList* W = (void*)(intptr_t)a; if (W) { if (W->cap != INT_MIN) { ")
+}

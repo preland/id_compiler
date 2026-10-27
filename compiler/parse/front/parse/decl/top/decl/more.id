@@ -6,8 +6,10 @@ push_func_line(int[] pos) {
   push((import pline), cur_ln_v);
   int ret_i = push_func_body(pos);
 } return int ret_i;
-given decl_tokens ([0]):(0)
-given decl_tokens ([0]):(0) then (import chkfail)[0]:(0)
+given decl_tokens {
+  ([0]):(0)
+  ([0]):(0) then (import chkfail)[0]:(0)
+}
 
 // The function's own token range is recorded beside it (ptoks/ptoke), before
 // its cases are taken: the text a case key hashes is the declaration alone,
@@ -21,8 +23,10 @@ push_func_body(int[] pos) {
   ptok_note(ptok_first, ptok_last, parse_func_v);
   int ret_i = take_cases(pos);
 } return int ret_i;
-given decl_tokens ([0]):(0) then ptok_span:(37)
-given decl_tokens ([0]):(0) then (import chkfail)[0]:(0)
+given decl_tokens {
+  ([0]):(0) then ptok_span:(37)
+  ([0]):(0) then (import chkfail)[0]:(0)
+}
 
 // push_asm records where an asm declaration begins, the way push_func
 // records an ordinary function's, before parse_asm (../core/top.id) consumes

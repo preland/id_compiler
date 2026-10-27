@@ -9,8 +9,10 @@ bfl_arith(int bfl_i, string bfl_nm) {
     bfl_c = bfl_operand(bfl_i, bfl_nm);
   }
 } return int bfl_c;
-given bfl_fixture ((import bfl_plus), "fx_cnt"):(3)
-given bfl_fixture ((import bfl_plus), "other"):(0)
+given bfl_fixture {
+  ((import bfl_plus), "fx_cnt"):(3)
+  ((import bfl_plus), "other"):(0)
+}
 
 bfl_operand(int bfl_i, string bfl_nm) {
   int bfl_c = 0;
@@ -18,8 +20,10 @@ bfl_operand(int bfl_i, string bfl_nm) {
     bfl_c = 3;
   }
 } return int bfl_c;
-given bfl_fixture ((import bfl_plus), "fx_cnt"):(3)
-given bfl_fixture ((import bfl_plus), "other"):(0)
+given bfl_fixture {
+  ((import bfl_plus), "fx_cnt"):(3)
+  ((import bfl_plus), "other"):(0)
+}
 
 bfl_var_name(int bfl_e) {
   string bfl_text = "";
@@ -27,5 +31,7 @@ bfl_var_name(int bfl_e) {
     bfl_text = (import ns1)[bfl_e];
   }
 } return string bfl_text;
-given bfl_fixture ((import bfl_cv)):("fx_cnt")
-given bfl_fixture ((import bfl_one)):("")
+given bfl_fixture {
+  ((import bfl_cv)):("fx_cnt")
+  ((import bfl_one)):("")
+}

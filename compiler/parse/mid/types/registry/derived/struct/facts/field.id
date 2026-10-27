@@ -9,5 +9,7 @@ sd_fields_text(string sd_s) {
     sd_k = sd_k + 1;
   }
 } return string s;
-given sd_pair ("P"):("x, y")
-given sd_pair ("Q"):("s")
+given sd_pair {
+  ("P"):("x, y")
+  ("Q"):("s")
+}

@@ -21,6 +21,8 @@ unresolved_fn(string name) {
     ok = 1;
   }
 } return int ok;
-given pushfix ("print"):(0)
-given pushfix ("notafunction"):(1)
-given pushfix given sd_note("P", ["a"], ["int"], "p.id", 1) ("P"):(0)
+given pushfix {
+  ("print"):(0)
+  ("notafunction"):(1)
+  given sd_note("P", ["a"], ["int"], "p.id", 1) ("P"):(0)
+}

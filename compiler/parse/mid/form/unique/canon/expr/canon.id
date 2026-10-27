@@ -69,5 +69,7 @@ ce3(int id) {
     out = canon_bin(id);
   }
 } return string out;
-given lz_c ((import lz_imp)):("g(0)")
-given lz_c ((import lz_i1)):("?int#2")
+given lz_c {
+  ((import lz_imp)):("g(0)")
+  ((import lz_i1)):("?int#2")
+}

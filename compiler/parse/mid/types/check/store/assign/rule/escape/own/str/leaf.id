@@ -8,9 +8,11 @@ esc_leaf(int e) {
     x = (import ni1)[x];
   }
 } return int x;
-given esc_sfix ((import efs_dt)):((import efs_vd))
-given esc_sfix ((import efs_sum)):((import efs_vs))
-given esc_sfix ((import efs_vn)):((import efs_vn))
+given esc_sfix {
+  ((import efs_dt)):((import efs_vd))
+  ((import efs_sum)):((import efs_vs))
+  ((import efs_vn)):((import efs_vn))
+}
 
 // How many times the variable `nm` is read anywhere in the expression `e`.
 esc_cnt(int e, string nm) {
@@ -21,9 +23,11 @@ esc_cnt(int e, string nm) {
     c = esc_cnt2(e, nm);
   }
 } return int c;
-given esc_sfix ((import efs_dt), "d"):(2)
-given esc_sfix ((import efs_sum), "s"):(1)
-given esc_sfix ((import efs_sum), "q"):(0)
+given esc_sfix {
+  ((import efs_dt), "d"):(2)
+  ((import efs_sum), "s"):(1)
+  ((import efs_sum), "q"):(0)
+}
 
 esc_cnt2(int e, string nm) {
   int c = 0;
@@ -33,5 +37,7 @@ esc_cnt2(int e, string nm) {
     c = esc_cnt3(e, nm);
   }
 } return int c;
-given esc_sfix ((import efs_dt), "d"):(2)
-given esc_sfix ((import efs_dn), "d"):(1)
+given esc_sfix {
+  ((import efs_dt), "d"):(2)
+  ((import efs_dn), "d"):(1)
+}

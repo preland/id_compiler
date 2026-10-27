@@ -6,8 +6,10 @@ seg_text(string seg_sig, int[] seg_cur) {
   string seg_vec = imp_vec();
   string ret_s = seg_vec + "|" + seg_sig + "{" + seg_body + "}";
 } return string ret_s;
-given imp_decl_fixture ("S", [(import imp_decl)]):("cfg|S{d:int 0=g(0)}")
-given imp_decl_fixture ("S", [(import imp_decl), (import imp_decl)]):("cfg|S{d:int 0=g(0);d:int 0=g(0)}")
+given imp_decl_fixture {
+  ("S", [(import imp_decl)]):("cfg|S{d:int 0=g(0)}")
+  ("S", [(import imp_decl), (import imp_decl)]):("cfg|S{d:int 0=g(0);d:int 0=g(0)}")
+}
 
 // lz_c, then one import already read by the function being fingerprinted, so
 // the next import is position 1.

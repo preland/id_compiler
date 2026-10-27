@@ -11,8 +11,10 @@ ty_narrows(string want, string got) {
     ok = 1;
   }
 } return int ok;
-given init_tyreg ("int", "word"):(1)
-given init_tyreg ("int", "int"):(0)
+given init_tyreg {
+  ("int", "word"):(1)
+  ("int", "int"):(0)
+}
 
 argfn_match_call() {
   argfn_d();

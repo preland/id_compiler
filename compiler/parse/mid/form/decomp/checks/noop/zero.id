@@ -16,7 +16,9 @@ noop_zero(int nzz_node) {
     nzz_text = "`0 * e` is just `0`";
   }
 } return string nzz_text;
-given noop_world ((import nfx_times_zero)):("`e * 0` is just `0`")
-given noop_world ((import nfx_zero_times)):("`0 * e` is just `0`")
-given noop_world ((import nfx_plus_zero)):("")
-given noop_world ((import nfx_times_one)):("")
+given noop_world {
+  ((import nfx_times_zero)):("`e * 0` is just `0`")
+  ((import nfx_zero_times)):("`0 * e` is just `0`")
+  ((import nfx_plus_zero)):("")
+  ((import nfx_times_one)):("")
+}

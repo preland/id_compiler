@@ -9,9 +9,11 @@ wsc_used(string wus_name) {
   int wus_t = wsc_then(wus_name);
   int wus_r = (wus_g + wus_t) > 0;
 } return int wus_r;
-given wsc_marks ("wsget"):(1)
-given wsc_marks ("wsadd"):(1)
-given wsc_marks ("wsdead"):(0)
+given wsc_marks {
+  ("wsget"):(1)
+  ("wsadd"):(1)
+  ("wsdead"):(0)
+}
 
 wsc_given(string wgv_name) {
   int wgv_i = 0;
@@ -24,8 +26,10 @@ wsc_given(string wgv_name) {
     wgv_i = wgv_i + 1;
   }
 } return int wgv_r;
-given wsc_marks ("wsget"):(1)
-given wsc_marks ("wsput"):(0)
+given wsc_marks {
+  ("wsget"):(1)
+  ("wsput"):(0)
+}
 
 wsc_then(string wth_name) {
   int wth_i = 0;
@@ -37,5 +41,7 @@ wsc_then(string wth_name) {
     wth_i = wth_i + 1;
   }
 } return int wth_r;
-given wsc_marks ("wsadd"):(1)
-given wsc_marks ("wsdead"):(0)
+given wsc_marks {
+  ("wsadd"):(1)
+  ("wsdead"):(0)
+}

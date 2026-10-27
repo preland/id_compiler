@@ -7,13 +7,17 @@ lw_logic(int node) {
   int slot = lw_tmp("int");
   int ret_i = lw_logic_seed(node, slot);
 } return int ret_i;
-given logic_fixture ((import and_node)):(16)
-given logic_fixture ((import or_node)):(16)
+given logic_fixture {
+  ((import and_node)):(16)
+  ((import or_node)):(16)
+}
 
 lw_logic2(int node, int slot) {
   int lw_fn_v = (import lwfn)[0];
   int bdy = ir_block(lw_fn_v, "rhs");
   int ret_i = lw_logic2_join(node, slot, bdy);
 } return int ret_i;
-given logic_fixture ((import and_node), 2):(13)
-given logic_fixture ((import or_node), 2):(13)
+given logic_fixture {
+  ((import and_node), 2):(13)
+  ((import or_node), 2):(13)
+}

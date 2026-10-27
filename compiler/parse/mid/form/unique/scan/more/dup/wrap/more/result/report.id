@@ -17,5 +17,7 @@ cw_say(string name, string rt, string lit) {
   string cw_msg = "'" + name + "' only returns the constant " + lit + "; declare it in conf.id as '" + rt + " " + name + " = " + lit + ";' and read it with (import " + name + ")";
   diag("E0403", cw_where, cw_msg, name, "a value that never changes is a constant, and a constant belongs in conf.id where every reader finds it, not behind a function every caller has to open (docs/SPEC.md, section 7.2)", "");
 } return void;
-given env_init ("f", "int", "5"):() then prints:("<stdin>:1: error: 'f' only returns the constant 5; declare it in conf.id as 'int f = 5;' and read it with (import f) [E0403]\n  at: f\n  why: a value that never changes is a constant, and a constant belongs in conf.id where every reader finds it, not behind a function every caller has to open (docs/SPEC.md, section 7.2)\n")
-given env_init ("g", "void", "0"):() then prints:("<stdin>:1: error: 'g' only returns the constant 0; declare it in conf.id as 'void g = 0;' and read it with (import g) [E0403]\n  at: g\n  why: a value that never changes is a constant, and a constant belongs in conf.id where every reader finds it, not behind a function every caller has to open (docs/SPEC.md, section 7.2)\n")
+given env_init {
+  ("f", "int", "5"):() then prints:("<stdin>:1: error: 'f' only returns the constant 5; declare it in conf.id as 'int f = 5;' and read it with (import f) [E0403]\n  at: f\n  why: a value that never changes is a constant, and a constant belongs in conf.id where every reader finds it, not behind a function every caller has to open (docs/SPEC.md, section 7.2)\n")
+  ("g", "void", "0"):() then prints:("<stdin>:1: error: 'g' only returns the constant 0; declare it in conf.id as 'void g = 0;' and read it with (import g) [E0403]\n  at: g\n  why: a value that never changes is a constant, and a constant belongs in conf.id where every reader finds it, not behind a function every caller has to open (docs/SPEC.md, section 7.2)\n")
+}

@@ -20,8 +20,10 @@ esc_free_in(int fn, int[] stmts, string out) {
     i = i + 1;
   }
 } return string out;
-given esc_fix ((import efc_fn), (import efc_stmts), ""):("id_list_free(w); ")
-given esc_fix ((import efc_fn), (import efc_stmts), "id_list_free(w); "):("id_list_free(w); ")
+given esc_fix {
+  ((import efc_fn), (import efc_stmts), ""):("id_list_free(w); ")
+  ((import efc_fn), (import efc_stmts), "id_list_free(w); "):("id_list_free(w); ")
+}
 
 esc_free_one(int fn, int sn, string out) {
   if((import nkind)[sn] == "decl") {
@@ -30,5 +32,7 @@ esc_free_one(int fn, int sn, string out) {
     out = esc_free_nest(fn, sn, out);
   }
 } return string out;
-given esc_fix ((import efc_fn), (import efc_z), ""):("")
-given esc_fix ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")
+given esc_fix {
+  ((import efc_fn), (import efc_z), ""):("")
+  ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")
+}

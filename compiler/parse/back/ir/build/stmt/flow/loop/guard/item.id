@@ -7,16 +7,20 @@ gd_push_name(string gdi_item) {
   int gdi_val = gd_load(gdi_name);
   push((import gdstk), gdi_val);
 } return void;
-given gd_fix given gd_stk_new ("v:j"):() then (import gdstk)[0]:(3)
-given gd_fix given gd_stk_new ("v:v"):() then gd_last:("int[] load ")
+given gd_fix {
+  given gd_stk_new ("v:j"):() then (import gdstk)[0]:(3)
+  given gd_stk_new ("v:v"):() then gd_last:("int[] load ")
+}
 
 gd_push_lit(string gdi_item) {
   string gdi_name = gt_tail(gdi_item);
   int gdi_val = lw_const("int", gdi_name);
   push((import gdstk), gdi_val);
 } return void;
-given gd_fix given gd_stk_new ("i:7"):() then gd_last:("int const 7")
-given gd_fix given gd_stk_new ("i:12"):() then (import gdstk)[0]:(3)
+given gd_fix {
+  given gd_stk_new ("i:7"):() then gd_last:("int const 7")
+  given gd_stk_new ("i:12"):() then (import gdstk)[0]:(3)
+}
 
 gd_op(string gdi_item) {
   if(string_starts_with(gdi_item, "v:") == 1) {
@@ -25,5 +29,7 @@ gd_op(string gdi_item) {
     gd_op_b(gdi_item);
   }
 } return void;
-given gd_vals given gd_two ("v:j"):() then len((import gdstk)):(3)
-given gd_vals given gd_one_on ("len"):() then (import gdstk)[0]:(6)
+given gd_vals {
+  given gd_two ("v:j"):() then len((import gdstk)):(3)
+  given gd_one_on ("len"):() then (import gdstk)[0]:(6)
+}

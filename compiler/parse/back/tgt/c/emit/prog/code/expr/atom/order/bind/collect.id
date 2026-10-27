@@ -25,8 +25,10 @@ seq_units_list(int[] sq_kids, int[] sq_units) {
     i = i + 1;
   }
 } return void;
-given sq_fixture ([7, 0], []):([7, 0], [7])
-given sq_fixture ([12, 11], []):([12, 11], [12, 7, 9, 11])
+given sq_fixture {
+  ([7, 0], []):([7, 0], [7])
+  ([12, 11], []):([12, 11], [12, 7, 9, 11])
+}
 
 seq_clear(int[] sq_units) {
   int i = 0;
@@ -35,6 +37,8 @@ seq_clear(int[] sq_units) {
     i = i + 1;
   }
 } return void;
-given sq_marked ([7]):() then sq_foo_seqd:(0)
-given sq_marked ([9, 11]):() then sq_foo_seqd:(1)
-given sq_marked ([9, 7]):() then sq_foo_seqd:(0)
+given sq_marked {
+  ([7]):() then sq_foo_seqd:(0)
+  ([9, 11]):() then sq_foo_seqd:(1)
+  ([9, 7]):() then sq_foo_seqd:(0)
+}

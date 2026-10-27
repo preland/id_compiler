@@ -15,6 +15,8 @@ given esc_ffix ("FfPt"):(1)
 esc_heap_ty(string t) {
   int ok = esc_heap_list(t) == 1 || t == "string";
 } return int ok;
-given full_env ("string"):(1)
-given full_env ("int"):(0)
-given full_env ("int[][]"):(1)
+given full_env {
+  ("string"):(1)
+  ("int"):(0)
+  ("int[][]"):(1)
+}

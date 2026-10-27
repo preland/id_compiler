@@ -8,8 +8,10 @@ type_of_miss(int id) {
   }
   tcache_set(id, t);
 } return string t;
-given leaves_fixture ((import lit_a)):("int")
-given leaves_fixture ((import lit_str)):("string")
+given leaves_fixture {
+  ((import lit_a)):("int")
+  ((import lit_str)):("string")
+}
 
 // An int leaf is int, word when too wide, and bool when the parser marked it
 // as a `true` or `false` literal (node_bool).
@@ -19,5 +21,7 @@ lit_type(int id) {
     t = "bool";
   }
 } return string t;
-given leaves_fixture ((import lit_a)):("int")
-given leaves_fixture ((import lit_str)):("int")
+given leaves_fixture {
+  ((import lit_a)):("int")
+  ((import lit_str)):("int")
+}

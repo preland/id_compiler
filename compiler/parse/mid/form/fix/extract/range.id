@@ -6,11 +6,13 @@ fix_xsort(int xst, int xmode) {
     fix_xadd((import fixx_out), (import ttext)[xst]);
   }
 } return void;
-given fix_xfixture (1, 0):() then (import fixx_wr):(["a"])
-given fix_xfixture (3, 0):() then (import fixx_rd):(["a"])
-given fix_xfixture (8, 0):() then (import fixx_dc):(["b"])
-given fix_xfixture (3, 1):() then (import fixx_out):(["a"])
-given fix_xfixture (1, 1):() then (import fixx_wr):([])
+given fix_xfixture {
+  (1, 0):() then (import fixx_wr):(["a"])
+  (3, 0):() then (import fixx_rd):(["a"])
+  (8, 0):() then (import fixx_dc):(["b"])
+  (3, 1):() then (import fixx_out):(["a"])
+  (1, 1):() then (import fixx_wr):([])
+}
 
 fix_xrange(int xfrom, int xto, int xmode) {
   int xwalk = xfrom;
@@ -19,8 +21,10 @@ fix_xrange(int xfrom, int xto, int xmode) {
     xwalk = xwalk + 1;
   }
 } return void;
-given fix_xfixture (0, 16, 0):() then (import fixx_rd):(["a", "b"])
-given fix_xfixture (0, 16, 0):() then (import fixx_wr):(["a"])
-given fix_xfixture (0, 16, 1):() then (import fixx_out):(["a", "b"])
-given fix_xfixture (4, 6, 0):() then (import fixx_rd):([])
-given fix_xfixture (16, 2, 0):() then (import fixx_wr):([])
+given fix_xfixture {
+  (0, 16, 0):() then (import fixx_rd):(["a", "b"])
+  (0, 16, 0):() then (import fixx_wr):(["a"])
+  (0, 16, 1):() then (import fixx_out):(["a", "b"])
+  (4, 6, 0):() then (import fixx_rd):([])
+  (16, 2, 0):() then (import fixx_wr):([])
+}

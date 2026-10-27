@@ -19,8 +19,10 @@ chain_fn_make(string cfm_name, int cfm_val, string cfm_kind) {
   int cfm_fn = node_func(cfm_name, "int", cfm_none, cfm_body, cfm_one);
   push((import prog), cfm_fn);
 } return void;
-given env_init ("ca", 1, "chain"):() then len((import prog)):(1)
-given env_init ("cd", 2, "blank"):() then len((import prog)):(1)
+given env_init {
+  ("ca", 1, "chain"):() then len((import prog)):(1)
+  ("cd", 2, "blank"):() then len((import prog)):(1)
+}
 
 // prog = [ca, cb, cc, cd]: ca and cb are the same chain function under
 // different local names; cc differs from them in its first segment only; cd is

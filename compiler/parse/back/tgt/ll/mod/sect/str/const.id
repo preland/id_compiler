@@ -54,5 +54,7 @@ ll_const_str(int e, string name) {
   string gname = "@.cs." + name;
   ll_str_bytes(gname, spell);
 } return string gname;
-given lit_str_fixture ((import lit_str_e), "x"):("@.cs.x")
-given lit_str_fixture ((import lit_str_e), "y"):("@.cs.y")
+given lit_str_fixture {
+  ((import lit_str_e), "x"):("@.cs.x")
+  ((import lit_str_e), "y"):("@.cs.y")
+}

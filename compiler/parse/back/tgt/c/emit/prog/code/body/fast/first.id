@@ -9,6 +9,8 @@ lp_first(int lq_lo, int lq_hi, string lq_nm) {
     lq_i = lq_i + 1;
   }
 } return int lq_i;
-given lpf_more ((import lpf_lod), (import lpf_hid), "ldj"):((import lpf_id))
-given lpf_more ((import lpf_lod), (import lpf_hid), "zzz"):((import lpf_wd))
-given lpf_more ((import lpf_loa), (import lpf_hia), "las"):((import lpf_sa))
+given lpf_more {
+  ((import lpf_lod), (import lpf_hid), "ldj"):((import lpf_id))
+  ((import lpf_lod), (import lpf_hid), "zzz"):((import lpf_wd))
+  ((import lpf_loa), (import lpf_hia), "las"):((import lpf_sa))
+}

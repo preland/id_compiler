@@ -17,8 +17,10 @@ dg_asm_names(int dgr, int dgi) {
     dgi = dgi + 1;
   }
 } return void;
-given dg_t_asm (2, 0):() then dg_nfn:(3)
-given dg_t_asm (2, 1):() then dg_nfn:(2)
+given dg_t_asm {
+  (2, 0):() then dg_nfn:(3)
+  (2, 1):() then dg_nfn:(2)
+}
 
 dg_t_asm() {
   dg_t_rows();

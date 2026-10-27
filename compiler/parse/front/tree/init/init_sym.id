@@ -17,11 +17,13 @@ init_sym() {
   init_structs();
   lp_reset();
 } return void;
-given full_env given add_func("f", "int", 0) ():() then len((import fnames)):(0)
-given full_env given add_export("g", "int", "o") ():() then len((import enames)):(0)
-given full_env ():() then len((import fnames)):(0)
-given full_env ():() then init_units:(0)
-given full_env ():() then calls init_sym_a:[1]
+given full_env {
+  given add_func("f", "int", 0) ():() then len((import fnames)):(0)
+  given add_export("g", "int", "o") ():() then len((import enames)):(0)
+  ():() then len((import fnames)):(0)
+  ():() then init_units:(0)
+  ():() then calls init_sym_a:[1]
+}
 
 // fnames: How many functions are registered -- a `then` check for the void
 // functions above, which otherwise leave no result to compare.
@@ -30,10 +32,12 @@ init_sym_a() {
   export string[] frets = [];
   export string[] enames = [];
 } return void;
-given full_env given add_func("f", "int", 0) ():() then len((import frets)):(0)
-given full_env given add_export("g", "int", "o") ():() then len((import enames)):(0)
-given full_env ():() then (import chkfail)[0]:(0)
-given full_env ():() then init_units:(0)
+given full_env {
+  given add_func("f", "int", 0) ():() then len((import frets)):(0)
+  given add_export("g", "int", "o") ():() then len((import enames)):(0)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // eowners: The owner recorded for each exported name, pushed by add_export
 // (../collect/add.id) in step with enames and etypes. dead_err
@@ -54,7 +58,9 @@ init_sym_b() {
 } chain () {
   export int[] kept_lists = [0 - 1];
 } return void;
-given full_env given add_export("g", "int", "o") ():() then len((import eowners)):(0)
-given full_env given integer_list_set((import kept_lists), 0, 3) ():() then (import kept_lists)[0]:(-1)
-given full_env ():() then (import chkfail)[0]:(0)
-given full_env ():() then init_units:(0)
+given full_env {
+  given add_export("g", "int", "o") ():() then len((import eowners)):(0)
+  given integer_list_set((import kept_lists), 0, 3) ():() then (import kept_lists)[0]:(-1)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

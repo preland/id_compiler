@@ -6,8 +6,10 @@ ir_rauw_l(int i, int old, int fresh) {
     j = ir_rauw_one(l, j, old, fresh);
   }
 } return void;
-given ir_rows_lst (0, 5, 9):() then chk_l:([9, 7, 9])
-given ir_rows_lst (0, 99, 2):() then chk_l:([5, 7, 5])
+given ir_rows_lst {
+  (0, 5, 9):() then chk_l:([9, 7, 9])
+  (0, 99, 2):() then chk_l:([5, 7, 5])
+}
 
 ir_rauw_one(int[] l, int j, int old, int fresh) {
   if(l[j] == old) {

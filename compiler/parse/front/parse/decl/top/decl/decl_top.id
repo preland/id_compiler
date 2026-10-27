@@ -23,8 +23,10 @@ push_func(int[] pos) {
   push((import pfile), cur_file_v);
   int ret_i = push_func_line(pos);
 } return int ret_i;
-given decl_tokens ([0]):(0)
-given decl_tokens ([0]):(0) then (import chkfail)[0]:(0)
+given decl_tokens {
+  ([0]):(0)
+  ([0]):(0) then (import chkfail)[0]:(0)
+}
 
 //   tline   the source line of each stored token, parallel to tkind/ttext
 //   lnseen  every `line N` marker seen; the current line is the last one, a

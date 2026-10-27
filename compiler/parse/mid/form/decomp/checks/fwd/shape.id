@@ -32,5 +32,7 @@ fwd_stmt_id(int fid, int stmt) {
     callid = (import ni1)[stmt];
   }
 } return int callid;
-given farm_i (6, 4):(2)
-given farm_i (6, 7):(-1)
+given farm_i {
+  (6, 4):(2)
+  (6, 7):(-1)
+}

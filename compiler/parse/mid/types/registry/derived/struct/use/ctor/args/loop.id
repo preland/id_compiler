@@ -4,8 +4,10 @@
 ctor_arity_err(int id, string sd_nm) {
   tc_diag(id, "E0622", "struct '" + sd_nm + "' takes " + sd_nfields(sd_nm) + " field(s) (" + sd_fields_text(sd_nm) + "), got " + len(((import nl1)[id])) + "; pass one value per field, in order", sd_nm, "a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields", "pass one value per field, in the order the struct declares them");
 } return void;
-given sd_ctor_fixture ((import sd_c1), "P"):() then prints:("<stdin>:1: error: struct 'P' takes 2 field(s) (x, y), got 1; pass one value per field, in order [E0622]\n  at: P\n  why: a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields\n  help: pass one value per field, in the order the struct declares them\n")
-given sd_ctor_fixture ((import sd_c3), "Q"):() then prints:("<stdin>:1: error: struct 'Q' takes 1 field(s) (s), got 3; pass one value per field, in order [E0622]\n  at: Q\n  why: a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields\n  help: pass one value per field, in the order the struct declares them\n")
+given sd_ctor_fixture {
+  ((import sd_c1), "P"):() then prints:("<stdin>:1: error: struct 'P' takes 2 field(s) (x, y), got 1; pass one value per field, in order [E0622]\n  at: P\n  why: a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields\n  help: pass one value per field, in the order the struct declares them\n")
+  ((import sd_c3), "Q"):() then prints:("<stdin>:1: error: struct 'Q' takes 1 field(s) (s), got 3; pass one value per field, in order [E0622]\n  at: Q\n  why: a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields\n  help: pass one value per field, in the order the struct declares them\n")
+}
 
 ctor_args(int id, string sd_nm) {
   int sd_k = 0;
@@ -14,8 +16,10 @@ ctor_args(int id, string sd_nm) {
     sd_k = sd_k + 1;
   }
 } return void;
-given sd_ctor_fixture ((import sd_c2), "P"):() then (import chkfail)[0]:(0)
-given sd_ctor_fixture ((import sd_cb), "P"):() then (import chkfail)[0]:(1)
+given sd_ctor_fixture {
+  ((import sd_c2), "P"):() then (import chkfail)[0]:(0)
+  ((import sd_cb), "P"):() then (import chkfail)[0]:(1)
+}
 
 ctor_arg(int id, string sd_nm, int sd_k) {
   int sd_a = (import nl1)[id][sd_k];
@@ -24,6 +28,8 @@ ctor_arg(int id, string sd_nm, int sd_k) {
 } chain (int id, string sd_nm, int sd_k) {
   ctor_nested(sd_a, sd_nm, sd_k);
 } return void;
-given sd_ctor_fixture ((import sd_c2), "P", 0):() then (import chkfail)[0]:(0)
-given sd_ctor_fixture ((import sd_cb), "P", 1):() then (import chkfail)[0]:(1)
-given sd_ctor_fixture ((import sd_cd), "P", 0):() then prints:("<stdin>:1: error: argument 'x' of 'P' is a call; a constructor takes values that are already named, not calls [E0607]\n  at: P\n  why: a struct is built on a line of its own, where the next line can see what it is, so a constructor's arguments are names and values, not calls\n  help: name the value on its own line first, then pass the name\n") then (import chkfail)[0]:(1)
+given sd_ctor_fixture {
+  ((import sd_c2), "P", 0):() then (import chkfail)[0]:(0)
+  ((import sd_cb), "P", 1):() then (import chkfail)[0]:(1)
+  ((import sd_cd), "P", 0):() then prints:("<stdin>:1: error: argument 'x' of 'P' is a call; a constructor takes values that are already named, not calls [E0607]\n  at: P\n  why: a struct is built on a line of its own, where the next line can see what it is, so a constructor's arguments are names and values, not calls\n  help: name the value on its own line first, then pass the name\n") then (import chkfail)[0]:(1)
+}

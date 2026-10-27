@@ -19,9 +19,11 @@ lv_plan(int lv_n) {
     lv_r = gd_check();
   }
 } return int lv_r;
-given lv_fix ((import lpf_wa)):(1) then len((import lpg)):(16)
-given lv_fix given integer_list_set((import fsc), 0, 1) ((import lpf_wa)):(0)
-given lv_fix given integer_list_set((import lvc), 0, 0) ((import lpf_wa)):(0)
+given lv_fix {
+  ((import lpf_wa)):(1) then len((import lpg)):(16)
+  given integer_list_set((import fsc), 0, 1) ((import lpf_wa)):(0)
+  given integer_list_set((import lvc), 0, 0) ((import lpf_wa)):(0)
+}
 
 lv_callee(int lv_n, string lv_plain, string lv_cell) {
   string lv_f = lv_plain;
@@ -42,5 +44,7 @@ lv_copy(int lv_n, int lv_b, int lv_jn, int lv_on) {
   integer_list_set((import lpon), 0, 0);
   lw_term("br", 0 - 1, [lv_jn]);
 } return void;
-given lv_loop ((import while_node), 0, 0, 1):() then calls lw_while:((import while_node))
-given lv_loop ((import while_node), 0, 0, 1):() then (import lpon)[0]:(0)
+given lv_loop {
+  ((import while_node), 0, 0, 1):() then calls lw_while:((import while_node))
+  ((import while_node), 0, 0, 1):() then (import lpon)[0]:(0)
+}

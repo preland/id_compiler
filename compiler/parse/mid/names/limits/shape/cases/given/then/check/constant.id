@@ -29,8 +29,10 @@ then_arg_conf(int e) {
     }
   }
 } return int is_conf;
-given arg_conf_fixture given string_list_set((import eowners), 0, "conf.id") ((import fixture_conf_arg)):(1)
-given arg_conf_fixture ((import fixture_conf_arg)):(0)
+given arg_conf_fixture {
+  given string_list_set((import eowners), 0, "conf.id") ((import fixture_conf_arg)):(1)
+  ((import fixture_conf_arg)):(0)
+}
 
 arg_conf_fixture() {
   impcase_empty();

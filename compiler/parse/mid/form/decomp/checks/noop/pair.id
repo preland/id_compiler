@@ -10,9 +10,11 @@ noop_pair(int[] nzp_terms, int[] nzp_signs) {
     nzp_i = nzp_i + 1;
   }
 } return int nzp_hit;
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1]):(1)
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, 1]):(0)
-given noop_world ([], []):(0)
+given noop_world {
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1]):(1)
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, 1]):(0)
+  ([], []):(0)
+}
 
 noop_row(int[] nzw_terms, int[] nzw_signs, int nzw_i) {
   int nzw_j = nzw_i + 1;
@@ -22,9 +24,11 @@ noop_row(int[] nzw_terms, int[] nzw_signs, int nzw_i) {
     nzw_j = nzw_j + 1;
   }
 } return int nzw_hit;
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 1):(1)
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 0):(0)
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 2):(0)
+given noop_world {
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 1):(1)
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 0):(0)
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 2):(0)
+}
 
 noop_opposite(int[] nzd_terms, int[] nzd_signs, int nzd_i, int nzd_j) {
   int nzd_hit = 0;
@@ -32,6 +36,8 @@ noop_opposite(int[] nzd_terms, int[] nzd_signs, int nzd_i, int nzd_j) {
     nzd_hit = noop_same(nzd_terms[nzd_i], nzd_terms[nzd_j]);
   }
 } return int nzd_hit;
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 1, 2):(1)
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, 1], 1, 2):(0)
-given noop_world ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 0, 2):(0)
+given noop_world {
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 1, 2):(1)
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, 1], 1, 2):(0)
+  ([(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1], 0, 2):(0)
+}

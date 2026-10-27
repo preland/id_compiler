@@ -10,8 +10,10 @@ chk_ctor(int id) {
     chk_ctor_at(id, sd_nm);
   }
 } return void;
-given sd_ctor_fixture ((import sd_c2)):() then (import chkfail)[0]:(0)
-given sd_ctor_fixture ((import sd_c1)):() then (import chkfail)[0]:(1)
+given sd_ctor_fixture {
+  ((import sd_c2)):() then (import chkfail)[0]:(0)
+  ((import sd_c1)):() then (import chkfail)[0]:(1)
+}
 
 chk_ctor_at(int id, string sd_nm) {
   ctor_place(id);
@@ -21,8 +23,10 @@ chk_ctor_at(int id, string sd_nm) {
     ctor_args(id, sd_nm);
   }
 } return void;
-given sd_ctor_fixture ((import sd_c2), "P"):() then (import chkfail)[0]:(0)
-given sd_ctor_fixture ((import sd_c1), "P"):() then (import chkfail)[0]:(1)
+given sd_ctor_fixture {
+  ((import sd_c2), "P"):() then (import chkfail)[0]:(0)
+  ((import sd_c1), "P"):() then (import chkfail)[0]:(1)
+}
 
 // What a constructor call evaluates to: the struct it builds, which is the name
 // written. "" for a name that is not a struct, so a call to anything else is
@@ -33,6 +37,8 @@ sd_named(string sd_s) {
     t = sd_s;
   }
 } return string t;
-given sd_pair ("len"):("")
-given sd_pair ("q"):("")
-given sd_pair ("Q"):("Q")
+given sd_pair {
+  ("len"):("")
+  ("q"):("")
+  ("Q"):("Q")
+}

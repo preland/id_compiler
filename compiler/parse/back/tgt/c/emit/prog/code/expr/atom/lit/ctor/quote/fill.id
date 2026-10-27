@@ -19,9 +19,11 @@ lit_run(string raw, word ad) {
     i = i + lit_width(raw, i);
   }
 } return int j;
-given lit_buf ("ab", (import lit_ad)):(2)
-given lit_buf ("a?", (import lit_ad)):(3)
-given lit_buf ("a\\x41", (import lit_ad)):(7)
+given lit_buf {
+  ("ab", (import lit_ad)):(2)
+  ("a?", (import lit_ad)):(3)
+  ("a\\x41", (import lit_ad)):(7)
+}
 
 // One unit of the literal written at j; the new j. A backslash pair is two
 // bytes as written, a `?` is the two bytes `\?`, anything else is itself.
@@ -39,5 +41,7 @@ lit_emit(string raw, int i, word ad, int j) {
     j = j + 1;
   }
 } return int j;
-given lit_buf ("ab", 0, (import lit_ad), 0):(1)
-given lit_buf ("a?", 1, (import lit_ad), 0):(2)
+given lit_buf {
+  ("ab", 0, (import lit_ad), 0):(1)
+  ("a?", 1, (import lit_ad), 0):(2)
+}

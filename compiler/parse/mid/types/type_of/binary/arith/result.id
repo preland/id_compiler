@@ -9,8 +9,10 @@ tb2(int id) {
     t = tb2_arith(id);
   }
 } return string t;
-given composite_fixture ((import bin_plus)):("int")
-given composite_fixture ((import bin_and)):("bool")
+given composite_fixture {
+  ((import bin_plus)):("int")
+  ((import bin_and)):("bool")
+}
 
 // Widening order is int < word < float, so mixing an index with an address
 // gives an address rather than silently truncating it to 32 bits. The order
@@ -22,5 +24,7 @@ arith_result(string lt, string rt) {
     t = ty_wider(lt, rt);
   }
 } return string t;
-given init_tyreg ("int", "word"):("word")
-given init_tyreg ("string", "int"):("int")
+given init_tyreg {
+  ("int", "word"):("word")
+  ("string", "int"):("int")
+}

@@ -7,5 +7,7 @@ vocab_path_rows() {
   push((import vocab_paths), "dmore");
   push((import vocab_paths), "dbuffer");
 } return void;
-given full_env ():() then len((import vocab_paths)):(2)
-given full_env ():() then (import vocab_paths)[1]:("dbuffer")
+given full_env {
+  ():() then len((import vocab_paths)):(2)
+  ():() then (import vocab_paths)[1]:("dbuffer")
+}

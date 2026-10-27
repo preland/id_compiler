@@ -4,8 +4,10 @@ take_item(int[] pos, int[] items) {
   int v = case_item(pos);
   push(items, v);
 } return void;
-given tup1_fix ([1], []):([2], [0])
-given tup1_fix ([1], [7]):([2], [7, 0])
+given tup1_fix {
+  ([1], []):([2], [0])
+  ([1], [7]):([2], [7, 0])
+}
 
 // Consumed only when present, so a case written `(1, 2)(3)` is reported once,
 // here, rather than again at every token that follows it.

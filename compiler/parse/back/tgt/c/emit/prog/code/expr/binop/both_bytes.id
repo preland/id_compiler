@@ -17,5 +17,7 @@ compare_function(int compare_node) {
     compare_name = "id_bytes_cmp";
   }
 } return string compare_name;
-given nz_bin_eq_fixture ((import nz_strn)):("strcmp")
-given nz_bin_eq_fixture ((import nz_strn2)):("strcmp")
+given nz_bin_eq_fixture {
+  ((import nz_strn)):("strcmp")
+  ((import nz_strn2)):("strcmp")
+}

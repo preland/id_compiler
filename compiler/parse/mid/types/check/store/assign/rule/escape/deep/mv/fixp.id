@@ -21,10 +21,12 @@ esc_mp_a() {
 } chain () {
   export int emp_pc = node_call("push", [(import emp_rv), (import emp_wv)]);
 } return void;
-given esc_mp_fix ():() then calls add_var:("mrows", "int[][]", 0) then calls add_var:("mrow", "int[]", 0)
-given esc_mp_fix ():() then calls add_var:("mm", "int", 0) then calls node_txt:("var", "mrows")
-given esc_mp_fix ():() then (import chkfail)[0]:(0)
-given esc_mp_fix ():() then init_units:(0)
+given esc_mp_fix {
+  ():() then calls add_var:("mrows", "int[][]", 0) then calls add_var:("mrow", "int[]", 0)
+  ():() then calls add_var:("mm", "int", 0) then calls node_txt:("var", "mrows")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_mp_b() {
   export int emp_ps = node_exprstmt((import emp_pc));
@@ -37,10 +39,12 @@ esc_mp_b() {
 } chain () {
   export int emp_bad = node_func("mp_bad", "int", (import emp_pd), (import emp_bbody), node_txt("var", "mn"));
 } return void;
-given esc_mp_fix ():() then calls node_exprstmt:((import emp_pc)) then calls node_call:("len", [(import emp_wv)])
-given esc_mp_fix ():() then calls node_param:("param", "int", "mn") then calls node_txt:("var", "mn")
-given esc_mp_fix ():() then (import chkfail)[0]:(0)
-given esc_mp_fix ():() then init_units:(0)
+given esc_mp_fix {
+  ():() then calls node_exprstmt:((import emp_pc)) then calls node_call:("len", [(import emp_wv)])
+  ():() then calls node_param:("param", "int", "mn") then calls node_txt:("var", "mn")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_mp_fix() {
   esc_fix();

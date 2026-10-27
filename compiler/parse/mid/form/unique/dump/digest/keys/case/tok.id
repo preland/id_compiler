@@ -12,8 +12,10 @@ dg_case_tok(word[] dgacc, int dgt) {
     dg_case_ref(dgacc, (import ttext)[dgt]);
   }
 } return void;
-given dg_t_built ([0, 0], 41):([8248207263563534326, 0])
-given dg_t_built ([0, 0], 19):([-8617499241897732819, 0])
+given dg_t_built {
+  ([0, 0], 41):([8248207263563534326, 0])
+  ([0, 0], 19):([-8617499241897732819, 0])
+}
 
 dg_case_ref(word[] dgacc, string dgnm) {
   int dgg = dg_fn_named(dgnm);

@@ -20,15 +20,19 @@ gd_nty(string gdy_name) {
     gdy_ty = (import ity)[gdy_slot];
   }
 } return string gdy_ty;
-given gd_fix ("j"):("int")
-given gd_fix ("v"):("int[]")
-given gd_fix ("nothing"):("")
+given gd_fix {
+  ("j"):("int")
+  ("v"):("int[]")
+  ("nothing"):("")
+}
 
 gd_okname(string gdy_name) {
   string gdy_ty = gd_nty(gdy_name);
   int gdy_ok = gdy_ty == "int" || gdy_ty == "word" || gdy_ty == "bytes" || gdy_ty == "string" || ty_is_list(gdy_ty) == 1;
 } return int gdy_ok;
-given gd_fix ("j"):(1)
-given gd_fix ("v"):(1)
-given gd_fix ("f"):(0)
-given gd_fix ("nothing"):(0)
+given gd_fix {
+  ("j"):(1)
+  ("v"):(1)
+  ("f"):(0)
+  ("nothing"):(0)
+}

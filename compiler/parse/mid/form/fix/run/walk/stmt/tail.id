@@ -2,16 +2,20 @@ fix_then(int sn) {
   int[] l1_of_v = (import nl1)[sn];
   fix_block(l1_of_v);
 } return void;
-given fix_if_fixture (1):() then calls fix_block:([])
-given fix_if_fixture (2):() then calls fix_block:([])
-given fix_if_fixture (2):() then calls fix_block:[1]
+given fix_if_fixture {
+  (1):() then calls fix_block:([])
+  (2):() then calls fix_block:([])
+  (2):() then calls fix_block:[1]
+}
 
 fix_while(int sn) {
   fix_cond(sn, 1);
   fix_then(sn);
 } return void;
-given fix_if_fixture (2):() then calls fix_cond:(2, 1)
-given fix_if_fixture (2):() then calls fix_then:(2)
+given fix_if_fixture {
+  (2):() then calls fix_cond:(2, 1)
+  (2):() then calls fix_then:(2)
+}
 
 // An "if" node (cond 0, empty then/else) and a "while" node (same cond, empty
 // body), both over fix_tokline_node_fixture's own node -- fix_plan's own

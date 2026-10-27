@@ -11,8 +11,10 @@ ll_native_pars(int[] ps) {
     i = i + 1;
   }
 } return string out;
-given ll_native_fixture ((import nat_params)):("i32, i64")
-given ll_native_fixture ((import nat_params0)):("")
+given ll_native_fixture {
+  ((import nat_params)):("i32, i64")
+  ((import nat_params0)):("")
+}
 
 // A native with two parameters ("helper", int/word) and one with none
 // ("getter", word) -- a `native` is a plain func node with 1 in its i2

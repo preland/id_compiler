@@ -6,8 +6,10 @@ parse_arr(int[] pos) {
   scan_list(pos, elems, "]");
   int ret_i = node_arr(elems);
 } return int ret_i;
-given atom_tokens ([7]):(3)
-given atom_tokens ([34]):(1)
+given atom_tokens {
+  ([7]):(3)
+  ([34]):(1)
+}
 
 scan_list(int[] pos, int[] items, string close) {
   int sl_ln = cur_ln(pos);
@@ -16,8 +18,10 @@ scan_list(int[] pos, int[] items, string close) {
 } chain (int[] pos, int[] items, string close) {
   close_bracket(pos, close, sl_ln);
 } return void;
-given atom_tokens ([7], [], "]"):([14], [0, 1, 2])
-given atom_tokens ([34], [], "]"):([37], [0])
-given atom_tokens ([1], [], ")"):([6], [0, 1])
-given atom_tokens ([19], [], ")"):([23], [0])
+given atom_tokens {
+  ([7], [], "]"):([14], [0, 1, 2])
+  ([34], [], "]"):([37], [0])
+  ([1], [], ")"):([6], [0, 1])
+  ([19], [], ")"):([23], [0])
+}
 

@@ -12,8 +12,10 @@ vocab_scan_paths(int vocab_i) {
     vocab_i = vocab_i + 1;
   }
 } return void;
-given full_env given vocab_path_rows (0):() then (import vocab_totals)[1]:(1)
-given full_env given vocab_path_rows (1):() then (import vocab_totals)[0]:(1)
+given full_env {
+  given vocab_path_rows (0):() then (import vocab_totals)[1]:(1)
+  given vocab_path_rows (1):() then (import vocab_totals)[0]:(1)
+}
 
 vocab_path_check(string vocab_entry) {
   string vocab_rel = slice(vocab_entry, 1, len(vocab_entry));
@@ -26,10 +28,12 @@ vocab_path_check(string vocab_entry) {
     vocab_path_report(vocab_entry, vocab_name, vocab_failed, vocab_filler);
   }
 } return void;
-given full_env given vocab_path_words ("dmore"):() then (import vocab_totals)[1]:(1)
-given full_env given vocab_path_words ("fsrc/fb"):() then (import vocab_totals)[1]:(1)
-given full_env given vocab_path_words ("dsrc/buffer_width"):() then (import vocab_totals)[1]:(0)
-given full_env given vocab_path_words ("dsrc/buffer_width"):() then (import vocab_totals)[0]:(1)
+given full_env {
+  given vocab_path_words ("dmore"):() then (import vocab_totals)[1]:(1)
+  given vocab_path_words ("fsrc/fb"):() then (import vocab_totals)[1]:(1)
+  given vocab_path_words ("dsrc/buffer_width"):() then (import vocab_totals)[1]:(0)
+  given vocab_path_words ("dsrc/buffer_width"):() then (import vocab_totals)[0]:(1)
+}
 
 vocab_path_name(string vocab_rel) {
   string[] vocab_rel_parts = string_split(vocab_rel, "/");

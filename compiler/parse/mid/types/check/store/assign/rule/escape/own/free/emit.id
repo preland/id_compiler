@@ -17,9 +17,11 @@ esc_free_nest(int fn, int sn, string out) {
   out = esc_free_in(fn, (import nl1)[sn], out);
   out = esc_free_in(fn, (import nl2)[sn], out);
 } return string out;
-given esc_fix ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")
-given esc_fix ((import efc_fn), (import efc_z), "q"):("q")
-given esc_fix ((import efc_fn), (import efc_ife), ""):("id_list_free(w); ")
+given esc_fix {
+  ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")
+  ((import efc_fn), (import efc_z), "q"):("q")
+  ((import efc_fn), (import efc_ife), ""):("id_list_free(w); ")
+}
 
 // `nm = code;`, or for an owned list or string a block that keeps the old value,
 // stores the new one and frees the old -- after the new is computed, because the

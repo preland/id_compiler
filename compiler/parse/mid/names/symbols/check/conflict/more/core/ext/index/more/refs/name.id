@@ -6,8 +6,10 @@ ixw_local(string[] ixw_names, int ixw_id) {
     push(ixw_names, (import ns2)[ixw_id]);
   }
 } return void;
-given ixn_fx ([], (import ixn_decl)):(["pts"])
-given ixn_fx ([], (import ixn_call)):([])
+given ixn_fx {
+  ([], (import ixn_decl)):(["pts"])
+  ([], (import ixn_call)):([])
+}
 
 ixw_ref(string[] ixw_out, string[] ixw_own, int ixw_id) {
   string ixw_nm = ixw_name_of(ixw_id);
@@ -15,8 +17,10 @@ ixw_ref(string[] ixw_out, string[] ixw_own, int ixw_id) {
     push(ixw_out, ixw_nm);
   }
 } return void;
-given ixn_fx ([], [], (import ixn_call)):(["foo"])
-given ixn_fx ([], ["zz"], (import ixn_var)):([])
+given ixn_fx {
+  ([], [], (import ixn_call)):(["foo"])
+  ([], ["zz"], (import ixn_var)):([])
+}
 
 ixw_name_of(int ixw_id) {
   string ixw_kd = (import nkind)[ixw_id];
@@ -25,5 +29,7 @@ ixw_name_of(int ixw_id) {
     ixw_nm = (import ns1)[ixw_id];
   }
 } return string ixw_nm;
-given ixn_fx ((import ixn_call)):("foo")
-given ixn_fx ((import ixn_decl)):("Point")
+given ixn_fx {
+  ((import ixn_call)):("foo")
+  ((import ixn_decl)):("Point")
+}

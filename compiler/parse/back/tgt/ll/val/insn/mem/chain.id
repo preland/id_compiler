@@ -11,8 +11,10 @@ ll_t3(int id) {
     s = "store " + ll_op(ir_b_v) + ", ptr " + ll_val(ir_a_v2);
   }
 } return string s;
-given ir_fixture3 ((import ir_load)):("%v4 = load i32, ptr poison")
-given ir_fixture3 ((import ir_store)):("store void poison, ptr poison")
+given ir_fixture3 {
+  ((import ir_load)):("%v4 = load i32, ptr poison")
+  ((import ir_store)):("store void poison, ptr poison")
+}
 
 ll_t4(int id) {
   string s = ll_t5(id);

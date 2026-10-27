@@ -7,8 +7,10 @@ parse_type(int[] pos) {
   advance(pos);
   string ret_s = type_tail(t, pos);
 } return string ret_s;
-given decl_tokens ([2]):("int")
-given decl_tokens ([34]):("int")
+given decl_tokens {
+  ([2]):("int")
+  ([34]):("int")
+}
 
 // A function type takes no brackets of its own: any that follow belong to its
 // return type, which it parses itself.
@@ -20,8 +22,10 @@ type_tail(string t, int[] pos) {
     s = end_or_brackets(t, pos);
   }
 } return string s;
-given decl_tokens ("int", [3]):("int")
-given decl_tokens ("string", [3]):("string")
+given decl_tokens {
+  ("int", [3]):("int")
+  ("string", [3]):("string")
+}
 
 add_brackets(string t, int[] pos) {
   while(cur_text(pos) == "[") {
@@ -30,5 +34,7 @@ add_brackets(string t, int[] pos) {
     t = t + "[]";
   }
 } return string t;
-given decl_tokens ("int", [3]):("int")
-given decl_tokens ("string", [6]):("string")
+given decl_tokens {
+  ("int", [3]):("int")
+  ("string", [6]):("string")
+}

@@ -2,14 +2,18 @@
 fix_at(int t0) {
   string ret_s = (import tline)[t0] + "|" + fix_col(t0);
 } return string ret_s;
-given mk_two_toks (0):("1|0")
-given mk_two_toks (1):("1|0")
+given mk_two_toks {
+  (0):("1|0")
+  (1):("1|0")
+}
 
 fix_after(int t0) {
   string ret_s = (import tline)[t0] + "|" + fix_endc(t0);
 } return string ret_s;
-given mk_two_toks (0):("1|-1")
-given mk_two_toks (1):("1|-1")
+given mk_two_toks {
+  (0):("1|-1")
+  (1):("1|-1")
+}
 
 fix_span(int e) {
   int b = fix_nbeg(e);

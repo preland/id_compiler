@@ -11,8 +11,10 @@ fv_sym(string name, int nd) {
   fv_note(name, nd);
   string s = "idfn_a_" + name + (import fv_sep) + nd;
 } return string s;
-given lw_clo_fixture ("tick", 0):("idfn_a_tick__0") then len((import fvname)):(1)
-given lw_clo_fixture ("pick", 2):("idfn_a_pick__2") then (import fvk)[0]:(2)
+given lw_clo_fixture {
+  ("tick", 0):("idfn_a_tick__0") then len((import fvname)):(1)
+  ("pick", 2):("idfn_a_pick__2") then (import fvk)[0]:(2)
+}
 
 lw_obj_args(int obj, int[] args) {
   int[] full = [obj];
@@ -30,5 +32,7 @@ lw_fnval(string name, string ety) {
   int fnraw = ir_leaf("global", "string", 0 - 1, 0 - 1, "id_" + name);
   int ret_i = lw_callf("id_fn_plain", ety, [fa, fnraw]);
 } return int ret_i;
-given lw_clo_fixture ("tick", "func(int) return int"):(2) then (import istr)[0]:("idfn_a_tick__0")
-given lw_clo_fixture ("tick", "func(int) return int"):(2) then (import istr)[1]:("id_tick")
+given lw_clo_fixture {
+  ("tick", "func(int) return int"):(2) then (import istr)[0]:("idfn_a_tick__0")
+  ("tick", "func(int) return int"):(2) then (import istr)[1]:("id_tick")
+}

@@ -16,10 +16,12 @@ noop_unread(int nzx_decl) {
     noop_unread_report(nzx_decl, nzx_owner);
   }
 } return void;
-given noop_world ((import nfx_dpad)):() then (import chkfail)[0]:(1)
-given noop_world ((import nfx_dused)):() then (import chkfail)[0]:(0)
-given noop_world ((import nfx_dexport)):() then (import chkfail)[0]:(0)
-given noop_world ((import nfx_dasg)):() then (import chkfail)[0]:(0)
+given noop_world {
+  ((import nfx_dpad)):() then (import chkfail)[0]:(1)
+  ((import nfx_dused)):() then (import chkfail)[0]:(0)
+  ((import nfx_dexport)):() then (import chkfail)[0]:(0)
+  ((import nfx_dasg)):() then (import chkfail)[0]:(0)
+}
 
 noop_reads(string nzy_name, int nzy_from, int nzy_to) {
   int nzy_i = nzy_from;
@@ -31,10 +33,12 @@ noop_reads(string nzy_name, int nzy_from, int nzy_to) {
     nzy_i = nzy_i + 1;
   }
 } return int nzy_n;
-given noop_world ("used", (import nfx_dused), (import nfx_fused)):(1)
-given noop_world ("pad", (import nfx_dpad), (import nfx_fpad)):(0)
-given noop_world ("a", 5, 5):(0)
-given noop_world ("asg", (import nfx_dasg), (import nfx_fasg)):(1)
+given noop_world {
+  ("used", (import nfx_dused), (import nfx_fused)):(1)
+  ("pad", (import nfx_dpad), (import nfx_fpad)):(0)
+  ("a", 5, 5):(0)
+  ("asg", (import nfx_dasg), (import nfx_fasg)):(1)
+}
 
 noop_owner(int nzz_node) {
   int nzz_at = nzz_node + 1;
@@ -46,5 +50,7 @@ noop_owner(int nzz_node) {
     nzz_at = nzz_at + 1;
   }
 } return int nzz_found;
-given noop_world ((import nfx_plus_zero)):((import nfx_fpad))
-given noop_world (100000):(-1)
+given noop_world {
+  ((import nfx_plus_zero)):((import nfx_fpad))
+  (100000):(-1)
+}

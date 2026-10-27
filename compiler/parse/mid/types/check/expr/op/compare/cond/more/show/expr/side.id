@@ -8,8 +8,10 @@ show_arg_at(int[] l, int i, string out) {
   }
   string ret_s = out + sep + show_expr(l[i]);
 } return string ret_s;
-given shapes_fixture ((import arr_elems), 0, ""):("2")
-given shapes_fixture ((import arr_elems), 1, "2"):("2, 5")
+given shapes_fixture {
+  ((import arr_elems), 0, ""):("2")
+  ((import arr_elems), 1, "2"):("2, 5")
+}
 
 show_bin(int id) {
   int i1_of_v = (import ni1)[id];

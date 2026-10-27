@@ -36,12 +36,16 @@ parse_ret_or(int[] pos) {
     node = parse_stmt4(pos);
   }
 } return int node;
-given flow_tokens ([2]):(1) then calls parse_ret:[1]
-given flow_tokens ([7]):(1) then calls parse_stmt4:[1]
+given flow_tokens {
+  ([2]):(1) then calls parse_ret:[1]
+  ([7]):(1) then calls parse_stmt4:[1]
+}
 
 finish_decl_tail(int[] pos, string type, string name, int exported) {
   eat_text(pos, "=");
   int ret_i = decl_rhs(pos, type, name, exported);
 } return int ret_i;
-given stmt_tokens ([2], "int", "x", 0):(1)
-given stmt_tokens ([17], "int", "y", 0):(1) then prints:("")
+given stmt_tokens {
+  ([2], "int", "x", 0):(1)
+  ([17], "int", "y", 0):(1) then prints:("")
+}

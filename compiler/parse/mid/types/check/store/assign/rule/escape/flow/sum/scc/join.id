@@ -4,8 +4,10 @@
 esc_summary(int fn) {
   int esm = esc_params(fn) | esc_nf(fn);
 } return int esm;
-given esc_fix ((import efa_fn)):(32770)
-given esc_fix ((import efb_fn)):(-1073741823)
+given esc_fix {
+  ((import efa_fn)):(32770)
+  ((import efb_fn)):(-1073741823)
+}
 
 esc_join(int ix, int esm) {
   int ejo = (import esc_pe)[ix] | esm;
@@ -14,15 +16,19 @@ esc_join(int ix, int esm) {
     integer_list_set((import esc_fx), 2, (import esc_fx)[2] + 1);
   }
 } return void;
-given esc_fix (0, 6):() then (import esc_pe)[0]:(6)
-given esc_fix (0, 6):() then (import esc_fx)[2]:(1)
-given esc_fix (0, 0):() then (import esc_fx)[2]:(0)
+given esc_fix {
+  (0, 6):() then (import esc_pe)[0]:(6)
+  (0, 6):() then (import esc_fx)[2]:(1)
+  (0, 0):() then (import esc_fx)[2]:(0)
+}
 
 esc_open(int ix, int esd) {
   integer_list_set((import esc_st), ix, 1);
   integer_list_set((import esc_dp), ix, esd);
   integer_list_set((import esc_fx), 0, esd + 1);
 } return void;
-given esc_fix (1, 4):() then (import esc_st)[1]:(1)
-given esc_fix (1, 4):() then (import esc_dp)[1]:(4)
-given esc_fix (1, 4):() then (import esc_fx)[0]:(5)
+given esc_fix {
+  (1, 4):() then (import esc_st)[1]:(1)
+  (1, 4):() then (import esc_dp)[1]:(4)
+  (1, 4):() then (import esc_fx)[0]:(5)
+}

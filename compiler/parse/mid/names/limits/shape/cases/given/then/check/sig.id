@@ -28,10 +28,12 @@ dupeq_ends() {
   push((import caseend), 2);
   dupeq_fns();
 } return void;
-given dupeq_fixture ():() then len((import caseend)):(4)
-given dupeq_fixture ():() then (import caseend)[3]:(2)
-given dupeq_fixture ():() then (import chkfail)[0]:(0)
-given dupeq_fixture ():() then init_units:(0)
+given dupeq_fixture {
+  ():() then len((import caseend)):(4)
+  ():() then (import caseend)[3]:(2)
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // A `then (import NAME).a.b` clause's fields, followed to the type they reach
 // (then_path_type, ../../../more/dup/utread.id): a path that is not one is
@@ -47,5 +49,7 @@ then_imp_field(int ci, int chk_node, string want) {
     then_imp_value(ci, chk_node, ft);
   }
 } return void;
-given then_imp_fixture ("int", 0, 0) given string_list_set((import ns2), (import then_imp_node), ".z") ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx).z: (import gx) is a int, not a struct, so it has no fields; drop '.z', or name an export that is a struct\n")
-given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_node), "int"):() then calls then_imp_value:((import fixture_ci), (import then_imp_node), "int")
+given then_imp_fixture ("int", 0, 0) {
+  given string_list_set((import ns2), (import then_imp_node), ".z") ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx).z: (import gx) is a int, not a struct, so it has no fields; drop '.z', or name an export that is a struct\n")
+  ((import fixture_ci), (import then_imp_node), "int"):() then calls then_imp_value:((import fixture_ci), (import then_imp_node), "int")
+}

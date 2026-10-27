@@ -13,10 +13,12 @@ vocab_path_filler(string vocab_name) {
     vocab_i = vocab_i + 1;
   }
 } return string vocab_acc;
-given full_env given vocab_path_words ("more"):("more")
-given full_env given vocab_path_words ("buffer_more"):("more")
-given full_env given vocab_path_words ("buffer_width"):("")
-given full_env given vocab_path_words (""):("")
+given full_env {
+  given vocab_path_words ("more"):("more")
+  given vocab_path_words ("buffer_more"):("more")
+  given vocab_path_words ("buffer_width"):("")
+  given vocab_path_words (""):("")
+}
 
 vocab_filler_add(string vocab_acc, string vocab_piece) {
   string vocab_next = vocab_acc;
@@ -24,14 +26,18 @@ vocab_filler_add(string vocab_acc, string vocab_piece) {
     vocab_next = vocab_join(vocab_acc, vocab_piece);
   }
 } return string vocab_next;
-given full_env given vocab_path_words ("", "More"):("More")
-given full_env given vocab_path_words ("", "buffer"):("")
-given full_env given vocab_path_words ("a", "more"):("a, more")
+given full_env {
+  given vocab_path_words ("", "More"):("More")
+  given vocab_path_words ("", "buffer"):("")
+  given vocab_path_words ("a", "more"):("a, more")
+}
 
 vocab_path_words() {
   vocab_words();
   hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "more");
   hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "!more");
 } return void;
-given full_env ():() then (import vocab_count)[0]:(5)
-given full_env ():() then (import chkfail)[0]:(0)
+given full_env {
+  ():() then (import vocab_count)[0]:(5)
+  ():() then (import chkfail)[0]:(0)
+}

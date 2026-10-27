@@ -25,5 +25,7 @@ lw_concat(int node) {
   int a = lw_tostr(i1_of_v);
   int ret_i = lw_concat_b(node, a);
 } return int ret_i;
-given str_fixture2 ((import concat_node)):(5) then (import chkfail)[0]:(0)
-given str_fixture2 ((import concat_node)):(5) then init_units:(0)
+given str_fixture2 {
+  ((import concat_node)):(5) then (import chkfail)[0]:(0)
+  ((import concat_node)):(5) then init_units:(0)
+}

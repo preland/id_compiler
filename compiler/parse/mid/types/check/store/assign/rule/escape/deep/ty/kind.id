@@ -11,10 +11,12 @@ esc_dkind(string t) {
     dz_k = esc_dkind2(t);
   }
 } return int dz_k;
-given esc_ty_fix ("int[][]"):(1)
-given esc_ty_fix ("string[]"):(2)
-given esc_ty_fix ("Tr"):(3)
-given esc_ty_fix ("Pt"):(0)
+given esc_ty_fix {
+  ("int[][]"):(1)
+  ("string[]"):(2)
+  ("Tr"):(3)
+  ("Pt"):(0)
+}
 
 esc_dkind2(string t) {
   int dz_k = 0;
@@ -28,11 +30,13 @@ esc_dkind2(string t) {
     dz_k = 4;
   }
 } return int dz_k;
-given esc_ty_fix ("bytes[]"):(4)
-given esc_ty_fix ("string[]"):(2)
-given esc_ty_fix ("Pg"):(3)
-given esc_ty_fix ("Pt"):(0)
-given esc_ty_fix ("int[]"):(0)
+given esc_ty_fix {
+  ("bytes[]"):(4)
+  ("string[]"):(2)
+  ("Pg"):(3)
+  ("Pt"):(0)
+  ("int[]"):(0)
+}
 
 // The runtime call that frees a deep-owned value of type `t`.
 esc_dfn(string t) {
@@ -47,7 +51,9 @@ esc_dfn(string t) {
     dz_f = "id_list_free_bytes";
   }
 } return string dz_f;
-given esc_ty_fix ("bytes[]"):("id_list_free_bytes")
-given esc_ty_fix ("int[][]"):("id_list_free_deep")
-given esc_ty_fix ("string[]"):("id_list_free_strs")
-given esc_ty_fix ("Tr"):("idfr_Tr")
+given esc_ty_fix {
+  ("bytes[]"):("id_list_free_bytes")
+  ("int[][]"):("id_list_free_deep")
+  ("string[]"):("id_list_free_strs")
+  ("Tr"):("idfr_Tr")
+}

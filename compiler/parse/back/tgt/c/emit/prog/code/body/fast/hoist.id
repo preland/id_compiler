@@ -15,8 +15,10 @@ lp_hoist(int lq_w, string lq_ind) {
 } chain (int lq_w, string lq_ind) {
   lp_hlens(lq_ind, lq_lo, lq_hi);
 } return void;
-given lpf_in(0) given lpf_planned ((import lpf_wa), "  "):() then prints:("  IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n")
-given lpf_in(0) given lpf_planb ((import lpf_wb), "  "):() then prints:("  IdList idh_c_lbv = *(lbv); IdList* idh_lbv = &idh_c_lbv;\n  int idh_n_lbv = id_list_len(lbv);\n")
+given lpf_in(0) {
+  given lpf_planned ((import lpf_wa), "  "):() then prints:("  IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n")
+  given lpf_planb ((import lpf_wb), "  "):() then prints:("  IdList idh_c_lbv = *(lbv); IdList* idh_lbv = &idh_c_lbv;\n  int idh_n_lbv = id_list_len(lbv);\n")
+}
 
 lp_hbases(string lq_ind) {
   int lq_k = 0;
@@ -25,8 +27,10 @@ lp_hbases(string lq_ind) {
     lq_k = lq_k + 1;
   }
 } return void;
-given lpf_in(0) given lpf_planned (""):() then (import lph)[0]:("lav")
-given lpf_in(0) given lpf_planb (""):() then len((import lph)):(1)
+given lpf_in(0) {
+  given lpf_planned (""):() then (import lph)[0]:("lav")
+  given lpf_planb (""):() then len((import lph)):(1)
+}
 
 lp_hbase(int lq_id, string lq_ind) {
   int lq_b = lp_bnode(lq_id);
@@ -38,5 +42,7 @@ lp_hbase(int lq_id, string lq_ind) {
     print(lq_ind + lq_ty + " idh_c_" + lq_nm + " = *(" + lq_nm + "); " + lq_ty + "* idh_" + lq_nm + " = &idh_c_" + lq_nm + ";");
   }
 } return void;
-given lpf_in(0) given lpf_planned ((import lpf_xa), "  "):() then prints:("  IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n")
-given lpf_in(0) given lpf_planned ((import lpf_xa), ""):() then (import lph)[0]:("lav")
+given lpf_in(0) {
+  given lpf_planned ((import lpf_xa), "  "):() then prints:("  IdList idh_c_lav = *(lav); IdList* idh_lav = &idh_c_lav;\n")
+  given lpf_planned ((import lpf_xa), ""):() then (import lph)[0]:("lav")
+}

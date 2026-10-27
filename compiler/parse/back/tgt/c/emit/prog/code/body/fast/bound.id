@@ -10,7 +10,9 @@ lp_bound(int lq_c) {
     integer_list_set((import lpbad), 0, 1);
   }
 } return void;
-given lpf_more ((import lpf_ca)):() then (import lpj)[0]:("laj")
-given lpf_more ((import lpf_cb)):() then (import lpj)[0]:("lbj")
-given lpf_more ((import lpf_negl)):() then (import lpbad)[0]:(1)
-given lpf_more ((import lpf_bigr)):() then len((import lpn)):(0)
+given lpf_more {
+  ((import lpf_ca)):() then (import lpj)[0]:("laj")
+  ((import lpf_cb)):() then (import lpj)[0]:("lbj")
+  ((import lpf_negl)):() then (import lpbad)[0]:(1)
+  ((import lpf_bigr)):() then len((import lpn)):(0)
+}

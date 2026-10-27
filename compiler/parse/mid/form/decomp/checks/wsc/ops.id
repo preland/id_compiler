@@ -28,13 +28,15 @@ wsc_ops(int wop_f, int wop_e) {
     wop_w = 1 + wsc_ops(wop_f, (import ni1)[wop_e]);
   }
 } return int wop_w;
-given wsc_world ((import wx_fget), (import wx_va)):(0)
-given wsc_world ((import wx_fget), (import wx_rv)):(1001)
-given wsc_world ((import wx_fadd), (import wx_vt)):(1002002)
-given wsc_world ((import wx_fget), (import wx_neg)):(1)
-given wsc_world ((import wx_fget), (import wx_foo2)):(2)
-given wsc_world ((import wx_fget), (import wx_arr)):(1000001)
-given wsc_world ((import wx_fget), (import wx_str)):(1000000)
+given wsc_world {
+  ((import wx_fget), (import wx_va)):(0)
+  ((import wx_fget), (import wx_rv)):(1001)
+  ((import wx_fadd), (import wx_vt)):(1002002)
+  ((import wx_fget), (import wx_neg)):(1)
+  ((import wx_fget), (import wx_foo2)):(2)
+  ((import wx_fget), (import wx_arr)):(1000001)
+  ((import wx_fget), (import wx_str)):(1000000)
+}
 
 wsc_wvar(int wwv_f, int wwv_e) {
   int wwv_i = wsc_local(wwv_f, (import ns1)[wwv_e]);
@@ -43,8 +45,10 @@ wsc_wvar(int wwv_f, int wwv_e) {
     wwv_w = 1000 + wsc_ops(wwv_f, wwv_i);
   }
 } return int wwv_w;
-given wsc_world ((import wx_fget), (import wx_rv)):(1001)
-given wsc_world ((import wx_fget), (import wx_vst)):(0)
+given wsc_world {
+  ((import wx_fget), (import wx_rv)):(1001)
+  ((import wx_fget), (import wx_vst)):(0)
+}
 
 wsc_total(int wto_f, int[] wto_l) {
   int wto_w = 0;
@@ -54,5 +58,7 @@ wsc_total(int wto_f, int[] wto_l) {
     wto_i = wto_i + 1;
   }
 } return int wto_w;
-given wsc_world ((import wx_fadd), (import wx_l1)):(1001003)
-given wsc_world ((import wx_fadd), (import wx_l0)):(0)
+given wsc_world {
+  ((import wx_fadd), (import wx_l1)):(1001003)
+  ((import wx_fadd), (import wx_l0)):(0)
+}

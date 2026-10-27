@@ -13,8 +13,10 @@ lw_slot(string name) {
     v = (import lwslot)[r];
   }
 } return int v;
-given lw_fixture_vars ("x"):(9)
-given lw_fixture_vars ("nope"):(-1)
+given lw_fixture_vars {
+  ("x"):(9)
+  ("nope"):(-1)
+}
 
 // Where a name lives: an alloca for a local, the global itself for an export.
 // An exported name is reserved program-wide, so a name that is not a local is

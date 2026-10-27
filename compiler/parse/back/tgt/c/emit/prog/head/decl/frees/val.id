@@ -12,10 +12,12 @@ frs_val(string fz_t, string fz_e, int fz_d) {
     fz_r = "id_str_free(" + frs_ptr(fz_e) + ");";
   }
 } return string fz_r;
-given esc_ty_fix ("string", "e", 1):("id_str_free((void*)(intptr_t)e);")
-given esc_ty_fix ("int", "e", 1):("")
-given esc_ty_fix ("Tr[]", "e", 1):("{ IdList* L1 = (void*)(intptr_t)e; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } }")
-given esc_ty_fix ("string[][]", "e", 1):("{ IdList* L1 = (void*)(intptr_t)e; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { { IdList* L2 = (void*)(intptr_t)L1->data[i1]; if (L2) { if (L2->cap != INT_MIN) { for (int i2 = 0; i2 < L2->len; i2++) { id_str_free((void*)(intptr_t)L2->data[i2]); } } id_list_free(L2); } } } } id_list_free(L1); } }")
+given esc_ty_fix {
+  ("string", "e", 1):("id_str_free((void*)(intptr_t)e);")
+  ("int", "e", 1):("")
+  ("Tr[]", "e", 1):("{ IdList* L1 = (void*)(intptr_t)e; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { id_frs_push(s, (void*)(intptr_t)L1->data[i1], idfs_Tr); } } id_list_free(L1); } }")
+  ("string[][]", "e", 1):("{ IdList* L1 = (void*)(intptr_t)e; if (L1) { if (L1->cap != INT_MIN) { for (int i1 = 0; i1 < L1->len; i1++) { { IdList* L2 = (void*)(intptr_t)L1->data[i1]; if (L2) { if (L2->cap != INT_MIN) { for (int i2 = 0; i2 < L2->len; i2++) { id_str_free((void*)(intptr_t)L2->data[i2]); } } id_list_free(L2); } } } } id_list_free(L1); } }")
+}
 
 frs_val2(string fz_t, string fz_e, int fz_d) {
   string fz_r = frs_val3(fz_t, fz_e, fz_d);
@@ -23,8 +25,10 @@ frs_val2(string fz_t, string fz_e, int fz_d) {
     fz_r = frs_struct(fz_t, fz_e);
   }
 } return string fz_r;
-given esc_ty_fix ("Tr", "e", 1):("id_frs_push(s, (void*)(intptr_t)e, idfs_Tr);")
-given esc_ty_fix ("float", "e", 1):("")
+given esc_ty_fix {
+  ("Tr", "e", 1):("id_frs_push(s, (void*)(intptr_t)e, idfs_Tr);")
+  ("float", "e", 1):("")
+}
 
 frs_val3(string fz_t, string fz_e, int fz_d) {
   string fz_r = "";
@@ -32,5 +36,7 @@ frs_val3(string fz_t, string fz_e, int fz_d) {
     fz_r = frs_list(list_elem(fz_t), fz_e, fz_d);
   }
 } return string fz_r;
-given esc_ty_fix ("int[]", "e", 1):("id_list_free((void*)(intptr_t)e);")
-given esc_ty_fix ("bool", "e", 1):("")
+given esc_ty_fix {
+  ("int[]", "e", 1):("id_list_free((void*)(intptr_t)e);")
+  ("bool", "e", 1):("")
+}

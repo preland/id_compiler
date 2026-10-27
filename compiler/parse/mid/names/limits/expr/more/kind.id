@@ -12,8 +12,10 @@ hc_kids(int e) {
     ok = hc_pair(i1_of_v, i2_of_v);
   }
 } return int ok;
-given hidden_call_fixture ((import hc_un)):(1)
-given hidden_call_fixture ((import hc_call)):(0)
+given hidden_call_fixture {
+  ((import hc_un)):(1)
+  ((import hc_call)):(0)
+}
 
 hc_more(int e) {
   int ok = 0;
@@ -25,8 +27,10 @@ hc_more(int e) {
     ok = hc_list(l1_of_v);
   }
 } return int ok;
-given hidden_call_fixture ((import hc_un)):(1)
-given hidden_call_fixture ((import hc_call)):(0)
+given hidden_call_fixture {
+  ((import hc_un)):(1)
+  ((import hc_call)):(0)
+}
 
 hc_pair(int a, int b) {
   int ok = has_call(a);

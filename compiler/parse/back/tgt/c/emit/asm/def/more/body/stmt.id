@@ -17,10 +17,12 @@ asm_stmt2(int r, string asm_body_text, string asm_quote1) {
   string asm_in_text = asm_in_ops((import afparams)[r]);
   asm_stmt3(r, asm_body_text, asm_quote1, asm_quote2, asm_in_text);
 } return void;
-given llasm_row_fixture (0, "T", "Q"):() then prints:("    __asm__ __volatile__(T : [result] Q=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
-given llasm_row_fixture (0, "U", "Z"):() then prints:("    __asm__ __volatile__(U : [result] Z=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
-given llasm_row_fixture (0, "T", "Q"):() then calls asm_stmt3:[1]
-given llasm_row_fixture (0, "U", "Z"):() then calls asm_stmt3:[1]
+given llasm_row_fixture {
+  (0, "T", "Q"):() then prints:("    __asm__ __volatile__(T : [result] Q=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+  (0, "U", "Z"):() then prints:("    __asm__ __volatile__(U : [result] Z=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+  (0, "T", "Q"):() then calls asm_stmt3:[1]
+  (0, "U", "Z"):() then calls asm_stmt3:[1]
+}
 
 asm_stmt3(int r, string asm_body_text, string asm_quote1, string asm_quote2, string asm_in_text) {
   string chr_v3 = chr(34);
@@ -30,5 +32,7 @@ asm_stmt3(int r, string asm_body_text, string asm_quote1, string asm_quote2, str
   print("    return " + (import afretn)[r] + ";");
   print("}");
 } return void;
-given llasm_row_fixture (0, "T", "Q", "Q", "OPS"):() then prints:("    __asm__ __volatile__(T : [result] Q=rQ (result) : OPS : \"memory\");\n    return result;\n}\n")
-given llasm_row_fixture (0, "U", "Z", "Z", ""):() then prints:("    __asm__ __volatile__(U : [result] Z=rZ (result) :  : \"memory\");\n    return result;\n}\n")
+given llasm_row_fixture {
+  (0, "T", "Q", "Q", "OPS"):() then prints:("    __asm__ __volatile__(T : [result] Q=rQ (result) : OPS : \"memory\");\n    return result;\n}\n")
+  (0, "U", "Z", "Z", ""):() then prints:("    __asm__ __volatile__(U : [result] Z=rZ (result) :  : \"memory\");\n    return result;\n}\n")
+}

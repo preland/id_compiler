@@ -14,12 +14,14 @@ gd_known(string gdk_tok) {
     gdk_ok = gd_okname(gt_tail(gdk_tok));
   }
 } return int gdk_ok;
-given gd_fix ("v:j"):(1)
-given gd_fix ("v:f"):(0)
-given gd_fix ("wide"):(1)
-given gd_fix ("->len"):(0)
-given gd_fix ("-:3"):(1)
-given gd_fix ("-:x"):(0)
+given gd_fix {
+  ("v:j"):(1)
+  ("v:f"):(0)
+  ("wide"):(1)
+  ("->len"):(0)
+  ("-:3"):(1)
+  ("-:x"):(0)
+}
 
 gd_check() {
   int gdk_at = 0;
@@ -29,6 +31,8 @@ gd_check() {
     gdk_at = gdk_at + 1;
   }
 } return int gdk_ok;
-given gd_fix given gd_cond(["v:j", "k:0", ">=", "|", "v:v", "null", "!=", "|"]) ():(1)
-given gd_fix given gd_cond(["v:j", "k:0", ">=", "|", "v:f", "k:0", ">=", "|"]) ():(0)
-given gd_fix given gd_cond(["v:j", "k:0", ">=", "|", "v:j", "->foo", ">=", "|"]) ():(0)
+given gd_fix {
+  given gd_cond(["v:j", "k:0", ">=", "|", "v:v", "null", "!=", "|"]) ():(1)
+  given gd_cond(["v:j", "k:0", ">=", "|", "v:f", "k:0", ">=", "|"]) ():(0)
+  given gd_cond(["v:j", "k:0", ">=", "|", "v:j", "->foo", ">=", "|"]) ():(0)
+}

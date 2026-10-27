@@ -9,10 +9,12 @@ pcall_fixture_tail(int f) {
   export int pcall_arg_n = node_txt2("int", "9", 9, 0);
   export int pcall_node = node_call("gparam", [(import pcall_arg_n)]);
 } return void;
-given pcall_fixture (0):() then calls add_func:("gparam", "int", 0)
-given pcall_fixture (0):() then calls node_txt2:("int", "9", 9, 0)
-given pcall_fixture (0):() then (import chkfail)[0]:(0)
-given pcall_fixture (0):() then init_units:(0)
+given pcall_fixture {
+  (0):() then calls add_func:("gparam", "int", 0)
+  (0):() then calls node_txt2:("int", "9", 9, 0)
+  (0):() then (import chkfail)[0]:(0)
+  (0):() then init_units:(0)
+}
 
 // Two enclosing loops exiting to blocks 1 and 2 (innermost last), a `break`,
 // and an early `return` of ev_node from a function returning int -- for the

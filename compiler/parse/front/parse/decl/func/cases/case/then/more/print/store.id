@@ -7,8 +7,10 @@ then_push_kind(string kind, string s1v, int[] items) {
   int[] no_items = [];
   then_store(kind, s1v, items, n - 1, no_items);
 } return void;
-given fn_fixture ("thenprints", "", []):() then calls then_store:("thenprints", "", [], 0, [])
-given fn_fixture ("theneprints", "", [1]):() then calls then_store:("theneprints", "", [1], 0, [])
+given fn_fixture {
+  ("thenprints", "", []):() then calls then_store:("thenprints", "", [], 0, [])
+  ("theneprints", "", [1]):() then calls then_store:("theneprints", "", [1], 0, [])
+}
 
 
 // `(import NAME)` and the fields after it, `.a.b`, of a `then (import NAME).a.b:(value)` check (../../clauses.id). The
@@ -24,8 +26,10 @@ then_imp_item(int[] pos) {
 } chain (int[] pos) {
   string_list_set((import ns2), e, path);
 } return int e;
-given env_init given toks_push(["op", "kw", "ident", "op", "op", "ident", "op", "ident", "op"], ["(", "import", "zz", ")", ".", "a", ".", "b", ":"]) ([0]):(0) then (import ns2)[0]:(".a.b")
-given env_init given toks_push(["op", "kw", "ident", "op", "op"], ["(", "import", "zz", ")", ":"]) ([0]):(0) then (import ns2)[0]:("")
+given env_init {
+  given toks_push(["op", "kw", "ident", "op", "op", "ident", "op", "ident", "op"], ["(", "import", "zz", ")", ".", "a", ".", "b", ":"]) ([0]):(0) then (import ns2)[0]:(".a.b")
+  given toks_push(["op", "kw", "ident", "op", "op"], ["(", "import", "zz", ")", ":"]) ([0]):(0) then (import ns2)[0]:("")
+}
 
 // The check node for a then-import clause: the export's name and its field path are the leaf's, the
 // index and the value are the clause's.
@@ -34,5 +38,7 @@ then_imp_store(string kind, int e, int[] items, int[] imp_ix) {
   int node = newnode(kind, n - 1, 0, (import ns1)[e], (import ns2)[e], items, imp_ix);
   push((import thennode), node);
 } return void;
-given fn_fixture given string_list_set((import ns2), (import fixture_zero), ".a") ("thenimp", (import fixture_zero), [], []):() then calls newnode:("thenimp", 0, 0, "0", ".a", [], [])
-given fn_fixture ("thenlen", (import fixture_zero), [], []):() then calls newnode:("thenlen", 0, 0, "0", "", [], [])
+given fn_fixture {
+  given string_list_set((import ns2), (import fixture_zero), ".a") ("thenimp", (import fixture_zero), [], []):() then calls newnode:("thenimp", 0, 0, "0", ".a", [], [])
+  ("thenlen", (import fixture_zero), [], []):() then calls newnode:("thenlen", 0, 0, "0", "", [], [])
+}

@@ -20,8 +20,10 @@ ty_float_pick(string pick_t, string pick_float, string pick_other) {
     ret_s = pick_float;
   }
 } return string ret_s;
-given ir_rows ("float", "F", "O"):("F")
-given ir_rows ("int", "F", "O"):("O")
+given ir_rows {
+  ("float", "F", "O"):("F")
+  ("int", "F", "O"):("O")
+}
 
 str_pick2(string pick_x, string pick_k1, string pick_y1, string pick_k2, string pick_y2, string pick_no) {
   string ret_s = pick_no;

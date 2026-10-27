@@ -18,8 +18,10 @@ lw_narrow(string t, string want) {
     op = "trunc";
   }
 } return string op;
-given env_init ("word", "int"):("trunc")
-given env_init ("int", "word"):("sext")
+given env_init {
+  ("word", "int"):("trunc")
+  ("int", "word"):("sext")
+}
 
 // A builtin argument widened to what its helper takes. `udiv`, `umod`, `ult`
 // and `ushr` read an `int` as its 32 unsigned bits, so there the widening is a
@@ -33,6 +35,8 @@ lw_as_arg(int node, string want, string name) {
     r = lw_as(node, want);
   }
 } return int r;
-given lw_fix_int ((import fix_int_n), "word", "ushr"):(1)
-given lw_fix_int ((import fix_int_n), "word", "ult"):(1)
-given lw_fix_int ((import fix_int_n), "int", "chr"):(0)
+given lw_fix_int {
+  ((import fix_int_n), "word", "ushr"):(1)
+  ((import fix_int_n), "word", "ult"):(1)
+  ((import fix_int_n), "int", "chr"):(0)
+}

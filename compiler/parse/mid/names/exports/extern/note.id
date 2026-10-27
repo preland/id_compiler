@@ -20,5 +20,7 @@ wr_row(string wr_key, string wr_fname) {
   push((import wrx), wr_key);
   push((import wrf), wr_fname);
 } return void;
-given env_init given wr_build ("i:gx", "f"):() then (import wrx)[0]:("i:gx")
-given env_init given wr_build ("v:p", "g"):() then (import wrf)[0]:("g")
+given env_init {
+  given wr_build ("i:gx", "f"):() then (import wrx)[0]:("i:gx")
+  given wr_build ("v:p", "g"):() then (import wrf)[0]:("g")
+}

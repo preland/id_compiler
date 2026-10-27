@@ -36,7 +36,9 @@ chk_retexp(int id) {
     retexp_err(id, cr_nm);
   }
 } return void;
-given fn_fixture given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:((import fixture_fn), "gx")
-given fn_fixture given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then prints:("<stdin>:1: error: 'gx' is named by the return clause of 'fx_target' (return void export gx), but 'fx_target' does not export it in its own body; add 'export TYPE gx = VALUE;' to 'fx_target', or drop 'export gx' from its return clause\n")
-given fn_fixture given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[1]
-given fn_fixture given add_export("gx", "int", "fx_target") given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[0]
+given fn_fixture {
+  given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:((import fixture_fn), "gx")
+  given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then prints:("<stdin>:1: error: 'gx' is named by the return clause of 'fx_target' (return void export gx), but 'fx_target' does not export it in its own body; add 'export TYPE gx = VALUE;' to 'fx_target', or drop 'export gx' from its return clause\n")
+  given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[1]
+  given add_export("gx", "int", "fx_target") given list_string_extend((import retexp), ["gx"]) given integer_list_set((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[0]
+}

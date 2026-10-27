@@ -20,10 +20,12 @@ lw_fix_fnval_reg() {
   push((import fnodes), (import lw_fixture_n));
   export int fix_fnval_n = node_txt("var", "fx_target");
 } return void;
-given lw_fix_fnval ():() then calls fidx_add:("fx_target")
-given lw_fix_fnval ():() then calls node_txt:("var", "fx_target")
-given lw_fix_fnval ():() then (import chkfail)[0]:(0)
-given lw_fix_fnval ():() then init_units:(0)
+given lw_fix_fnval {
+  ():() then calls fidx_add:("fx_target")
+  ():() then calls node_txt:("var", "fx_target")
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 // A `bin` node ("1 + 1"), for the atom/tail.id dispatch cases -- one operand
 // reused on both sides, since lw_bin only lowers each side and never needs

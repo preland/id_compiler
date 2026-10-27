@@ -12,7 +12,9 @@ esc_fs_f() {
   export int efs_dq = node_decl("func(int) return int", "k", (import efs_vf), 0);
   export int efs_cnone = node_func("fs_cnone", "int", (import efs_np), [(import efs_dq)], (import efs_vn));
 } return void;
-given esc_sfix ():() then calls node_txt:("var", "fs_acc") then calls node_call:("bind", [(import efs_vf), (import efs_vn)]) then calls node_decl:("func(int) return int", "k", (import efs_bn), 0)
-given esc_sfix ():() then calls node_func:("fs_clo", "int", (import efs_np), [(import efs_dk)], (import efs_vn)) then calls node_decl:("func(int) return int", "k", (import efs_vf), 0) then calls node_func:("fs_cnone", "int", (import efs_np), [(import efs_dq)], (import efs_vn))
-given esc_sfix ():() then (import chkfail)[0]:(0)
-given esc_sfix ():() then init_units:(0)
+given esc_sfix {
+  ():() then calls node_txt:("var", "fs_acc") then calls node_call:("bind", [(import efs_vf), (import efs_vn)]) then calls node_decl:("func(int) return int", "k", (import efs_bn), 0)
+  ():() then calls node_func:("fs_clo", "int", (import efs_np), [(import efs_dk)], (import efs_vn)) then calls node_decl:("func(int) return int", "k", (import efs_vf), 0) then calls node_func:("fs_cnone", "int", (import efs_np), [(import efs_dq)], (import efs_vn))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

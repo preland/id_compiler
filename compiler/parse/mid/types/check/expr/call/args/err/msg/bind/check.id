@@ -13,14 +13,18 @@ chk_bind(int id) {
     bind_first(id, n);
   }
 } return void;
-given bind_fixture ((import bind_none)):() then (import chkfail)[0]:(1)
-given bind_fixture ((import bind_ok)):() then (import chkfail)[0]:(0)
+given bind_fixture {
+  ((import bind_none)):() then (import chkfail)[0]:(1)
+  ((import bind_ok)):() then (import chkfail)[0]:(0)
+}
 
 bind_few(int id) {
   tc_diag(id, "E0639", "'bind' takes the name of a function and at least one value to capture: write bind(NAME, value, ...); with no value to capture, NAME alone is already a function value", "bind", "bind captures values into a new function value, and with nothing to capture there is nothing to bind", "write bind(NAME, value, ...), or use NAME alone as the function value");
 } return void;
-given bind_fixture ((import bind_none)):() then (import chkfail)[0]:(1)
-given bind_fixture ((import bind_one)):() then (import chkfail)[0]:(1)
+given bind_fixture {
+  ((import bind_none)):() then (import chkfail)[0]:(1)
+  ((import bind_one)):() then (import chkfail)[0]:(1)
+}
 
 bind_first(int id, int n) {
   int a = (import nl1)[id][0];
@@ -30,5 +34,7 @@ bind_first(int id, int n) {
     bind_fit(id, n);
   }
 } return void;
-given bind_fixture ((import bind_var), 2):() then (import chkfail)[0]:(1)
-given bind_fixture ((import bind_ok), 2):() then (import chkfail)[0]:(0)
+given bind_fixture {
+  ((import bind_var), 2):() then (import chkfail)[0]:(1)
+  ((import bind_ok), 2):() then (import chkfail)[0]:(0)
+}

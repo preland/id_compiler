@@ -11,12 +11,16 @@ arg_err_msg(int id, int fn, int i, string t) {
   string pt = (import ns1)[(((import nl1)[fn])[i])];
   string msg = arg_err_msg2(id, pname, pt, t);
 } return string msg;
-given argfn_d ((import argfn_fn), (import argfn_fn), 0, "string"):("argument 'p' of 'g' expects int, got string")
-given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):("argument 'p' of 'g' expects int, got word")
+given argfn_d {
+  ((import argfn_fn), (import argfn_fn), 0, "string"):("argument 'p' of 'g' expects int, got string")
+  ((import argfn_fn), (import argfn_fn), 0, "word"):("argument 'p' of 'g' expects int, got word")
+}
 
 arg_err_msg2(int id, string pname, string pt, string t) {
   string callname = (import ns1)[id];
   string msg = "argument '" + pname + "' of '" + callname + "' expects " + pt + ", got " + t;
 } return string msg;
-given argfn_d ((import argfn_fn), "p", "int", "string"):("argument 'p' of 'g' expects int, got string")
-given argfn_d ((import argfn_fn), "x", "word", "int"):("argument 'x' of 'g' expects word, got int")
+given argfn_d {
+  ((import argfn_fn), "p", "int", "string"):("argument 'p' of 'g' expects int, got string")
+  ((import argfn_fn), "x", "word", "int"):("argument 'x' of 'g' expects word, got int")
+}

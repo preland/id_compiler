@@ -36,6 +36,8 @@ esc_decl_type(int[] stmts, string nm) {
     i = i + 1;
   }
 } return string t;
-given esc_fix ((import efc_stmts), "z"):("int[]")
-given esc_fix ((import efc_stmts), "w"):("int[]")
-given esc_fix ((import efc_stmts), "q"):("")
+given esc_fix {
+  ((import efc_stmts), "z"):("int[]")
+  ((import efc_stmts), "w"):("int[]")
+  ((import efc_stmts), "q"):("")
+}

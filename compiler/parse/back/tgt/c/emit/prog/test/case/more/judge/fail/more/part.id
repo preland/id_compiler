@@ -15,5 +15,7 @@ exp_tail(int[] expd) {
   }
   string so = c_esc(", expected " + et + "\n");
 } return string so;
-given arith_fix ([0]):(", expected 6\\n")
-given arith_fix ([0, 0]):(", expected (6, 6)\\n")
+given arith_fix {
+  ([0]):(", expected 6\\n")
+  ([0, 0]):(", expected (6, 6)\\n")
+}

@@ -6,8 +6,10 @@ gd_slen(int gds_str) {
   int gds_cell = lw_callf("id_len", "int", [gds_str]);
   int gds_out = gd_wide(gds_cell);
 } return int gds_out;
-given gd_vals (4):(6) then calls lw_callf:("id_len", "int", [4])
-given gd_vals (4):(6) then gd_last:("word sext ")
+given gd_vals {
+  (4):(6) then calls lw_callf:("id_len", "int", [4])
+  (4):(6) then gd_last:("word sext ")
+}
 
 gd_lenof(string gds_op, int gds_val) {
   int gds_out = 0 - 1;
@@ -17,5 +19,7 @@ gd_lenof(string gds_op, int gds_val) {
     gds_out = gd_raw(gds_op, gds_val);
   }
 } return int gds_out;
-given gd_vals ("slen", 4):(6) then calls lw_callf:("id_len", "int", [4])
-given gd_vals ("len", 4):(6) then calls lw_callf:("id_list_len_raw", "int", [4])
+given gd_vals {
+  ("slen", 4):(6) then calls lw_callf:("id_len", "int", [4])
+  ("len", 4):(6) then calls lw_callf:("id_list_len_raw", "int", [4])
+}

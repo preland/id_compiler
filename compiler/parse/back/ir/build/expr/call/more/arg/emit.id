@@ -16,8 +16,10 @@ lw_callf(string name, string ret, int[] args) {
   int[] none = [];
   int ret_i = lw_emit("call", ret, 0 - 1, 0 - 1, name, args, none);
 } return int ret_i;
-given lw_env_fixture ("id_x", "int", []):(0) then ir_last_b:(0)
-given lw_env_fixture ("id_y", "", [1, 2]):(0)
+given lw_env_fixture {
+  ("id_x", "int", []):(0) then ir_last_b:(0)
+  ("id_y", "", [1, 2]):(0)
+}
 
 // print and eprint: the one argument, of any type, in string context, passed
 // to the runtime helper `print_helper` names. Only the helper differs between the two.
@@ -26,5 +28,7 @@ lw_print(string print_helper, int node) {
   int lw_tostr_v = lw_tostr(l1_of_v[0]);
   int ret_i = lw_callf(print_helper, "", [lw_tostr_v]);
 } return int ret_i;
-given bicall_fixture ("id_print", (import bicall_node)):(2)
-given bicall_fixture ("id_eprint", (import bicall_node)):(2)
+given bicall_fixture {
+  ("id_print", (import bicall_node)):(2)
+  ("id_eprint", (import bicall_node)):(2)
+}

@@ -9,11 +9,13 @@ emit_tc_helpers() {
   tc_collect();
   tc_emit_types();
 } return void;
-given wrap_fixture ():() then calls chk_type:((import fixture_fn), 0)
-given wrap_fixture ():() then calls note_ty:("int")
-given wrap_fixture ():() then calls emit_ty_protos:[1]
-given wrap_fixture ():() then calls tc_collect:[1]
-given wrap_fixture ():() then prints:("")
+given wrap_fixture {
+  ():() then calls chk_type:((import fixture_fn), 0)
+  ():() then calls note_ty:("int")
+  ():() then calls emit_ty_protos:[1]
+  ():() then calls tc_collect:[1]
+  ():() then prints:("")
+}
 
 tc_emit_types() {
   emit_ty_protos();
@@ -32,6 +34,8 @@ tc_collect() {
   }
   tc_collect_thens();
 } return void;
-given wrap_fixture ():() then calls chk_type:((import fixture_fn), 0)
-given wrap_fixture ():() then calls note_ty:("int")
-given wrap_fixture ():() then calls chk_type:[1]
+given wrap_fixture {
+  ():() then calls chk_type:((import fixture_fn), 0)
+  ():() then calls note_ty:("int")
+  ():() then calls chk_type:[1]
+}

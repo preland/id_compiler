@@ -30,5 +30,7 @@ fwd_sig_match(int fid, string callee_name) {
     ok = fwd_sig_match2(fid, callee_fid);
   }
 } return int ok;
-given farm_e (6, "target"):(1)
-given farm_e (6, "nope"):(0)
+given farm_e {
+  (6, "target"):(1)
+  (6, "nope"):(0)
+}

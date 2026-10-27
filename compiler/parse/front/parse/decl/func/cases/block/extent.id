@@ -14,8 +14,10 @@ gblk_texts_equal(int gb_a, int gb_b, int gb_size) {
     gb_i = gb_i + 1;
   }
 } return int gb_yes;
-given gblk_stream("share") (0, 7, 2):(1)
-given gblk_stream("share") (0, 2, 2):(0)
+given gblk_stream("share") {
+  (0, 7, 2):(1)
+  (0, 2, 2):(0)
+}
 
 gblk_paren_end(int gb_at) {
   int gb_cur = gb_at + 1;

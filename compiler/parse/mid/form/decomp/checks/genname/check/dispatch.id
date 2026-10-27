@@ -4,9 +4,11 @@ genname_check(int i, int[] params, int pk) {
   int pid = params[pk];
   genname_param(i, pid);
 } return void;
-given gn_env (0, (import f_pgen_list), 0):() then calls genname_report:(0, "ret_i")
-given gn_env (0, (import f_pgen_list), 0):() then calls genname_param:(0, (import f_pgen))
-given gn_env (0, [11], 0):() then calls genname_report:[0]
+given gn_env {
+  (0, (import f_pgen_list), 0):() then calls genname_report:(0, "ret_i")
+  (0, (import f_pgen_list), 0):() then calls genname_param:(0, (import f_pgen))
+  (0, [11], 0):() then calls genname_report:[0]
+}
 
 genname_param(int i, int pid) {
   string name = (import ns2)[pid];
@@ -14,9 +16,11 @@ genname_param(int i, int pid) {
     genname_report(i, name);
   }
 } return void;
-given gn_env (0, (import f_pgen)):() then calls genname_report:(0, "ret_i")
-given gn_env (0, (import f_pgen)):() then calls is_genparam:("ret_i")
-given gn_env (0, 11):() then calls genname_report:[0]
+given gn_env {
+  (0, (import f_pgen)):() then calls genname_report:(0, "ret_i")
+  (0, (import f_pgen)):() then calls is_genparam:("ret_i")
+  (0, 11):() then calls genname_report:[0]
+}
 
 // The `--fix` convention (../more/match.id) or the `ret_i`/`ret_s` return-value
 // style (../more/retstyle.id) this compiler's own source uses throughout.

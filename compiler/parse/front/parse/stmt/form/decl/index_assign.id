@@ -10,5 +10,7 @@ parse_iassign(int[] pos) {
   skip_text(pos, ";");
   int ret_i = node_iassign(target, expr);
 } return int ret_i;
-given atom_tokens ([33]):(4)
-given atom_tokens ([33]):(4) then calls node_iassign:[1]
+given atom_tokens {
+  ([33]):(4)
+  ([33]):(4) then calls node_iassign:[1]
+}

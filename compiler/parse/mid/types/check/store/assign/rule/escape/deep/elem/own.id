@@ -17,9 +17,11 @@ esc_ownv(int e) {
     dz_o = esc_ownc(e);
   }
 } return int dz_o;
-given esc_dfix ((import efd_lit)):(1)
-given esc_dfix ((import efd_v)):(0)
-given esc_dfix ((import efd_lbl)):(1)
+given esc_dfix {
+  ((import efd_lit)):(1)
+  ((import efd_v)):(0)
+  ((import efd_lbl)):(1)
+}
 
 esc_ownc(int e) {
   int dz_o = str_fresh_node(e);
@@ -29,10 +31,12 @@ esc_ownc(int e) {
     dz_o = esc_ndf(e) == 0;
   }
 } return int dz_o;
-given esc_ffix ((import eff_cmk)):(1)
-given esc_ffix ((import eff_cleak)):(0)
-given esc_ffix ((import eff_vn)):(0)
-given esc_ffix ((import eff_csr)):(1)
+given esc_ffix {
+  ((import eff_cmk)):(1)
+  ((import eff_cleak)):(0)
+  ((import eff_vn)):(0)
+  ((import eff_csr)):(1)
+}
 
 // 1 when every element of the list or argument list is something with nothing
 // to free, or is fresh.
@@ -46,6 +50,8 @@ esc_okl(int[] els) {
     i = i + 1;
   }
 } return int ok;
-given esc_dfix ((import efd_elok)):(1)
-given esc_dfix ((import efd_elbad)):(0)
-given esc_dfix ((import ef_none)):(1)
+given esc_dfix {
+  ((import efd_elok)):(1)
+  ((import efd_elbad)):(0)
+  ((import ef_none)):(1)
+}

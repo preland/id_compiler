@@ -16,8 +16,10 @@ cw_arr_spell_items(int[] els) {
     i = i + 1;
   }
 } return string out;
-given cwv_setup ([0, 1]):("1, \"hi\"")
-given cwv_setup ([]):("")
+given cwv_setup {
+  ([0, 1]):("1, \"hi\"")
+  ([]):("")
+}
 
 // A string element is re-quoted; an int or a float already reads as source.
 cw_elem_spell(int e) {
@@ -27,5 +29,7 @@ cw_elem_spell(int e) {
     out = "\"" + (import ns1)[e] + "\"";
   }
 } return string out;
-given cwv_setup (0):("1")
-given cwv_setup (1):("\"hi\"")
+given cwv_setup {
+  (0):("1")
+  (1):("\"hi\"")
+}

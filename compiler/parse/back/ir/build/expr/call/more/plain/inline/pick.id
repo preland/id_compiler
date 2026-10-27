@@ -22,5 +22,7 @@ lw_expand_ushr(string helper, string ret_ty, int[] ih_args) {
     ret_i = lw_callf(helper, ret_ty, ih_args);
   }
 } return int ret_i;
-given lw_env_fixture ("id_ushr", "word", [0, 1]):(12)
-given lw_env_fixture ("id_x", "word", [0, 1]):(0)
+given lw_env_fixture {
+  ("id_ushr", "word", [0, 1]):(12)
+  ("id_x", "word", [0, 1]):(0)
+}

@@ -14,5 +14,7 @@ m2r_inc(int f, int b, int ph, int j, int i) {
   m2r_inc_at(f, ph, j, pb);
   int ret_i = i + 1;
 } return int ret_i;
-given m2r_predfx (0, 1, 0, 0, 0):(1) then calls m2r_inc_at:(0, 0, 0, 0)
-given m2r_predfx (0, 1, 1, 0, 0):(1) then calls m2r_inc_at:(0, 1, 0, 0)
+given m2r_predfx {
+  (0, 1, 0, 0, 0):(1) then calls m2r_inc_at:(0, 0, 0, 0)
+  (0, 1, 1, 0, 0):(1) then calls m2r_inc_at:(0, 1, 0, 0)
+}

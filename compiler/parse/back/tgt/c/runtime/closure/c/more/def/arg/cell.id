@@ -11,8 +11,10 @@ fv_arg(int fn, int nd, int i) {
     s = fv_cell(i, pt);
   }
 } return string s;
-given clo_fixture ((import fixture_fn), 0, 0):("a0")
-given clo_fixture ((import fixture_fn), 1, 0):("(int)(ID_FNC(c)[0])")
+given clo_fixture {
+  ((import fixture_fn), 0, 0):("a0")
+  ((import fixture_fn), 1, 0):("(int)(ID_FNC(c)[0])")
+}
 
 fv_cell(int i, string pt) {
   string code = "ID_FNC(c)[" + i + "]";

@@ -8,8 +8,10 @@ iset_hz(int id) {
   int i2_of_v = (import ni2)[id];
   int ok = seq_both(i2_of_v, l1_of_v[0]);
 } return int ok;
-given sq_fixture ((import sq_iset)):(1)
-given sq_fixture ((import sq_iset0)):(0)
+given sq_fixture {
+  ((import sq_iset)):(1)
+  ((import sq_iset0)):(0)
+}
 
 seq_both(int a, int b) {
   int ok = 0;
@@ -17,9 +19,11 @@ seq_both(int a, int b) {
     ok = 1;
   }
 } return int ok;
-given sq_fixture (7, 9):(1)
-given sq_fixture (7, 0):(0)
-given sq_fixture (0, 7):(0)
+given sq_fixture {
+  (7, 9):(1)
+  (7, 0):(0)
+  (0, 7):(0)
+}
 
 // The index's declaration is emitted here, before its statement, the same
 // way seq_bind (bind/wrap.id) declares a unit it binds; the index is emitted
@@ -38,5 +42,7 @@ iset_seq(int id, string val) {
   seq_mark(i2_of_v, 0);
   string ret_s = "(" + sq_name(i2_of_v) + " = " + sq_code + ", " + iset_code_v + ")";
 } return string ret_s;
-given sq_fixture ((import sq_iset), "V"):("(idsq_7 = id_foo(7), id_list_set(id_list_lit(1, (long long)(7)), idsq_7, V))") then prints:("int idsq_7;\n")
-given sq_fixture ((import sq_iset), "W"):("(idsq_7 = id_foo(7), id_list_set(id_list_lit(1, (long long)(7)), idsq_7, W))") then sq_foo_seqd:(0)
+given sq_fixture {
+  ((import sq_iset), "V"):("(idsq_7 = id_foo(7), id_list_set(id_list_lit(1, (long long)(7)), idsq_7, V))") then prints:("int idsq_7;\n")
+  ((import sq_iset), "W"):("(idsq_7 = id_foo(7), id_list_set(id_list_lit(1, (long long)(7)), idsq_7, W))") then sq_foo_seqd:(0)
+}

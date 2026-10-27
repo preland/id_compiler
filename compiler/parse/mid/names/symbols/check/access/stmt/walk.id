@@ -10,9 +10,11 @@ acc_list(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
-given scnames_fix ((import rgdeclist), "f"):() then calls acc_stmt:((import rgdecl_node), "f")
-given scnames_fix ([(import rgif_node)], "f"):() then calls acc_stmt:((import rgif_node), "f")
-given scnames_fix ([], "f"):() then calls acc_stmt:[0]
+given scnames_fix {
+  ((import rgdeclist), "f"):() then calls acc_stmt:((import rgdecl_node), "f")
+  ([(import rgif_node)], "f"):() then calls acc_stmt:((import rgif_node), "f")
+  ([], "f"):() then calls acc_stmt:[0]
+}
 
 acc_stmt(int id, string owner) {
   if((import nkind)[id] == "if") {
@@ -29,5 +31,7 @@ acc_if(int id, string owner) {
   acc_expr(i1_of_v, owner, (import nline)[id]);
   acc_if_body(id, owner);
 } return void;
-given scnames_fix ((import rgif_node), "f"):() then calls acc_if_body:((import rgif_node), "f")
-given scnames_fix ((import rgif_node), "g"):() then calls acc_if_body:((import rgif_node), "g")
+given scnames_fix {
+  ((import rgif_node), "f"):() then calls acc_if_body:((import rgif_node), "f")
+  ((import rgif_node), "g"):() then calls acc_if_body:((import rgif_node), "g")
+}

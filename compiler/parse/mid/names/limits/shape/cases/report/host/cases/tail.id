@@ -11,5 +11,7 @@ ut_case_tail(string name) {
     ret_s = "this case would never run until the asm function has a body for the host: " + ut_fix_v;
   }
 } return string ret_s;
-given ut_host_seeded ("port_byte"):("this case would never run until the asm function has a body for the host: adding asm \"x86_64-unknown-none\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)")
-given ut_host_seeded given ut_add("zz", "native 'zz'", "*") ("zz"):("this case would never run, and a function that cannot be tested needs none")
+given ut_host_seeded {
+  ("port_byte"):("this case would never run until the asm function has a body for the host: adding asm \"x86_64-unknown-none\" in8(...) makes it testable (docs/ASM.md, Overloading by platform)")
+  given ut_add("zz", "native 'zz'", "*") ("zz"):("this case would never run, and a function that cannot be tested needs none")
+}

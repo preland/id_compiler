@@ -9,10 +9,12 @@ lp_rel(int lq_nn, string lq_rhs, string lq_op) {
   push(lq_tk, lq_op);
   lp_add(lq_tk);
 } return void;
-given lpf_more ((import lpf_na), "null", "!="):() then (import lpg):(["v:lan", "null", "!=", "|"])
-given lpf_more ((import lpf_q), "null", "!="):() then (import lpcond):(["v:lpfq null !="])
-given lpf_more ((import lpf_na), "k:0", ">="):() then (import lpg):(["v:lan", "k:0", ">=", "|"])
-given lpf_more ((import lpf_n0), "k:0", ">="):() then (import lpcond):(["i:1 k:0 >="])
+given lpf_more {
+  ((import lpf_na), "null", "!="):() then (import lpg):(["v:lan", "null", "!=", "|"])
+  ((import lpf_q), "null", "!="):() then (import lpcond):(["v:lpfq null !="])
+  ((import lpf_na), "k:0", ">="):() then (import lpg):(["v:lan", "k:0", ">=", "|"])
+  ((import lpf_n0), "k:0", ">="):() then (import lpcond):(["i:1 k:0 >="])
+}
 
 lp_capok(int lq_nn) {
   string[] lq_tk = [];
@@ -23,5 +25,7 @@ lp_capok(int lq_nn) {
   push(lq_tk, ">=");
   lp_add(lq_tk);
 } return void;
-given lpf_more ((import lpf_q)):() then (import lpg):(["v:lpfq", "cap", "k:0", ">=", "|"])
-given lpf_more ((import lpf_na)):() then (import lpcond):(["v:lan cap k:0 >="])
+given lpf_more {
+  ((import lpf_q)):() then (import lpg):(["v:lpfq", "cap", "k:0", ">=", "|"])
+  ((import lpf_na)):() then (import lpcond):(["v:lan cap k:0 >="])
+}

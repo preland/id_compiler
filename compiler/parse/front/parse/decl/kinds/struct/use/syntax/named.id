@@ -13,8 +13,10 @@ is_named_type_start(int[] pos) {
     ok = 1;
   }
 } return int ok;
-given sd_stmt_toks ([0]):(1)
-given sd_stmt_toks ([5]):(1)
+given sd_stmt_toks {
+  ([0]):(1)
+  ([5]):(1)
+}
 
 cur2_kind(int[] pos) {
   string k = "eof";
@@ -22,6 +24,8 @@ cur2_kind(int[] pos) {
     k = (import tkind)[pos[0] + 1];
   }
 } return string k;
-given sd_stmt_toks ([0]):("ident")
-given sd_stmt_toks ([2]):("int")
+given sd_stmt_toks {
+  ([0]):("ident")
+  ([2]):("int")
+}
 

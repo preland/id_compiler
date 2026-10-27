@@ -9,9 +9,11 @@ div_traps(int id) {
     ok = 1 - safe_div(i2_of_v);
   }
 } return int ok;
-given sq_fixture ((import sq_mod)):(1)
-given sq_fixture ((import sq_div3)):(0)
-given sq_fixture ((import nz_call_foo)):(0)
+given sq_fixture {
+  ((import sq_mod)):(1)
+  ((import sq_div3)):(0)
+  ((import nz_call_foo)):(0)
+}
 
 // A big literal keeps 0 in its value field, so it is counted as one that
 // could trap: the cost is a temporary, never a wrong order.
@@ -21,9 +23,11 @@ safe_div(int e) {
     ok = 1;
   }
 } return int ok;
-given sq_fixture ((import nz_int2)):(1)
-given sq_fixture (13):(0)
-given sq_fixture ((import nz_call_foo)):(0)
+given sq_fixture {
+  ((import nz_int2)):(1)
+  (13):(0)
+  ((import nz_call_foo)):(0)
+}
 
 is_logic(int id) {
   int ok = 0;
@@ -32,6 +36,8 @@ is_logic(int id) {
     ok = 1;
   }
 } return int ok;
-given sq_fixture ((import sq_and)):(1)
-given sq_fixture ((import sq_two)):(0)
-given sq_fixture ((import nz_bin_add)):(0)
+given sq_fixture {
+  ((import sq_and)):(1)
+  ((import sq_two)):(0)
+  ((import nz_bin_add)):(0)
+}

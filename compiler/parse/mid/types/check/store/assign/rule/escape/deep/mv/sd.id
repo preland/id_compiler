@@ -15,10 +15,12 @@ esc_mvsd(int fn, int[] stmts, int i, int a) {
     ok = (esc_block((import nl2)[fn], sd_kn) & 172) == 0 && esc_mvok(fn, sd_kn) == 1;
   }
 } return int ok;
-given esc_ms_fix ((import ems_sfn), (import ems_sbody), 3, (import ems_tv)):(1)
-given esc_ms_fix ((import ems_sbfn), (import ems_sbbody), 3, (import ems_tv)):(0)
-given esc_ms_fix ((import ems_sfn), (import ems_sbody), 2, (import ems_tv)):(1)
-given esc_ms_fix ((import ems_sfn), (import ems_sbody), 3, (import ems_sv)):(1)
+given esc_ms_fix {
+  ((import ems_sfn), (import ems_sbody), 3, (import ems_tv)):(1)
+  ((import ems_sbfn), (import ems_sbbody), 3, (import ems_tv)):(0)
+  ((import ems_sfn), (import ems_sbody), 2, (import ems_tv)):(1)
+  ((import ems_sfn), (import ems_sbody), 3, (import ems_sv)):(1)
+}
 
 // A list a struct takes over is freed by the struct's type, element by element,
 // so the elements pushed onto it must have been moved in too (flag 256, the
@@ -31,6 +33,8 @@ esc_mvrow(int fn, int[] stmts, int i, int a) {
     ok = esc_mvok(fn, rw_kn);
   }
 } return int ok;
-given esc_mp_fix ((import emp_fn), (import emp_body), 2, (import emp_rv)):(1)
-given esc_mp_fix ((import emp_bad), (import emp_bbody), 2, (import emp_rv)):(0)
-given esc_mp_fix ((import emp_fn), (import emp_body), 2, (import emp_nv)):(1)
+given esc_mp_fix {
+  ((import emp_fn), (import emp_body), 2, (import emp_rv)):(1)
+  ((import emp_bad), (import emp_bbody), 2, (import emp_rv)):(0)
+  ((import emp_fn), (import emp_body), 2, (import emp_nv)):(1)
+}

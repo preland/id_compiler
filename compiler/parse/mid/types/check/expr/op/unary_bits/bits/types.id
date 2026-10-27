@@ -15,8 +15,10 @@ bits_types(int id, int a, int b) {
     bits_err(id, lt, rt);
   }
 } return void;
-given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
-given cmp_fixture ((import bin_bitand), (import lit_str), (import lit_a)):() then (import chkfail)[0]:(1)
+given cmp_fixture {
+  ((import bin_bitand), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
+  ((import bin_bitand), (import lit_str), (import lit_a)):() then (import chkfail)[0]:(1)
+}
 
 fcall_reg_a() {
   call2_setup();

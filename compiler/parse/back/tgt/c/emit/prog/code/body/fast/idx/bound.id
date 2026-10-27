@@ -23,8 +23,10 @@ lx_hbin(string[] lg_tk, int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
   lx_hi(lg_tk, (import ni2)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
   push(lg_tk, (import ns1)[lg_e] + ":2");
 } return void;
-given lpq_cs(0) ([], (import lpq_ms), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2", "i:3", "wide", "*:2"])
-given lpq_cs(0) ([], (import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2", "i:3", "wide", "*:2", "v:lsc", "wide", "+:2"]) then len((import lpcond)):(2)
+given lpq_cs(0) {
+  ([], (import lpq_ms), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2", "i:3", "wide", "*:2"])
+  ([], (import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2", "i:3", "wide", "*:2", "v:lsc", "wide", "+:2"]) then len((import lpcond)):(2)
+}
 
 lx_hleaf(string[] lg_tk, int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
   int lg_k = lx_kind(lg_e, lg_id, lg_lo, lg_hi, lg_dp);

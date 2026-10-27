@@ -13,8 +13,10 @@ dce_fixture() {
 chk_a0() {
   string ret_i_t = "a0 " + ((import ia)[0]);
 } return string ret_i_t;
-given dce_fixture ():("a0 -1")
-given dce_fixture ():("a0 -1") then (import iop)[0]:("call")
+given dce_fixture {
+  ():("a0 -1")
+  ():("a0 -1") then (import iop)[0]:("call")
+}
 
 // Test check: every instruction's op, how many there are first and then each,
 // joined by "|". dce_one (../one.id) reads one op to decide whether to kill an

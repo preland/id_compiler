@@ -6,5 +6,7 @@ bi_arg_err_uword(int id, int i, string t) {
   string s1_of_v = (import ns1)[id];
   tc_diag(l1_of_v[i], "E0644", s1_of_v + " takes word arguments, got " + t + " for argument " + i + "; widen an int first with uword_of_int, as in " + s1_of_v + "(uword_of_int(a), b)", s1_of_v, "it multiplies two unsigned 64-bit words, and argument " + i + " is " + t, "pass a word, or zero-extend an int with uword_of_int(a)");
 } return void;
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "int"):() then (import chkfail)[0]:(1)
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "string"):() then (import chkfail)[0]:(1)
+given bi_mismatch_setup {
+  ((import bi_mismatch_call), 0, "int"):() then (import chkfail)[0]:(1)
+  ((import bi_mismatch_call), 0, "string"):() then (import chkfail)[0]:(1)
+}

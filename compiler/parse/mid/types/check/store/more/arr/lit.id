@@ -18,9 +18,11 @@ bad_arr(string want, int e) {
     ok = arr_els(want, e);
   }
 } return int ok;
-given shapes_fixture ("int", (import arr_ints)):(1)
-given shapes_fixture ("int[]", (import arr_ints)):(0)
-given shapes_fixture ("bytes", (import arr_ints)):(0)
+given shapes_fixture {
+  ("int", (import arr_ints)):(1)
+  ("int[]", (import arr_ints)):(0)
+  ("bytes", (import arr_ints)):(0)
+}
 
 // Zero, because every disagreement here has already been reported against the
 // element that caused it. Handing a 1 back to the caller would add "cannot
@@ -32,8 +34,10 @@ arr_els(string want, int e) {
     i = arr_el_at(want, e, i);
   }
 } return int 0;
-given shapes_fixture ("int[]", (import arr_ints)):(0) then (import chkfail)[0]:(0)
-given shapes_fixture ("string[]", (import arr_ints)):(0) then (import chkfail)[0]:(1)
+given shapes_fixture {
+  ("int[]", (import arr_ints)):(0) then (import chkfail)[0]:(0)
+  ("string[]", (import arr_ints)):(0) then (import chkfail)[0]:(1)
+}
 
 neg1_setup() {
   call2_setup();

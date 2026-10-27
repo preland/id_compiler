@@ -19,9 +19,11 @@ fold_const(int d) {
     fold_out = node_decl((import ns1)[d], (import ns2)[d], (import ni1)[fold_src], 1);
   }
 } return int fold_out;
-given fold_setup ((import fold_dep)):(7) then calls node_decl:("int", "b", (import fold_e), 1)
-given fold_setup ((import fold_a)):((import fold_a)) then len((import nkind)):(7)
-given fold_setup ((import fold_a)):((import fold_a))
+given fold_setup {
+  ((import fold_dep)):(7) then calls node_decl:("int", "b", (import fold_e), 1)
+  ((import fold_a)):((import fold_a)) then len((import nkind)):(7)
+  ((import fold_a)):((import fold_a))
+}
 
 const_src(int e) {
   int fold_src = 0 - 1;
@@ -29,8 +31,10 @@ const_src(int e) {
     fold_src = const_find((import ns1)[e]);
   }
 } return int fold_src;
-given fold_setup ((import fold_imp)):((import fold_a))
-given fold_setup ((import fold_e)):(-1)
+given fold_setup {
+  ((import fold_imp)):((import fold_a))
+  ((import fold_e)):(-1)
+}
 
 const_find(string name) {
   int fold_src = 0 - 1;
@@ -42,5 +46,7 @@ const_find(string name) {
     i = i + 1;
   }
 } return int fold_src;
-given fold_setup ("a"):((import fold_a))
-given fold_setup ("ls"):(-1)
+given fold_setup {
+  ("a"):((import fold_a))
+  ("ls"):(-1)
+}

@@ -8,8 +8,10 @@ dg_succ(int dgv, int dgi) {
     dgi = dgi + 1;
   }
 } return void;
-given dg_t_graph (4, 0):() then (import dg_ctr)[1]:(1)
-given dg_t_graph (4, 1):() then (import dg_ctr)[1]:(0)
+given dg_t_graph {
+  (4, 0):() then (import dg_ctr)[1]:(1)
+  (4, 1):() then (import dg_ctr)[1]:(0)
+}
 
 dg_step(int dgv, int dgw) {
   if((import dg_ix)[dgw] < 0) {
@@ -27,5 +29,7 @@ dg_lower(int dgv, int dglv) {
     integer_list_set((import dg_low), dgv, dglv);
   }
 } return void;
-given dg_t_graph (0, -1):() then (import dg_low)[0]:(-1)
-given dg_t_graph (0, 5):() then (import dg_low)[0]:(0)
+given dg_t_graph {
+  (0, -1):() then (import dg_low)[0]:(-1)
+  (0, 5):() then (import dg_low)[0]:(0)
+}

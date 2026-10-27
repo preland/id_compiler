@@ -11,6 +11,8 @@ unit_scope(int unit) {
     scope = (import stdunit)[0];
   }
 } return int scope;
-given regrow_d (3):(0)
-given regrow_d given integer_list_set((import stdunit), 0, 2) (3):(2)
-given regrow_d given integer_list_set((import stdunit), 0, 2) (1):(0)
+given regrow_d {
+  (3):(0)
+  given integer_list_set((import stdunit), 0, 2) (3):(2)
+  given integer_list_set((import stdunit), 0, 2) (1):(0)
+}

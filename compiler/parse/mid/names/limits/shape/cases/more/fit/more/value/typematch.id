@@ -38,8 +38,10 @@ fit_elems(int i, int e, string want) {
     j = j + 1;
   }
 } return void;
-given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then (import chkfail)[0]:(0)
-given lit_arr_fixture given case_fixture_line (0, (import lit_arr_e), "string[]"):() then (import chkfail)[0]:(1)
-given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then calls fit_value:[2]
-given lit_arr_fixture (0, (import lit_arr_e), "bytes"):() then calls fit_value:[2]
-given lit_arr_fixture (0, (import lit_arr_e), "bytes"):() then (import chkfail)[0]:(0)
+given lit_arr_fixture {
+  (0, (import lit_arr_e), "int[]"):() then (import chkfail)[0]:(0)
+  given case_fixture_line (0, (import lit_arr_e), "string[]"):() then (import chkfail)[0]:(1)
+  (0, (import lit_arr_e), "int[]"):() then calls fit_value:[2]
+  (0, (import lit_arr_e), "bytes"):() then calls fit_value:[2]
+  (0, (import lit_arr_e), "bytes"):() then (import chkfail)[0]:(0)
+}

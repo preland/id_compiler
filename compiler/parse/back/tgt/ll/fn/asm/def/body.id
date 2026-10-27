@@ -32,5 +32,7 @@ ll_asm_cons(int r, int i) {
   }
   string ret_s = s + ",~{memory}";
 } return string ret_s;
-given llasm_row_fixture (0, 0):("=r,r,~{memory}")
-given llasm_row_fixture (0, 1):("=r,~{memory}")
+given llasm_row_fixture {
+  (0, 0):("=r,r,~{memory}")
+  (0, 1):("=r,~{memory}")
+}

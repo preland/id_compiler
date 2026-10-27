@@ -10,9 +10,11 @@ push_tok3(string kind, string text) {
     push_tok4(kind, text);
   }
 } return void;
-given full_env ("wrd", "buffer"):() then (import vocab_count)[0]:(1)
-given full_env ("kw", "if"):() then (import vocab_count)[0]:(0)
-given full_env ("kw", "if"):() then len((import tkind)):(1)
+given full_env {
+  ("wrd", "buffer"):() then (import vocab_count)[0]:(1)
+  ("kw", "if"):() then (import vocab_count)[0]:(0)
+  ("kw", "if"):() then len((import tkind)):(1)
+}
 
 push_tok4(string kind, string text) {
   if(kind == "wrp") {
@@ -21,6 +23,8 @@ push_tok4(string kind, string text) {
     push_real(kind, text);
   }
 } return void;
-given full_env ("wrp", "dmore"):() then (import vocab_paths)[0]:("dmore")
-given full_env ("kw", "if"):() then len((import vocab_paths)):(0)
-given full_env ("kw", "if"):() then len((import tkind)):(1)
+given full_env {
+  ("wrp", "dmore"):() then (import vocab_paths)[0]:("dmore")
+  ("kw", "if"):() then len((import vocab_paths)):(0)
+  ("kw", "if"):() then len((import tkind)):(1)
+}

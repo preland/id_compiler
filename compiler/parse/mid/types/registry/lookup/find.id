@@ -5,8 +5,10 @@ ty_row2(int tw, int ts) {
   push((import tywidth), tw);
   push((import tysigned), ts);
 } return void;
-given init_tyreg (77, 1):() then reg_last_width:(77)
-given init_tyreg (3, 0):() then reg_last_width:(3)
+given init_tyreg {
+  (77, 1):() then reg_last_width:(77)
+  (3, 0):() then reg_last_width:(3)
+}
 
 // A list type is derived, not registered: `T[]` for any T. 93 is `]`. The
 // length test rules out the empty string, whose last character does not exist.

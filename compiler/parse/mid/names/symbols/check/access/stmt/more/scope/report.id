@@ -7,8 +7,10 @@ report_scope(string name, string owner, int ln) {
   string scope_msg_v = scope_msg(name, owner, ln);
   diag("E0307", scope_where, "variable '" + name + "' is used on line " + ln + scope_msg_v, name, "a variable exists only from its declaration to the end of the block that declares it", "declare it above this use, in a block that also holds the use, or pass the value in");
 } return void;
-given regrow_d ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' is used on line 10, before its declaration on line 10 [E0307]\n  at: x\n  why: a variable exists only from its declaration to the end of the block that declares it\n  help: declare it above this use, in a block that also holds the use, or pass the value in\n") then (import chkfail)[0]:(1)
-given regrow_d ("y", "g", 20):() then prints:("<stdin>:20: error: variable 'y' is used on line 20, outside the block that declares it on line 0 [E0307]\n  at: y\n  why: a variable exists only from its declaration to the end of the block that declares it\n  help: declare it above this use, in a block that also holds the use, or pass the value in\n") then (import chkfail)[0]:(1)
+given regrow_d {
+  ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' is used on line 10, before its declaration on line 10 [E0307]\n  at: x\n  why: a variable exists only from its declaration to the end of the block that declares it\n  help: declare it above this use, in a block that also holds the use, or pass the value in\n") then (import chkfail)[0]:(1)
+  ("y", "g", 20):() then prints:("<stdin>:20: error: variable 'y' is used on line 20, outside the block that declares it on line 0 [E0307]\n  at: y\n  why: a variable exists only from its declaration to the end of the block that declares it\n  help: declare it above this use, in a block that also holds the use, or pass the value in\n") then (import chkfail)[0]:(1)
+}
 
 scope_msg(string name, string owner, int ln) {
   int dl = decl_line(name, owner);
@@ -17,8 +19,10 @@ scope_msg(string name, string owner, int ln) {
     msg = ", outside the block that declares it on line " + dl;
   }
 } return string msg;
-given regrow_d ("x", "f", 5):(", before its declaration on line 10")
-given regrow_d ("x", "f", 15):(", outside the block that declares it on line 10")
+given regrow_d {
+  ("x", "f", 5):(", before its declaration on line 10")
+  ("x", "f", 15):(", outside the block that declares it on line 10")
+}
 
 // A function declares a name at most once, so the one matching row is it.
 decl_line(string name, string owner) {
@@ -31,5 +35,7 @@ decl_line(string name, string owner) {
     i = i + 1;
   }
 } return int dl;
-given regrow_d ("x", "f"):(10)
-given regrow_d ("y", "f"):(0)
+given regrow_d {
+  ("x", "f"):(10)
+  ("y", "f"):(0)
+}

@@ -20,10 +20,12 @@ esc_cm_a() {
   export int ecm_ps = node_exprstmt((import ecm_call));
   export int ecm_dc = node_decl("int", "mc", (import ecm_call), 0);
 } return void;
-given esc_cm_fix ():() then calls node_param:("param", "int[][]", "mrows") then calls node_param:("param", "int[]", "mrow")
-given esc_cm_fix ():() then calls node_call:("cm_ok", (import ecm_as)) then calls node_exprstmt:((import ecm_call))
-given esc_cm_fix ():() then (import chkfail)[0]:(0)
-given esc_cm_fix ():() then init_units:(0)
+given esc_cm_fix {
+  ():() then calls node_param:("param", "int[][]", "mrows") then calls node_param:("param", "int[]", "mrow")
+  ():() then calls node_call:("cm_ok", (import ecm_as)) then calls node_exprstmt:((import ecm_call))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}
 
 esc_cm_fix() {
   esc_fix();
@@ -36,6 +38,8 @@ esc_cm_fix() {
 } chain () {
   esc_seed();
 } return void;
-given esc_cm_fix ():() then calls add_func:("cm_ok", "int", (import ecm_fn)) then calls add_func:("cm_bad", "int", (import ecm_bad))
-given esc_cm_fix ():() then (import chkfail)[0]:(0)
-given esc_cm_fix ():() then init_units:(0)
+given esc_cm_fix {
+  ():() then calls add_func:("cm_ok", "int", (import ecm_fn)) then calls add_func:("cm_bad", "int", (import ecm_bad))
+  ():() then (import chkfail)[0]:(0)
+  ():() then init_units:(0)
+}

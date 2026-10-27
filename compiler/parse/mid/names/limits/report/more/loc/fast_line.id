@@ -10,8 +10,10 @@ fast_line(string fname) {
   int ix = find_ix((import fnames), (import fidx)[slot_v], fname);
   int hit = line_if_same(ix);
 } return int hit;
-given fast_line_fixture ("fx_target"):(7)
-given fast_line_fixture ("nosuchfn"):(-1)
+given fast_line_fixture {
+  ("fx_target"):(7)
+  ("nosuchfn"):(-1)
+}
 
 line_if_same(int ix) {
   int r = 0 - 1;
@@ -21,9 +23,11 @@ line_if_same(int ix) {
     }
   }
 } return int r;
-given edge_fixture (0):(7)
-given edge_fixture (5):(-1)
-given edge_fixture (-1):(-1)
+given edge_fixture {
+  (0):(7)
+  (5):(-1)
+  (-1):(-1)
+}
 
 line_scan(int hit, string fname) {
   int n = hit;
@@ -36,6 +40,8 @@ line_scan(int hit, string fname) {
     }
   }
 } return int n;
-given edge_fixture (7, "nosuchfn"):(7)
-given edge_fixture (-1, "fx_target"):(7)
-given edge_fixture (-1, "nosuchfn"):(1)
+given edge_fixture {
+  (7, "nosuchfn"):(7)
+  (-1, "fx_target"):(7)
+  (-1, "nosuchfn"):(1)
+}

@@ -3,16 +3,20 @@ decl_err(int id, string t, int e) {
   string type_of_v = type_of(e);
   tc_diag(id, "E0609", "cannot initialize " + t + " '" + s2_of_v + "' with a " + type_of_v + " value", s2_of_v, "id converts nothing silently, so a variable holds exactly the type it was declared with", "give the variable the type of the value, or convert the value first, as in to_int(\"1\")");
 } return void;
-given decltype_fixture ((import decl_list), "int[]", (import lit_a)):() then prints:("<stdin>:1: error: cannot initialize int[] 'xs' with a int value [E0609]\n  at: xs\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
-given decltype_fixture ((import decl_scalar), "int", (import lit_str)):() then prints:("<stdin>:1: error: cannot initialize int 'x' with a string value [E0609]\n  at: x\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
+given decltype_fixture {
+  ((import decl_list), "int[]", (import lit_a)):() then prints:("<stdin>:1: error: cannot initialize int[] 'xs' with a int value [E0609]\n  at: xs\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
+  ((import decl_scalar), "int", (import lit_str)):() then prints:("<stdin>:1: error: cannot initialize int 'x' with a string value [E0609]\n  at: x\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
+}
 
 assign_err(int id, string vt, int e) {
   string type_of_v = type_of(e);
   string s1_of_v = (import ns1)[id];
   tc_diag(id, "E0609", "cannot assign a " + type_of_v + " value to " + vt + " '" + s1_of_v + "'", s1_of_v, "id converts nothing silently, so a variable holds exactly the type it was declared with", "give the variable the type of the value, or convert the value first, as in to_int(\"1\")");
 } return void;
-given assign_build ((import assign_list), "int[]", (import lit_a)):() then prints:("<stdin>:1: error: cannot assign a int value to int[] 'xl' [E0609]\n  at: xl\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
-given assign_build ((import assign_list), "int[]", (import lit_str)):() then prints:("<stdin>:1: error: cannot assign a string value to int[] 'xl' [E0609]\n  at: xl\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
+given assign_build {
+  ((import assign_list), "int[]", (import lit_a)):() then prints:("<stdin>:1: error: cannot assign a int value to int[] 'xl' [E0609]\n  at: xl\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
+  ((import assign_list), "int[]", (import lit_str)):() then prints:("<stdin>:1: error: cannot assign a string value to int[] 'xl' [E0609]\n  at: xl\n  why: id converts nothing silently, so a variable holds exactly the type it was declared with\n  help: give the variable the type of the value, or convert the value first, as in to_int(\"1\")\n")
+}
 
 bad_store2(string want, int e) {
   string type_of_v = type_of(e);
@@ -21,5 +25,7 @@ bad_store2(string want, int e) {
     ok = 1;
   }
 } return int ok;
-given leaves_fixture ("int", (import lit_str)):(1)
-given leaves_fixture ("int", (import lit_a)):(0)
+given leaves_fixture {
+  ("int", (import lit_str)):(1)
+  ("int", (import lit_a)):(0)
+}
